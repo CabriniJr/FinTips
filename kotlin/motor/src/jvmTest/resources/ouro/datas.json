@@ -1,0 +1,62 @@
+{
+  "o_que_e": "leitura de data OFX, incluindo os casos que o fixture não cobre",
+  "gerado_por": "fintips.parsers.ofx.parse_datetime",
+  "casos": [
+    {
+      "bruto": "20260601100000[-3:BRT]",
+      "data": "2026-06-01",
+      "hora": "10:00",
+      "mes": "2026-06",
+      "deslocamento_segundos": -10800
+    },
+    {
+      "bruto": "20260601100000",
+      "data": "2026-06-01",
+      "hora": "10:00",
+      "mes": "2026-06",
+      "deslocamento_segundos": -10800
+    },
+    {
+      "bruto": "20260601",
+      "data": "2026-06-01",
+      "hora": "00:00",
+      "mes": "2026-06",
+      "deslocamento_segundos": -10800
+    },
+    {
+      "bruto": "20260601235959[-3:BRT]",
+      "data": "2026-06-01",
+      "hora": "23:59",
+      "mes": "2026-06",
+      "deslocamento_segundos": -10800
+    },
+    {
+      "bruto": "20260601000000[+0:GMT]",
+      "data": "2026-06-01",
+      "hora": "00:00",
+      "mes": "2026-06",
+      "deslocamento_segundos": 0
+    },
+    {
+      "bruto": "20260601120000[-3.5:XXX]",
+      "data": "2026-06-01",
+      "hora": "12:00",
+      "mes": "2026-06",
+      "deslocamento_segundos": -12600
+    },
+    {
+      "bruto": "30/06/2026",
+      "data": "2026-06-30",
+      "hora": "00:00",
+      "mes": "2026-06",
+      "deslocamento_segundos": -10800
+    },
+    {
+      "bruto": "1/1/2027",
+      "data": "2027-01-01",
+      "hora": "00:00",
+      "mes": "2027-01",
+      "deslocamento_segundos": -10800
+    }
+  ]
+}

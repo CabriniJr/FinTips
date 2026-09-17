@@ -1,0 +1,108 @@
+{
+  "o_que_e": "canônico completo do tests/fixture.ofx",
+  "gerado_por": "fintips.parsers.ofx.parse_ofx",
+  "sal": "ouro-do-harness",
+  "conta": {
+    "id_hash": "acct:f90e93d1a9",
+    "instituicao": "PagSeguro Internet S/A",
+    "id_banco": "290",
+    "tipo": "CHECKING",
+    "moeda": "BRL"
+  },
+  "origem": "ofx:PagSeguro Internet S/A",
+  "periodo": {
+    "inicio": "2026-06-01",
+    "fim": "2026-06-15"
+  },
+  "saldo": {
+    "centavos": 453310,
+    "em": "2026-06-30"
+  },
+  "conciliacao": {
+    "bate": true,
+    "diferenca_centavos": 0
+  },
+  "transacoes": [
+    {
+      "id": "f1",
+      "data": "2026-06-01",
+      "hora": "10:00",
+      "mes": "2026-06",
+      "centavos": -10000,
+      "memo": "Renda Fixa - Aplicação em CDB",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f2",
+      "data": "2026-06-05",
+      "hora": "08:00",
+      "mes": "2026-06",
+      "centavos": 500000,
+      "memo": "Salário/Remuneração - PAGSEGURO INTERNET INSTITUICAO DE PAGAMENTO S.A.",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f3",
+      "data": "2026-06-06",
+      "hora": "09:00",
+      "mes": "2026-06",
+      "centavos": -790,
+      "memo": "Cobrança Seguro Cartão Protegido - Para: PAGSEGURO INTERNET INSTITUICAO DE PAGAMENTO",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f4",
+      "data": "2026-06-07",
+      "hora": "15:00",
+      "mes": "2026-06",
+      "centavos": -900,
+      "memo": "Cartão de Débito - CENTRO DE CULTURA        SAO PAULO    BR",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f5",
+      "data": "2026-06-10",
+      "hora": "12:00",
+      "mes": "2026-06",
+      "centavos": -50000,
+      "memo": "Pix enviado - Carlos Alberto Nogueira",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f6",
+      "data": "2026-06-11",
+      "hora": "12:00",
+      "mes": "2026-06",
+      "centavos": -15000,
+      "memo": "Pix enviado - Marina Duarte Prado",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f7",
+      "data": "2026-06-12",
+      "hora": "12:00",
+      "mes": "2026-06",
+      "centavos": 30000,
+      "memo": "Pix recebido - Titular Da Conta Exemplo",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f8",
+      "data": "2026-06-15",
+      "hora": "06:28",
+      "mes": "2026-06",
+      "centavos": -2000,
+      "memo": "Cartão de Débito - TARIFA TRANS*ATM TMOB    SAO PAULO    BR",
+      "conta_id": "acct:f90e93d1a9"
+    },
+    {
+      "id": "f8#2",
+      "data": "2026-06-15",
+      "hora": "06:28",
+      "mes": "2026-06",
+      "centavos": 2000,
+      "memo": "Estorno Cartão de Débito - TARIFA TRANS*ATM TMOB    SAO PAULO    BR",
+      "conta_id": "acct:f90e93d1a9"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "o_que_e": "normalização, slug e nome canônico de contraparte",
+  "gerado_por": "fintips.categorize.norm / entities.slug / entities.canonical_name",
+  "casos": [
+    {
+      "texto": "Padaria São João",
+      "norm": "PADARIA SAO JOAO",
+      "slug": "padaria-sao-joao",
+      "canonico": "Padaria São João"
+    },
+    {
+      "texto": "CAFÉ AÇÚCAR",
+      "norm": "CAFE ACUCAR",
+      "slug": "cafe-acucar",
+      "canonico": "CAFÉ AÇÚCAR"
+    },
+    {
+      "texto": "  espaços   demais  ",
+      "norm": "ESPACOS DEMAIS",
+      "slug": "espacos-demais",
+      "canonico": "espaços demais"
+    },
+    {
+      "texto": "Gelato Roma-LJ0046",
+      "norm": "GELATO ROMA-LJ0046",
+      "slug": "gelato-roma-lj0046",
+      "canonico": "Gelato Roma"
+    },
+    {
+      "texto": "Gelato Roma-LJ0084",
+      "norm": "GELATO ROMA-LJ0084",
+      "slug": "gelato-roma-lj0084",
+      "canonico": "Gelato Roma"
+    },
+    {
+      "texto": "EMV CMT*144318981",
+      "norm": "EMV CMT*144318981",
+      "slug": "emv-cmt-144318981",
+      "canonico": "EMV CMT"
+    },
+    {
+      "texto": "MERCADO 1234",
+      "norm": "MERCADO 1234",
+      "slug": "mercado-1234",
+      "canonico": "MERCADO"
+    },
+    {
+      "texto": "LOJA UN 7",
+      "norm": "LOJA UN 7",
+      "slug": "loja-un-7",
+      "canonico": "LOJA"
+    },
+    {
+      "texto": "Farmácia III",
+      "norm": "FARMACIA III",
+      "slug": "farmacia-iii",
+      "canonico": "Farmácia"
+    },
+    {
+      "texto": "PF:ab12cd",
+      "norm": "PF:AB12CD",
+      "slug": "pf-ab12cd",
+      "canonico": "PF:ab12cd"
+    },
+    {
+      "texto": "",
+      "norm": "",
+      "slug": "sem-nome",
+      "canonico": ""
+    },
+    {
+      "texto": "   ",
+      "norm": "",
+      "slug": "sem-nome",
+      "canonico": ""
+    },
+    {
+      "texto": "ÁÉÍÓÚ àèìòù âêîôû ãõ ç ñ",
+      "norm": "AEIOU AEIOU AEIOU AO C N",
+      "slug": "aeiou-aeiou-aeiou-ao-c-n",
+      "canonico": "ÁÉÍÓÚ àèìòù âêîôû ãõ ç ñ"
+    },
+    {
+      "texto": "ÿ Ÿ œ Œ ß",
+      "norm": "Y Y Œ Œ SS",
+      "slug": "y-y",
+      "canonico": "ÿ Ÿ œ Œ ß"
+    },
+    {
+      "texto": "Restaurante do Zé - FIL 02",
+      "norm": "RESTAURANTE DO ZE - FIL 02",
+      "slug": "restaurante-do-ze-fil-02",
+      "canonico": "Restaurante do Zé"
+    },
+    {
+      "texto": "posto ipiranga*9988",
+      "norm": "POSTO IPIRANGA*9988",
+      "slug": "posto-ipiranga-9988",
+      "canonico": "POSTO IPIRANGA"
+    },
+    {
+      "texto": "naïve café",
+      "norm": "NAIVE CAFE",
+      "slug": "naive-cafe",
+      "canonico": "naïve café"
+    },
+    {
+      "texto": "1234",
+      "norm": "1234",
+      "slug": "1234",
+      "canonico": "1234"
+    },
+    {
+      "texto": "---",
+      "norm": "---",
+      "slug": "sem-nome",
+      "canonico": "---"
+    },
+    {
+      "texto": "A*B",
+      "norm": "A*B",
+      "slug": "a-b",
+      "canonico": "A*B"
+    }
+  ]
+}
