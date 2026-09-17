@@ -122,6 +122,39 @@ espaçante), que é exatamente o que `unicodedata.combining(c)` testa. Filtrar
 por faixa de código em vez de por categoria pegaria o acento latino e deixaria
 passar o resto — funcionaria no teste e falharia no extrato de alguém.
 
+## Onde `Double` entra, e por quê
+
+A regra que separa os dois mundos: **dinheiro é exato, estatística é
+aproximada**.
+
+Somar gasto em `Double` erraria centavo, então tudo que é dinheiro continua em
+centavos inteiros. Mas o Python usa `float` de propósito em dois lugares, e
+ali o Kotlin usa `Double` também — para o harness comparar maçã com maçã:
+
+- **volatilidade** — desvio padrão sobre a média, arredondado em três casas.
+- **mediana** — com contagem par ela cai no meio centavo (`(10.01+10.02)/2 =
+  10.015`). Guardar em `Dinheiro` perderia a metade e mudaria a amplitude que
+  decide se um gasto é assinatura. Em `Double` a conta é exata, porque a soma
+  é inteira e dividir por dois é exato em binário.
+
+Dois cuidados de paridade no baseline, os dois invisíveis até alguém conferir
+na mão:
+
+- a **taxa de poupança** sai das somas, não das médias já arredondadas. O
+  Python divide em `Decimal` de precisão cheia e só arredonda no fim.
+- o desvio é **populacional** (divide por n), não amostral (n-1). Trocar um
+  pelo outro não quebra nada visivelmente: só devolve uma volatilidade maior,
+  que vira um score pior sem explicação.
+
+Os dois foram confirmados quebrando de propósito. O segundo devolveu
+exatamente isto:
+
+```
+baseline divergiu do motor Python:
+  [tres_meses_variando] volatilidade: python 0.092, kotlin 0.112
+  [mes_no_vermelho]     volatilidade: python 0.229, kotlin 0.281
+```
+
 ## Ordem dos módulos
 
 Do que não depende de nada para o que depende de tudo. Cada linha só começa
@@ -136,7 +169,8 @@ quando a anterior tem ouro fechando.
 | 5 | `Contratos` — Proveniencia, autoridade, Causa, Regra | **pronto** |
 | 6 | `Texto` + `MotorDeRegras` — norm, slug, precedência, cobertura | **pronto** |
 | 6b | `Heuristica` — o piso de categorias (espera o YAML) | a fazer |
-| 7 | `Analise` — baseline, meses, recorrências, invisível | a fazer |
+| 7 | `Analise` — baseline, meses, recorrências, atípicos | **pronto** |
+| 7b | `gasto invisível` — depende das etiquetas da heurística | a fazer |
 | 8 | `Score`, `Projecao`, `Planos`, `Compras` | a fazer |
 | 9 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | a fazer |
 | 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |

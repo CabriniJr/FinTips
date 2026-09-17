@@ -49,9 +49,18 @@ value class Dinheiro(val centavos: Long) : Comparable<Dinheiro> {
      * soma sempre para cima: com meio-para-cima, mil valores terminados em
      * meio centavo viram mil erros na mesma direção.
      */
-    fun dividir(divisor: Int): Dinheiro {
-        require(divisor != 0) { "divisão por zero em Dinheiro" }
-        val d = divisor.toLong()
+    fun dividir(divisor: Int): Dinheiro = dividir(divisor.toLong())
+
+    /**
+     * Mesma divisão, com divisor em `Long`.
+     *
+     * Existe porque a taxa de poupança divide centavos por centavos: um
+     * patrimônio de R$ 21 milhões já estoura `Int`, e o erro apareceria como
+     * número negativo absurdo em vez de exceção.
+     */
+    fun dividir(divisor: Long): Dinheiro {
+        require(divisor != 0L) { "divisão por zero em Dinheiro" }
+        val d = divisor
         val q = centavos / d
         val resto = centavos % d
         if (resto == 0L) return Dinheiro(q)

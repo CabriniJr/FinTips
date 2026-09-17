@@ -8,7 +8,17 @@ kotlin {
     jvm {
         // O painel desktop e o servidor rodam aqui. O alvo Android entra ao
         // lado, lendo exatamente o mesmo commonMain.
-        testRuns["test"].executionTask.configure { useJUnitPlatform() }
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+            testLogging {
+                // Sem isto o Gradle só diz "FAILED" e engole a mensagem. O
+                // harness inteiro existe para nomear qual caso divergiu — de
+                // nada adianta se a mensagem não chega a quem lê o log.
+                events("failed")
+                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+                showStackTraces = false
+            }
+        }
     }
 
     sourceSets {

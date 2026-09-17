@@ -468,6 +468,183 @@ def ouro_regras() -> dict:
     }
 
 
+def _extrato_sintetico(meses: list[dict], inicio_dia: int = 1, fim_dia: int = 28):
+    """Monta um extrato com renda e despesa exatas por mês.
+
+    Existe porque o fixture tem um mês só, e com um mês a volatilidade é
+    sempre 0.0 — o cálculo mais delicado do baseline nunca seria exercitado.
+    É a mesma lição de `ouro/datas.json`: harness é tão bom quanto o dado que
+    ele compara.
+    """
+    from datetime import date, datetime, timedelta, timezone
+    from decimal import Decimal
+    from fintips.models import Account, Statement, Transaction
+
+    tz = timezone(timedelta(hours=-3))
+    txs = []
+    for i, m in enumerate(meses):
+        ano, mes = (int(x) for x in m["mes"].split("-"))
+        if m.get("renda_centavos"):
+            txs.append(Transaction(
+                id=f"i{i}", ts=datetime(ano, mes, 5, 10, 0, tzinfo=tz),
+                amount=Decimal(m["renda_centavos"]) / 100, memo_raw="renda",
+                flow="income", category="renda", counterparty="Empregador",
+            ))
+        if m.get("despesa_centavos"):
+            txs.append(Transaction(
+                id=f"e{i}", ts=datetime(ano, mes, 15, 10, 0, tzinfo=tz),
+                amount=-Decimal(m["despesa_centavos"]) / 100, memo_raw="gasto",
+                flow="expense", category=m.get("categoria", "outros"),
+                counterparty=m.get("contraparte", "Loja"),
+            ))
+    primeiro = min(t.ts.date() for t in txs)
+    ultimo = max(t.ts.date() for t in txs)
+    return Statement(
+        account=Account(id_hash="acct:teste"),
+        period_start=date(primeiro.year, primeiro.month, inicio_dia),
+        period_end=date(ultimo.year, ultimo.month, fim_dia),
+        ledger_balance=Decimal("0"),
+        balance_as_of=ultimo,
+        transactions=txs,
+        source="sintetico",
+    )
+
+
+def ouro_analise() -> dict:
+    """Baseline, mês a mês, recorrências e eventos atípicos.
+
+    Aqui entram os dois cálculos que o resto do motor usa como referência e que
+    dependem de estatística: volatilidade (desvio padrão sobre a média) e
+    mediana. São também os únicos pontos onde o Python usa `float` de propósito
+    — e onde o Kotlin precisa usar `Double` para comparar maçã com maçã.
+    """
+    from fintips import analysis
+
+    series = [
+        {"nome": "um_mes", "meses": [
+            {"mes": "2026-01", "renda_centavos": 500000, "despesa_centavos": 300000}]},
+        {"nome": "dois_meses_iguais", "meses": [
+            {"mes": "2026-01", "renda_centavos": 500000, "despesa_centavos": 300000},
+            {"mes": "2026-02", "renda_centavos": 500000, "despesa_centavos": 300000}]},
+        {"nome": "tres_meses_variando", "meses": [
+            {"mes": "2026-01", "renda_centavos": 500000, "despesa_centavos": 280000},
+            {"mes": "2026-02", "renda_centavos": 500000, "despesa_centavos": 350000},
+            {"mes": "2026-03", "renda_centavos": 500000, "despesa_centavos": 310000}]},
+        {"nome": "mes_no_vermelho", "meses": [
+            {"mes": "2026-01", "renda_centavos": 300000, "despesa_centavos": 280000},
+            {"mes": "2026-02", "renda_centavos": 300000, "despesa_centavos": 450000},
+            {"mes": "2026-03", "renda_centavos": 300000, "despesa_centavos": 290000}]},
+        {"nome": "sem_renda", "meses": [
+            {"mes": "2026-01", "renda_centavos": 0, "despesa_centavos": 100000},
+            {"mes": "2026-02", "renda_centavos": 0, "despesa_centavos": 120000}]},
+        {"nome": "divisao_nao_exata", "meses": [
+            {"mes": "2026-01", "renda_centavos": 100001, "despesa_centavos": 33334},
+            {"mes": "2026-02", "renda_centavos": 100000, "despesa_centavos": 33333},
+            {"mes": "2026-03", "renda_centavos": 100000, "despesa_centavos": 33333}]},
+        {"nome": "cinco_meses", "meses": [
+            {"mes": "2026-01", "renda_centavos": 412345, "despesa_centavos": 298711},
+            {"mes": "2026-02", "renda_centavos": 398000, "despesa_centavos": 301299},
+            {"mes": "2026-03", "renda_centavos": 455010, "despesa_centavos": 277654},
+            {"mes": "2026-04", "renda_centavos": 402222, "despesa_centavos": 350001},
+            {"mes": "2026-05", "renda_centavos": 399999, "despesa_centavos": 289888}]},
+    ]
+
+    casos = []
+    for serie in series:
+        stmt = _extrato_sintetico(serie["meses"])
+        base = analysis.baseline(stmt)
+        meses = analysis.monthly(stmt)
+        completos = analysis.full_months(stmt)
+        casos.append({
+            "nome": serie["nome"],
+            "entrada": serie["meses"],
+            "baseline": base,
+            "meses": [
+                {"mes": m.month, "renda_centavos": centavos(m.income),
+                 "despesa_centavos": centavos(m.expense),
+                 "sobra_centavos": centavos(m.net),
+                 "taxa_poupanca": m.savings_rate}
+                for m in meses
+            ],
+            "meses_completos": [m.month for m in completos],
+        })
+
+    # recorte parcial nas pontas: o que `full_months` descarta
+    recortes = []
+    for inicio_dia, fim_dia in [(1, 28), (5, 28), (1, 10), (5, 10)]:
+        stmt = _extrato_sintetico(
+            [{"mes": "2026-01", "renda_centavos": 500000, "despesa_centavos": 300000},
+             {"mes": "2026-02", "renda_centavos": 500000, "despesa_centavos": 320000},
+             {"mes": "2026-03", "renda_centavos": 500000, "despesa_centavos": 310000}],
+            inicio_dia=inicio_dia, fim_dia=fim_dia,
+        )
+        recortes.append({
+            "inicio_dia": inicio_dia, "fim_dia": fim_dia,
+            "meses_completos": [m.month for m in analysis.full_months(stmt)],
+        })
+
+    # recorrências: mediana com contagem par e ímpar, e as três cadências
+    from datetime import datetime, timedelta, timezone
+    from decimal import Decimal as D
+    from fintips.models import Account, Statement, Transaction
+
+    tz = timezone(timedelta(hours=-3))
+    def tx(i, mes, dia, valor, parte, cat="outros"):
+        return Transaction(
+            id=f"r{i}", ts=datetime(2026, mes, dia, 12, 0, tzinfo=tz),
+            amount=-D(valor) / 100, memo_raw="", flow="expense",
+            category=cat, counterparty=parte,
+        )
+
+    txs = []
+    n = 0
+    # assinatura: mesmo valor, uma vez por mês (contagem ímpar de 3)
+    for mes in (1, 2, 3):
+        txs.append(tx(n := n + 1, mes, 10, 2990, "Streaming", "assinaturas"))
+    # sangria: muitas compras por mês (contagem par de 12)
+    for mes in (1, 2, 3):
+        for dia in (3, 9, 17, 25):
+            txs.append(tx(n := n + 1, mes, dia, 1500 + dia, "Padaria", "alimentacao"))
+    # recorrente: valor variando, uma ou duas por mês (contagem par de 4)
+    for mes, dia, valor in ((1, 5, 8000), (1, 20, 12000), (2, 7, 9500), (3, 12, 15000)):
+        txs.append(tx(n := n + 1, mes, dia, valor, "Mercado", "mercado"))
+    # abaixo do mínimo de meses: não deve aparecer
+    for mes in (1, 2):
+        txs.append(tx(n := n + 1, mes, 8, 5000, "Farmacia", "saude"))
+
+    stmt_rec = Statement(
+        account=Account(id_hash="acct:teste"),
+        period_start=datetime(2026, 1, 1, tzinfo=tz).date(),
+        period_end=datetime(2026, 3, 28, tzinfo=tz).date(),
+        ledger_balance=D("0"), balance_as_of=datetime(2026, 3, 28, tzinfo=tz).date(),
+        transactions=txs, source="sintetico",
+    )
+    recs = analysis.recurrences(stmt_rec)
+    atipicos = analysis.outliers(stmt_rec)
+
+    return {
+        "o_que_e": "baseline, mês a mês, recorrências e eventos atípicos",
+        "gerado_por": "fintips.analysis",
+        "casos": casos,
+        "recortes_de_ponta": recortes,
+        "recorrencias": {
+            "entrada": [
+                {"id": t.id, "mes": t.month, "contraparte": t.counterparty,
+                 "categoria": t.category, "centavos": centavos(t.amount)}
+                for t in txs
+            ],
+            "saida": [
+                {"contraparte": r.counterparty, "categoria": r.category,
+                 "tipo": r.kind, "meses": r.months, "vezes": r.occurrences,
+                 "valor_tipico": float(r.median_amount),
+                 "custo_mensal_centavos": centavos(r.monthly_cost)}
+                for r in recs
+            ],
+            "atipicos": [t.id for t in atipicos],
+        },
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
@@ -476,6 +653,7 @@ GERADORES = {
     "contratos.json": ouro_contratos,
     "texto.json": ouro_texto,
     "regras.json": ouro_regras,
+    "analise.json": ouro_analise,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
