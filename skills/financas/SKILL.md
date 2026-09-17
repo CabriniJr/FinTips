@@ -1,6 +1,6 @@
 ---
 name: financas
-description: Use ao analisar finanças pessoais, mapear e categorizar gastos, definir custos fixos, conduzir a triagem periódica do FinTips, montar o perfil financeiro do usuário, ler previsões de caixa, avaliar uma intenção de compra, revisar planos, ou processar um extrato bancário novo (OFX). Aciona o motor FinTips, que roda local.
+description: Use ao analisar finanças pessoais, mapear e categorizar gastos, definir custos fixos, conduzir a triagem periódica do FinTips, montar o perfil financeiro do usuário, entender por que um gasto existe, ler previsões de caixa, avaliar uma intenção de compra, revisar planos, ou processar um extrato bancário novo (OFX). Aciona o motor FinTips, que roda local.
 ---
 
 # FinTips — mapear, decidir, registrar
@@ -13,6 +13,23 @@ A regra que sustenta todo o resto: **nada é verdade sem proveniência**. Toda
 classificação carrega quem decidiu (`heuristica`, `importacao`, `agente`,
 `usuario`), com que confiança e por quê. A lista de estabelecimentos embutida no
 pacote é palpite — serve para ranquear o que olhar primeiro, nunca para concluir.
+
+## Comece pelo briefing
+
+`briefing` (ou o recurso `fintips://briefing`, que alguns clientes carregam
+sozinhos) devolve o retrato enxuto: perfil assinado, o que ainda é palpite, os
+números que enquadram, as causas ativas com a atitude tomada, e o que está em
+aberto. Cada bloco traz `expandir_com` — o nome da ferramenta que devolve
+aquilo em detalhe.
+
+Puxe o detalhe quando precisar, não por precaução. `analise_completa` é o
+contexto inteiro e custa caro; na maior parte das conversas o briefing mais uma
+chamada dirigida resolve melhor.
+
+Leia o `cabecalho` antes de tudo. As três coberturas — classificação, perfil e
+causal — dizem quanto disso alguém decidiu e quanto ainda é o app achando
+coisa. Com cobertura baixa, sua leitura é preliminar, e dizer isso é parte do
+trabalho.
 
 ## O loop da triagem
 
@@ -70,6 +87,49 @@ cálculos diretamente. Para tudo que é específico daquela pessoa, crie a chave
 **origem `usuario` só quando a pessoa afirmou.** Sua conclusão bem fundamentada é
 `agente`. Inflar isso quebra a única garantia que o sistema oferece.
 
+## Causas: o porquê, que é onde mora o conselho
+
+O motor sabe o quê e quanto. Só você pode saber o porquê, e é o porquê que
+decide se um gasto é problema.
+
+Duas pessoas gastam R$ 400 por mês em delivery. Na primeira é jornada dupla e
+chegar em casa às 22h — cortar significa trocar dinheiro por sono ou por tempo
+com a filha, e talvez não valha. Na segunda é tédio de domingo, ela já tentou
+parar três vezes e se frustra com isso. Mesmo número, mesma categoria, mesma
+alavanca em reais. Conversas opostas. **Nenhum extrato do mundo distingue as
+duas** — só perguntar distingue.
+
+Por isso `gravar_causa` recusa origem `heuristica` e `importacao`. Não existe
+detecção de causa no motor, e não deve existir. Se você não perguntou, você não
+sabe.
+
+### Como conduzir
+
+1. **`investigar` antes de perguntar.** Chegue com o padrão concreto: dia da
+   semana, hora, distribuição de valores, presença mensal.
+2. **Traga o padrão, não o rótulo.** "Sete das onze compras são depois das 21h,
+   cinco em dia de semana" é observação que a pessoa confirma ou corrige.
+   "Você gasta muito com delivery" é julgamento — ela só pode aceitar ou negar,
+   e a maioria aceita por educação e some.
+3. **Uma pergunta por vez, e espere.** A causa quase nunca é a primeira
+   resposta: "é mais prático" vira "chego destruído do plantão" depois de mais
+   uma pergunta feita sem pressa.
+4. **Grave nas palavras dela.** Não traduza "não tenho energia para cozinhar
+   depois do plantão" para "conveniência". A frase original é o que vai fazer
+   sentido para ela daqui a seis meses; a tradução é o que faz sentido para um
+   relatório.
+5. **Pergunte o que ela quer fazer, e registre com `decidir_causa`.**
+   `aceitar` é resposta legítima e boa: nomeia o gasto como escolha, e escolha
+   consciente não é vazamento. **Não empurre corte** — empurrar corte onde a
+   pessoa já disse que não vai cortar é o jeito mais rápido de ela parar de
+   usar isso.
+6. **Marque `revisar_em`** no que provavelmente muda: projeto que acaba, obra,
+   estágio, período de tratamento. A causa volta para a fila quando vencer, em
+   vez de virar verdade permanente sobre alguém.
+
+O prompt `entender_um_gasto` traz esse roteiro pronto; `conversa_de_compra`
+carrega perfil, causas e planos antes de discutir uma compra.
+
 ## O perfil: onde é mais fácil errar
 
 O motor casa arquétipos contra os seus números e devolve isso em `perfil`. É
@@ -125,7 +185,8 @@ Duas cautelas:
 
 | Ler | Para quê |
 |---|---|
-| `analise_completa` | Contexto inteiro. Primeira parada de quase toda conversa. |
+| `briefing` | Retrato enxuto com ponteiros. **Primeira parada de toda conversa.** |
+| `analise_completa` | Contexto inteiro. Caro — use quando o briefing não bastar. |
 | `triagem` | A fila de decisões em aberto, por impacto. |
 | `investigar` | Evidência sobre contraparte, categoria, texto ou transação. |
 | `listar_taxonomia` / `listar_regras` | O que existe e quem decidiu. |
@@ -134,6 +195,7 @@ Duas cautelas:
 | `buscar_transacoes`, `projecao` | Consulta e cenários. |
 | `perfil` | Arquétipos sugeridos, traços assinados e cobertura do perfil. |
 | `alavancas` | O que muda cada número, com o motor rodado de novo. |
+| `listar_causas` | Por que o dinheiro sai, e quanto da despesa já tem explicação. |
 
 | Simular / Escrever | Para quê |
 |---|---|
@@ -142,6 +204,7 @@ Duas cautelas:
 | `definir_custo_fixo`, `remover_custo_fixo` | Compromissos mensais. |
 | `gravar_fato`, `esquecer_fato` | Contexto do usuário. |
 | `assinar_perfil`, `esquecer_traco` | Perfil, um eixo por vez. Só depois de conversar. |
+| `gravar_causa`, `decidir_causa`, `esquecer_causa` | O porquê e a atitude. Nunca derivados. |
 | `resolver_item` | Fecha um item da triagem, depois de gravada a decisão. |
 | `salvar_plano`, `avaliar_compra`, `patrimonio`, `ingerir_extrato` | O resto. |
 
@@ -167,6 +230,12 @@ Duas cautelas:
    inteiro existe para não cometer.
 10. **Alavanca não é dica.** O número vem do motor; a leitura é sua, com o que
    você aprendeu conversando. Não repasse a lista crua como se fosse conselho.
+11. **Causa não se deduz do extrato.** Padrão não é motivo. Se você não
+   perguntou, escreva `origem: agente` e diga que é hipótese — ou, melhor,
+   pergunte.
+12. **`aceitar` encerra o assunto.** Se a pessoa decidiu aceitar um gasto,
+   pare de trazê-lo como problema. Voltar a cobrar o que já foi decidido é o
+   comportamento que faz as pessoas abandonarem ferramenta de finanças.
 
 ## Formato
 
@@ -180,9 +249,11 @@ traga o valor mensal e o que ele custa em um ano.
 duas maiores fugas de dinheiro, uma ação para o próximo mês, e **uma** decisão da
 fila conduzida até o fim.
 
-**"Vale a pena comprar X?"** → `avaliar_compra` → veredito, tabela de
-estratégias, o que essa compra atrasa. Sem prazo nem forma de pagamento
-declarados, pergunte antes de decidir por ele.
+**"Vale a pena comprar X?"** → `briefing` + `avaliar_compra` + `listar_causas`
+→ veredito primeiro, com o número que o sustenta; o que a compra atrasa em cada
+plano; e, se houver causa gravada para aquela categoria, traga a frase dela.
+Sem prazo nem forma de pagamento declarados, pergunte antes de decidir por ele.
+O prompt `conversa_de_compra` já monta isso.
 
 **"Quem sou eu financeiramente?"** → `perfil` → traga as evidências de dois ou
 três eixos como observação, confirme com ele, e assine o que ele confirmar. Um

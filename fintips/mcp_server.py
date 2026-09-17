@@ -23,12 +23,13 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-from . import levers, mapping, plans as plans_mod
+from . import causes as causes_mod
+from . import dossier, levers, mapping, plans as plans_mod
 from . import projection as proj_mod
 from . import purchases, report
 from .analysis import baseline
 from .categorize import norm
-from .contracts import Proveniencia
+from .contracts import ATITUDES, NATUREZAS_SUGERIDAS, Proveniencia
 from .entities import canonical_name, slug
 from .workspace import Workspace
 
@@ -54,6 +55,110 @@ def _prov(origem: str, confianca: float, porque: str,
         origem=origem, confianca=float(confianca), porque=porque,
         evidencia=evidencia or [], por_quem="claude",
     )
+
+
+# ==========================================================================
+# RECURSOS — o que o cliente carrega antes da conversa começar
+#
+# A diferença para uma ferramenta importa: recurso o cliente pode ler sozinho,
+# sem gastar um turno. O agente chega sabendo quem é a pessoa e por que o
+# dinheiro dela sai, em vez de descobrir isso na terceira pergunta.
+# ==========================================================================
+
+@mcp.resource(
+    "fintips://briefing",
+    name="Briefing do usuário",
+    description=(
+        "Perfil assinado, o que ainda é palpite, números que enquadram, causas "
+        "ativas com a atitude tomada, planos e o que está em aberto. Resumo com "
+        "ponteiro: cada bloco diz qual ferramenta devolve o detalhe."
+    ),
+    mime_type="application/json",
+)
+def recurso_briefing() -> str:
+    ws = _ws()
+    try:
+        ctx = report.analyze(ws)
+    except FileNotFoundError:
+        return _json({
+            "sem_dados": True,
+            "o_que_fazer": "nenhum extrato importado ainda — use `ingerir_extrato`",
+        })
+    d = dossier.montar(ctx)
+    return _json({"cabecalho": d["cabecalho"], "briefing": d["briefing"],
+                  "correlacoes": d["correlacoes"]})
+
+
+@mcp.resource(
+    "fintips://spec",
+    name="Contratos do FinTips",
+    description=(
+        "A regra de proveniência, os contratos e os vocabulários. Leia antes de "
+        "gravar qualquer coisa: é o que separa o que o app garante do que só "
+        "você pode concluir."
+    ),
+    mime_type="application/json",
+)
+def recurso_spec() -> str:
+    return _json(_SPEC)
+
+
+# A spec é montada a partir do próprio código: vocabulário que mudar em
+# contracts.py muda aqui junto, e o agente nunca recebe uma lista desatualizada.
+_SPEC = {
+    "principio": (
+        "O app guarda, aplica e calcula. O agente descobre, pergunta e decide. "
+        "O usuário assina. Nada é verdade sem proveniência."
+    ),
+    "proveniencia": {
+        "ordem_de_autoridade": ["heuristica", "importacao", "agente", "usuario"],
+        "vale_como_verdade": ["agente", "usuario"],
+        "nunca_vale": {
+            "heuristica": "lista embutida no pacote; ranqueia o que olhar, não conclui",
+            "importacao": "derivado dos dados (cadência, arquétipo casado, alavanca)",
+        },
+        "regra": "origem menor nunca sobrescreve origem maior, por mais confiante que esteja",
+    },
+    "contratos": {
+        "Categoria": "uma categoria existe porque alguém a criou",
+        "Regra": "quando -> então, determinística e simulável antes de gravar",
+        "CustoFixo": "compromisso DEFINIDO; a detecção só produz candidato",
+        "Fato": "um pedaço de contexto, com evidência e prazo opcional",
+        "Causa": "por que o dinheiro sai + a atitude tomada; nunca derivável",
+        "TracoDePerfil": "um eixo do perfil, assinado por quem tem autoridade",
+        "ItemDeTriagem": "algo em aberto, com o custo mensal de não decidir",
+    },
+    "vocabularios": {
+        "causa.efeito_tipo": list(causes_mod.EFEITOS),
+        "causa.natureza": {
+            "sugeridas": list(NATUREZAS_SUGERIDAS),
+            "lista_aberta": True,
+            "nota": "invente a palavra que a vida da pessoa pedir; o app valida a forma",
+        },
+        "causa.atitude": {
+            "valores": list(ATITUDES),
+            "lista_fechada": True,
+            "nota": "o dossiê e as alavancas calculam em cima disso",
+        },
+        "perfil.eixos": ["fase", "renda", "custo", "consumo", "constancia"],
+    },
+    "toda_escrita_exige": ["porque"],
+    "como_expandir": {
+        "perfil": "perfil",
+        "causas": "listar_causas",
+        "numeros": "analise_completa",
+        "projecao": "projecao",
+        "pendencias": "triagem",
+        "alavancas": "alavancas",
+        "uma_contraparte": "investigar",
+    },
+    "erros_que_o_motor_recusa": [
+        "assinar perfil ou gravar causa com origem heuristica/importacao",
+        "gravar qualquer decisão sem `porque`",
+        "causa sem enunciado (rótulo não é causa)",
+        "atitude fora do vocabulário fechado",
+    ],
+}
 
 
 # ==========================================================================
@@ -240,6 +345,54 @@ def projecao(cenario: str = "base", meses: int = 12) -> str:
 # ==========================================================================
 # SIMULAR — antes de gravar
 # ==========================================================================
+
+@mcp.tool()
+def briefing() -> str:
+    """Comece por aqui. O retrato enxuto de quem é a pessoa e do que está aberto.
+
+    Mesmo conteúdo do recurso `fintips://briefing`, para clientes que não
+    carregam recursos sozinhos. É resumo com ponteiro: cada bloco traz
+    `expandir_com`, o nome da ferramenta que devolve aquilo em detalhe. Puxe o
+    detalhe quando precisar dele, não por precaução — o contexto inteiro custa
+    caro e a maior parte não vai ser usada nesta conversa.
+
+    Leia o `cabecalho` antes do resto: as três coberturas (classificação,
+    perfil, causal) dizem quanto disso alguém decidiu e quanto ainda é o app
+    achando coisa."""
+    ws = _ws()
+    d = dossier.montar(report.analyze(ws))
+    return _json({"cabecalho": d["cabecalho"], "briefing": d["briefing"],
+                  "correlacoes": d["correlacoes"], "orcamento": d["orcamento"]})
+
+
+@mcp.tool()
+def listar_causas(alvo: str = "", incluir_vencidas: bool = True) -> str:
+    """As causas gravadas: por que o dinheiro sai e o que se decidiu sobre isso.
+
+    `alvo` filtra por quem a causa explica, no formato 'categoria:mercado' ou
+    'contraparte:ifood'. Sem filtro, vem tudo, mais a cobertura causal — o
+    percentual da despesa que alguém já explicou, e as categorias onde falta.
+
+    Uma causa vencida (passou do `revisar_em`) continua listada, marcada. Isso
+    é de propósito: causa de comportamento envelhece, e saber que a explicação
+    é velha vale mais do que não ter explicação."""
+    ws = _ws()
+    st = report.stores(ws)
+    loja = st["causas"]
+    itens = loja.to_dicts()
+    if alvo:
+        itens = [c for c in itens if c["alvo"] == alvo]
+    if not incluir_vencidas:
+        itens = [c for c in itens if not c["vencida"]]
+    stmt = report.load_statement(ws, st)
+    report.enrich(ws, stmt, st)
+    return _json({
+        "causas": itens,
+        "cobertura": loja.cobertura(stmt),
+        "vocabulario": {"naturezas_sugeridas": list(NATUREZAS_SUGERIDAS),
+                        "atitudes": list(ATITUDES)},
+    })
+
 
 @mcp.tool()
 def perfil() -> str:
@@ -451,6 +604,70 @@ def esquecer_fato(chave: str) -> str:
 
 
 @mcp.tool()
+def gravar_causa(efeito_tipo: str, efeito_ref: str, natureza: str, enunciado: str,
+                 porque: str, atitude: str = "nenhuma", atitude_nota: str = "",
+                 origem: str = "agente", confianca: float = 0.9,
+                 evidencia: list[str] | None = None, revisar_em: str = "") -> str:
+    """Grava por que um gasto existe. Só depois de a pessoa ter contado.
+
+    Esta é a ferramenta mais fácil de usar errado do FinTips inteiro, porque o
+    padrão nos dados *parece* explicar o gasto. Ele não explica. Duas pessoas
+    pedem delivery toda terça: uma faz plantão até 22h, a outra odeia cozinhar
+    e já tentou parar três vezes. O extrato é idêntico; a conversa seguinte é
+    oposta. Se você não perguntou, você não sabe — e a ferramenta recusa
+    origem derivada justamente para isso.
+
+    `efeito_tipo`: categoria | contraparte | padrao | mes | plano | compromisso.
+    `enunciado`: a frase, o mais perto possível das palavras da pessoa. Não
+    traduza "não tenho energia para cozinhar depois do plantão" para
+    "conveniência" — a primeira versão é o que vai fazer sentido para ela
+    daqui a seis meses.
+    `natureza`: use uma das sugeridas se servir, invente se não servir.
+    `atitude`: deixe 'nenhuma' se ainda não decidiram nada — a triagem vai
+    cobrar a decisão depois, que é melhor do que fingir que houve uma.
+    `revisar_em` (AAAA-MM-DD): para causa que provavelmente muda (um projeto
+    que acaba, um período de obra, um estágio)."""
+    st = report.stores(_ws())
+    try:
+        causa = st["causas"].gravar(
+            efeito_tipo=efeito_tipo, efeito_ref=efeito_ref, natureza=natureza,
+            enunciado=enunciado, atitude=atitude, atitude_nota=atitude_nota,
+            evidencia=evidencia or [], revisar_em=revisar_em or None,
+            proveniencia=_prov(origem, confianca, porque, evidencia),
+        )
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    return _json({"causa": causa.to_dict()})
+
+
+@mcp.tool()
+def decidir_causa(causa_id: str, atitude: str, nota: str = "") -> str:
+    """Registra o que se decidiu sobre uma causa já entendida.
+
+    Separado de `gravar_causa` porque entender e decidir acontecem em momentos
+    diferentes — às vezes com semanas entre um e outro, que é o tempo normal
+    de alguém mudar de ideia sobre o próprio comportamento.
+
+    `atitude`: nenhuma | aceitar | reduzir | eliminar | substituir |
+    automatizar | observar. Note que **aceitar é uma decisão legítima**: tira o
+    gasto da lista de culpa e o coloca na de escolhas. Nem toda causa precisa
+    virar corte, e empurrar corte onde a pessoa já disse que não vai cortar é
+    o jeito mais rápido de ela parar de usar isso aqui."""
+    st = report.stores(_ws())
+    try:
+        causa = st["causas"].decidir(causa_id, atitude, nota)
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    return _json({"causa": causa.to_dict()})
+
+
+@mcp.tool()
+def esquecer_causa(causa_id: str) -> str:
+    """Apaga uma causa — quando o usuário corrige, ou quando a vida mudou."""
+    return _json({"esquecido": report.stores(_ws())["causas"].esquecer(causa_id)})
+
+
+@mcp.tool()
 def assinar_perfil(eixo: str, arquetipo: str, porque: str, nome: str = "",
                    descricao: str = "", origem: str = "agente",
                    confianca: float = 0.9, evidencia: list[str] | None = None) -> str:
@@ -600,6 +817,91 @@ def ingerir_extrato(caminho: str) -> str:
         "canonico": str(out),
         "triagem": ctx["triagem"]["resumo"],
     })
+
+
+# ==========================================================================
+# PROMPTS — conversas que valem a pena começar já carregadas
+# ==========================================================================
+
+@mcp.prompt(
+    name="conversa_de_compra",
+    title="Avaliar uma compra",
+    description=(
+        "Carrega perfil, causas, planos e reserva antes de discutir uma compra. "
+        "Use quando a pessoa disser que está pensando em comprar alguma coisa."
+    ),
+)
+def conversa_de_compra(item: str, preco: str = "", prazo: str = "") -> str:
+    """Monta o roteiro da conversa de compra com o contexto já em mãos."""
+    return f"""A pessoa está pensando em comprar: {item}{f' (R$ {preco})' if preco else ''}{f', prazo: {prazo}' if prazo else ''}.
+
+Antes de responder qualquer coisa, carregue o contexto:
+
+1. `briefing` — quem ela é, o que já foi assinado e o que ainda é palpite.
+2. `avaliar_compra` com o item e o preço — a conta: impacto na reserva, o que
+   a compra atrasa em cada plano, cenários de pagamento e o risco de
+   arrependimento tirado do histórico dela.
+3. `listar_causas` — se existe causa gravada para a categoria dessa compra, ela
+   muda a conversa inteira.
+
+Depois responda como alguém que a conhece, não como uma calculadora:
+
+- **Comece pelo veredito**, com o número que o sustenta. "Cabe, e atrasa a
+  viagem em 2 meses" é resposta; "depende de vários fatores" não é.
+- **Cruze com o perfil assinado.** Renda variável muda o que é prudente; custo
+  sufocado muda o que é possível. Se o eixo relevante ainda for palpite, diga
+  que está supondo e pergunte.
+- **Traga a causa, se houver.** Se ela mesma descreveu um gatilho para essa
+  categoria, e esta compra parece acionado por ele, aponte — com a frase dela,
+  não com um diagnóstico seu. Se a atitude registrada foi `aceitar`, não
+  transforme isso em cobrança: ela já decidiu, e a decisão vale.
+- **Diga o que a compra custa em coisas, não só em reais.** Mês de reserva,
+  meses de atraso numa meta, aportes que deixam de acontecer.
+- **Se for para desaconselhar, desaconselhe.** Com o dado na mão. Ela quer um
+  consultor, não aplauso.
+- **Ofereça o caminho do meio** quando existir: esperar até tal mês, comprar a
+  versão anterior, parcelar sem juros mantendo o aporte, vender o que ela
+  substitui.
+
+Se a pessoa não disse preço ou prazo, pergunte antes de calcular — decidir por
+ela qual é o preço é o erro mais bobo possível aqui.
+
+Se algo relevante estiver em branco (sem plano cadastrado, patrimônio
+desatualizado, categoria dessa compra sem causa), diga que a leitura é
+preliminar e qual decisão fecharia a maior lacuna."""
+
+
+@mcp.prompt(
+    name="entender_um_gasto",
+    title="Investigar por que um gasto existe",
+    description=(
+        "Roteiro para descobrir a causa de um padrão de gasto e registrá-la com "
+        "evidência. Use quando aparecer 'sem causa' na triagem."
+    ),
+)
+def entender_um_gasto(alvo: str) -> str:
+    """Roteiro da entrevista de causa para uma categoria ou contraparte."""
+    return f"""Objetivo: entender por que o dinheiro sai em {alvo} — e registrar isso.
+
+1. `investigar` primeiro. Dia da semana, hora, distribuição de valores,
+   presença mensal, exemplos. Você precisa chegar na conversa com o padrão
+   concreto, não com a categoria.
+2. **Traga o padrão, não o rótulo.** "Sete das onze compras são depois das 21h,
+   e cinco delas em dias de semana" é observação que a pessoa confirma ou
+   corrige. "Você gasta muito com delivery" é julgamento que ela só pode
+   aceitar ou negar.
+3. **Pergunte uma coisa por vez** e deixe ela contar. A causa quase nunca é a
+   primeira resposta — "é mais prático" costuma virar "chego destruído às 22h"
+   depois de mais uma pergunta.
+4. `gravar_causa` com o enunciado nas **palavras dela**. Não traduza para
+   vocabulário de finanças: a frase original é o que vai fazer sentido para ela
+   daqui a seis meses.
+5. **Pergunte o que ela quer fazer a respeito**, e registre com `decidir_causa`.
+   `aceitar` é uma resposta boa: nomeia o gasto como escolha, e escolha
+   consciente não é vazamento. Não empurre corte.
+6. Se for algo que provavelmente muda (projeto que acaba, obra, estágio),
+   marque `revisar_em` — a causa vai voltar para a fila quando vencer.
+7. `resolver_item` no item da triagem, dizendo o que foi gravado."""
 
 
 @mcp.tool()

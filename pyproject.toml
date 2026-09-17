@@ -8,8 +8,11 @@ dependencies = ["PyYAML>=6.0"]
 
 [project.optional-dependencies]
 app = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9"]
-mcp = ["mcp>=1.2.0"]
-tudo = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9", "mcp>=1.2.0"]
+# O SDK 2.x renomeou FastMCP para MCPServer e mudou a API de registro.
+# Enquanto `mcp_server.py` não migrar, o teto evita que `pip install`
+# resolva para uma versão que não importa.
+mcp = ["mcp>=1.2.0,<2"]
+tudo = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9", "mcp>=1.2.0,<2"]
 
 [project.scripts]
 fintips = "fintips.cli:main"
