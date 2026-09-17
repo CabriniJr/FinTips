@@ -125,10 +125,15 @@ def cmd_holdings(args) -> None:
 
 def cmd_buy(args) -> None:
     ws = _ws(args)
+    st = report.stores(ws)
     stmt = _load_statement(ws)
-    base = baseline(stmt)
-    plan_res = plans_mod.evaluate_all(plans_mod.load_plans(ws.planos_path), stmt, base)
-    patr = ws.load_patrimonio()
+    report.enrich(ws, stmt, st)
+    # o contexto inteiro, para a compra ser lida à luz do perfil assinado e das
+    # causas gravadas — e não só do saldo
+    ctx = report.analyze(ws, stmt=stmt, st=st)
+    base = ctx["baseline"]
+    plan_res = ctx["planos"]
+    patr = ctx["patrimonio"]
     intent = purchases.PurchaseIntent(
         item=args.item,
         preco=Decimal(str(args.preco)),
@@ -141,7 +146,9 @@ def cmd_buy(args) -> None:
         intent, stmt, base, plan_res,
         saldo_conta=stmt.ledger_balance,
         patrimonio=Decimal(str(patr.get("total", 0))),
-        reserva_alvo_meses=float(ws.config.get("reserva_alvo_meses", 6)),
+        reserva_alvo_meses=float(base.get("reserva_alvo_meses", 6)),
+        perfil=ctx.get("perfil"),
+        causas=(ctx.get("causas") or {}).get("itens"),
     )
     print(json.dumps(res, ensure_ascii=False, indent=2))
 

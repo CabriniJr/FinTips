@@ -19,7 +19,7 @@ recálculo consistente e **proveniência em tudo**.
 ```
   conectores          núcleo determinístico            interfaces
  ┌───────────┐   ┌──────────────────────────┐   ┌────────────────────────┐
- │ ofx       │   │ parser   → Transaction   │   │ MCP stdio (28 tools)   │──▶ agente
+ │ ofx       │   │ parser   → Transaction   │   │ MCP stdio (33 + recursos)│──▶ agente
  │ pluggy    │──▶│ heurística (palpite)     │──▶│ FastAPI 127.0.0.1:8420 │──▶ painel
  │ csv (todo)│   │ mapping  (decisões)      │   │ CLI                    │
  └───────────┘   │ entities → Counterparty  │   └────────────────────────┘
@@ -63,6 +63,7 @@ Consequências concretas, todas testadas:
 | `Condicao` / `Efeito` / `Regra` | o `quando` e o `então` de uma classificação |
 | `CustoFixo` | compromisso mensal **definido** (não detectado) |
 | `Fato` | um pedaço de contexto, com o que o sustenta e prazo opcional |
+| `Causa` | o motivo de um padrão + a atitude tomada; nunca derivável |
 | `ItemDeTriagem` | algo em aberto, com o custo mensal de não decidir |
 
 ## Módulos
@@ -76,6 +77,8 @@ Consequências concretas, todas testadas:
 | `taxonomy.py` | categorias como dado do usuário; sugestões do pacote são heurística |
 | `mapping.py` | motor de regras genérico + cobertura da classificação |
 | `context.py` | núcleo demarcado + fatos livres; cálculo de lacuna e impacto |
+| `causes.py` | por que o dinheiro sai + atitude; cobertura causal |
+| `dossier.py` | briefing orçado, correlações e observações em formato longo |
 | `commitments.py` | custo fixo definido, com base, método e proveniência |
 | `discovery.py` | detecção de padrão → **candidatos**, nunca conclusões |
 | `entities.py` | contrapartes agrupadas, cadência, id estável |
@@ -193,6 +196,37 @@ exemplo, é uma rampa entre o teto de 15% da despesa e zero — o motor mostra
 dois pontos dela e não escolhe, porque escolher é decidir o que é cortável na
 vida de alguém.
 
+## Causas
+
+A camada mais perigosa do motor, porque é a que mais parece automatizável. O
+padrão nos dados *parece* explicar o gasto — e não explica. Delivery toda
+terça é jornada dupla numa pessoa e tédio na outra; o extrato é idêntico e a
+conversa seguinte é oposta.
+
+Por isso não existe `detectar_causas()` em `causes.py`, e um teste guarda essa
+ausência. `CauseStore.gravar` recusa origem derivada, `porque` vazio e
+enunciado vazio.
+
+A `atitude` é vocabulário fechado (`aceitar`, `reduzir`, `eliminar`,
+`substituir`, `automatizar`, `observar`, `nenhuma`) porque o dossiê e as
+alavancas calculam em cima dela. A `natureza` é lista aberta pelo motivo
+oposto: a vida de alguém pode pedir uma palavra que não está no código.
+
+`cobertura` espelha `mapping.cobertura`. As duas respondem perguntas
+diferentes sobre o mesmo dinheiro: se ele está no balde certo, e se alguém
+sabe por que ele saiu.
+
+## Dossiê
+
+Um artefato derivado, dois consumidores. `briefing` é orçado em tokens e serve
+ao agente; `correlacoes` liga causa, dinheiro, compromisso, plano e pendência
+com IDs estáveis; `observacoes.jsonl` é formato longo, uma linha por
+observação, legível como dataframe sem o pacote depender de pandas.
+
+A regra que o mantém honesto: todo bloco do briefing carrega `expandir_com`,
+o nome da ferramenta que devolve o detalhe. Resumo sem ponteiro vira resumo
+escondendo, e o agente passa a supor em vez de perguntar.
+
 ## Como estender
 
 **Novo banco (OFX)**: normalmente nada a fazer. Memo com prefixo diferente →
@@ -211,6 +245,11 @@ graça.
 precisam apontar indicadores que `profile.indicadores` já calcula — indicador
 inexistente vem `None` e reprova o sinal, em vez de casar por omissão. Sem
 código, sem deploy.
+
+**Nova natureza de causa**: nada — a lista é aberta, basta usar a palavra.
+
+**Novo efeito de traço na compra**: uma entrada em `purchases.EFEITO_DO_TRACO`,
+com o texto do que reler. O texto descreve cálculo, nunca ação.
 
 **Nova alavanca**: uma função em `levers.py` que devolve `_alavanca(...)` com
 número, efeito recalculado e evidência. A ordenação é por reais por mês; o que
@@ -232,6 +271,9 @@ converter.
 ## Backlog
 
 - Cartão de crédito (fatura OFX/CSV) — maior ponto cego.
+- Migrar o servidor MCP para o SDK 2.x (FastMCP virou MCPServer); hoje o
+  pyproject tem teto em `mcp<2`.
+- Causas e correlações no painel: hoje só o agente as consome.
 - Orçamento por categoria com alerta de estouro no meio do mês.
 - Histórico de score e de decisões ao longo do tempo.
 - Sazonalidade na projeção (13º, férias, IPVA).

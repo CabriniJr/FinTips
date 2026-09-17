@@ -7,7 +7,7 @@ pergunta e registra; você assina. Um painel local mostra tudo.
 ```
                        ┌─ painel local (React, 127.0.0.1)
 extrato.ofx ─┐         │
-             ├─ motor ─┼─ agente Claude (MCP: 28 primitivas)
+             ├─ motor ─┼─ agente Claude (MCP: 33 primitivas + 2 recursos)
 Open Finance ┘         │
   (Pluggy)             └─ YAML no seu disco (fonte de verdade)
 ```
@@ -52,6 +52,11 @@ decisão e quanto ainda é palpite**. Começa em 0%.
 - **Contexto híbrido**: núcleo demarcado para o que é universal (moradia, cartão,
   renda, reserva) + chave livre para o que é só seu
   (`transporte.reembolsado_pela_empresa`).
+- **Guarda o porquê, não só o quanto.** Uma causa liga um padrão de gasto ao
+  motivo dele, nas palavras da pessoa, mais a atitude tomada — inclusive
+  `aceitar`, que é decisão legítima e tira o gasto da lista de culpa. Causa
+  nunca é derivada: duas pessoas com o mesmo extrato de delivery podem estar
+  com jornada dupla ou com tédio de domingo, e só perguntar distingue.
 - **Monta o perfil em cinco eixos independentes** (fase, renda, custo, consumo,
   constância). O catálogo casa arquétipos contra os seus números e devolve
   isso como **palpite, com a evidência anexada** — perfil mesmo só existe
@@ -104,12 +109,15 @@ FinTips/
     regras.yaml        regras de classificação com proveniência
     contexto.yaml      fatos sobre você, com evidência
     perfil.yaml        traços assinados, um por eixo
+    causas.yaml        por que o dinheiro sai, e o que se decidiu
     custos-fixos.yaml  compromissos definidos
     triagem.yaml       o que já foi resolvido ou adiado
     regras-locais.yaml estabelecimentos do seu dia a dia (fora do Git)
     planos.yaml        metas financeiras
     patrimonio.yaml    saldo + investimentos
   relatorios/          análises geradas
+    dossie.json        briefing do agente + correlações (derivado)
+    observacoes.jsonl  uma linha por observação, vira dataframe (derivado)
 ```
 
 ## Como plugin do Claude
@@ -118,12 +126,19 @@ FinTips/
 que ensina o agente a conduzir a triagem: investigar antes de perguntar, simular
 antes de gravar, e dizer o que mudou depois.
 
-As 28 ferramentas se dividem em ler (`analise_completa`, `triagem`, `investigar`,
+O agente chega pré-carregado: os recursos `fintips://briefing` (quem é a
+pessoa, causas ativas, o que está aberto) e `fintips://spec` (a regra de
+proveniência e os vocabulários) o cliente lê sozinho, sem gastar um turno. Os
+prompts `conversa_de_compra` e `entender_um_gasto` trazem roteiro pronto.
+
+As 33 ferramentas se dividem em ler (`analise_completa`, `triagem`, `investigar`,
 `listar_taxonomia`, `listar_regras`, `contexto_do_usuario`, `custos_fixos`,
-`buscar_transacoes`, `projecao`, `perfil`, `alavancas`), simular
+`buscar_transacoes`, `projecao`, `perfil`, `alavancas`, `briefing`,
+`listar_causas`), simular
 (`simular_regra`) e escrever (`criar_categoria`, `definir_regra`,
 `remover_regra`, `definir_custo_fixo`, `remover_custo_fixo`, `gravar_fato`,
-`esquecer_fato`, `assinar_perfil`, `esquecer_traco`, `resolver_item`,
+`esquecer_fato`, `assinar_perfil`, `esquecer_traco`, `gravar_causa`,
+`decidir_causa`, `esquecer_causa`, `resolver_item`,
 `salvar_plano`, `avaliar_compra`, `patrimonio`, `ingerir_extrato`).
 
 Toda escrita exige `porque` — é o que torna a decisão auditável depois.
@@ -158,6 +173,9 @@ Para usar fora do plugin:
 - **Alavanca não é dica.** O motor entrega a régua — número e efeito
   recalculado. O conselho depende de saber se aquele gasto é a única coisa boa
   da semana da pessoa, e isso o extrato não conta.
+- **Resumo com ponteiro.** O briefing que o agente carrega é enxuto, mas cada
+  bloco diz qual ferramenta devolve o detalhe. Resumir escondendo é pior que
+  não resumir: o agente passa a supor.
 - **PII fica em casa.** Conta vira hash; pessoa física vira apelido local ou
   pseudônimo estável. As regras públicas só citam marcas nacionais — a padaria da
   sua esquina vai em `data/regras-locais.yaml`, fora do Git, porque a lista de
@@ -183,8 +201,7 @@ próprio não guarda nada: só sabe onde os seus dados ficam.
 ## Testes
 
 ```bash
-python tests/test_engine.py && python tests/test_v02.py && \
-  python tests/test_v03.py && python tests/test_v04.py
+for t in tests/test_*.py; do python "$t" || break; done
 ```
 
 ## Documentos

@@ -179,6 +179,142 @@ def plan_impact(intent: PurchaseIntent, plan_results: list[dict], base: dict) ->
     return out
 
 
+# Como cada traço assinado muda a leitura de uma compra.
+#
+# Os textos são do APP e descrevem qual cálculo reler — nunca o que fazer. A
+# frase "não compre" não aparece aqui e não deve aparecer: o motor mede, quem
+# conhece a pessoa interpreta. `reserva_meses` é a única alteração numérica, e
+# ela não substitui nada: entra como leitura alternativa, ao lado da original.
+EFEITO_DO_TRACO: dict[str, dict] = {
+    "renda:variavel": {
+        "o_que_muda": (
+            "com renda variável, o excedente calculado sobre a média esconde o pior "
+            "mês; a mesma compra que cabe na média pode não caber em março"
+        ),
+        "reserva_meses": 9.0,
+    },
+    "renda:mista": {
+        "o_que_muda": (
+            "só a parte previsível da renda sustenta parcela; o excedente variável "
+            "cabe em compra à vista, não em compromisso mensal"
+        ),
+    },
+    "custo:sufocado": {
+        "o_que_muda": (
+            "com quase toda a renda comprometida, uma parcela nova disputa espaço "
+            "com compromisso existente, não com consumo do mês"
+        ),
+    },
+    "custo:carregado": {
+        "o_que_muda": (
+            "metade do mês já está decidida por compromissos anteriores; a sobra "
+            "aparente é menor do que a média sugere"
+        ),
+    },
+    "fase:sobrevivencia": {
+        "o_que_muda": (
+            "sem sobra consistente, qualquer parcela vira dívida futura — a conta "
+            "que importa aqui é a de custo comprometido, não a da compra"
+        ),
+    },
+    "fase:consolidacao": {
+        "o_que_muda": (
+            "com reserva coberta e sobra excedente, a pergunta deixa de ser se cabe "
+            "e passa a ser se é isso que a pessoa quer fazer com o excedente"
+        ),
+    },
+    "constancia:oscilante": {
+        "o_que_muda": (
+            "o gasto varia bastante entre meses; comprometer a sobra média é apostar "
+            "que o mês da compra será um mês bom"
+        ),
+    },
+    "consumo:pulverizado": {
+        "o_que_muda": (
+            "o gasto desta pessoa não aparece em decisões isoladas; uma compra grande "
+            "é visível e provavelmente não é onde o dinheiro dela some"
+        ),
+    },
+}
+
+
+def contexto_pessoal(
+    intent: PurchaseIntent,
+    perfil: dict | None,
+    causas: list[dict] | None,
+    *,
+    despesa_mes: Decimal,
+    saldo_mais_patrimonio: Decimal,
+) -> dict:
+    """O que o perfil assinado e as causas gravadas dizem sobre esta compra.
+
+    Nada aqui vira veredito. São ponteiros para o agente: qual cálculo reler à
+    luz de quem a pessoa é, e qual frase que ela mesma disse essa compra toca.
+    """
+    tracos, leitura_alternativa = [], None
+    for eixo in (perfil or {}).get("eixos") or []:
+        assinado = eixo.get("assinado")
+        if not assinado:
+            continue
+        chave = f"{eixo['eixo']}:{assinado['arquetipo']}"
+        efeito = EFEITO_DO_TRACO.get(chave)
+        if not efeito:
+            continue
+        tracos.append({
+            "eixo": eixo["eixo"],
+            "arquetipo": assinado["nome"],
+            "porque_foi_assinado": assinado["proveniencia"]["porque"],
+            "o_que_muda": efeito["o_que_muda"],
+        })
+        meses = efeito.get("reserva_meses")
+        if meses and despesa_mes > 0:
+            alvo = despesa_mes * Decimal(str(meses))
+            leitura_alternativa = {
+                "porque": f"traço assinado '{assinado['nome']}'",
+                "reserva_alvo_meses": meses,
+                "reserva_alvo_valor": float(alvo.quantize(Decimal("0.01"))),
+                "excedente": float((saldo_mais_patrimonio - alvo).quantize(Decimal("0.01"))),
+                "compra_fura_reserva": intent.preco > (saldo_mais_patrimonio - alvo),
+                "nota": (
+                    "leitura alternativa, ao lado da original — o motor não troca o "
+                    "alvo que a pessoa declarou por um que ela não declarou"
+                ),
+            }
+
+    texto = norm(f"{intent.item} {intent.categoria} {' '.join(intent.tags)}")
+    acionadas = []
+    for c in causas or []:
+        alvo_cat = c["efeito"]["tipo"] == "categoria" and c["efeito"]["ref"] == intent.categoria
+        alvo_texto = bool(c["efeito"]["ref"]) and norm(c["efeito"]["ref"]) in texto
+        if not (alvo_cat or alvo_texto):
+            continue
+        acionadas.append({
+            "id": c["id"],
+            "alvo": c["alvo"],
+            "natureza": c["natureza"],
+            "nas_palavras_dela": c["enunciado"],
+            "atitude": c["atitude"],
+            "vencida": c.get("vencida", False),
+            "ja_decidido": c["atitude"] == "aceitar",
+            "como_usar": (
+                "ela já decidiu aceitar esse gasto — não transforme isso em cobrança"
+                if c["atitude"] == "aceitar"
+                else "cite a frase dela, não um diagnóstico seu"
+            ),
+        })
+
+    return {
+        "tracos_aplicados": tracos,
+        "causas_acionadas": acionadas,
+        "leitura_alternativa_da_reserva": leitura_alternativa,
+        "sem_perfil_assinado": not tracos,
+        "nota": (
+            "nenhum destes itens muda o veredito calculado. Eles dizem o que reler "
+            "e o que trazer para a conversa — a interpretação é sua"
+        ),
+    }
+
+
 def evaluate(
     intent: PurchaseIntent,
     stmt: Statement,
@@ -188,6 +324,8 @@ def evaluate(
     saldo_conta: Decimal | float = 0,
     reserva_alvo_meses: float = 6.0,
     patrimonio: Decimal | float = 0,
+    perfil: dict | None = None,
+    causas: list[dict] | None = None,
 ) -> dict:
     saldo = Decimal(str(saldo_conta))
     patr = Decimal(str(patrimonio))
@@ -241,6 +379,10 @@ def evaluate(
         "estrategias": cen,
         "impacto_nos_planos": impacto_planos,
         "melhor_estrategia": _best(cen, fura_reserva, regret["risco_arrependimento"]),
+        "contexto_pessoal": contexto_pessoal(
+            intent, perfil, causas,
+            despesa_mes=despesa, saldo_mais_patrimonio=saldo + patr,
+        ),
     }
 
 

@@ -28,7 +28,7 @@ from .categorize import norm
 from .contracts import Proveniencia
 from .workspace import Workspace
 
-API_VERSION = "0.4.0"
+API_VERSION = "0.5.0"
 WEB_DIR = Path(__file__).parent / "web"
 
 
@@ -432,6 +432,8 @@ def avaliar_compra(body: PurchaseIn) -> dict:
         saldo_conta=ctx["saldo_conta"],
         patrimonio=ctx["patrimonio"].get("total", 0),
         reserva_alvo_meses=float(ctx["baseline"].get("reserva_alvo_meses", 6)),
+        perfil=ctx.get("perfil"),
+        causas=(ctx.get("causas") or {}).get("itens"),
     )
 
 

@@ -777,6 +777,8 @@ def avaliar_compra(item: str, preco: float, categoria: str = "compras",
         saldo_conta=ctx["saldo_conta"],
         patrimonio=ctx["patrimonio"].get("total", 0),
         reserva_alvo_meses=float(ctx["baseline"].get("reserva_alvo_meses", 6)),
+        perfil=ctx.get("perfil"),
+        causas=(ctx.get("causas") or {}).get("itens"),
     ))
 
 
