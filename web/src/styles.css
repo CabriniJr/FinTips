@@ -1,207 +1,378 @@
+/* FinTips — sistema visual.
+ *
+ * A linguagem é emprestada do delineax: preto e branco, canto vivo, borda de
+ * 1px sólida e sombra dura deslocada, sem desfoque. Tipografia monoespaçada
+ * em caixa alta para tudo que é interface (rótulo, botão, cabeçalho de
+ * tabela) e sem serifa para o que é leitura corrida.
+ *
+ * O movimento é o que dá vida a isso: cada elemento clicável fica sobre uma
+ * sombra sólida, e no hover ele anda na direção dela. É o gesto de apertar
+ * um adesivo contra o papel. Rápido (120ms), curto (2px) e igual em toda a
+ * aplicação — animação que varia de lugar para lugar vira ruído.
+ *
+ * A cor sobrevive em um lugar só: dado. Gráfico precisa distinguir séries, e
+ * padrão de hachura é pior que matiz para isso. Interface é monocromática;
+ * o que tem cor é número.
+ */
+
 :root {
   color-scheme: light;
-  --bg: #f7f7f5;
+
+  --paper: #f4f3f0;
   --card: #ffffff;
-  --card-2: #fbfbf9;
-  --line: #e5e4de;
-  --line-2: #efeeea;
-  --ink: #141410;
-  --ink-2: #56554d;
-  --ink-3: #8b8a80;
-  --s1: #2a78d6;
-  --s2: #eb6834;
-  --s3: #1baf7a;
-  --s4: #eda100;
-  --good: #008300;
-  --warn: #eda100;
-  --crit: #e34948;
-  --grid: #ecebe6;
-  --shadow: 0 1px 2px rgba(20, 20, 16, 0.05), 0 8px 24px -16px rgba(20, 20, 16, 0.18);
+  --card-2: #faf9f7;
+  --ink: #000000;
+  --ink-2: #454442;
+  --ink-3: #7c7a75;
+  --line: #000000;          /* borda estrutural: sempre tinta cheia */
+  --line-2: #d9d7d1;        /* régua interna: divide sem fechar caixa */
+  --grid: #e4e2dc;
+  --marca: #e9e7e1;         /* bloco de destaque atrás de palavra */
+
+  /* sombra dura: o deslocamento é o próprio efeito, nunca há blur */
+  --lift: 4px 4px 0 var(--ink);
+  --lift-sm: 3px 3px 0 var(--ink);
+  --lift-press: 1px 1px 0 var(--ink);
+
+  /* dado — o único lugar com matiz */
+  --s1: #1f5fb5;
+  --s2: #c0491c;
+  --s3: #10795a;
+  --s4: #a37000;
+  --good: #10795a;
+  --warn: #a37000;
+  --crit: #b8322f;
+
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --t: 120ms cubic-bezier(0.2, 0, 0.1, 1);
 }
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #131312;
-    --card: #1c1c1a;
-    --card-2: #201f1d;
-    --line: #35342f;
-    --line-2: #2a2926;
-    --ink: #f6f5f0;
-    --ink-2: #b6b4a9;
-    --ink-3: #85847a;
-    --s1: #3987e5;
-    --s2: #d95926;
-    --s3: #199e70;
-    --s4: #c98500;
-    --good: #3aa03a;
-    --warn: #c98500;
-    --crit: #e66767;
-    --grid: #2b2a27;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -18px rgba(0, 0, 0, 0.8);
+    --paper: #12110f;
+    --card: #1b1a17;
+    --card-2: #201f1b;
+    --ink: #f5f3ec;
+    --ink-2: #b4b1a6;
+    --ink-3: #85827a;
+    --line: #f5f3ec;
+    --line-2: #3a3833;
+    --grid: #2c2a26;
+    --marca: #2a2823;
+    --s1: #5c9ae8;
+    --s2: #e07a4e;
+    --s3: #3fae88;
+    --s4: #d4a017;
+    --good: #3fae88;
+    --warn: #d4a017;
+    --crit: #e46764;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #131312; --card: #1c1c1a; --card-2: #201f1d; --line: #35342f; --line-2: #2a2926;
-  --ink: #f6f5f0; --ink-2: #b6b4a9; --ink-3: #85847a;
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-  --good: #3aa03a; --warn: #c98500; --crit: #e66767; --grid: #2b2a27;
+  --paper: #12110f; --card: #1b1a17; --card-2: #201f1b;
+  --ink: #f5f3ec; --ink-2: #b4b1a6; --ink-3: #85827a;
+  --line: #f5f3ec; --line-2: #3a3833; --grid: #2c2a26; --marca: #2a2823;
+  --s1: #5c9ae8; --s2: #e07a4e; --s3: #3fae88; --s4: #d4a017;
+  --good: #3fae88; --warn: #d4a017; --crit: #e46764;
 }
 
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
+
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
   font-size: 15px;
   line-height: 1.5;
+  background-color: var(--paper);
+  /* poeira: dois pontos quase invisíveis em grade grande, como no papel do
+     delineax. Sem isso o fundo chapado deixa a interface parecendo wireframe */
+  background-image:
+    radial-gradient(circle at 17% 23%, var(--line-2) 0.6px, transparent 0.7px),
+    radial-gradient(circle at 71% 66%, var(--line-2) 0.5px, transparent 0.6px);
+  background-size: 137px 149px, 211px 197px;
 }
+
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
-/* ---------------------------------------------------------------- shell */
+/* ----------------------------------------------------------------- shell */
 .app { display: flex; flex-direction: column; min-height: 100%; }
+
 .topbar {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--paper);
+  border-bottom: 2px solid var(--ink);
 }
 .topbar-in {
-  max-width: 1180px; margin: 0 auto; padding: 12px 16px;
+  max-width: 1180px; margin: 0 auto; padding: 11px 16px;
   display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
 }
-.brand { font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 8px; }
-.brand small { font-family: var(--mono); font-size: 11px; color: var(--ink-3); font-weight: 400; }
-nav { display: flex; gap: 2px; flex-wrap: wrap; margin-left: auto; }
-nav button {
-  font: inherit; font-size: 13.5px; border: 0; background: transparent; color: var(--ink-2);
-  padding: 6px 11px; border-radius: 7px; cursor: pointer; position: relative;
-}
-nav button:hover { background: var(--line-2); color: var(--ink); }
-nav button[aria-current="true"] { background: var(--ink); color: var(--bg); }
-nav .badge-n {
-  display: inline-block; margin-left: 6px; font-family: var(--mono); font-size: 10.5px;
-  background: var(--s2); color: #fff; border-radius: 999px; padding: 0 5px;
-}
-main { flex: 1; max-width: 1180px; width: 100%; margin: 0 auto; padding: 22px 16px 60px; }
+.topbar .mono { color: var(--paper); opacity: 0.66; }
 
-/* ----------------------------------------------------------------- grid */
-.grid { display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); }
-.panel {
-  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-  padding: 18px; box-shadow: var(--shadow); min-width: 0;
+.brand {
+  font-family: var(--mono); font-weight: 600; font-size: 15px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  display: flex; align-items: baseline; gap: 10px; color: var(--paper);
 }
-.panel > h2 { font-size: 13px; font-weight: 600; margin: 0 0 2px; }
+.brand small {
+  font-size: 10.5px; letter-spacing: 0.08em; opacity: 0.6; font-weight: 400;
+}
+
+nav { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+nav button {
+  position: relative;
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid transparent; background: transparent; color: var(--paper);
+  padding: 6px 11px; cursor: pointer; border-radius: 0;
+  transition: color var(--t), background var(--t), border-color var(--t);
+}
+/* sublinhado que cresce da esquerda — o mesmo gesto do menu do delineax */
+nav button::after {
+  content: ""; position: absolute; left: 11px; right: 11px; bottom: 3px;
+  height: 1.5px; background: currentColor;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform var(--t);
+}
+nav button:hover::after { transform: scaleX(1); }
+nav button[aria-current="true"] {
+  background: var(--paper); color: var(--ink); border-color: var(--paper);
+}
+nav button[aria-current="true"]::after { transform: scaleX(0); }
+nav .badge-n {
+  display: inline-block; margin-left: 7px; font-size: 10px;
+  background: var(--paper); color: var(--ink); padding: 0 5px;
+  border: 1px solid currentColor;
+}
+nav button[aria-current="true"] .badge-n { background: var(--ink); color: var(--paper); }
+
+main { flex: 1; max-width: 1180px; width: 100%; margin: 0 auto; padding: 24px 16px 70px; }
+
+/* ------------------------------------------------------------------ grid */
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(12, 1fr); }
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 18px;
+  box-shadow: var(--lift);
+  min-width: 0;
+}
+/* cabeçalho de painel: rótulo em caixa alta e uma régua que ocupa o resto da
+   linha, como os "EDITOR" / "PREVIEW" / "STRUCTURE" do delineax */
+.panel > h2 {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  margin: 0 0 3px; display: flex; align-items: center; gap: 12px;
+}
+.panel > h2::after {
+  content: ""; flex: 1; height: 1px; background: var(--line-2);
+}
 .panel > .hint { font-size: 12.5px; color: var(--ink-3); margin: 0 0 14px; }
+
 .c12 { grid-column: span 12; } .c8 { grid-column: span 8; } .c7 { grid-column: span 7; }
 .c6 { grid-column: span 6; } .c5 { grid-column: span 5; } .c4 { grid-column: span 4; }
 @media (max-width: 880px) { .c8, .c7, .c6, .c5, .c4 { grid-column: span 12; } }
 
-/* ----------------------------------------------------------- tipografia */
+/* ------------------------------------------------------------ tipografia */
 .eyebrow {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
   text-transform: uppercase; color: var(--ink-3);
 }
-h1 { font-size: 22px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.01em; }
+h1 {
+  font-family: var(--mono); font-size: 19px; margin: 0 0 6px;
+  font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+}
 .sub { color: var(--ink-2); font-size: 13.5px; }
+/* destaque atrás da palavra, não embaixo dela */
+.marca { background: var(--marca); padding: 0 4px; }
 
-/* ----------------------------------------------------------------- kpis */
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px;
-  background: var(--line-2); border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }
-.kpi { background: var(--card); padding: 13px 14px; }
-.kpi .k { font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); font-family: var(--mono); }
-.kpi .v { font-size: 20px; font-weight: 600; font-family: var(--mono); margin-top: 3px; }
+/* ------------------------------------------------------------------ kpis */
+.kpis {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0; border: 1px solid var(--line); background: var(--card);
+}
+.kpi { background: var(--card); padding: 13px 14px; border-right: 1px solid var(--line-2); }
+.kpi:last-child { border-right: 0; }
+.kpi .k {
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--ink-3); font-family: var(--mono);
+}
+.kpi .v { font-size: 21px; font-weight: 600; font-family: var(--mono); margin-top: 4px; letter-spacing: -0.01em; }
 .kpi .n { font-size: 11.5px; color: var(--ink-3); }
 
-/* ---------------------------------------------------------------- score */
-.score-head { display: flex; align-items: baseline; gap: 12px; }
-.score-num { font-size: 46px; font-weight: 600; font-family: var(--mono); line-height: 1; letter-spacing: -0.03em; }
-.faixa { margin-left: auto; font-size: 12px; padding: 3px 10px; border-radius: 999px; font-family: var(--mono);
-  background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good);
-  border: 1px solid color-mix(in srgb, var(--good) 34%, transparent); }
-.dims { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-.dim { display: grid; grid-template-columns: 100px 1fr 74px; gap: 10px; align-items: center; font-size: 13px; }
-.track { height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
-.track i { display: block; height: 100%; border-radius: 4px; }
-.dim .val { text-align: right; color: var(--ink-2); font-family: var(--mono); font-size: 12.5px; }
-.lever { margin-top: 15px; padding: 11px 13px; border-radius: 8px; background: var(--card-2);
-  border: 1px solid var(--line-2); font-size: 13px; color: var(--ink-2); }
+/* ----------------------------------------------------------------- score */
+.score-head { display: flex; align-items: baseline; gap: 14px; }
+.score-num {
+  font-size: 50px; font-weight: 600; font-family: var(--mono);
+  line-height: 1; letter-spacing: -0.04em;
+}
+.faixa {
+  margin-left: auto; font-size: 10.5px; padding: 4px 10px;
+  font-family: var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
+  background: var(--ink); color: var(--paper); border: 1px solid var(--ink);
+}
+.dims { display: flex; flex-direction: column; gap: 11px; margin-top: 18px; }
+.dim {
+  display: grid; grid-template-columns: 104px 1fr 74px; gap: 11px;
+  align-items: center; font-size: 12.5px;
+  font-family: var(--mono); letter-spacing: 0.04em;
+}
+.track { height: 10px; background: var(--card-2); border: 1px solid var(--line); overflow: hidden; }
+.track i { display: block; height: 100%; }
+.dim .val { text-align: right; color: var(--ink-2); font-size: 12px; }
+.lever {
+  margin-top: 17px; padding: 12px 13px; background: var(--card-2);
+  border: 1px solid var(--line); border-left-width: 4px;
+  font-size: 13px; color: var(--ink-2);
+}
 .lever b { color: var(--ink); }
 
-/* -------------------------------------------------------------- tabelas */
+/* --------------------------------------------------------------- tabelas */
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: left; font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase;
-  color: var(--ink-3); font-weight: 500; font-family: var(--mono); padding: 0 0 8px; }
-td { padding: 8px 0; border-top: 1px solid var(--line-2); vertical-align: baseline; }
+th {
+  text-align: left; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 500; font-family: var(--mono);
+  padding: 0 0 9px; border-bottom: 1px solid var(--line);
+}
+td { padding: 9px 0; border-top: 1px solid var(--line-2); vertical-align: baseline; }
+tbody tr { transition: background var(--t); }
+tbody tr:hover { background: var(--card-2); }
 td + td, th + th { padding-left: 14px; }
-td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.num, th.num {
+  text-align: right; font-family: var(--mono);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
 .scroll-x { overflow-x: auto; }
 
-/* ----------------------------------------------------------------- tags */
-.tag { font-size: 10.5px; font-family: var(--mono); padding: 1.5px 7px; border-radius: 999px;
-  border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
-.tag.contratual { color: var(--s1); border-color: color-mix(in srgb, var(--s1) 40%, transparent);
-  background: color-mix(in srgb, var(--s1) 10%, transparent); }
-.tag.rotina { color: var(--s3); border-color: color-mix(in srgb, var(--s3) 40%, transparent);
-  background: color-mix(in srgb, var(--s3) 10%, transparent); }
-.tag.declarado { color: var(--s4); border-color: color-mix(in srgb, var(--s4) 45%, transparent);
-  background: color-mix(in srgb, var(--s4) 12%, transparent); }
-.tag.assinatura { color: var(--s1); border-color: color-mix(in srgb, var(--s1) 40%, transparent); }
-.tag.fixo_de_uso { color: var(--s3); border-color: color-mix(in srgb, var(--s3) 40%, transparent); }
-
-/* -------------------------------------------------------------- perguntas */
-.question { border: 1px solid var(--line); border-radius: 10px; padding: 16px; background: var(--card-2); }
-.question + .question { margin-top: 12px; }
-.question .q { font-size: 14.5px; font-weight: 500; margin: 6px 0 4px; }
-.question .why { font-size: 12.5px; color: var(--ink-3); margin-bottom: 12px; }
-.opts { display: flex; flex-direction: column; gap: 6px; }
-.opts button, .btn {
-  font: inherit; font-size: 13px; text-align: left; cursor: pointer;
-  background: var(--card); color: var(--ink); border: 1px solid var(--line);
-  border-radius: 8px; padding: 8px 11px;
+/* ------------------------------------------------------------------ tags */
+.tag {
+  font-size: 10px; font-family: var(--mono); padding: 2px 7px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px solid var(--line); color: var(--ink); background: var(--card);
+  white-space: nowrap; display: inline-block;
 }
-.opts button:hover, .btn:hover { border-color: var(--s1); background: color-mix(in srgb, var(--s1) 7%, var(--card)); }
-.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.btn.small { padding: 4px 9px; font-size: 12px; }
-.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tag.contratual, .tag.assinatura { background: var(--ink); color: var(--paper); }
+.tag.rotina, .tag.fixo_de_uso { background: var(--card); color: var(--ink); }
+.tag.declarado { background: var(--marca); color: var(--ink); }
+
+/* ------------------------------------------------------------- perguntas */
+.question {
+  border: 1px solid var(--line); padding: 16px; background: var(--card);
+  box-shadow: var(--lift-sm);
+}
+.question + .question { margin-top: 16px; }
+.question .q { font-size: 14.5px; font-weight: 500; margin: 7px 0 4px; }
+.question .why { font-size: 12.5px; color: var(--ink-3); margin-bottom: 13px; }
+.opts { display: flex; flex-direction: column; gap: 8px; }
+
+/* ----------------------------------------------------- botões e controles
+ * O gesto: o elemento repousa sobre a própria sombra e, no hover, anda na
+ * direção dela. `transform` e `box-shadow` são as duas únicas propriedades
+ * animadas — as duas rodam no compositor, então não há reflow.
+ */
+.opts button, .btn {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; text-align: left; cursor: pointer;
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 0;
+  padding: 9px 13px;
+  box-shadow: var(--lift-sm);
+  transition: transform var(--t), box-shadow var(--t), background var(--t), color var(--t);
+}
+.opts button:hover, .btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: var(--lift-press);
+}
+.opts button:active, .btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.primary:hover { background: var(--ink); color: var(--paper); }
+.btn.small { padding: 5px 9px; font-size: 10.5px; box-shadow: var(--lift-press); }
+.btn.small:hover { transform: translate(1px, 1px); box-shadow: 0 0 0 var(--ink); }
+.btn:disabled {
+  cursor: not-allowed; color: var(--ink-3); border-color: var(--line-2);
+  box-shadow: none; transform: none;
+}
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
 input, select, textarea {
   font: inherit; font-size: 13px; background: var(--card); color: var(--ink);
-  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-width: 0;
+  border: 1px solid var(--line); border-radius: 0; padding: 8px 10px; min-width: 0;
+  transition: box-shadow var(--t), transform var(--t);
+}
+input:hover, select:hover, textarea:hover { box-shadow: var(--lift-press); }
+input:focus, select:focus, textarea:focus {
+  outline: none; box-shadow: var(--lift-sm);
 }
 input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--s1); outline-offset: 1px;
+  outline: 2px solid var(--ink); outline-offset: 2px;
 }
-label.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-3); }
+label.field {
+  display: flex; flex-direction: column; gap: 5px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-3);
+}
 
 /* ---------------------------------------------------------------- charts */
 svg { display: block; width: 100%; height: auto; overflow: visible; }
-.tick { font-family: var(--mono); font-size: 10.5px; fill: var(--ink-3); }
-.axis-lab { font-family: var(--mono); font-size: 11px; fill: var(--ink-2); }
+.tick { font-family: var(--mono); font-size: 10px; fill: var(--ink-3); }
+.axis-lab { font-family: var(--mono); font-size: 10.5px; fill: var(--ink-2); }
 .gridline { stroke: var(--grid); stroke-width: 1; }
-.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); margin-bottom: 10px; }
-.legend span { display: inline-flex; align-items: center; gap: 6px; }
-.swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
-.swatch.line { height: 2px; width: 14px; }
+.legend {
+  display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-2);
+}
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 10px; height: 10px; border-radius: 0; display: inline-block; border: 1px solid var(--ink); }
+.swatch.line { height: 3px; width: 16px; border: 0; }
 .tt {
-  position: fixed; pointer-events: none; z-index: 60; background: var(--ink); color: var(--bg);
-  font-family: var(--mono); font-size: 11.5px; padding: 6px 9px; border-radius: 6px;
-  white-space: pre; line-height: 1.45;
+  position: fixed; pointer-events: none; z-index: 60;
+  background: var(--ink); color: var(--paper);
+  font-family: var(--mono); font-size: 11px; padding: 7px 10px; border-radius: 0;
+  white-space: pre; line-height: 1.45; border: 1px solid var(--ink);
 }
 
-/* -------------------------------------------------------------- estados */
-.empty { text-align: center; padding: 60px 20px; color: var(--ink-3); }
-.stack { display: flex; height: 26px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-2); }
+/* --------------------------------------------------------------- estados */
+.empty {
+  text-align: center; padding: 70px 20px; color: var(--ink-3);
+  font-family: var(--mono);
+}
+.stack { display: flex; height: 28px; overflow: hidden; border: 1px solid var(--line); }
 .stack i { display: block; height: 100%; }
-.bar-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 12.5px; }
+.bar-legend {
+  display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; font-size: 12.5px;
+}
 .bar-legend .item { display: flex; align-items: baseline; gap: 7px; }
 .bar-legend b { font-family: var(--mono); font-weight: 600; }
 .toast {
-  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-  background: var(--ink); color: var(--bg); padding: 9px 15px; border-radius: 999px;
-  font-size: 13px; z-index: 80; box-shadow: var(--shadow);
+  position: fixed; bottom: 20px; left: 50%;
+  background: var(--ink); color: var(--paper); padding: 10px 16px;
+  border-radius: 0; font-family: var(--mono); font-size: 11.5px;
+  letter-spacing: 0.1em; text-transform: uppercase; z-index: 80;
+  border: 1px solid var(--ink); box-shadow: var(--lift-sm);
+  animation: sobe 160ms cubic-bezier(0.2, 0, 0.1, 1);
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@keyframes sobe {
+  from { transform: translate(-50%, 10px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+.toast { transform: translateX(-50%); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  /* sem movimento, o hover precisa continuar legível: a sombra sai do lugar
+     do gesto e vira estado */
+  .opts button:hover, .btn:hover { transform: none; box-shadow: var(--lift-press); }
+}

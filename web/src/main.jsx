@@ -1,16 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { api, brl, dataBR } from "./lib.js";
+import { ForecastView, LeversView, ProfileView } from "./profile.jsx";
 import { TriageView } from "./triage.jsx";
 import { Data, Fixed, Overview, Plans, Spending } from "./views.jsx";
 import "./styles.css";
 
 const ABAS = [
   ["visao", "Visão geral"],
+  ["perfil", "Perfil"],
   ["triagem", "Triagem"],
   ["gastos", "Gastos"],
   ["fixos", "Compromissos"],
-  ["planos", "Planos e projeção"],
+  ["planos", "Planos"],
+  ["previsoes", "Previsões"],
+  ["alavancas", "Alavancas"],
   ["dados", "Dados"],
 ];
 
@@ -78,10 +82,13 @@ function App() {
 
       <main>
         {aba === "visao" && <Overview {...props} />}
+        {aba === "perfil" && <ProfileView {...props} />}
         {aba === "triagem" && <TriageView {...props} />}
         {aba === "gastos" && <Spending {...props} />}
         {aba === "fixos" && <Fixed {...props} />}
         {aba === "planos" && <Plans {...props} />}
+        {aba === "previsoes" && <ForecastView {...props} />}
+        {aba === "alavancas" && <LeversView {...props} />}
         {aba === "dados" && <Data {...props} />}
       </main>
 

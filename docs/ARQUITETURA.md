@@ -19,7 +19,7 @@ recálculo consistente e **proveniência em tudo**.
 ```
   conectores          núcleo determinístico            interfaces
  ┌───────────┐   ┌──────────────────────────┐   ┌────────────────────────┐
- │ ofx       │   │ parser   → Transaction   │   │ MCP stdio (21 tools)   │──▶ agente
+ │ ofx       │   │ parser   → Transaction   │   │ MCP stdio (28 tools)   │──▶ agente
  │ pluggy    │──▶│ heurística (palpite)     │──▶│ FastAPI 127.0.0.1:8420 │──▶ painel
  │ csv (todo)│   │ mapping  (decisões)      │   │ CLI                    │
  └───────────┘   │ entities → Counterparty  │   └────────────────────────┘
@@ -81,6 +81,9 @@ Consequências concretas, todas testadas:
 | `entities.py` | contrapartes agrupadas, cadência, id estável |
 | `triage.py` | a fila do que está em aberto, ordenada por impacto em reais |
 | `analysis.py` | mês a mês, baseline, gasto invisível, eventos atípicos |
+| `profile.py` | arquétipos casados por número (palpite) e traços assinados |
+| `rules/arquetipos.yaml` | o catálogo: cinco eixos, sinais determinísticos |
+| `levers.py` | alavancas: número + o motor rodado de novo com ele |
 | `plans.py`, `purchases.py`, `score.py`, `projection.py` | metas, compra, score, caixa |
 | `report.py` | monta o contexto único |
 | `api.py`, `mcp_server.py`, `cli.py` | as três interfaces |
@@ -156,6 +159,40 @@ A cada importação (e sob demanda) o motor recalcula o que está em aberto:
 Cada item traz o **impacto mensal em reais** de deixá-lo em aberto, e é isso que
 ordena a fila. O que foi resolvido não volta; o que foi adiado volta no fim.
 
+## Perfil
+
+O perfil é a parte do motor que mais facilmente trairia a fronteira, porque é
+onde o app é tentado a dizer quem a pessoa é. O desenho separa duas coisas:
+
+| | Casamento | Assinatura |
+|---|---|---|
+| origem | `importacao` | `agente` ou `usuario` |
+| onde mora | em lugar nenhum — é recalculado | `data/perfil.yaml` |
+| vale como verdade | não | sim |
+| exige `porque` | não se aplica | sim, e a loja recusa sem ele |
+
+`PerfilStore.assinar` levanta `ValueError` para proveniência de autoridade
+insuficiente. Não é validação defensiva: é a regra do produto expressa em
+código. Rodar `analyze` mil vezes nunca cria perfil.
+
+Os eixos são independentes (fase, renda, custo, consumo, constância) porque
+perfil único descreve todo mundo um pouco e não muda cálculo nenhum. Cada eixo
+pode ficar **sem leitura** quando nenhum arquétipo atinge a aderência mínima ou
+quando dois empatam — estado honesto, preferível a forçar o menos ruim.
+
+## Alavancas
+
+Uma alavanca é um número e o motor rodado de novo com ele: `score.compute` e
+`projection.project`, as mesmas funções que as outras interfaces consomem.
+Nunca uma estimativa paralela, que divergiria da tela ao lado no primeiro
+refactor.
+
+O que o módulo não faz é igualmente estrutural: não escreve prosa, não ordena
+cortes, não chama gasto de desnecessário. A dimensão de vazamentos, por
+exemplo, é uma rampa entre o teto de 15% da despesa e zero — o motor mostra
+dois pontos dela e não escolhe, porque escolher é decidir o que é cortável na
+vida de alguém.
+
 ## Como estender
 
 **Novo banco (OFX)**: normalmente nada a fazer. Memo com prefixo diferente →
@@ -169,6 +206,16 @@ calcule o impacto. A interface não muda.
 **Nova chave de núcleo**: um `ChaveDoNucleo` em `context.NUCLEO`, com
 `porque_importa` e `peso`. A lacuna, o impacto e a entrada na triagem saem de
 graça.
+
+**Novo arquétipo ou eixo**: um bloco em `rules/arquetipos.yaml`. Os sinais
+precisam apontar indicadores que `profile.indicadores` já calcula — indicador
+inexistente vem `None` e reprova o sinal, em vez de casar por omissão. Sem
+código, sem deploy.
+
+**Nova alavanca**: uma função em `levers.py` que devolve `_alavanca(...)` com
+número, efeito recalculado e evidência. A ordenação é por reais por mês; o que
+não converte em dinheiro vai com `ordenacao: 0` e o motor diz que não soube
+converter.
 
 ## Pensado como produto
 
@@ -188,5 +235,6 @@ graça.
 - Orçamento por categoria com alerta de estouro no meio do mês.
 - Histórico de score e de decisões ao longo do tempo.
 - Sazonalidade na projeção (13º, férias, IPVA).
+- Histórico do perfil: hoje um traço substituído guarda só o valor anterior.
 - Regras com janela de validade (o padrão mudou a partir de tal mês).
 - Multiusuário: autenticação e workspaces nomeados.

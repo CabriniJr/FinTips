@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CostStack, FlowChart, HBars, ProjectionChart, ScoreBars } from "./charts.jsx";
+import { CostStack, FlowChart, HBars, ScoreBars } from "./charts.jsx";
 import { api, brl, brl0, dataBR, mesLabel, pct, titulo } from "./lib.js";
 
 function Panel({ titulo: t, hint, className = "c12", children }) {
@@ -308,13 +308,9 @@ export function Fixed({ ctx, reload, toast }) {
 
 /* ================================================= PLANOS, PROJEÇÃO, COMPRA */
 export function Plans({ ctx, reload, toast }) {
-  const [cenario, setCenario] = useState("base");
-  const [proj, setProj] = useState(ctx.projecao);
   const [novo, setNovo] = useState({ nome: "", custo_alvo: "", data_alvo: "", aporte_mensal: "", prioridade: "media" });
   const [compra, setCompra] = useState({ item: "", preco: "", parcelas_possiveis: 1, urgencia: "media" });
   const [veredito, setVeredito] = useState(null);
-
-  useEffect(() => { api.projection(cenario).then(setProj).catch(() => {}); }, [cenario]);
 
   async function salvarPlano(e) {
     e.preventDefault();
@@ -341,24 +337,6 @@ export function Plans({ ctx, reload, toast }) {
 
   return (
     <div className="grid">
-      <Panel className="c12" titulo="Projeção de caixa"
-        hint="Repete como certo apenas o que foi definido como compromisso; o resto entra como média variável.">
-        <div className="row" style={{ marginBottom: 12 }}>
-          {["base", "conservador", "otimista"].map((c) => (
-            <button key={c} className={`btn small ${c === cenario ? "primary" : ""}`} onClick={() => setCenario(c)}>
-              {titulo(c)}
-            </button>
-          ))}
-          {proj && (
-            <span style={{ color: "var(--ink-3)", fontSize: 12.5, marginLeft: 6 }}>
-              sobra {brl0(proj.premissas.sobra_mensal)}/mês · fixo {pct(proj.premissas.fixo_pct_da_renda)} da renda
-              {proj.reserva.atingida_em && ` · reserva completa em ${mesLabel(proj.reserva.atingida_em)}`}
-            </span>
-          )}
-        </div>
-        {proj && <ProjectionChart linhas={proj.linhas} reservaAlvo={proj.reserva.alvo} />}
-      </Panel>
-
       <Panel className="c7" titulo="Planos" hint="Meta cruzada com o extrato: o que já foi gasto nela conta como execução.">
         {(ctx.planos || []).length === 0 && <p className="hint">Nenhum plano cadastrado.</p>}
         {(ctx.planos || []).map((p) => (
