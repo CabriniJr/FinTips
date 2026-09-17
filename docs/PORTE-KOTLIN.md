@@ -76,6 +76,30 @@ Duas consequências:
 
 Harness é tão bom quanto o dado que ele compara.
 
+## O que a porta se permite mudar: representação
+
+Nos contratos, o Kotlin faz a única mudança que a regra permite. O Python
+valida origem e atitude como string em tempo de execução; aqui elas são `enum`,
+e `origem = "usario"` vira erro de compilação em vez de heurística silenciosa.
+
+Isso não viola "porta replica, não corrige", porque **não muda comportamento
+nenhum**: o texto que vai para o disco continua `"heuristica"` e `"aceitar"`, e
+o harness compara a serialização chave por chave, na ordem. Trocar como o dado
+é guardado na memória é livre; trocar o que sai no arquivo, não.
+
+Por isso o ouro dos contratos protege duas coisas separadas:
+
+- **comportamento** — autoridade, id estável, especificidade, prioridade. Se
+  divergir, o Kotlin classifica transação diferente do Python.
+- **formato de gravação** — as chaves e a ordem do `to_dict`. Se divergir, o
+  YAML que um motor grava deixa de ser legível pelo outro, e quem migrar perde
+  o histórico de decisões. Essa quebra não aparece em cálculo nenhum: aparece
+  como arquivo corrompido semanas depois.
+
+Confirmado quebrando de propósito: mudar um peso de especificidade, um peso de
+prioridade e acrescentar uma chave na serialização derrubou quatro testes, um
+por tipo de garantia.
+
 ## Dependências que o Python não precisava
 
 Duas coisas que são biblioteca padrão no Python e não são no Kotlin:
@@ -105,7 +129,7 @@ quando a anterior tem ouro fechando.
 | 2 | `Modelo` — Transacao, Conta, Extrato, taxonomias | **pronto** |
 | 3 | `LeitorOfx` — SGML e XML, dedup por FITID | **pronto** |
 | 4 | `Privacidade` — hash de conta (pseudônimo espera o `norm`) | **parcial** |
-| 5 | `Contratos` — Proveniencia, autoridade, Causa, Regra | a fazer |
+| 5 | `Contratos` — Proveniencia, autoridade, Causa, Regra | **pronto** |
 | 6 | `Classificacao` — regras determinísticas e cobertura | a fazer |
 | 7 | `Analise` — baseline, meses, recorrências, invisível | a fazer |
 | 8 | `Score`, `Projecao`, `Planos`, `Compras` | a fazer |

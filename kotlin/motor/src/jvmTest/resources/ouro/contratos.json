@@ -1,0 +1,549 @@
+{
+  "o_que_e": "autoridade, ids, especificidade, prioridade e formato de gravação",
+  "gerado_por": "fintips.contracts",
+  "quando_fixo": "2026-06-15T10:30:00",
+  "autoridade": [
+    {
+      "origem": "heuristica",
+      "autoridade": 0,
+      "e_verdade": false
+    },
+    {
+      "origem": "importacao",
+      "autoridade": 1,
+      "e_verdade": false
+    },
+    {
+      "origem": "agente",
+      "autoridade": 2,
+      "e_verdade": true
+    },
+    {
+      "origem": "usuario",
+      "autoridade": 3,
+      "e_verdade": true
+    }
+  ],
+  "atitudes": [
+    "nenhuma",
+    "aceitar",
+    "reduzir",
+    "eliminar",
+    "substituir",
+    "automatizar",
+    "observar"
+  ],
+  "ids": [
+    {
+      "prefixo": "causa",
+      "partes": [
+        "categoria",
+        "alimentacao",
+        "gatilho"
+      ],
+      "id": "causa-e368a67c"
+    },
+    {
+      "prefixo": "cf",
+      "partes": [
+        "categoria",
+        "transporte"
+      ],
+      "id": "cf-66c294c8"
+    },
+    {
+      "prefixo": "r",
+      "partes": [
+        "uber",
+        "lazer"
+      ],
+      "id": "r-f52a56f1"
+    },
+    {
+      "prefixo": "x",
+      "partes": [
+        ""
+      ],
+      "id": "x-e3b0c442"
+    },
+    {
+      "prefixo": "acento",
+      "partes": [
+        "alimentação",
+        "café"
+      ],
+      "id": "acento-2735f1e7"
+    }
+  ],
+  "especificidade": [
+    {
+      "quando": {},
+      "especificidade": 0,
+      "vazia": true,
+      "serializado": {}
+    },
+    {
+      "quando": {
+        "contraparte_id": "uber"
+      },
+      "especificidade": 5,
+      "vazia": false,
+      "serializado": {
+        "contraparte_id": "uber"
+      }
+    },
+    {
+      "quando": {
+        "memo_casa": "(bilhete|TOP SP)"
+      },
+      "especificidade": 4,
+      "vazia": false,
+      "serializado": {
+        "memo_casa": "(bilhete|TOP SP)"
+      }
+    },
+    {
+      "quando": {
+        "contraparte_contem": "ifood"
+      },
+      "especificidade": 3,
+      "vazia": false,
+      "serializado": {
+        "contraparte_contem": "ifood"
+      }
+    },
+    {
+      "quando": {
+        "canal": "pix",
+        "fluxo": "expense"
+      },
+      "especificidade": 3,
+      "vazia": false,
+      "serializado": {
+        "canal": "pix",
+        "fluxo": "expense"
+      }
+    },
+    {
+      "quando": {
+        "valor_min": 10.0,
+        "valor_max": 100.0
+      },
+      "especificidade": 2,
+      "vazia": false,
+      "serializado": {
+        "valor_min": 10.0,
+        "valor_max": 100.0
+      }
+    },
+    {
+      "quando": {
+        "dias_semana": [
+          5,
+          6
+        ]
+      },
+      "especificidade": 2,
+      "vazia": false,
+      "serializado": {
+        "dias_semana": [
+          5,
+          6
+        ]
+      }
+    },
+    {
+      "quando": {
+        "hora_min": 20,
+        "hora_max": 23
+      },
+      "especificidade": 2,
+      "vazia": false,
+      "serializado": {
+        "hora_min": 20,
+        "hora_max": 23
+      }
+    },
+    {
+      "quando": {
+        "contraparte_id": "uber",
+        "dias_semana": [
+          5,
+          6
+        ],
+        "hora_min": 20
+      },
+      "especificidade": 9,
+      "vazia": false,
+      "serializado": {
+        "contraparte_id": "uber",
+        "dias_semana": [
+          5,
+          6
+        ],
+        "hora_min": 20
+      }
+    }
+  ],
+  "prioridade_de_regra": [
+    {
+      "origem": "usuario",
+      "confianca": 1.0,
+      "quando": {
+        "contraparte_id": "uber"
+      },
+      "prioridade": [
+        3,
+        5,
+        1.0
+      ]
+    },
+    {
+      "origem": "agente",
+      "confianca": 0.9,
+      "quando": {
+        "contraparte_id": "uber",
+        "dias_semana": [
+          5,
+          6
+        ]
+      },
+      "prioridade": [
+        2,
+        7,
+        0.9
+      ]
+    },
+    {
+      "origem": "heuristica",
+      "confianca": 0.4,
+      "quando": {
+        "memo_casa": "uber"
+      },
+      "prioridade": [
+        0,
+        4,
+        0.4
+      ]
+    },
+    {
+      "origem": "importacao",
+      "confianca": 0.6,
+      "quando": {
+        "canal": "pix"
+      },
+      "prioridade": [
+        1,
+        2,
+        0.6
+      ]
+    }
+  ],
+  "prioridade_de_triagem": [
+    {
+      "tipo": "fato_ausente",
+      "impacto_mensal": 100.0,
+      "prioridade": 130.0
+    },
+    {
+      "tipo": "fato_ausente",
+      "impacto_mensal": 33.33,
+      "prioridade": 43.33
+    },
+    {
+      "tipo": "fato_ausente",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "fato_ausente",
+      "impacto_mensal": -50.0,
+      "prioridade": 65.0
+    },
+    {
+      "tipo": "custo_fixo_derivou",
+      "impacto_mensal": 100.0,
+      "prioridade": 120.0
+    },
+    {
+      "tipo": "custo_fixo_derivou",
+      "impacto_mensal": 33.33,
+      "prioridade": 40.0
+    },
+    {
+      "tipo": "custo_fixo_derivou",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "custo_fixo_derivou",
+      "impacto_mensal": -50.0,
+      "prioridade": 60.0
+    },
+    {
+      "tipo": "contraparte_nova",
+      "impacto_mensal": 100.0,
+      "prioridade": 100.0
+    },
+    {
+      "tipo": "contraparte_nova",
+      "impacto_mensal": 33.33,
+      "prioridade": 33.33
+    },
+    {
+      "tipo": "contraparte_nova",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "contraparte_nova",
+      "impacto_mensal": -50.0,
+      "prioridade": 50.0
+    },
+    {
+      "tipo": "candidato_custo_fixo",
+      "impacto_mensal": 100.0,
+      "prioridade": 100.0
+    },
+    {
+      "tipo": "candidato_custo_fixo",
+      "impacto_mensal": 33.33,
+      "prioridade": 33.33
+    },
+    {
+      "tipo": "candidato_custo_fixo",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "candidato_custo_fixo",
+      "impacto_mensal": -50.0,
+      "prioridade": 50.0
+    },
+    {
+      "tipo": "classificacao_fraca",
+      "impacto_mensal": 100.0,
+      "prioridade": 90.0
+    },
+    {
+      "tipo": "classificacao_fraca",
+      "impacto_mensal": 33.33,
+      "prioridade": 30.0
+    },
+    {
+      "tipo": "classificacao_fraca",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "classificacao_fraca",
+      "impacto_mensal": -50.0,
+      "prioridade": 45.0
+    },
+    {
+      "tipo": "evento_sem_explicacao",
+      "impacto_mensal": 100.0,
+      "prioridade": 80.0
+    },
+    {
+      "tipo": "evento_sem_explicacao",
+      "impacto_mensal": 33.33,
+      "prioridade": 26.66
+    },
+    {
+      "tipo": "evento_sem_explicacao",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "evento_sem_explicacao",
+      "impacto_mensal": -50.0,
+      "prioridade": 40.0
+    },
+    {
+      "tipo": "fato_vencido",
+      "impacto_mensal": 100.0,
+      "prioridade": 80.0
+    },
+    {
+      "tipo": "fato_vencido",
+      "impacto_mensal": 33.33,
+      "prioridade": 26.66
+    },
+    {
+      "tipo": "fato_vencido",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "fato_vencido",
+      "impacto_mensal": -50.0,
+      "prioridade": 40.0
+    },
+    {
+      "tipo": "causa_ausente",
+      "impacto_mensal": 100.0,
+      "prioridade": 110.0
+    },
+    {
+      "tipo": "causa_ausente",
+      "impacto_mensal": 33.33,
+      "prioridade": 36.66
+    },
+    {
+      "tipo": "causa_ausente",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "causa_ausente",
+      "impacto_mensal": -50.0,
+      "prioridade": 55.0
+    },
+    {
+      "tipo": "causa_a_revisar",
+      "impacto_mensal": 100.0,
+      "prioridade": 100.0
+    },
+    {
+      "tipo": "causa_a_revisar",
+      "impacto_mensal": 33.33,
+      "prioridade": 33.33
+    },
+    {
+      "tipo": "causa_a_revisar",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "causa_a_revisar",
+      "impacto_mensal": -50.0,
+      "prioridade": 50.0
+    },
+    {
+      "tipo": "causa_sem_atitude",
+      "impacto_mensal": 100.0,
+      "prioridade": 90.0
+    },
+    {
+      "tipo": "causa_sem_atitude",
+      "impacto_mensal": 33.33,
+      "prioridade": 30.0
+    },
+    {
+      "tipo": "causa_sem_atitude",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "causa_sem_atitude",
+      "impacto_mensal": -50.0,
+      "prioridade": 45.0
+    },
+    {
+      "tipo": "tipo_que_nao_existe",
+      "impacto_mensal": 100.0,
+      "prioridade": 100.0
+    },
+    {
+      "tipo": "tipo_que_nao_existe",
+      "impacto_mensal": 33.33,
+      "prioridade": 33.33
+    },
+    {
+      "tipo": "tipo_que_nao_existe",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "tipo_que_nao_existe",
+      "impacto_mensal": -50.0,
+      "prioridade": 50.0
+    }
+  ],
+  "serializacao": {
+    "proveniencia": {
+      "origem": "usuario",
+      "confianca": 1.0,
+      "porque": "a pessoa afirmou",
+      "evidencia": [
+        "tx-1",
+        "tx-2"
+      ],
+      "quando": "2026-06-15T10:30:00",
+      "por_quem": "claude"
+    },
+    "causa": {
+      "id": "causa-abc",
+      "efeito": {
+        "tipo": "categoria",
+        "ref": "alimentacao"
+      },
+      "alvo": "categoria:alimentacao",
+      "natureza": "gatilho",
+      "enunciado": "peço delivery depois do plantão",
+      "atitude": "aceitar",
+      "atitude_nota": "é o custo de trabalhar à noite",
+      "evidencia": [
+        "tx-9"
+      ],
+      "revisar_em": "2027-01-01",
+      "vencida": false,
+      "criado_em": "2026-06-15T10:30:00",
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa afirmou",
+        "evidencia": [
+          "tx-1",
+          "tx-2"
+        ],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    },
+    "custo_fixo": {
+      "id": "cf-abc",
+      "rotulo": "Transporte trabalho",
+      "base": {
+        "tipo": "categoria",
+        "ref": "transporte-trabalho"
+      },
+      "valor_mensal": 79.5,
+      "valor_anual": 954.0,
+      "metodo": "mediana_meses_completos",
+      "natureza": "rotina",
+      "ativo": true,
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa afirmou",
+        "evidencia": [
+          "tx-1",
+          "tx-2"
+        ],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    },
+    "fato": {
+      "chave": "moradia.situacao",
+      "valor": "com_familia",
+      "tipo": "texto",
+      "expira_em": null,
+      "substituiu": null,
+      "vencido": false,
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa afirmou",
+        "evidencia": [
+          "tx-1",
+          "tx-2"
+        ],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    }
+  }
+}

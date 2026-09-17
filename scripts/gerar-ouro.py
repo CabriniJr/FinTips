@@ -192,11 +192,129 @@ def ouro_privacidade() -> dict:
     }
 
 
+QUANDO_FIXO = "2026-06-15T10:30:00"
+
+
+def ouro_contratos() -> dict:
+    """Autoridade, ids, especificidade, prioridade e o formato de gravação.
+
+    As duas primeiras partes protegem comportamento; a última protege
+    compatibilidade de arquivo. Se `to_dict` mudar de chave ou de ordem, o YAML
+    que o motor Kotlin gravar deixa de ser legível pelo Python e vice-versa —
+    e quem estiver migrando perde o histórico de decisões.
+    """
+    from fintips.contracts import (
+        AUTORIDADE, ATITUDES, Causa, Condicao, CustoFixo, Efeito, Fato,
+        ItemDeTriagem, Proveniencia, Regra, novo_id,
+    )
+
+    autoridade = [
+        {"origem": o, "autoridade": AUTORIDADE[o],
+         "e_verdade": Proveniencia(origem=o).e_verdade}
+        for o in ("heuristica", "importacao", "agente", "usuario")
+    ]
+
+    ids = [
+        {"prefixo": "causa", "partes": ["categoria", "alimentacao", "gatilho"]},
+        {"prefixo": "cf", "partes": ["categoria", "transporte"]},
+        {"prefixo": "r", "partes": ["uber", "lazer"]},
+        {"prefixo": "x", "partes": [""]},
+        {"prefixo": "acento", "partes": ["alimentação", "café"]},
+    ]
+    for caso in ids:
+        caso["id"] = novo_id(caso["prefixo"], *caso["partes"])
+
+    condicoes = [
+        {},
+        {"contraparte_id": "uber"},
+        {"memo_casa": "(bilhete|TOP SP)"},
+        {"contraparte_contem": "ifood"},
+        {"canal": "pix", "fluxo": "expense"},
+        {"valor_min": 10.0, "valor_max": 100.0},
+        {"dias_semana": [5, 6]},
+        {"hora_min": 20, "hora_max": 23},
+        {"contraparte_id": "uber", "dias_semana": [5, 6], "hora_min": 20},
+    ]
+    especificidade = []
+    for c in condicoes:
+        cond = Condicao.from_dict(c)
+        especificidade.append({
+            "quando": c,
+            "especificidade": cond.especificidade(),
+            "vazia": cond.vazia(),
+            "serializado": cond.to_dict(),
+        })
+
+    regras = []
+    for origem, conf, quando in [
+        ("usuario", 1.0, {"contraparte_id": "uber"}),
+        ("agente", 0.9, {"contraparte_id": "uber", "dias_semana": [5, 6]}),
+        ("heuristica", 0.4, {"memo_casa": "uber"}),
+        ("importacao", 0.6, {"canal": "pix"}),
+    ]:
+        r = Regra(
+            id="r-teste", quando=Condicao.from_dict(quando), entao=Efeito(categoria="lazer"),
+            proveniencia=Proveniencia(origem=origem, confianca=conf, porque="ouro"),
+        )
+        regras.append({
+            "origem": origem, "confianca": conf, "quando": quando,
+            "prioridade": list(r.prioridade()),
+        })
+
+    itens = []
+    for tipo in ("fato_ausente", "custo_fixo_derivou", "contraparte_nova",
+                 "candidato_custo_fixo", "classificacao_fraca",
+                 "evento_sem_explicacao", "fato_vencido",
+                 "causa_ausente", "causa_a_revisar", "causa_sem_atitude",
+                 "tipo_que_nao_existe"):
+        for impacto in (100.0, 33.33, 0.0, -50.0):
+            it = ItemDeTriagem(id="t", tipo=tipo, titulo="", impacto_mensal=impacto,
+                               porque_importa="")
+            itens.append({"tipo": tipo, "impacto_mensal": impacto,
+                          "prioridade": it.prioridade})
+
+    prov = Proveniencia(origem="usuario", confianca=1.0, porque="a pessoa afirmou",
+                        evidencia=["tx-1", "tx-2"], quando=QUANDO_FIXO, por_quem="claude")
+    causa = Causa(
+        id="causa-abc", efeito_tipo="categoria", efeito_ref="alimentacao",
+        natureza="gatilho", enunciado="peço delivery depois do plantão",
+        atitude="aceitar", atitude_nota="é o custo de trabalhar à noite",
+        evidencia=["tx-9"], proveniencia=prov, revisar_em="2027-01-01",
+        criado_em=QUANDO_FIXO,
+    )
+    custo = CustoFixo(
+        id="cf-abc", rotulo="Transporte trabalho", base_tipo="categoria",
+        base_ref="transporte-trabalho", valor_mensal=79.5,
+        metodo="mediana_meses_completos", natureza="rotina", proveniencia=prov,
+    )
+    fato = Fato(chave="moradia.situacao", valor="com_familia", tipo="texto",
+                proveniencia=prov, expira_em=None, substituiu=None)
+
+    return {
+        "o_que_e": "autoridade, ids, especificidade, prioridade e formato de gravação",
+        "gerado_por": "fintips.contracts",
+        "quando_fixo": QUANDO_FIXO,
+        "autoridade": autoridade,
+        "atitudes": list(ATITUDES),
+        "ids": ids,
+        "especificidade": especificidade,
+        "prioridade_de_regra": regras,
+        "prioridade_de_triagem": itens,
+        "serializacao": {
+            "proveniencia": prov.to_dict(),
+            "causa": causa.to_dict(),
+            "custo_fixo": custo.to_dict(),
+            "fato": fato.to_dict(),
+        },
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
     "privacidade.json": ouro_privacidade,
     "ofx.json": ouro_ofx,
+    "contratos.json": ouro_contratos,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
