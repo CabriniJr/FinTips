@@ -1,0 +1,43 @@
+{
+  "o_que_e": "hash truncado de conta e pseudônimo de pessoa física",
+  "gerado_por": "fintips.privacy.digest / hash_account / pseudonym",
+  "sal": "ouro-do-harness",
+  "casos": [
+    {
+      "valor": "12345678",
+      "digest": "77fde5cdcd",
+      "hash_conta": "acct:77fde5cdcd",
+      "pseudonimo": "PF:77fde5"
+    },
+    {
+      "valor": "0001-9",
+      "digest": "853b3fe421",
+      "hash_conta": "acct:853b3fe421",
+      "pseudonimo": "PF:853b3f"
+    },
+    {
+      "valor": "",
+      "digest": "8cb742ea62",
+      "hash_conta": "acct:8cb742ea62",
+      "pseudonimo": "PF:8cb742"
+    },
+    {
+      "valor": "Conta Corrente 42",
+      "digest": "e3c2f14891",
+      "hash_conta": "acct:e3c2f14891",
+      "pseudonimo": "PF:86f290"
+    },
+    {
+      "valor": "ÁÉÍÕÇ",
+      "digest": "c822fb2872",
+      "hash_conta": "acct:c822fb2872",
+      "pseudonimo": "PF:21d02d"
+    },
+    {
+      "valor": "acentuação",
+      "digest": "bf0a6fa379",
+      "hash_conta": "acct:bf0a6fa379",
+      "pseudonimo": "PF:d52b07"
+    }
+  ]
+}

@@ -13,10 +13,11 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // Deliberadamente vazio por enquanto. O motor do FinTips quase não
-            // tem dependência — o parser OFX é escrito à mão e a única
-            // biblioteca do lado Python é o PyYAML. Manter assim é o que torna
-            // a porta para Kotlin viável em primeiro lugar.
+            // Uma dependência só, e por um motivo que não existe no Python:
+            // data e hora não estão no stdlib do Kotlin. O `datetime` do
+            // Python é biblioteca padrão; aqui, não. O resto do motor segue
+            // sem dependência — o leitor OFX é escrito à mão, como lá.
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

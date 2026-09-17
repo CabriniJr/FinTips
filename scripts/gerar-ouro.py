@@ -72,12 +72,134 @@ def ouro_dinheiro() -> dict:
     }
 
 
+# Sal fixo para o ouro. O sal real do usuário mora em `.fintips-salt` e nunca
+# sai da máquina; aqui ele precisa ser conhecido dos dois lados, senão o hash
+# da conta jamais bateria e o teste falharia por motivo errado.
+SAL_DO_OURO = "ouro-do-harness"
+
+
+def ouro_ofx() -> dict:
+    """O canônico inteiro do fixture, transação a transação.
+
+    Este é o ouro que pega de verdade: ele cobre leitura de tag SGML, data com
+    fuso, valor em pt-BR, deduplicação por (FITID, valor, data), desambiguação
+    de FITID repetido, ordenação e conciliação. Se o leitor Kotlin errar em
+    qualquer um desses, o teste aponta a transação.
+    """
+    from fintips.parsers.ofx import parse_ofx
+
+    stmt = parse_ofx(RAIZ / "tests" / "fixture.ofx", salt=SAL_DO_OURO)
+    bate, diff = stmt.reconciles()
+    return {
+        "o_que_e": "canônico completo do tests/fixture.ofx",
+        "gerado_por": "fintips.parsers.ofx.parse_ofx",
+        "sal": SAL_DO_OURO,
+        "conta": {
+            "id_hash": stmt.account.id_hash,
+            "instituicao": stmt.account.institution,
+            "id_banco": stmt.account.bank_id,
+            "tipo": stmt.account.type,
+            "moeda": stmt.account.currency,
+        },
+        "origem": stmt.source,
+        "periodo": {
+            "inicio": stmt.period_start.isoformat(),
+            "fim": stmt.period_end.isoformat(),
+        },
+        "saldo": {
+            "centavos": centavos(stmt.ledger_balance),
+            "em": stmt.balance_as_of.isoformat(),
+        },
+        "conciliacao": {"bate": bate, "diferenca_centavos": centavos(diff)},
+        "transacoes": [
+            {
+                "id": t.id,
+                "data": t.ts.strftime("%Y-%m-%d"),
+                "hora": t.ts.strftime("%H:%M"),
+                "mes": t.month,
+                "centavos": centavos(t.amount),
+                "memo": t.memo_raw,
+                "conta_id": t.account_id,
+            }
+            for t in stmt.transactions
+        ],
+    }
+
+
+def ouro_datas() -> dict:
+    """Leitura de data OFX, isolada do fixture.
+
+    Este ouro nasceu de uma lacuna encontrada na prática: todo `DTPOSTED` do
+    fixture traz `[-3:BRT]` explícito, então o fuso padrão nunca era
+    exercitado. Trocar o padrão de -3 para -2 no leitor Kotlin não quebrava
+    teste nenhum — não porque o harness fosse cego, mas porque o fixture não
+    fazia a pergunta.
+
+    Harness é tão bom quanto o dado que ele compara. Estes casos fazem a
+    pergunta: data sem fuso, só com dia, com fuso fracionário, em dd/mm/aaaa.
+    """
+    from fintips.parsers.ofx import parse_datetime
+
+    brutos = [
+        "20260601100000[-3:BRT]",
+        "20260601100000",             # sem fuso: cai no padrão
+        "20260601",                   # só a data
+        "20260601235959[-3:BRT]",
+        "20260601000000[+0:GMT]",
+        "20260601120000[-3.5:XXX]",   # fuso fracionário
+        "30/06/2026",
+        "1/1/2027",
+    ]
+    casos = []
+    for b in brutos:
+        dt = parse_datetime(b)
+        casos.append({
+            "bruto": b,
+            "data": dt.strftime("%Y-%m-%d"),
+            "hora": dt.strftime("%H:%M"),
+            "mes": dt.strftime("%Y-%m"),
+            "deslocamento_segundos": int(dt.utcoffset().total_seconds()),
+        })
+    return {
+        "o_que_e": "leitura de data OFX, incluindo os casos que o fixture não cobre",
+        "gerado_por": "fintips.parsers.ofx.parse_datetime",
+        "casos": casos,
+    }
+
+
+def ouro_privacidade() -> dict:
+    """Hash de conta e pseudônimo — precisam bater dígito por dígito.
+
+    Se divergirem, o workspace de quem já usa o motor Python vira lixo na
+    primeira importação pelo Kotlin: a mesma conta apareceria como duas.
+    """
+    from fintips.privacy import digest, hash_account, pseudonym
+
+    entradas = ["12345678", "0001-9", "", "Conta Corrente 42", "ÁÉÍÕÇ", "acentuação"]
+    return {
+        "o_que_e": "hash truncado de conta e pseudônimo de pessoa física",
+        "gerado_por": "fintips.privacy.digest / hash_account / pseudonym",
+        "sal": SAL_DO_OURO,
+        "casos": [
+            {
+                "valor": v,
+                "digest": digest(v, SAL_DO_OURO),
+                "hash_conta": hash_account(v, SAL_DO_OURO),
+                "pseudonimo": pseudonym(v, SAL_DO_OURO),
+            }
+            for v in entradas
+        ],
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
+    "datas.json": ouro_datas,
+    "privacidade.json": ouro_privacidade,
+    "ofx.json": ouro_ofx,
     # Os próximos entram aqui, na ordem da porta:
-    #   "modelo.json"   — Transaction/Account/Statement do fixture
-    #   "ofx.json"      — o canônico inteiro, transação a transação
-    #   "analise.json"  — baseline, meses, recorrências
+    #   "classificacao.json" — regras determinísticas e cobertura
+    #   "analise.json"       — baseline, meses, recorrências
 }
 
 

@@ -58,6 +58,42 @@ Onde o Python usa `float` de propósito — volatilidade, desvio padrão,
 percentual — o Kotlin usa `Double` também, para o harness comparar maçã com
 maçã.
 
+## O harness precisa ser testado também
+
+Depois de portar o leitor OFX, quebrei o fuso padrão de propósito — de -3 para
+-2 — esperando ver o harness acusar. **Ele não acusou**, e a explicação vale
+mais que o susto: todo `DTPOSTED` do fixture traz `[-3:BRT]` explícito, então o
+fuso padrão nunca era exercitado. O harness não estava cego; o fixture é que
+não fazia a pergunta.
+
+Duas consequências:
+
+- Nasceu `ouro/datas.json`, isolado do fixture, com data sem fuso, data sem
+  hora, fuso fracionário e `dd/mm/aaaa`.
+- Virou prática: **a cada módulo portado, quebrar o Kotlin de propósito e
+  confirmar que o teste falha nomeando o problema**. Inverter a ordenação das
+  transações, por exemplo, derruba três testes de uma vez — esse morde.
+
+Harness é tão bom quanto o dado que ele compara.
+
+## Dependências que o Python não precisava
+
+Duas coisas que são biblioteca padrão no Python e não são no Kotlin:
+
+| O que | Python | Kotlin |
+|---|---|---|
+| data e hora | `datetime` | `kotlinx-datetime` (única dependência do `commonMain`) |
+| SHA-256 | `hashlib` | `expect`/`actual` — `MessageDigest` na JVM e no Android |
+| normalização Unicode | `unicodedata` | ainda não resolvido; trava o `norm()` e o `pseudonimo` |
+
+Criptografia entra por `expect`/`actual` em vez de implementação à mão: cada
+alvo já traz a sua, e escrever SHA-256 no braço é ruim mesmo quando o algoritmo
+é conhecido.
+
+O `pseudonimo` ficou **de fora** desta fatia de propósito. No Python ele é
+`"PF:" + digest(_norm(nome), sal, 6)`, e sem o `_norm` o hash de "José" sairia
+diferente — a mesma pessoa viraria duas. Portar meio é pior que não portar.
+
 ## Ordem dos módulos
 
 Do que não depende de nada para o que depende de tudo. Cada linha só começa
@@ -65,10 +101,10 @@ quando a anterior tem ouro fechando.
 
 | # | Módulo | Estado |
 |---|---|---|
-| 1 | `Dinheiro` — leitura de valor e arredondamento | **pronto**, 14 testes |
-| 2 | `Modelo` — Transacao, Conta, Extrato, taxonomias | a fazer |
-| 3 | `LeitorOfx` — SGML e XML, dedup por FITID | a fazer |
-| 4 | `Privacidade` — hash de conta, pseudônimo | a fazer |
+| 1 | `Dinheiro` — leitura de valor e arredondamento | **pronto** |
+| 2 | `Modelo` — Transacao, Conta, Extrato, taxonomias | **pronto** |
+| 3 | `LeitorOfx` — SGML e XML, dedup por FITID | **pronto** |
+| 4 | `Privacidade` — hash de conta (pseudônimo espera o `norm`) | **parcial** |
 | 5 | `Contratos` — Proveniencia, autoridade, Causa, Regra | a fazer |
 | 6 | `Classificacao` — regras determinísticas e cobertura | a fazer |
 | 7 | `Analise` — baseline, meses, recorrências, invisível | a fazer |
