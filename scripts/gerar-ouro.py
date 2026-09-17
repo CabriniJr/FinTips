@@ -309,12 +309,173 @@ def ouro_contratos() -> dict:
     }
 
 
+def ouro_texto() -> dict:
+    """Normalização caractere a caractere.
+
+    Parece o ouro mais bobo da lista e é um dos mais importantes: `norm` é a
+    base de toda comparação de nome do motor. Divergir num acento faz a mesma
+    padaria virar duas contrapartes, e o custo mensal dela se parte ao meio sem
+    nenhum erro aparecer.
+    """
+    from fintips.categorize import norm
+    from fintips.entities import canonical_name, slug
+
+    textos = [
+        "Padaria São João", "CAFÉ AÇÚCAR", "  espaços   demais  ",
+        "Gelato Roma-LJ0046", "Gelato Roma-LJ0084", "EMV CMT*144318981",
+        "MERCADO 1234", "LOJA UN 7", "Farmácia III", "PF:ab12cd",
+        "", "   ", "ÁÉÍÓÚ àèìòù âêîôû ãõ ç ñ", "ÿ Ÿ œ Œ ß",
+        "Restaurante do Zé - FIL 02", "posto ipiranga*9988",
+        "naïve café", "1234", "---", "A*B",
+    ]
+    return {
+        "o_que_e": "normalização, slug e nome canônico de contraparte",
+        "gerado_por": "fintips.categorize.norm / entities.slug / entities.canonical_name",
+        "casos": [
+            {"texto": t, "norm": norm(t), "slug": slug(t), "canonico": canonical_name(t)}
+            for t in textos
+        ],
+    }
+
+
+def ouro_regras() -> dict:
+    """O motor de regras, isolado da heurística.
+
+    O estado inicial das transações é escrito aqui à mão, e não produzido pelo
+    `Categorizer`. Isso é de propósito: a heurística ainda não foi portada, e
+    um ouro que dependesse dela testaria duas coisas ao mesmo tempo — quando
+    falhasse, ninguém saberia qual das duas quebrou.
+
+    O estado escolhido exercita todos os campos de condição: contraparte por
+    id, por conteúdo, memo, canal, fluxo, categoria atual, faixa de valor, dia
+    da semana e hora.
+    """
+    from fintips.contracts import Condicao, Efeito, Proveniencia, Regra
+    from fintips.mapping import aplicar, casa, cobertura
+    from fintips.parsers.ofx import parse_ofx
+
+    class LojaFalsa:
+        def __init__(self, regras):
+            self.regras = regras
+
+        def ativas(self):
+            return sorted(
+                [r for r in self.regras if r.ativa],
+                key=lambda r: r.prioridade(), reverse=True,
+            )
+
+    # Estado inicial explícito, por posição no extrato ordenado.
+    ESTADO = [
+        {"contraparte": "Gelato Roma-LJ0046", "categoria": "outros", "canal": "debit_card", "fluxo": "expense"},
+        {"contraparte": "PAGSEGURO INTERNET", "categoria": "renda", "canal": "salary", "fluxo": "income"},
+        {"contraparte": "Seguro Cartão", "categoria": "taxas", "canal": "fee", "fluxo": "expense"},
+        {"contraparte": "iFood", "categoria": "alimentacao", "canal": "pix", "fluxo": "expense"},
+        {"contraparte": "Uber", "categoria": "transporte", "canal": "debit_card", "fluxo": "expense"},
+        {"contraparte": "Café Açúcar", "categoria": "alimentacao", "canal": "debit_card", "fluxo": "expense"},
+        {"contraparte": "EMV CMT*144318981", "categoria": "transporte", "canal": "transit_topup", "fluxo": "expense"},
+        {"contraparte": "", "categoria": "outros", "canal": "other", "fluxo": "expense"},
+        {"contraparte": "PF:ab12cd", "categoria": "pessoas", "canal": "pix", "fluxo": "expense"},
+    ]
+
+    definicoes = [
+        ("r-heuristica-ampla", "heuristica", 0.4, {"fluxo": "expense"},
+         {"categoria": "outros-heuristica"}),
+        ("r-usuario-ampla", "usuario", 1.0, {"fluxo": "expense"},
+         {"categoria": "decidido-pelo-usuario"}),
+        ("r-agente-especifica", "agente", 0.9,
+         {"fluxo": "expense", "valor_min": 1.0, "valor_max": 50.0},
+         {"categoria": "pequeno", "marcar": ["micro"]}),
+        ("r-por-contraparte-id", "usuario", 1.0, {"contraparte_id": "gelato-roma"},
+         {"categoria": "sobremesa"}),
+        ("r-por-contraparte-contem", "usuario", 1.0, {"contraparte_contem": "cafe"},
+         {"categoria": "cafeteria", "rotulo": "Cafeteria do bairro"}),
+        ("r-por-memo", "usuario", 1.0, {"memo_casa": "(CDB|Renda Fixa)"},
+         {"categoria": "investimento", "fluxo": "savings_out"}),
+        ("r-por-canal", "agente", 0.8, {"canal": "transit_topup"},
+         {"categoria": "transporte-trabalho", "marcar": ["rotina"]}),
+        ("r-por-categoria-atual", "agente", 0.7, {"categoria_atual": "pessoas"},
+         {"marcar": ["repasse"]}),
+        ("r-fim-de-semana", "usuario", 1.0, {"dias_semana": [5, 6]},
+         {"categoria": "lazer-fds"}),
+        ("r-noturna", "usuario", 1.0, {"hora_min": 20, "hora_max": 23},
+         {"categoria": "noturno", "rotulo": "Compra noturna"}),
+    ]
+    regras = [
+        Regra(id=rid, quando=Condicao.from_dict(q), entao=Efeito.from_dict(e),
+              proveniencia=Proveniencia(origem=o, confianca=c, porque="ouro"))
+        for rid, o, c, q, e in definicoes
+    ]
+
+    stmt = parse_ofx(RAIZ / "tests" / "fixture.ofx", salt=SAL_DO_OURO)
+    for tx, estado in zip(stmt.transactions, ESTADO):
+        tx.counterparty = estado["contraparte"]
+        tx.category = estado["categoria"]
+        tx.channel = estado["canal"]
+        tx.flow = estado["fluxo"]
+        tx.category_source = "heuristica"
+        tx.category_confidence = 0.4
+        tx.tags = []
+
+    estado_inicial = [
+        {
+            "id": t.id, "contraparte": t.counterparty, "categoria": t.category,
+            "canal": t.channel, "fluxo": t.flow,
+            "dia_semana": t.ts.weekday(), "hora": t.ts.hour,
+            "centavos": centavos(t.amount), "memo": t.memo_raw,
+        }
+        for t in stmt.transactions
+    ]
+
+    casamentos = [
+        {"transacao": t.id, "casa_com": [r.id for r in regras if casa(r, t)]}
+        for t in stmt.transactions
+    ]
+
+    precedencia = [
+        {"id": r.id, "prioridade": list(r.prioridade())}
+        for r in LojaFalsa(regras).ativas()
+    ]
+
+    resultado = aplicar(LojaFalsa(regras), stmt)
+    cob = cobertura(stmt)
+
+    return {
+        "o_que_e": "precedência, casamento, aplicação e cobertura, isolados da heurística",
+        "gerado_por": "fintips.mapping.casa / aplicar / cobertura",
+        "sal": SAL_DO_OURO,
+        "regras": [
+            {"id": rid, "origem": o, "confianca": c, "quando": q, "entao": e}
+            for rid, o, c, q, e in definicoes
+        ],
+        "estado_inicial": estado_inicial,
+        "precedencia": precedencia,
+        "casamentos": casamentos,
+        "resultado": resultado,
+        "cobertura": cob,
+        "transacoes_depois": [
+            {
+                "id": t.id,
+                "categoria": t.category,
+                "fluxo": t.flow,
+                "contraparte": t.counterparty,
+                "etiquetas": sorted(t.tags),
+                "origem_categoria": t.category_source,
+                "confianca": round(t.category_confidence, 2),
+                "regra": t.rule_id,
+            }
+            for t in stmt.transactions
+        ],
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
     "privacidade.json": ouro_privacidade,
     "ofx.json": ouro_ofx,
     "contratos.json": ouro_contratos,
+    "texto.json": ouro_texto,
+    "regras.json": ouro_regras,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências

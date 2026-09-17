@@ -108,15 +108,19 @@ Duas coisas que são biblioteca padrão no Python e não são no Kotlin:
 |---|---|---|
 | data e hora | `datetime` | `kotlinx-datetime` (única dependência do `commonMain`) |
 | SHA-256 | `hashlib` | `expect`/`actual` — `MessageDigest` na JVM e no Android |
-| normalização Unicode | `unicodedata` | ainda não resolvido; trava o `norm()` e o `pseudonimo` |
+| normalização Unicode | `unicodedata` | `expect`/`actual` — `java.text.Normalizer` na JVM e no Android |
 
 Criptografia entra por `expect`/`actual` em vez de implementação à mão: cada
 alvo já traz a sua, e escrever SHA-256 no braço é ruim mesmo quando o algoritmo
 é conhecido.
 
-O `pseudonimo` ficou **de fora** desta fatia de propósito. No Python ele é
-`"PF:" + digest(_norm(nome), sal, 6)`, e sem o `_norm` o hash de "José" sairia
-diferente — a mesma pessoa viraria duas. Portar meio é pior que não portar.
+As três lacunas estão fechadas. O `pseudonimo`, que tinha ficado de fora por
+depender do `norm`, entrou junto com ele.
+
+O filtro do `semAcento` remove a categoria Unicode **Mn** (marca não
+espaçante), que é exatamente o que `unicodedata.combining(c)` testa. Filtrar
+por faixa de código em vez de por categoria pegaria o acento latino e deixaria
+passar o resto — funcionaria no teste e falharia no extrato de alguém.
 
 ## Ordem dos módulos
 
@@ -128,9 +132,10 @@ quando a anterior tem ouro fechando.
 | 1 | `Dinheiro` — leitura de valor e arredondamento | **pronto** |
 | 2 | `Modelo` — Transacao, Conta, Extrato, taxonomias | **pronto** |
 | 3 | `LeitorOfx` — SGML e XML, dedup por FITID | **pronto** |
-| 4 | `Privacidade` — hash de conta (pseudônimo espera o `norm`) | **parcial** |
+| 4 | `Privacidade` — hash de conta, pseudônimo | **pronto** |
 | 5 | `Contratos` — Proveniencia, autoridade, Causa, Regra | **pronto** |
-| 6 | `Classificacao` — regras determinísticas e cobertura | a fazer |
+| 6 | `Texto` + `MotorDeRegras` — norm, slug, precedência, cobertura | **pronto** |
+| 6b | `Heuristica` — o piso de categorias (espera o YAML) | a fazer |
 | 7 | `Analise` — baseline, meses, recorrências, invisível | a fazer |
 | 8 | `Score`, `Projecao`, `Planos`, `Compras` | a fazer |
 | 9 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | a fazer |

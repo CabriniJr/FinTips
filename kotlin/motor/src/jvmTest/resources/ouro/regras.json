@@ -1,0 +1,499 @@
+{
+  "o_que_e": "precedência, casamento, aplicação e cobertura, isolados da heurística",
+  "gerado_por": "fintips.mapping.casa / aplicar / cobertura",
+  "sal": "ouro-do-harness",
+  "regras": [
+    {
+      "id": "r-heuristica-ampla",
+      "origem": "heuristica",
+      "confianca": 0.4,
+      "quando": {
+        "fluxo": "expense"
+      },
+      "entao": {
+        "categoria": "outros-heuristica"
+      }
+    },
+    {
+      "id": "r-usuario-ampla",
+      "origem": "usuario",
+      "confianca": 1.0,
+      "quando": {
+        "fluxo": "expense"
+      },
+      "entao": {
+        "categoria": "decidido-pelo-usuario"
+      }
+    },
+    {
+      "id": "r-agente-especifica",
+      "origem": "agente",
+      "confianca": 0.9,
+      "quando": {
+        "fluxo": "expense",
+        "valor_min": 1.0,
+        "valor_max": 50.0
+      },
+      "entao": {
+        "categoria": "pequeno",
+        "marcar": [
+          "micro"
+        ]
+      }
+    },
+    {
+      "id": "r-por-contraparte-id",
+      "origem": "usuario",
+      "confianca": 1.0,
+      "quando": {
+        "contraparte_id": "gelato-roma"
+      },
+      "entao": {
+        "categoria": "sobremesa"
+      }
+    },
+    {
+      "id": "r-por-contraparte-contem",
+      "origem": "usuario",
+      "confianca": 1.0,
+      "quando": {
+        "contraparte_contem": "cafe"
+      },
+      "entao": {
+        "categoria": "cafeteria",
+        "rotulo": "Cafeteria do bairro"
+      }
+    },
+    {
+      "id": "r-por-memo",
+      "origem": "usuario",
+      "confianca": 1.0,
+      "quando": {
+        "memo_casa": "(CDB|Renda Fixa)"
+      },
+      "entao": {
+        "categoria": "investimento",
+        "fluxo": "savings_out"
+      }
+    },
+    {
+      "id": "r-por-canal",
+      "origem": "agente",
+      "confianca": 0.8,
+      "quando": {
+        "canal": "transit_topup"
+      },
+      "entao": {
+        "categoria": "transporte-trabalho",
+        "marcar": [
+          "rotina"
+        ]
+      }
+    },
+    {
+      "id": "r-por-categoria-atual",
+      "origem": "agente",
+      "confianca": 0.7,
+      "quando": {
+        "categoria_atual": "pessoas"
+      },
+      "entao": {
+        "marcar": [
+          "repasse"
+        ]
+      }
+    },
+    {
+      "id": "r-fim-de-semana",
+      "origem": "usuario",
+      "confianca": 1.0,
+      "quando": {
+        "dias_semana": [
+          5,
+          6
+        ]
+      },
+      "entao": {
+        "categoria": "lazer-fds"
+      }
+    },
+    {
+      "id": "r-noturna",
+      "origem": "usuario",
+      "confianca": 1.0,
+      "quando": {
+        "hora_min": 20,
+        "hora_max": 23
+      },
+      "entao": {
+        "categoria": "noturno",
+        "rotulo": "Compra noturna"
+      }
+    }
+  ],
+  "estado_inicial": [
+    {
+      "id": "f1",
+      "contraparte": "Gelato Roma-LJ0046",
+      "categoria": "outros",
+      "canal": "debit_card",
+      "fluxo": "expense",
+      "dia_semana": 0,
+      "hora": 10,
+      "centavos": -10000,
+      "memo": "Renda Fixa - Aplicação em CDB"
+    },
+    {
+      "id": "f2",
+      "contraparte": "PAGSEGURO INTERNET",
+      "categoria": "renda",
+      "canal": "salary",
+      "fluxo": "income",
+      "dia_semana": 4,
+      "hora": 8,
+      "centavos": 500000,
+      "memo": "Salário/Remuneração - PAGSEGURO INTERNET INSTITUICAO DE PAGAMENTO S.A."
+    },
+    {
+      "id": "f3",
+      "contraparte": "Seguro Cartão",
+      "categoria": "taxas",
+      "canal": "fee",
+      "fluxo": "expense",
+      "dia_semana": 5,
+      "hora": 9,
+      "centavos": -790,
+      "memo": "Cobrança Seguro Cartão Protegido - Para: PAGSEGURO INTERNET INSTITUICAO DE PAGAMENTO"
+    },
+    {
+      "id": "f4",
+      "contraparte": "iFood",
+      "categoria": "alimentacao",
+      "canal": "pix",
+      "fluxo": "expense",
+      "dia_semana": 6,
+      "hora": 15,
+      "centavos": -900,
+      "memo": "Cartão de Débito - CENTRO DE CULTURA        SAO PAULO    BR"
+    },
+    {
+      "id": "f5",
+      "contraparte": "Uber",
+      "categoria": "transporte",
+      "canal": "debit_card",
+      "fluxo": "expense",
+      "dia_semana": 2,
+      "hora": 12,
+      "centavos": -50000,
+      "memo": "Pix enviado - Carlos Alberto Nogueira"
+    },
+    {
+      "id": "f6",
+      "contraparte": "Café Açúcar",
+      "categoria": "alimentacao",
+      "canal": "debit_card",
+      "fluxo": "expense",
+      "dia_semana": 3,
+      "hora": 12,
+      "centavos": -15000,
+      "memo": "Pix enviado - Marina Duarte Prado"
+    },
+    {
+      "id": "f7",
+      "contraparte": "EMV CMT*144318981",
+      "categoria": "transporte",
+      "canal": "transit_topup",
+      "fluxo": "expense",
+      "dia_semana": 4,
+      "hora": 12,
+      "centavos": 30000,
+      "memo": "Pix recebido - Titular Da Conta Exemplo"
+    },
+    {
+      "id": "f8",
+      "contraparte": "",
+      "categoria": "outros",
+      "canal": "other",
+      "fluxo": "expense",
+      "dia_semana": 0,
+      "hora": 6,
+      "centavos": -2000,
+      "memo": "Cartão de Débito - TARIFA TRANS*ATM TMOB    SAO PAULO    BR"
+    },
+    {
+      "id": "f8#2",
+      "contraparte": "PF:ab12cd",
+      "categoria": "pessoas",
+      "canal": "pix",
+      "fluxo": "expense",
+      "dia_semana": 0,
+      "hora": 6,
+      "centavos": 2000,
+      "memo": "Estorno Cartão de Débito - TARIFA TRANS*ATM TMOB    SAO PAULO    BR"
+    }
+  ],
+  "precedencia": [
+    {
+      "id": "r-por-contraparte-id",
+      "prioridade": [
+        3,
+        5,
+        1.0
+      ]
+    },
+    {
+      "id": "r-por-memo",
+      "prioridade": [
+        3,
+        4,
+        1.0
+      ]
+    },
+    {
+      "id": "r-por-contraparte-contem",
+      "prioridade": [
+        3,
+        3,
+        1.0
+      ]
+    },
+    {
+      "id": "r-fim-de-semana",
+      "prioridade": [
+        3,
+        2,
+        1.0
+      ]
+    },
+    {
+      "id": "r-noturna",
+      "prioridade": [
+        3,
+        2,
+        1.0
+      ]
+    },
+    {
+      "id": "r-usuario-ampla",
+      "prioridade": [
+        3,
+        1,
+        1.0
+      ]
+    },
+    {
+      "id": "r-agente-especifica",
+      "prioridade": [
+        2,
+        3,
+        0.9
+      ]
+    },
+    {
+      "id": "r-por-canal",
+      "prioridade": [
+        2,
+        2,
+        0.8
+      ]
+    },
+    {
+      "id": "r-por-categoria-atual",
+      "prioridade": [
+        2,
+        1,
+        0.7
+      ]
+    },
+    {
+      "id": "r-heuristica-ampla",
+      "prioridade": [
+        0,
+        1,
+        0.4
+      ]
+    }
+  ],
+  "casamentos": [
+    {
+      "transacao": "f1",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla",
+        "r-por-contraparte-id",
+        "r-por-memo"
+      ]
+    },
+    {
+      "transacao": "f2",
+      "casa_com": []
+    },
+    {
+      "transacao": "f3",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla",
+        "r-agente-especifica",
+        "r-fim-de-semana"
+      ]
+    },
+    {
+      "transacao": "f4",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla",
+        "r-agente-especifica",
+        "r-fim-de-semana"
+      ]
+    },
+    {
+      "transacao": "f5",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla"
+      ]
+    },
+    {
+      "transacao": "f6",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla",
+        "r-por-contraparte-contem"
+      ]
+    },
+    {
+      "transacao": "f7",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla",
+        "r-por-canal"
+      ]
+    },
+    {
+      "transacao": "f8",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla",
+        "r-agente-especifica"
+      ]
+    },
+    {
+      "transacao": "f8#2",
+      "casa_com": [
+        "r-heuristica-ampla",
+        "r-usuario-ampla",
+        "r-agente-especifica",
+        "r-por-categoria-atual"
+      ]
+    }
+  ],
+  "resultado": {
+    "regras_ativas": 10,
+    "transacoes_tocadas": 8,
+    "por_regra": {
+      "r-por-contraparte-id": 1,
+      "r-fim-de-semana": 2,
+      "r-usuario-ampla": 4,
+      "r-por-contraparte-contem": 1
+    },
+    "sem_regra": 1
+  },
+  "cobertura": {
+    "despesa_total": 1106.9,
+    "classificado_por_decisao": 1106.9,
+    "classificado_por_heuristica": 0.0,
+    "cobertura_pct": 100.0
+  },
+  "transacoes_depois": [
+    {
+      "id": "f1",
+      "categoria": "sobremesa",
+      "fluxo": "expense",
+      "contraparte": "Gelato Roma-LJ0046",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-por-contraparte-id"
+    },
+    {
+      "id": "f2",
+      "categoria": "renda",
+      "fluxo": "income",
+      "contraparte": "PAGSEGURO INTERNET",
+      "etiquetas": [],
+      "origem_categoria": "heuristica",
+      "confianca": 0.4,
+      "regra": ""
+    },
+    {
+      "id": "f3",
+      "categoria": "lazer-fds",
+      "fluxo": "expense",
+      "contraparte": "Seguro Cartão",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-fim-de-semana"
+    },
+    {
+      "id": "f4",
+      "categoria": "lazer-fds",
+      "fluxo": "expense",
+      "contraparte": "iFood",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-fim-de-semana"
+    },
+    {
+      "id": "f5",
+      "categoria": "decidido-pelo-usuario",
+      "fluxo": "expense",
+      "contraparte": "Uber",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-usuario-ampla"
+    },
+    {
+      "id": "f6",
+      "categoria": "cafeteria",
+      "fluxo": "expense",
+      "contraparte": "Cafeteria do bairro",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-por-contraparte-contem"
+    },
+    {
+      "id": "f7",
+      "categoria": "decidido-pelo-usuario",
+      "fluxo": "expense",
+      "contraparte": "EMV CMT*144318981",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-usuario-ampla"
+    },
+    {
+      "id": "f8",
+      "categoria": "decidido-pelo-usuario",
+      "fluxo": "expense",
+      "contraparte": "",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-usuario-ampla"
+    },
+    {
+      "id": "f8#2",
+      "categoria": "decidido-pelo-usuario",
+      "fluxo": "expense",
+      "contraparte": "PF:ab12cd",
+      "etiquetas": [],
+      "origem_categoria": "usuario",
+      "confianca": 1.0,
+      "regra": "r-usuario-ampla"
+    }
+  ]
+}

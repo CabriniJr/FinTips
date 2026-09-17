@@ -144,6 +144,13 @@ class OuroOfxTest {
             if (esperadoHash != obtidoHash) {
                 divergencias += "  hashConta('$valor') → python $esperadoHash, kotlin $obtidoHash"
             }
+            // o pseudônimo normaliza antes do hash: "José" e "JOSE" precisam
+            // dar o mesmo apelido, senão a mesma pessoa aparece duas vezes
+            val esperadoPseudo = texto(c, "pseudonimo")
+            val obtidoPseudo = pseudonimo(valor, sal)
+            if (esperadoPseudo != obtidoPseudo) {
+                divergencias += "  pseudonimo('$valor') → python $esperadoPseudo, kotlin $obtidoPseudo"
+            }
         }
         if (divergencias.isNotEmpty()) {
             fail("pseudonimização divergiu do motor Python:\n" + divergencias.joinToString("\n"))
