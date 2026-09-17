@@ -17,3 +17,6 @@ __pycache__/
 .venv/
 dist/
 build/
+
+# gerado por quem instala (UID local) — não versionar
+.env

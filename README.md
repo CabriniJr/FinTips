@@ -71,6 +71,57 @@ decisão e quanto ainda é palpite**. Começa em 0%.
 - **Avalia intenção de compra** contra reserva, planos e o seu histórico de
   arrependimento.
 
+## A jornada, em três passos
+
+```
+1. IMPORTAR            2. CONVERSAR                 3. VIVER COM ISSO
+extrato .ofx      →    o agente investiga,     →    "posso comprar isso?"
+(futuro: Open          pergunta e registra          "quando fecho a viagem?"
+ Finance)              com evidência                "onde estou perdendo?"
+```
+
+O extrato entra e vira modelo canônico. **Nada é concluído aí** — as três
+coberturas (classificação, perfil, causas) começam em 0%. O perfil nasce na
+conversa com o agente, que investiga antes de perguntar e grava cada decisão
+com `porque`. Daí em diante o painel centraliza o que foi acumulando, e as
+perguntas do dia a dia passam a ter contra o que ser respondidas.
+
+Detalhe de cada etapa, com os buracos que ainda existem, em `docs/JORNADA.md`.
+
+## Rodar com Docker (Linux)
+
+Três comandos, do zero ao painel:
+
+```bash
+./scripts/fintips-docker.sh setup          # .env com o seu UID, workspace e imagem
+./scripts/fintips-docker.sh importar extrato.ofx
+./scripts/fintips-docker.sh up             # http://127.0.0.1:8420
+```
+
+O `setup` resolve as três coisas que dão errado ao rodar isto em Linux: o
+volume sair com dono root (ele passa o seu UID/GID para o build), o `~` do
+caminho não ser expandido pelo compose (ele grava o caminho absoluto) e o
+painel acabar publicado na rede (o mapeamento é `127.0.0.1:8420:8420`, e
+trocar aquilo por `8420:8420` serve o seu extrato para a rede inteira).
+
+Qualquer comando do CLI passa pelo mesmo script:
+
+```bash
+./scripts/fintips-docker.sh triagem
+./scripts/fintips-docker.sh perfil
+./scripts/fintips-docker.sh alavancas
+./scripts/fintips-docker.sh down
+```
+
+Para conectar o agente ao mesmo workspace:
+
+```bash
+./scripts/fintips-docker.sh mcp-config     # imprime o JSON do cliente MCP
+```
+
+Seus dados ficam no workspace montado (`~/Documents/FinTips` por padrão), nunca
+dentro da imagem: o container é descartável, o workspace não.
+
 ## Instalação
 
 ```bash
@@ -206,6 +257,7 @@ for t in tests/test_*.py; do python "$t" || break; done
 
 ## Documentos
 
+- `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
 - `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem
 - `docs/PRIVACIDADE.md` — modelo de ameaça e o que nunca sai da máquina
 - `docs/OPEN-FINANCE.md` — por que via agregador e como plugar
