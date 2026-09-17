@@ -78,7 +78,7 @@ class Workspace:
     @property
     def compras_path(self) -> Path: return self.data / "compras.yaml"
     @property
-    def perfil_path(self) -> Path: return self.data / "perfil.yaml"   # legado (v0.2)
+    def perfil_path(self) -> Path: return self.data / "perfil.yaml"
     @property
     def taxonomia_path(self) -> Path: return self.data / "taxonomia.yaml"
     @property

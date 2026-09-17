@@ -1,0 +1,251 @@
+# Arquétipos financeiros — catálogo heurístico.
+#
+# ATENÇÃO À NATUREZA DESTE ARQUIVO: nada aqui é verdade sobre ninguém. São
+# recortes genéricos que servem para UMA coisa — dar ao agente um ponto de
+# partida nomeado para a conversa, e ranquear o que olhar primeiro. Um
+# arquétipo casado pelos números entra no perfil como `importacao`, ou seja,
+# palpite. Só vira perfil de verdade quando o agente conclui depois de
+# conversar (`agente`) ou quando a pessoa afirma (`usuario`).
+#
+# Cada eixo é independente: alguém pode estar em `acumulacao` com renda
+# `variavel` e custo `sufocado` ao mesmo tempo. Isso é de propósito — perfil
+# único ("o poupador", "o gastador") é horóscopo, não leitura de extrato.
+#
+# Sinais: cada um aponta um indicador calculado pelo motor e a faixa em que o
+# arquétipo se sustenta. `peso` diz quanto aquele sinal importa para o
+# casamento. O motor soma o peso dos sinais que casaram, divide pelo total e
+# compara com `minimo`. Nenhum sinal sozinho decide.
+#
+# `o_que_muda` é texto do APP: descreve qual cálculo ou qual dúvida esse
+# arquétipo levanta. Nunca é conselho, e nunca é uma pergunta pronta — a
+# pergunta é do agente, que sabe com quem está falando.
+
+schema_version: 1
+
+eixos:
+  # ------------------------------------------------------------------ fase
+  - id: fase
+    nome: Fase financeira
+    o_que_e: onde a pessoa está entre não fechar o mês e acumular com folga
+    minimo: 0.55
+    arquetipos:
+      - id: sobrevivencia
+        nome: Sobrevivência
+        descricao: o mês não fecha sozinho, ou fecha raspando
+        o_que_muda: >-
+          com sobra nula ou negativa, plano com aporte mensal não cabe e a
+          projeção fecha no vermelho; o cálculo que importa primeiro é o de
+          custo comprometido, não o de meta
+        sinais:
+          - indicador: taxa_poupanca
+            max: 0.05
+            peso: 3
+          - indicador: meses_no_vermelho
+            min: 1
+            peso: 2
+          - indicador: meses_de_reserva
+            max: 1.0
+            peso: 2
+
+      - id: equilibrio
+        nome: Equilíbrio sem colchão
+        descricao: sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo
+        o_que_muda: >-
+          existe capacidade de aporte, e ela vai toda para a reserva antes de
+          qualquer meta; a projeção deve responder em que mês a reserva fecha
+        sinais:
+          - indicador: taxa_poupanca
+            min: 0.05
+            max: 0.25
+            peso: 3
+          - indicador: meses_de_reserva
+            min: 0.5
+            max: 3.0
+            peso: 3
+          - indicador: meses_no_vermelho
+            max: 0
+            peso: 1
+
+      - id: acumulacao
+        nome: Acumulação
+        descricao: sobra consistente e reserva a caminho de completar
+        o_que_muda: >-
+          a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a
+          ordem dos planos e o que cada um adia
+        sinais:
+          - indicador: taxa_poupanca
+            min: 0.20
+            peso: 3
+          - indicador: meses_de_reserva
+            min: 2.0
+            max: 6.0
+            peso: 2
+          - indicador: meses_no_vermelho
+            max: 0
+            peso: 1
+
+      - id: consolidacao
+        nome: Consolidação
+        descricao: reserva completa e sobra que excede o que está planejado
+        o_que_muda: >-
+          com reserva coberta, o excedente deixa de ter destino automático; a
+          conta que falta é a de alocação, que este motor não faz — ele só
+          mostra quanto está sobrando sem função
+        sinais:
+          - indicador: meses_de_reserva
+            min: 6.0
+            peso: 4
+          - indicador: taxa_poupanca
+            min: 0.25
+            peso: 2
+
+  # ----------------------------------------------------------------- renda
+  - id: renda
+    nome: Natureza da renda
+    o_que_e: se o que entra todo mês é previsível
+    minimo: 0.55
+    arquetipos:
+      - id: fixa
+        nome: Renda fixa
+        descricao: mesma entrada, mesma época, todo mês
+        o_que_muda: >-
+          a média mensal vale como capacidade de aporte, e a projeção pode
+          repetir a renda sem desconto
+        sinais:
+          - indicador: renda_variacao
+            max: 0.10
+            peso: 3
+          - indicador: meses_com_renda_pct
+            min: 0.9
+            peso: 2
+
+      - id: mista
+        nome: Renda mista
+        descricao: uma base previsível mais entradas que variam
+        o_que_muda: >-
+          só a base previsível deve sustentar compromisso mensal; o excedente
+          variável cabe em aporte pontual, não em parcela
+        sinais:
+          - indicador: renda_variacao
+            min: 0.10
+            max: 0.35
+            peso: 3
+          - indicador: meses_com_renda_pct
+            min: 0.9
+            peso: 2
+
+      - id: variavel
+        nome: Renda variável
+        descricao: valor e frequência mudam mês a mês
+        o_que_muda: >-
+          média mensal engana: a capacidade real é mais próxima do pior mês
+          observado, e a reserva precisa cobrir mais meses que o padrão
+        sinais:
+          - indicador: renda_variacao
+            min: 0.35
+            peso: 3
+          - indicador: meses_com_renda_pct
+            max: 0.9
+            peso: 2
+
+  # ----------------------------------------------------------------- custo
+  - id: custo
+    nome: Estrutura de custo
+    o_que_e: quanto da renda já está comprometido antes de qualquer escolha do mês
+    minimo: 0.6
+    arquetipos:
+      - id: enxuto
+        nome: Custo enxuto
+        descricao: o comprometido ocupa pouco da renda
+        o_que_muda: >-
+          a maior parte do gasto é decisão do mês, então corte e aumento de
+          aporte têm efeito rápido na projeção
+        sinais:
+          - indicador: comprometido_pct_renda
+            max: 35.0
+            peso: 4
+
+      - id: carregado
+        nome: Custo carregado
+        descricao: o comprometido pesa, mas ainda sobra margem de manobra
+        o_que_muda: >-
+          metade da projeção já está decidida por compromissos anteriores;
+          mexer no mês seguinte rende pouco sem renegociar compromisso
+        sinais:
+          - indicador: comprometido_pct_renda
+            min: 35.0
+            max: 60.0
+            peso: 4
+
+      - id: sufocado
+        nome: Custo sufocado
+        descricao: o comprometido consome quase tudo o que entra
+        o_que_muda: >-
+          com quase toda a renda comprometida, a projeção é rígida: nenhum
+          ajuste de consumo muda o mês em que a reserva fecha
+        sinais:
+          - indicador: comprometido_pct_renda
+            min: 60.0
+            peso: 4
+
+  # --------------------------------------------------------------- consumo
+  - id: consumo
+    nome: Padrão de consumo
+    o_que_e: se o gasto variável se concentra em poucas decisões ou se espalha em muitas
+    minimo: 0.6
+    arquetipos:
+      - id: concentrado
+        nome: Consumo concentrado
+        descricao: poucas transações grandes respondem pela maior parte do gasto
+        o_que_muda: >-
+          rever meia dúzia de decisões cobre a maior parte da despesa; o
+          detalhamento por transação pequena rende pouco
+        sinais:
+          - indicador: concentracao_top3_categorias
+            min: 60.0
+            peso: 2
+          - indicador: despesa_em_micro_pct
+            max: 10.0
+            peso: 3
+
+      - id: pulverizado
+        nome: Consumo pulverizado
+        descricao: muitas transações pequenas somam o grosso do mês
+        o_que_muda: >-
+          o gasto não aparece em nenhuma decisão isolada, só no total; a conta
+          que revela é a soma mensal por contraparte, não a transação
+        sinais:
+          - indicador: despesa_em_micro_pct
+            min: 10.0
+            peso: 3
+          - indicador: transacoes_micro_pct
+            min: 40.0
+            peso: 2
+
+  # ------------------------------------------------------------ constância
+  - id: constancia
+    nome: Constância do gasto
+    o_que_e: se o gasto mensal se repete ou salta de um mês para o outro
+    minimo: 0.6
+    arquetipos:
+      - id: estavel
+        nome: Gasto estável
+        descricao: os meses se parecem
+        o_que_muda: >-
+          a média mensal é uma boa previsão, e a projeção pode ser lida com
+          confiança maior nos meses distantes
+        sinais:
+          - indicador: volatilidade_despesa
+            max: 0.20
+            peso: 4
+
+      - id: oscilante
+        nome: Gasto oscilante
+        descricao: um mês não parece com o outro
+        o_que_muda: >-
+          a média mensal esconde o pior mês; a reserva precisa cobrir a
+          oscilação, e o cenário conservador vale mais que o base
+        sinais:
+          - indicador: volatilidade_despesa
+            min: 0.20
+            peso: 4

@@ -23,7 +23,8 @@ from typing import Any
 import yaml
 
 from . import analysis, commitments, discovery, mapping, plans as plans_mod
-from . import projection, score as score_mod, taxonomy as tax_mod, triage
+from . import profile as profile_mod, projection
+from . import score as score_mod, taxonomy as tax_mod, triage
 from .categorize import Categorizer
 from .context import ContextStore
 from .entities import build_counterparties
@@ -52,6 +53,7 @@ def stores(ws: Workspace) -> dict[str, Any]:
         "contexto": ContextStore(ws.contexto_path),
         "compromissos": commitments.CommitmentStore(ws.custos_fixos_path),
         "triagem": triage.TriageStore(ws.triagem_path),
+        "perfil": profile_mod.PerfilStore(ws.perfil_path),
     }
 
 
@@ -175,6 +177,7 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
             "inicio": stmt.period_start.isoformat(),
             "fim": stmt.period_end.isoformat(),
             "transacoes": len(stmt.transactions),
+            "despesas": sum(1 for t in stmt.transactions if t.flow == "expense"),
         },
         "conciliacao": {"bate": ok, "diferenca": float(diff)},
         "saldo_conta": float(stmt.ledger_balance),
@@ -234,6 +237,9 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         "planos": plan_results,
         "contexto": contexto.resumo(),
     }
+
+    # o perfil lê o contexto já montado: sugestão por número + o que foi assinado
+    ctx["perfil"] = profile_mod.montar(ctx, st["perfil"])
 
     ctx["projecao"] = projection.project(
         baseline=ctx["baseline"],
