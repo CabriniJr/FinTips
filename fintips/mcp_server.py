@@ -23,7 +23,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-from . import mapping, plans as plans_mod
+from . import levers, mapping, plans as plans_mod
 from . import projection as proj_mod
 from . import purchases, report
 from .analysis import baseline
@@ -242,6 +242,37 @@ def projecao(cenario: str = "base", meses: int = 12) -> str:
 # ==========================================================================
 
 @mcp.tool()
+def perfil() -> str:
+    """O perfil financeiro: o que os números sugerem e o que foi assinado.
+
+    Cinco eixos independentes (fase, renda, custo, consumo, constância). Em
+    cada um vem o arquétipo que o catálogo casou contra o extrato, com a
+    aderência e a evidência que a sustenta — e o traço assinado, se já houver.
+
+    Leia isto assim: a **sugestão é palpite**, derivada dos números, e não
+    vale como verdade. Ela existe para você ter por onde começar a conversa,
+    não para ser repetida ao usuário como diagnóstico. Confirme conversando e
+    só então chame `assinar_perfil`. `cobertura` diz quanto do perfil já é
+    decisão — começa em 0%, e é assim que deve começar mesmo."""
+    return _json(report.analyze(_ws())["perfil"])
+
+
+@mcp.tool()
+def alavancas() -> str:
+    """O que muda cada número, e quanto — com o motor rodado de novo.
+
+    Cada alavanca traz um valor (reais por mês, em geral) e o efeito
+    recalculado: score depois da mudança, mês em que a reserva fecha, mês em
+    que cada plano conclui. Nenhuma delas é conselho, de propósito.
+
+    O conselho é seu: você sabe o que aquele gasto significa para a pessoa, se
+    o corte é viável, o que já foi tentado. Use os números como régua e
+    escreva a leitura — mas grave o que concluir com `gravar_fato` ou
+    `assinar_perfil`, para a próxima conversa não recomeçar do zero."""
+    return _json(levers.calcular(report.analyze(_ws())))
+
+
+@mcp.tool()
 def simular_regra(quando: dict, entao: dict) -> str:
     """Mostra o que uma regra faria, sem gravar nada.
 
@@ -417,6 +448,38 @@ def esquecer_fato(chave: str) -> str:
     ws = _ws()
     st = report.stores(ws)
     return _json({"esquecido": st["contexto"].esquecer(chave)})
+
+
+@mcp.tool()
+def assinar_perfil(eixo: str, arquetipo: str, porque: str, nome: str = "",
+                   descricao: str = "", origem: str = "agente",
+                   confianca: float = 0.9, evidencia: list[str] | None = None) -> str:
+    """Assina o traço de um eixo do perfil. Só depois de conversar.
+
+    `eixo`: fase | renda | custo | consumo | constancia.
+    `arquetipo`: um id do catálogo daquele eixo, ou 'personalizado' com `nome`
+    e `descricao` seus — use isso quando nenhum recorte pronto descreve a
+    pessoa, o que é comum e não é problema.
+
+    `origem` 'usuario' quando a pessoa afirmou, 'agente' quando você concluiu.
+    O casamento por número NÃO pode assinar: se o único fundamento for "os
+    indicadores casaram", ainda não há perfil — há palpite, e a ferramenta
+    recusa. Pergunte antes."""
+    st = report.stores(_ws())
+    try:
+        traco = st["perfil"].assinar(
+            eixo, arquetipo, nome=nome, descricao=descricao,
+            proveniencia=_prov(origem, confianca, porque, evidencia),
+        )
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    return _json({"traco": traco.to_dict()})
+
+
+@mcp.tool()
+def esquecer_traco(eixo: str) -> str:
+    """Apaga o traço de um eixo — quando o usuário corrige ou a vida mudou."""
+    return _json({"esquecido": report.stores(_ws())["perfil"].esquecer(eixo)})
 
 
 @mcp.tool()

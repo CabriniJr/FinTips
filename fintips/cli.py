@@ -26,6 +26,7 @@ from pathlib import Path
 
 import yaml
 
+from . import levers
 from . import plans as plans_mod
 from . import purchases, report
 from .analysis import baseline
@@ -181,6 +182,71 @@ def cmd_triagem(args) -> None:
         print(f"   por quê: {i['porque_importa'][:110]}")
 
 
+def cmd_perfil(args) -> None:
+    """Mostra o perfil, ou assina um eixo.
+
+    Sem argumentos é só leitura: o que o catálogo sugere por número, o que já
+    foi assinado e quanto do perfil é decisão. Assinar pelo terminal grava com
+    origem `usuario` — porque quem está digitando é a pessoa.
+    """
+    from .contracts import Proveniencia
+
+    ws = _ws(args)
+    st = report.stores(ws)
+    if args.assinar:
+        if not args.porque:
+            sys.exit("assinar um traço de perfil exige --porque")
+        try:
+            traco = st["perfil"].assinar(
+                args.assinar, args.arquetipo or "",
+                nome=args.nome or "", descricao=args.descricao or "",
+                proveniencia=Proveniencia(origem="usuario", confianca=1.0, porque=args.porque),
+            )
+        except ValueError as e:
+            sys.exit(str(e))
+        print(json.dumps(traco.to_dict(), ensure_ascii=False, indent=2))
+        return
+    if args.esquecer:
+        print(json.dumps({"esquecido": st["perfil"].esquecer(args.esquecer)},
+                         ensure_ascii=False, indent=2))
+        return
+
+    perfil = report.analyze(ws, st=st)["perfil"]
+    cob = perfil["cobertura"]
+    print(f"perfil assinado: {cob['assinados']}/{cob['eixos']} eixos ({cob['pct']}%)")
+    print("o resto é sugestão do catálogo contra os seus números — palpite\n")
+    for e in perfil["eixos"]:
+        assinado = e["assinado"]
+        sug = e["sugerido"]
+        marca = "assinado" if assinado else "sugestão"
+        if assinado:
+            quem = assinado["proveniencia"]["origem"]
+            print(f"{e['eixo']:11} {assinado['nome']}  [{marca}: {quem}]")
+            print(f"            porque: {assinado['proveniencia']['porque'][:90]}")
+            if e["diverge_da_sugestao"]:
+                print(f"            (os números sugeririam '{sug['id']}')")
+        elif sug:
+            print(f"{e['eixo']:11} {sug['nome']}  [{marca}, aderência {sug['aderencia']}]")
+            for ev in sug["evidencia"]:
+                print(f"            {ev}")
+        else:
+            print(f"{e['eixo']:11} sem leitura — {e['sem_leitura_porque']}")
+
+
+def cmd_alavancas(args) -> None:
+    ws = _ws(args)
+    out = levers.calcular(report.analyze(ws))
+    print(f"{out['total']} alavancas · ordenadas por {out['ordenado_por']}\n")
+    for a in out["alavancas"][: args.limite]:
+        unidade = {"BRL/mes": "/mês", "BRL": "", "coeficiente": " (coef.)"}.get(a["unidade"], "")
+        print(f"[{a['tipo']:8}] {a['titulo']}")
+        print(f"   {a['numero']}{unidade}")
+        for k, v in a["efeito"].items():
+            if v is not None:
+                print(f"   {k}: {v}")
+        print()
+
+
 def cmd_contexto(args) -> None:
     from .context import ContextStore
     from .contracts import Proveniencia
@@ -283,6 +349,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     rg = sub.add_parser("regras"); rg.add_argument("--remover")
     rg.set_defaults(func=cmd_regras)
+
+    pf = sub.add_parser("perfil")
+    pf.add_argument("--assinar", metavar="EIXO",
+                    help="fase | renda | custo | consumo | constancia")
+    pf.add_argument("--arquetipo", help="id do catálogo, ou 'personalizado'")
+    pf.add_argument("--nome"); pf.add_argument("--descricao")
+    pf.add_argument("--porque", help="obrigatório ao assinar")
+    pf.add_argument("--esquecer", metavar="EIXO")
+    pf.set_defaults(func=cmd_perfil)
+
+    al = sub.add_parser("alavancas"); al.add_argument("--limite", type=int, default=8)
+    al.set_defaults(func=cmd_alavancas)
     return p
 
 

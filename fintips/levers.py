@@ -148,43 +148,56 @@ def _de_score(ctx: dict) -> list[dict]:
                 ordenacao=round(falta / 12, 2),
             ))
 
-    # -------- vazamentos: o excedente de gasto invisível sobre o teto
+    # -------- vazamentos: a dimensão é uma rampa, não um degrau
+    #
+    # `score.compute` zera esta dimensão quando o invisível chega a 15% da
+    # despesa e dá nota cheia quando ele é zero. Ou seja: mirar no teto não
+    # vale ponto nenhum — qualquer alavanca honesta aqui tem que mostrar a
+    # rampa. O motor devolve dois pontos dela (metade e zero) e não escolhe
+    # nenhum: escolher é decidir o que é cortável, e isso depende da vida da
+    # pessoa, não do extrato.
     invis_mes = (
         float((invis.get("taxas_e_seguros") or {}).get("por_mes", 0) or 0)
         + float((invis.get("micro_gastos") or {}).get("por_mes", 0) or 0)
     )
-    if despesa > 0 and invis_mes > despesa * TETO_INVISIVEL_PCT:
-        excedente = round(invis_mes - despesa * TETO_INVISIVEL_PCT, 2)
-        novo_invis = copy.deepcopy(invis)
-        alvo_mes = despesa * TETO_INVISIVEL_PCT
-        fator = alvo_mes / invis_mes if invis_mes else 0
-        for chave in ("taxas_e_seguros", "micro_gastos"):
-            if chave in novo_invis:
-                novo_invis[chave] = dict(
-                    novo_invis[chave],
-                    por_mes=round(float(novo_invis[chave].get("por_mes", 0) or 0) * fator, 2),
-                )
-        depois = _recalcula(novo_invis=novo_invis)
+    if despesa > 0 and invis_mes > 0:
+        def _com_invisivel(fator: float) -> float:
+            novo = copy.deepcopy(invis)
+            for chave in ("taxas_e_seguros", "micro_gastos"):
+                if chave in novo:
+                    novo[chave] = dict(
+                        novo[chave],
+                        por_mes=round(float(novo[chave].get("por_mes", 0) or 0) * fator, 2),
+                    )
+            return _recalcula(novo_invis=novo)
+
+        metade = _com_invisivel(0.5)
+        zerado = _com_invisivel(0.0)
         out.append(_alavanca(
             id="score-vazamentos",
             tipo="score",
             alvo="vazamentos",
-            titulo="Gasto invisível acima do teto de 15% da despesa",
-            numero=excedente,
+            titulo="Gasto que sai sem decisão: taxas, seguros e micro-débitos",
+            numero=round(invis_mes, 2),
             unidade="BRL/mes",
             efeito={
                 "invisivel_agora": round(invis_mes, 2),
-                "teto": round(alvo_mes, 2),
+                "pct_da_despesa": round(invis_mes / despesa * 100, 1),
+                "teto_da_dimensao": round(despesa * TETO_INVISIVEL_PCT, 2),
                 "score_agora": atual,
-                "score_depois": depois,
-                "ganho_de_score": round(depois - atual, 1),
+                "score_depois": metade,           # cenário: metade disso
+                "ganho_de_score": round(metade - atual, 1),
+                "score_se_zerado": zerado,
+                "ganho_se_zerado": round(zerado - atual, 1),
+                "acumulado_em_12_meses": round(invis_mes * 12, 2),
             },
             evidencia=[
                 f"taxas e seguros {(invis.get('taxas_e_seguros') or {}).get('por_mes', 0)}/mês",
                 f"micro-gastos {(invis.get('micro_gastos') or {}).get('por_mes', 0)}/mês",
                 f"despesa média {despesa:.2f}/mês",
+                "o que já foi declarado como compromisso não entra nesta conta",
             ],
-            ordenacao=excedente,
+            ordenacao=round(invis_mes / 2, 2),
         ))
 
     # -------- estabilidade: sem tradução em reais, e o motor diz isso

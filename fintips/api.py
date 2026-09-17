@@ -22,13 +22,13 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import mapping, plans as plans_mod, projection, purchases, report
+from . import levers, mapping, plans as plans_mod, projection, purchases, report
 from .analysis import baseline
 from .categorize import norm
 from .contracts import Proveniencia
 from .workspace import Workspace
 
-API_VERSION = "0.3.0"
+API_VERSION = "0.4.0"
 WEB_DIR = Path(__file__).parent / "web"
 
 
@@ -158,6 +158,22 @@ class PurchaseIn(BaseModel):
     palavras_chave: list[str] = Field(default_factory=list)
 
 
+class ProfileIn(BaseModel):
+    """Assinatura de um traço de perfil.
+
+    `origem` só aceita agente ou usuário — o casamento por número é sugestão e
+    entra por outro caminho (a leitura de `/api/context`), nunca por aqui.
+    """
+
+    arquetipo: str
+    nome: str = ""
+    descricao: str = ""
+    porque: str = ""
+    origem: str = "usuario"
+    confianca: float = 1.0
+    evidencia: list[str] = Field(default_factory=list)
+
+
 class HoldingsIn(BaseModel):
     posicoes: list[dict]
 
@@ -219,6 +235,19 @@ def projecao(cenario: str = "base", meses: int = 12) -> dict:
         patrimonio=ctx["patrimonio"].get("total", 0),
         planos=ctx["planos"], meses=meses, cenario=cenario,
     )
+
+
+@app.get("/api/profile")
+def perfil() -> dict:
+    """Sugestão por número e assinatura, eixo a eixo. Ler nunca grava perfil."""
+    ws = _ws()
+    return cache.get(ws)["perfil"]
+
+
+@app.get("/api/levers")
+def alavancas() -> dict:
+    ws = _ws()
+    return levers.calcular(cache.get(ws))
 
 
 # --------------------------------------------------------------------------
@@ -314,6 +343,33 @@ def gravar_fato(body: FactIn) -> dict:
 def esquecer_fato(chave: str) -> dict:
     st = report.stores(_ws())
     ok = st["contexto"].esquecer(chave)
+    cache.clear()
+    return {"esquecido": ok}
+
+
+@app.post("/api/profile/{eixo}")
+def assinar_perfil(eixo: str, body: ProfileIn) -> dict:
+    # aqui o `porque` não ganha texto padrão: dizer quem a pessoa é sem dizer
+    # com base em quê é exatamente o que o perfil existe para impedir
+    if not body.porque.strip():
+        raise HTTPException(400, "assinar um traço de perfil exige `porque`")
+    st = report.stores(_ws())
+    try:
+        traco = st["perfil"].assinar(
+            eixo, body.arquetipo,
+            nome=body.nome, descricao=body.descricao,
+            proveniencia=_prov(body.origem, body.confianca, body.porque, body.evidencia),
+        )
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+    cache.clear()
+    return {"traco": traco.to_dict()}
+
+
+@app.delete("/api/profile/{eixo}")
+def esquecer_perfil(eixo: str) -> dict:
+    st = report.stores(_ws())
+    ok = st["perfil"].esquecer(eixo)
     cache.clear()
     return {"esquecido": ok}
 

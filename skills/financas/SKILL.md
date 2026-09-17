@@ -1,6 +1,6 @@
 ---
 name: financas
-description: Use ao analisar finanças pessoais, mapear e categorizar gastos, definir custos fixos, conduzir a triagem periódica do FinTips, avaliar uma intenção de compra, revisar planos, ou processar um extrato bancário novo (OFX). Aciona o motor FinTips, que roda local.
+description: Use ao analisar finanças pessoais, mapear e categorizar gastos, definir custos fixos, conduzir a triagem periódica do FinTips, montar o perfil financeiro do usuário, ler previsões de caixa, avaliar uma intenção de compra, revisar planos, ou processar um extrato bancário novo (OFX). Aciona o motor FinTips, que roda local.
 ---
 
 # FinTips — mapear, decidir, registrar
@@ -70,6 +70,57 @@ cálculos diretamente. Para tudo que é específico daquela pessoa, crie a chave
 **origem `usuario` só quando a pessoa afirmou.** Sua conclusão bem fundamentada é
 `agente`. Inflar isso quebra a única garantia que o sistema oferece.
 
+## O perfil: onde é mais fácil errar
+
+O motor casa arquétipos contra os seus números e devolve isso em `perfil`. É
+tentador ler a sugestão em voz alta e chamar de diagnóstico. **Não faça isso.**
+
+A sugestão é `importacao` — palpite. Ela diz que os números *se parecem* com um
+recorte genérico, e recortes genéricos descrevem todo mundo um pouco. Uma taxa
+de poupança alta pode ser disciplina ou pode ser um mês em que a pessoa passou
+as férias na casa da mãe. O extrato não distingue as duas coisas. Você
+distingue, perguntando.
+
+O loop é este:
+
+1. **`perfil`** — veja o que casou, com que aderência, e principalmente a
+   `evidencia`: quais números sustentam aquilo.
+2. **Traga o número, não o rótulo.** "Nos cinco meses completos, seu gasto
+   variou menos de 8% entre o maior e o menor" é uma observação que o usuário
+   pode confirmar ou corrigir. "Você é um gasto estável" é um rótulo que ele só
+   pode aceitar ou rejeitar — e a maioria aceita por educação.
+3. **`assinar_perfil`** com `origem: usuario` se ele afirmou, `agente` se você
+   concluiu. Se nenhum arquétipo do catálogo descreve a pessoa, use
+   `personalizado` com o nome e a descrição que a conversa produziu. Isso é
+   comum e é bom sinal: significa que você ouviu em vez de encaixar.
+4. Quando o perfil assinado **divergir** da sugestão (o campo
+   `diverge_da_sugestao`), a assinatura vence, sempre. Divergência não é erro a
+   corrigir: é o extrato não contando a história toda, que é o caso normal.
+
+Um eixo pode ficar sem leitura (`sem_leitura_porque`). Isso é um estado honesto
+— prefira-o a forçar o menos ruim.
+
+## As alavancas: régua, não conselho
+
+`alavancas` devolve números e efeitos recalculados: quanto falta de sobra para
+a nota cheia, o que o gasto invisível custa em doze meses, quantos meses a
+reserva antecipa se ele sair do variável, que mês cada plano fecha se for
+priorizado.
+
+Nenhuma delas é uma recomendação, de propósito. O motor não sabe se aquele
+gasto é a única coisa que dá prazer na semana da pessoa, se o plano priorizado
+é um sonho ou uma obrigação, se o corte já foi tentado três vezes e falhou.
+**Você sabe, ou pode perguntar.** A prosa é sua: use a alavanca como a conta
+que sustenta o que você vai dizer, e diga com o contexto que você tem.
+
+Duas cautelas:
+
+- Alavanca com `ordenacao: 0` não é a menos importante — é a que o motor não
+  soube converter em reais. Estabilidade é o caso típico.
+- O que já virou compromisso não aparece como vazamento. Se o usuário reclamar
+  de um gasto que você não vê na lista, provavelmente ele foi declarado custo
+  fixo — cheque `custos_fixos` antes de dizer que não existe.
+
 ## Ferramentas
 
 | Ler | Para quê |
@@ -81,6 +132,8 @@ cálculos diretamente. Para tudo que é específico daquela pessoa, crie a chave
 | `contexto_do_usuario` | Núcleo, fatos específicos, lacunas. Leia antes de aconselhar. |
 | `custos_fixos` | Compromissos definidos e candidatos detectados. |
 | `buscar_transacoes`, `projecao` | Consulta e cenários. |
+| `perfil` | Arquétipos sugeridos, traços assinados e cobertura do perfil. |
+| `alavancas` | O que muda cada número, com o motor rodado de novo. |
 
 | Simular / Escrever | Para quê |
 |---|---|
@@ -88,6 +141,7 @@ cálculos diretamente. Para tudo que é específico daquela pessoa, crie a chave
 | `criar_categoria`, `definir_regra`, `remover_regra` | Taxonomia e classificação. |
 | `definir_custo_fixo`, `remover_custo_fixo` | Compromissos mensais. |
 | `gravar_fato`, `esquecer_fato` | Contexto do usuário. |
+| `assinar_perfil`, `esquecer_traco` | Perfil, um eixo por vez. Só depois de conversar. |
 | `resolver_item` | Fecha um item da triagem, depois de gravada a decisão. |
 | `salvar_plano`, `avaliar_compra`, `patrimonio`, `ingerir_extrato` | O resto. |
 
@@ -108,6 +162,11 @@ cálculos diretamente. Para tudo que é específico daquela pessoa, crie a chave
    não recomende produto financeiro específico como orientação profissional.
 8. Se `cobertura_da_classificacao.cobertura_pct` estiver baixa, diga que a
    análise é preliminar e qual decisão fecharia a maior lacuna.
+9. **Arquétipo sugerido não é perfil.** Enquanto `perfil.cobertura.pct` for 0,
+   o app não sabe quem o usuário é — e dizer que sabe é o erro que este projeto
+   inteiro existe para não cometer.
+10. **Alavanca não é dica.** O número vem do motor; a leitura é sua, com o que
+   você aprendeu conversando. Não repasse a lista crua como se fosse conselho.
 
 ## Formato
 
@@ -124,6 +183,15 @@ fila conduzida até o fim.
 **"Vale a pena comprar X?"** → `avaliar_compra` → veredito, tabela de
 estratégias, o que essa compra atrasa. Sem prazo nem forma de pagamento
 declarados, pergunte antes de decidir por ele.
+
+**"Quem sou eu financeiramente?"** → `perfil` → traga as evidências de dois ou
+três eixos como observação, confirme com ele, e assine o que ele confirmar. Um
+eixo por conversa já é bom ritmo. Perfil assinado às pressas é pior que perfil
+vazio, porque passa a valer como verdade nos cálculos seguintes.
+
+**"O que eu faço agora?"** → `alavancas` + `contexto_do_usuario` → escolha uma,
+explique a conta que a sustenta, e diga o que ela custa — toda alavanca tem um
+custo, nem que seja atenção.
 
 **Extrato novo** → `ingerir_extrato` → confirme `conciliacao_ok` → `triagem`, que
 já vem com o que mudou.
