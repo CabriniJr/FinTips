@@ -1,0 +1,123 @@
+# Regras de classificação — edite à vontade, é dado, não código.
+# Ordem importa: a primeira regra de `canais` que casar vence.
+#
+# Este arquivo é PÚBLICO (vai para o repositório) e por isso contém só marcas
+# nacionais e códigos de adquirente. Estabelecimentos do seu dia a dia —
+# a padaria da esquina, o bar do bairro — identificam onde você mora e o que
+# você faz: eles vão em `data/regras-locais.yaml`, que o .gitignore barra.
+# Ver rules/exemplo-regras-locais.yaml.
+
+canais:
+  - match: "Renda Fixa - Aplicação"
+    canal: fixed_income
+    fluxo: savings_out
+    categoria: investimento
+    contraparte: "CDB"
+  - match: "Renda Fixa - Resgate"
+    canal: fixed_income
+    fluxo: savings_in
+    categoria: investimento
+    contraparte: "CDB"
+  - match: "Fundos de Investimento"
+    canal: fund
+    fluxo: savings_out
+    categoria: investimento
+    contraparte: "Fundo de investimento"
+  - match: "Rendimento da conta"
+    canal: yield
+    fluxo: income
+    categoria: renda
+    contraparte: "Rendimento da conta"
+  - match: "Salário/Remuneração"
+    canal: salary
+    fluxo: income
+    categoria: renda
+  - match: "Cobrança Seguro"
+    canal: fee
+    fluxo: expense
+    categoria: taxas
+    tags: [invisivel, recorrente]
+  - match: "Tarifa"
+    canal: fee
+    fluxo: expense
+    categoria: taxas
+    tags: [invisivel]
+  - match: "Estorno"
+    canal: reversal
+    fluxo: refund
+    categoria: outros
+  - match: "Devolução Pix"
+    canal: reversal
+    fluxo: refund
+    categoria: outros
+  - match: "Recarga de bilhete único"
+    canal: transit_topup
+    fluxo: expense
+    categoria: transporte
+    contraparte: "Bilhete Único"
+  - match: "QR Code Pix enviado"
+    canal: pix_qr
+    fluxo: expense
+  - match: "Pix Automático enviado"
+    canal: pix_auto
+    fluxo: expense
+    tags: [recorrente]
+  - match: "Pix enviado"
+    canal: pix
+    fluxo: expense
+  - match: "Pix recebido"
+    canal: pix
+    fluxo: income
+  - match: "Cartão de Débito"
+    canal: debit_card
+    fluxo: expense
+
+# Palavra-chave no nome da contraparte -> categoria.
+# Comparação sem acento, caixa alta, por substring.
+merchants:
+  alimentacao:
+    [IFOOD, IFD, RAPPI, SUSHI, TEMAKI, GELATO, SORVET, ACAI, PADARIA, DOCERIA,
+     RESTAURANT, LANCHE, SNACK, BURGER, HAMBURG, PIZZA, GRILL, CAFE, CAFETERIA,
+     FOODS, FOOD, BAR E, CHURRAS]
+  mercado:
+    [OXXO, CARREFOUR, PAO DE ACUCAR, ASSAI, ATACADAO, EXTRA, COOP, SONDA,
+     HIROTA, SAMS, HORTIFRUTI, MERCADO, MERCEARIA, SUPERMERC, EMPORIO]
+  transporte:
+    [UBER, 99APP, 99POP, AUTOPASS, TOP SP, TARFA, ATM TMOB, PRODATA, BILHETE,
+     ESTACIONAMENTO, POSTO, IPIRANGA, SHELL, PETROBRAS, EMV CMT, METRO, CPTM,
+     VIACAO, RODOVIAR, PEDAGIO, CONECTCAR, SEM PARAR]
+  assinaturas:
+    [GOOGLE, SPOTIFY, NETFLIX, APPLE, MICROSOFT, OPENAI, ANTHROPIC, CLAUDE,
+     GITHUB, BYTEDANCE, TIKTOK, DISNEY, MAX*, AMAZON PRIME, STEAM, NINTENDO,
+     PLAYSTATION, ADOBE, CANVA, NOTION]
+  compras:
+    [SHPP, SHOPEE, AMAZON, MERCADOLIVRE, MERCADO LIVRE, ALIEXPRESS, MAGALU,
+     MAGAZINE, AMERICANAS, CASAS BAHIA, KABUM, PICHAU, TEMU, SHEIN, PAGALEVE,
+     PIX MARKETPLACE, AIBR]
+  lazer:
+    [INGRESSO, CINEMA, CINEMARK, KINOPLEX, TEATRO, MUSEU, SYMPLA, EVENTBRITE,
+     ZIG*, BANCA, LIVRARIA, PARK]
+  vestuario:
+    [DECATHLON, CENTAURO, NIKE, ADIDAS, CEA, C&A, RENNER, RIACHUELO, ZARA,
+     HERING, NETSHOES, CALCADOS]
+  saude:
+    [DROGARIA, DROGASIL, DROGA RAIA, FARMACIA, PANVEL, PAGUE MENOS, CLINICA,
+     LABORATORIO, ODONTO, HOSPITAL, OBOTICARIO, HNA*]
+  educacao:
+    [UDEMY, ALURA, COURSERA, FACULDADE, UNIVERSIDADE, EDITORA, OREILLY,
+     PLURALSIGHT, LEETCODE]
+  doacoes:
+    [PAROQUIA, IGREJA, DOACAO, ONG, VAKINHA]
+  servicos:
+    [CORREIOS, CARTORIO, FLORICULTURA, LAVANDERIA, BARBEARIA, PAGSEGURO, ZOOP,
+     PAGBANK, CLOUDFLARE, DIGITALOCEAN, AWS, VERCEL]
+
+# Termos que, no nome da contraparte, indicam pessoa física (vira pseudônimo).
+pessoa_fisica_hint:
+  min_palavras: 2
+  sufixos_empresa:
+    [LTDA, S.A, S/A, SA, ME, EIRELI, EPP, INSTITUICAO, TECNOLOGIA, PAGAMENTO,
+     PAGAMENTOS, COMERCIO, BRASIL, MARKETPLACE, BANCO, SERVICOS, INC, CORP]
+
+# Categoria padrão quando nada casa.
+fallback: outros

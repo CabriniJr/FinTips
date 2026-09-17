@@ -1,0 +1,11 @@
+# dados pessoais — nunca versionar
+data/
+relatorios/
+.fintips-salt
+config.yaml
+*.ofx
+!tests/fixture.ofx
+
+__pycache__/
+*.egg-info/
+.venv/

@@ -1,0 +1,22 @@
+{
+  "name": "fintips",
+  "displayName": "FinTips",
+  "version": "0.1.0",
+  "description": "Motor financeiro pessoal: extrato bancário -> YAML canônico -> score, planos, gastos invisíveis e consultoria de compra. Os dados nunca saem da máquina.",
+  "author": {
+    "name": "CabriniJr"
+  },
+  "license": "MIT",
+  "keywords": ["financas", "ofx", "open-finance", "orcamento", "pagbank"],
+  "skills": "./skills/",
+  "mcpServers": {
+    "fintips": {
+      "command": "python",
+      "args": ["-m", "fintips.mcp_server"],
+      "env": {
+        "FINTIPS_ROOT": "${CLAUDE_PLUGIN_DATA}/workspace",
+        "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}"
+      }
+    }
+  }
+}

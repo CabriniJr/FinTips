@@ -1,0 +1,25 @@
+# Exemplo de regras locais. Copie para data/regras-locais.yaml no seu
+# workspace e preencha com os estabelecimentos que aparecem no SEU extrato.
+#
+# Esse arquivo fica dentro de data/, que o .gitignore barra — de propósito:
+# a lista dos lugares onde você compra diz onde você mora, por onde circula e
+# o que consome. É o mesmo tipo de dado que o resto do projeto pseudonimiza.
+#
+# O merge é por categoria: estas listas são somadas às do rules/categories.yaml,
+# e o que está aqui tem prioridade na hora de casar.
+
+merchants:
+  alimentacao:
+    - PADARIA DO ZE
+    - CANTINA DA ESQUINA
+  mercado:
+    - MERCADINHO SAO JOAO
+  lazer:
+    - BAR DO CENTRO
+    - CLUBE MUNICIPAL
+  vestuario:
+    - LOJA DE TRILHA DA AV
+
+# Você também pode sobrescrever canais (mesmo formato de rules/categories.yaml).
+# Regras daqui entram ANTES das públicas, então vencem em caso de empate.
+canais: []

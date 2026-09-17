@@ -1,0 +1,82 @@
+OFXHEADER:100
+DATA:OFXSGML
+VERSION:100
+ENCODING:UTF-8
+<OFX>
+  <SIGNONMSGSRSV1><SONRS><STATUS><CODE>0</CODE></STATUS>
+  <DTSERVER>20260616204527[-3:BRT]
+  <FI><ORG>PagSeguro Internet S/A</ORG><FID>290</FID></FI>
+  </SONRS></SIGNONMSGSRSV1>
+  <BANKMSGSRSV1><STMTTRNRS><STMTRS>
+    <CURDEF>BRL
+    <BANKACCTFROM><BANKID>290</BANKID><ACCTID>11111111-1</ACCTID><ACCTTYPE>CHECKING</ACCTTYPE></BANKACCTFROM>
+    <BANKTRANLIST>
+      <DTSTART>20260601000000[-3:BRT]
+      <DTEND>20260630000000[-3:BRT]
+          <STMTTRN>
+            <TRNTYPE>OUT
+            <DTPOSTED>20260601100000[-3:BRT]
+            <TRNAMT>-100.00
+            <FITID>f1
+            <MEMO>Renda Fixa - Aplicação em CDB
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>IN
+            <DTPOSTED>20260605080000[-3:BRT]
+            <TRNAMT>5000.00
+            <FITID>f2
+            <MEMO>Salário/Remuneração - PAGSEGURO INTERNET INSTITUICAO DE PAGAMENTO S.A.
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>OUT
+            <DTPOSTED>20260606090000[-3:BRT]
+            <TRNAMT>-7.90
+            <FITID>f3
+            <MEMO>Cobrança Seguro Cartão Protegido - Para: PAGSEGURO INTERNET INSTITUICAO DE PAGAMENTO
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>OUT
+            <DTPOSTED>20260607150031[-3:BRT]
+            <TRNAMT>-9.00
+            <FITID>f4
+            <MEMO>Cartão de Débito - CENTRO DE CULTURA        SAO PAULO    BR
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>OUT
+            <DTPOSTED>20260610120000[-3:BRT]
+            <TRNAMT>-500.00
+            <FITID>f5
+            <MEMO>Pix enviado - Carlos Alberto Nogueira
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>OUT
+            <DTPOSTED>20260611120000[-3:BRT]
+            <TRNAMT>-150.00
+            <FITID>f6
+            <MEMO>Pix enviado - Marina Duarte Prado
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>IN
+            <DTPOSTED>20260612120000[-3:BRT]
+            <TRNAMT>300.00
+            <FITID>f7
+            <MEMO>Pix recebido - Titular Da Conta Exemplo
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>OUT
+            <DTPOSTED>20260615062828[-3:BRT]
+            <TRNAMT>-20.00
+            <FITID>f8
+            <MEMO>Cartão de Débito - TARIFA TRANS*ATM TMOB    SAO PAULO    BR
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>IN
+            <DTPOSTED>20260615062835[-3:BRT]
+            <TRNAMT>20.00
+            <FITID>f8
+            <MEMO>Estorno Cartão de Débito - TARIFA TRANS*ATM TMOB    SAO PAULO    BR
+          </STMTTRN>
+    </BANKTRANLIST>
+    <LEDGERBAL><BALAMT>R$ 4.533,10</BALAMT><DTASOF>30/06/2026</DTASOF></LEDGERBAL>
+  </STMTRS></STMTTRNRS></BANKMSGSRSV1>
+</OFX>
