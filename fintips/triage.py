@@ -24,6 +24,7 @@ from pathlib import Path
 
 import yaml
 
+from .causes import CauseStore
 from .contracts import ItemDeTriagem, agora, novo_id
 from .context import ContextStore
 from .entities import Counterparty
@@ -96,6 +97,7 @@ def construir(
     custos_fixos: list[dict],
     candidatos_fixos: list[dict],
     store: TriageStore,
+    causas: "CauseStore | None" = None,
     fallback: str = "outros",
     limite: int = 40,
 ) -> list[ItemDeTriagem]:
@@ -202,7 +204,59 @@ def construir(
                        "tipo": lac["tipo"], "opcoes": lac["opcoes"], "afeta": lac["afeta"]},
         ))
 
-    # 6. eventos grandes sem explicação
+    # 6. dinheiro que sai sem ninguém saber por quê
+    #
+    # Note a diferença para o item 2: lá o gasto está no balde errado, aqui ele
+    # pode estar no balde certo e ainda assim ninguém sabe o motivo. Classificar
+    # delivery como "alimentacao" não explica por que ele acontece toda terça.
+    if causas is not None:
+        cob = causas.cobertura(stmt)
+        for linha in cob["maiores_sem_causa"]:
+            if linha["por_mes"] < 20:
+                continue  # abaixo disso a pergunta custa mais atenção do que rende
+            itens.append(ItemDeTriagem(
+                id=novo_id("ca", "categoria", linha["categoria"]),
+                tipo="causa_ausente",
+                titulo=f"sem causa: {linha['categoria']}",
+                impacto_mensal=linha["por_mes"],
+                porque_importa=(
+                    "o valor está classificado, mas ninguém escreveu por que esse "
+                    "dinheiro sai. Sem isso, qualquer sugestão de corte é chute — e "
+                    "o consultor de compras não tem com o que comparar uma compra nova"
+                ),
+                evidencia={"categoria": linha["categoria"], "por_mes": linha["por_mes"],
+                           "total_no_periodo": linha["total"]},
+            ))
+
+        for c in causas.vencidas():
+            itens.append(ItemDeTriagem(
+                id=novo_id("cr", c.id),
+                tipo="causa_a_revisar",
+                titulo=f"revisar causa: {c.enunciado[:60]}",
+                impacto_mensal=0.0,
+                porque_importa=(
+                    "causa de comportamento envelhece: o prazo de revisão venceu, e "
+                    "continuar calculando sobre ela é supor que a vida não mudou"
+                ),
+                evidencia={"causa_id": c.id, "alvo": c.alvo, "natureza": c.natureza,
+                           "atitude": c.atitude, "revisar_em": c.revisar_em},
+            ))
+
+        for c in causas.sem_atitude():
+            itens.append(ItemDeTriagem(
+                id=novo_id("cd", c.id),
+                tipo="causa_sem_atitude",
+                titulo=f"decidir sobre: {c.enunciado[:60]}",
+                impacto_mensal=0.0,
+                porque_importa=(
+                    "a causa está entendida e nada foi decidido. Entender sem decidir "
+                    "é diagnóstico sem tratamento — inclusive 'aceitar' é uma decisão, "
+                    "e tira o gasto da lista de culpa"
+                ),
+                evidencia={"causa_id": c.id, "alvo": c.alvo, "natureza": c.natureza},
+            ))
+
+    # 7. eventos grandes sem explicação
     for t in sorted(stmt.transactions, key=lambda x: abs(x.amount), reverse=True)[:40]:
         if abs(float(t.amount)) < 800 or t.flow not in ("expense", "transfer"):
             continue

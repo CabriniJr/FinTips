@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Literal
 
-CONTRACTS_SCHEMA = 1
+CONTRACTS_SCHEMA = 2   # 2: entra o contrato Causa
 
 # Quem decidiu. A ordem é de autoridade crescente.
 Origem = Literal["heuristica", "importacao", "agente", "usuario"]
@@ -288,6 +288,110 @@ class CustoFixo:
         )
 
 
+# Naturezas sugeridas para uma causa. A lista é aberta de propósito — o motor
+# valida a forma, não o conteúdo, e a vida de alguém pode exigir uma palavra
+# que não está aqui. Ela existe para o agente ter por onde começar e para o
+# dossiê agrupar causas parecidas.
+NATUREZAS_SUGERIDAS = (
+    "gatilho",        # algo dispara o gasto (cansaço, plantão, sexta-feira)
+    "necessidade",    # a vida exige, não há escolha real
+    "obrigacao",      # alguém acordou isso antes (contrato, acordo familiar)
+    "habito",         # repete por repetir, sem decisão a cada vez
+    "compensacao",    # troca dinheiro por tempo, energia ou humor
+    "evento",         # aconteceu uma vez, por um motivo que passou
+    "estrutural",     # decorre de onde mora, como trabalha, com quem vive
+)
+
+# Atitudes são fechadas, ao contrário das naturezas: o dossiê e as alavancas
+# calculam em cima delas. "Aceitar" e "reduzir" levam a contas diferentes, e
+# uma atitude inventada no meio da conversa não teria como entrar em nenhuma.
+ATITUDES = (
+    "nenhuma",        # ainda não se decidiu nada
+    "aceitar",        # fica como está, e agora isso é escolha, não descuido
+    "reduzir",
+    "eliminar",
+    "substituir",
+    "automatizar",    # vira aporte/pagamento automático, sai da decisão diária
+    "observar",       # sem decisão ainda; olhar de novo em tal data
+)
+
+
+@dataclass
+class Causa:
+    """Por que um padrão de gasto existe — e o que se decidiu sobre ele.
+
+    Esta é a única camada do motor que fala de motivo, e por isso a mais
+    perigosa. Um número o app calcula; um motivo ele não tem como saber. Duas
+    pessoas com o mesmo extrato de delivery podem estar com jornada dupla ou
+    com preguiça de cozinhar, e a conta seguinte é diferente em cada caso.
+
+    Por isso a causa não é derivável: nasce de `agente` ou `usuario`, sempre.
+    Não existe detecção de causa neste código, e não deve existir.
+
+    `atitude` é o que fecha o ciclo. Entender por que o dinheiro sai e não
+    decidir nada é diagnóstico sem tratamento — e `aceitar` é uma decisão
+    legítima, que tira o gasto da lista de culpa e o coloca na de escolhas.
+    """
+
+    id: str
+    efeito_tipo: str                 # categoria | contraparte | padrao | mes | plano | compromisso
+    efeito_ref: str
+    natureza: str                    # ver NATUREZAS_SUGERIDAS; lista aberta
+    enunciado: str                   # a frase, nas palavras de quem disse
+    atitude: str = "nenhuma"
+    atitude_nota: str = ""
+    evidencia: list[str] = field(default_factory=list)
+    proveniencia: Proveniencia = field(default_factory=Proveniencia)
+    revisar_em: str | None = None    # ISO date; causa de comportamento envelhece
+    criado_em: str = field(default_factory=agora)
+
+    def vencida(self, hoje: date | None = None) -> bool:
+        if not self.revisar_em:
+            return False
+        try:
+            return date.fromisoformat(self.revisar_em) < (hoje or date.today())
+        except ValueError:
+            return False
+
+    @property
+    def alvo(self) -> str:
+        """Chave de correlação: é por aqui que o dossiê liga causa a dinheiro."""
+        return f"{self.efeito_tipo}:{self.efeito_ref}"
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "efeito": {"tipo": self.efeito_tipo, "ref": self.efeito_ref},
+            "alvo": self.alvo,
+            "natureza": self.natureza,
+            "enunciado": self.enunciado,
+            "atitude": self.atitude,
+            "atitude_nota": self.atitude_nota,
+            "evidencia": self.evidencia,
+            "revisar_em": self.revisar_em,
+            "vencida": self.vencida(),
+            "criado_em": self.criado_em,
+            "proveniencia": self.proveniencia.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Causa":
+        efeito = d.get("efeito") or {}
+        return cls(
+            id=d["id"],
+            efeito_tipo=efeito.get("tipo", "categoria"),
+            efeito_ref=efeito.get("ref", ""),
+            natureza=d.get("natureza", ""),
+            enunciado=d.get("enunciado", ""),
+            atitude=d.get("atitude", "nenhuma"),
+            atitude_nota=d.get("atitude_nota", ""),
+            evidencia=list(d.get("evidencia") or []),
+            revisar_em=d.get("revisar_em"),
+            criado_em=d.get("criado_em") or agora(),
+            proveniencia=Proveniencia.from_dict(d.get("proveniencia")),
+        )
+
+
 @dataclass
 class Fato:
     """Um pedaço de contexto sobre o usuário, com o que o sustenta."""
@@ -334,7 +438,8 @@ class ItemDeTriagem:
     id: str
     tipo: str                        # contraparte_nova | classificacao_fraca |
                                      # candidato_custo_fixo | custo_fixo_derivou |
-                                     # fato_ausente | fato_vencido | evento_sem_explicacao
+                                     # fato_ausente | fato_vencido | evento_sem_explicacao |
+                                     # causa_ausente | causa_a_revisar | causa_sem_atitude
     titulo: str
     impacto_mensal: float            # em reais — é o que ordena a fila
     porque_importa: str              # qual cálculo muda quando isto for resolvido
@@ -350,6 +455,10 @@ class ItemDeTriagem:
             "fato_ausente": 1.3, "custo_fixo_derivou": 1.2, "contraparte_nova": 1.0,
             "candidato_custo_fixo": 1.0, "classificacao_fraca": 0.9,
             "evento_sem_explicacao": 0.8, "fato_vencido": 0.8,
+            # causa ausente pesa como contraparte nova: é dinheiro sem leitura.
+            # revisão e decisão pendentes não têm impacto em reais, então não
+            # competem por posição na fila — entram pelo peso, não pelo valor.
+            "causa_ausente": 1.1, "causa_a_revisar": 1.0, "causa_sem_atitude": 0.9,
         }.get(self.tipo, 1.0)
         return round(abs(self.impacto_mensal) * peso_tipo, 2)
 

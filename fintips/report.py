@@ -22,7 +22,8 @@ from typing import Any
 
 import yaml
 
-from . import analysis, commitments, discovery, mapping, plans as plans_mod
+from . import analysis, causes as causes_mod, commitments, discovery, mapping
+from . import plans as plans_mod
 from . import profile as profile_mod, projection
 from . import score as score_mod, taxonomy as tax_mod, triage
 from .categorize import Categorizer
@@ -54,6 +55,7 @@ def stores(ws: Workspace) -> dict[str, Any]:
         "compromissos": commitments.CommitmentStore(ws.custos_fixos_path),
         "triagem": triage.TriageStore(ws.triagem_path),
         "perfil": profile_mod.PerfilStore(ws.perfil_path),
+        "causas": causes_mod.CauseStore(ws.causas_path),
     }
 
 
@@ -241,6 +243,12 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
     # o perfil lê o contexto já montado: sugestão por número + o que foi assinado
     ctx["perfil"] = profile_mod.montar(ctx, st["perfil"])
 
+    ctx["causas"] = {
+        "cobertura": st["causas"].cobertura(stmt),
+        "itens": st["causas"].to_dicts(),
+        "por_alvo": st["causas"].por_alvo(),
+    }
+
     ctx["projecao"] = projection.project(
         baseline=ctx["baseline"],
         fixed_monthly=fixo_mes,
@@ -257,6 +265,7 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         custos_fixos=definidos,
         candidatos_fixos=candidatos,
         store=st["triagem"],
+        causas=st["causas"],
         fallback=tax_mod.FALLBACK,
     )
     ctx["triagem"] = {
