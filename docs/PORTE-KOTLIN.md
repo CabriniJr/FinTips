@@ -171,7 +171,8 @@ quando a anterior tem ouro fechando.
 | 6b | `Heuristica` — o piso de categorias (espera o YAML) | a fazer |
 | 7 | `Analise` — baseline, meses, recorrências, atípicos | **pronto** |
 | 7b | `gasto invisível` — depende das etiquetas da heurística | a fazer |
-| 8 | `Score`, `Projecao`, `Planos`, `Compras` | a fazer |
+| 8 | `Score` — cinco dimensões, pesos, alavanca de maior ganho | **pronto** |
+| 8b | `Projecao`, `Planos`, `Compras` | a fazer |
 | 9 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | a fazer |
 | 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |
 | 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |

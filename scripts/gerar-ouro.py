@@ -645,6 +645,100 @@ def ouro_analise() -> dict:
     }
 
 
+def ouro_score() -> dict:
+    """As cinco dimensões, os limites e a alavanca de maior ganho.
+
+    Os casos foram escolhidos pelas fronteiras, não pela média: despesa zero
+    (divisão por zero), sem plano cadastrado (meia nota por convenção),
+    poupança acima do teto, reserva acima do alvo, e quatro meses no vermelho
+    — que zera a estabilidade por multiplicação, um caso que ninguém escreve
+    sem querer.
+    """
+    from fintips import score as score_mod
+
+    def invisivel(taxas_mes=0.0, micro_mes=0.0):
+        return {
+            "taxas_e_seguros": {"por_mes": taxas_mes},
+            "micro_gastos": {"por_mes": micro_mes},
+        }
+
+    def base(renda, despesa, taxa, vol=0.0, vermelhos=0):
+        return {
+            "renda_media_mes": renda, "despesa_media_mes": despesa,
+            "taxa_poupanca_media": taxa, "volatilidade_despesa": vol,
+            "meses_no_vermelho": vermelhos,
+        }
+
+    casos = [
+        {
+            "nome": "saudavel",
+            "base": base(5000, 3000, 0.40, 0.05), "invisivel": invisivel(50, 80),
+            "planos": [{"aporte_necessario_mes": 500, "capacidade_mensal_real": 600}],
+            "patrimonio": 18000.0,
+        },
+        {
+            "nome": "zerado",
+            "base": base(0, 0, 0.0), "invisivel": invisivel(),
+            "planos": [], "patrimonio": 0.0,
+        },
+        {
+            "nome": "despesa_zero",
+            "base": base(4000, 0, 1.0), "invisivel": invisivel(10, 10),
+            "planos": [], "patrimonio": 5000.0,
+        },
+        {
+            "nome": "poupanca_acima_do_teto",
+            "base": base(5000, 1000, 0.80, 0.02), "invisivel": invisivel(),
+            "planos": [], "patrimonio": 60000.0,
+        },
+        {
+            "nome": "quatro_meses_no_vermelho",
+            "base": base(3000, 3400, -0.13, 0.30, 4), "invisivel": invisivel(200, 300),
+            "planos": [], "patrimonio": 500.0,
+        },
+        {
+            "nome": "volatilidade_estourada",
+            "base": base(4000, 3000, 0.25, 0.9), "invisivel": invisivel(20, 20),
+            "planos": [], "patrimonio": 9000.0,
+        },
+        {
+            "nome": "invisivel_acima_do_teto",
+            "base": base(4000, 2000, 0.50, 0.1), "invisivel": invisivel(200, 200),
+            "planos": [], "patrimonio": 12000.0,
+        },
+        {
+            "nome": "planos_variados",
+            "base": base(6000, 4000, 0.33, 0.12), "invisivel": invisivel(60, 40),
+            "planos": [
+                {"status": "concluido"},
+                {"aporte_necessario_mes": 0, "capacidade_mensal_real": 500},
+                {"aporte_necessario_mes": 1000, "capacidade_mensal_real": 250},
+                {"aporte_necessario_mes": 300, "capacidade_mensal_real": 900},
+            ],
+            "patrimonio": 15000.0,
+        },
+        {
+            "nome": "reserva_muito_acima",
+            "base": base(5000, 2000, 0.60, 0.03), "invisivel": invisivel(10, 10),
+            "planos": [], "patrimonio": 200000.0,
+        },
+    ]
+
+    saida = []
+    for c in casos:
+        r = score_mod.compute(
+            c["base"], c["invisivel"], c["planos"], patrimonio_liquido=c["patrimonio"],
+        )
+        saida.append({**c, "resultado": r})
+
+    return {
+        "o_que_e": "score em cinco dimensões, com pesos e limites explícitos",
+        "gerado_por": "fintips.score.compute",
+        "pesos": dict(score_mod.WEIGHTS),
+        "casos": saida,
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
@@ -654,6 +748,7 @@ GERADORES = {
     "texto.json": ouro_texto,
     "regras.json": ouro_regras,
     "analise.json": ouro_analise,
+    "score.json": ouro_score,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
