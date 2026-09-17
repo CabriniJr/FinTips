@@ -85,6 +85,7 @@ class Categorizer:
             tx.category = self._category_for(tx.counterparty)
 
         self._post(tx)
+        self._marca_origem(tx)
         return tx
 
     def apply_all(self, txs: Iterable[Transaction]) -> list[Transaction]:
@@ -142,6 +143,13 @@ class Categorizer:
             if any(k in n for k in keys):
                 return cat
         return self.rules.get("fallback", "outros")
+
+    def _marca_origem(self, tx: Transaction) -> None:
+        """Toda saída daqui é palpite do pacote, nunca conhecimento sobre a pessoa."""
+        tx.category_source = "heuristica"
+        # canal e fluxo vêm do formato do extrato (confiável); a CATEGORIA é que
+        # é chute — por isso a confiança fica baixa de propósito.
+        tx.category_confidence = 0.55 if tx.category != "outros" else 0.1
 
     def _post(self, tx: Transaction) -> None:
         """Ajustes que dependem do conjunto canal+categoria+valor."""

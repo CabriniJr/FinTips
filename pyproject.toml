@@ -1,12 +1,15 @@
 [project]
 name = "fintips"
-version = "0.1.0"
-description = "Motor financeiro pessoal: extrato -> YAML canônico -> score, planos e consultoria de compra"
+version = "0.3.0"
+description = "Motor financeiro pessoal: extrato -> objetos -> score, custos fixos, planos, projeção e consultoria de compra, com painel local e agente Claude"
 requires-python = ">=3.10"
+license = { text = "MIT" }
 dependencies = ["PyYAML>=6.0"]
 
 [project.optional-dependencies]
+app = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9"]
 mcp = ["mcp>=1.2.0"]
+tudo = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9", "mcp>=1.2.0"]
 
 [project.scripts]
 fintips = "fintips.cli:main"
@@ -19,4 +22,4 @@ build-backend = "setuptools.build_meta"
 include = ["fintips*"]
 
 [tool.setuptools.package-data]
-fintips = ["rules/*.yaml"]
+fintips = ["rules/*.yaml", "web/index.html", "web/assets/*"]

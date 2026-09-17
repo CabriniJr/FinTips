@@ -124,16 +124,31 @@ def recurrences(stmt: Statement, *, min_months: int = 3) -> list[Recurrence]:
     return sorted(out, key=lambda r: r.monthly_cost, reverse=True)
 
 
-def invisible_spending(stmt: Statement) -> dict:
+def invisible_spending(
+    stmt: Statement,
+    *,
+    ignorar_categorias: Iterable[str] = (),
+    ignorar_contrapartes: Iterable[str] = (),
+) -> dict:
     """Gasto que não dói na hora mas soma no mês.
 
     Três fontes: taxas e seguros, micro-débitos (<= R$30) e sangrias
     (mesmo estabelecimento, várias vezes por mês).
+
+    O que o usuário declarou como custo de rotina sai daqui: transporte diário
+    não é desperdício por ser pulverizado em recargas pequenas, e chamá-lo de
+    invisível seria empurrar um corte que não existe.
     """
+    ign_cat = {c for c in ignorar_categorias}
+    ign_cp = {c for c in ignorar_contrapartes}
+
+    def _vale(t: Transaction) -> bool:
+        return t.category not in ign_cat and t.counterparty not in ign_cp
+
     n_months = max(len({t.month for t in stmt.transactions}), 1)
     fees = [t for t in stmt.transactions if t.category == "taxas" and t.flow == "expense"]
-    micro = [t for t in stmt.transactions if "micro" in t.tags and t.flow == "expense"]
-    bleeds = [r for r in recurrences(stmt) if r.kind == "sangria"]
+    micro = [t for t in stmt.transactions if "micro" in t.tags and t.flow == "expense" and _vale(t)]
+    bleeds = [r for r in recurrences(stmt) if r.kind == "sangria" and r.category not in ign_cat]
 
     total_expense = _sum([t for t in stmt.transactions if t.flow == "expense"])
     micro_total = sum((abs(t.amount) for t in micro), Z)
@@ -167,6 +182,7 @@ def invisible_spending(stmt: Statement) -> dict:
             }
             for r in bleeds[:10]
         ],
+        "excluido_por_declaracao": sorted(ign_cat | ign_cp),
         "custo_fixo_estimado_mes": float(
             sum(
                 (r.monthly_cost for r in recurrences(stmt) if r.kind == "assinatura"),

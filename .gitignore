@@ -6,6 +6,14 @@ config.yaml
 *.ofx
 !tests/fixture.ofx
 
+# build do frontend: fintips/web/ É versionado de propósito, para que
+# `pip install` funcione sem Node. O que não entra é o ambiente de dev:
+web/node_modules/
+web/.vite/
+node_modules/
+
 __pycache__/
 *.egg-info/
 .venv/
+dist/
+build/

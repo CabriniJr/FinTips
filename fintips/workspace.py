@@ -78,6 +78,20 @@ class Workspace:
     @property
     def compras_path(self) -> Path: return self.data / "compras.yaml"
     @property
+    def perfil_path(self) -> Path: return self.data / "perfil.yaml"   # legado (v0.2)
+    @property
+    def taxonomia_path(self) -> Path: return self.data / "taxonomia.yaml"
+    @property
+    def regras_path(self) -> Path: return self.data / "regras.yaml"
+    @property
+    def contexto_path(self) -> Path: return self.data / "contexto.yaml"
+    @property
+    def custos_fixos_path(self) -> Path: return self.data / "custos-fixos.yaml"
+    @property
+    def triagem_path(self) -> Path: return self.data / "triagem.yaml"
+    @property
+    def contrapartes_path(self) -> Path: return self.data / "contrapartes.yaml"
+    @property
     def regras_locais_path(self) -> Path:
         """Estabelecimentos do seu dia a dia. Fica em data/ — fora do Git."""
         return self.data / "regras-locais.yaml"
