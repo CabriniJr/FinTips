@@ -1,0 +1,24 @@
+# Dados pessoais — nunca entram na imagem. Esta lista espelha o .gitignore
+# pelo mesmo motivo: o build copia o diretório inteiro, e um extrato esquecido
+# aqui viraria camada de imagem, que é ainda mais difícil de apagar que um
+# commit.
+data/
+relatorios/
+.fintips-salt
+config.yaml
+*.ofx
+!tests/fixture.ofx
+
+# Ambiente de build e de dev
+web/node_modules/
+web/.vite/
+node_modules/
+__pycache__/
+*.egg-info/
+.venv/
+venv*/
+dist/
+build/
+.git/
+.github/
+.env

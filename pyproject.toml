@@ -1,12 +1,18 @@
 [project]
 name = "fintips"
-version = "0.1.0"
-description = "Motor financeiro pessoal: extrato -> YAML canônico -> score, planos e consultoria de compra"
+version = "0.5.0"
+description = "Motor financeiro pessoal: extrato -> objetos -> causas -> perfil, score, custos fixos, planos, projeção e alavancas, com painel local e agente Claude"
 requires-python = ">=3.10"
+license = { text = "MIT" }
 dependencies = ["PyYAML>=6.0"]
 
 [project.optional-dependencies]
-mcp = ["mcp>=1.2.0"]
+app = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9"]
+# O SDK 2.x renomeou FastMCP para MCPServer e mudou a API de registro.
+# Enquanto `mcp_server.py` não migrar, o teto evita que `pip install`
+# resolva para uma versão que não importa.
+mcp = ["mcp>=1.2.0,<2"]
+tudo = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9", "mcp>=1.2.0,<2"]
 
 [project.scripts]
 fintips = "fintips.cli:main"
@@ -19,4 +25,4 @@ build-backend = "setuptools.build_meta"
 include = ["fintips*"]
 
 [tool.setuptools.package-data]
-fintips = ["rules/*.yaml"]
+fintips = ["rules/*.yaml", "web/index.html", "web/assets/*"]

@@ -1,0 +1,65 @@
+# FinTips local, em três serviços que compartilham o mesmo workspace.
+#
+#   docker compose up painel          o painel em http://127.0.0.1:8420
+#   docker compose run --rm cli ...   qualquer comando do fintips
+#   docker compose run --rm -T mcp    o servidor MCP por stdio (ver README)
+#
+# Antes do primeiro `up`, rode `./scripts/fintips-docker.sh setup`. Ele escreve
+# o .env com o seu UID e o caminho absoluto do workspace — sem isso os arquivos
+# que o container criar saem com dono root e você precisa de sudo para editar
+# o seu próprio orçamento.
+
+x-comum: &comum
+  build:
+    context: .
+    args:
+      UID: ${FINTIPS_UID:-1000}
+      GID: ${FINTIPS_GID:-1000}
+  image: fintips:local
+  environment:
+    FINTIPS_ROOT: /dados
+  volumes:
+    # Seus dados moram fora do container, de propósito: a imagem é
+    # descartável, o workspace não. O caminho vem do .env já expandido — o
+    # compose não expande `~` de forma confiável, então `scripts/fintips-docker.sh
+    # setup` escreve o caminho absoluto lá. O fallback ./workspace existe só
+    # para o compose não quebrar se o .env não existir.
+    - ${FINTIPS_WORKSPACE:-./workspace}:/dados
+
+services:
+  painel:
+    <<: *comum
+    container_name: fintips-painel
+    ports:
+      # O 127.0.0.1 na frente não é decoração: sem ele, o painel com o seu
+      # extrato fica visível para qualquer máquina da rede local.
+      - "127.0.0.1:${FINTIPS_PORTA:-8420}:8420"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8420/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  # Comandos avulsos. Exemplos:
+  #   docker compose run --rm cli init
+  #   docker compose run --rm cli ingest /dados/data/extratos/extrato.ofx
+  #   docker compose run --rm cli perfil
+  #   docker compose run --rm cli alavancas
+  cli:
+    <<: *comum
+    profiles: ["ferramentas"]
+    entrypoint: ["fintips", "--root", "/dados"]
+    command: ["--help"]
+
+  # Servidor MCP por stdio, para o cliente do agente. Não sobe com `up`:
+  # quem o executa é o cliente, uma vez por sessão.
+  mcp:
+    <<: *comum
+    profiles: ["ferramentas"]
+    stdin_open: true
+    tty: false
+    entrypoint: ["python", "-m", "fintips.mcp_server"]
+    command: []

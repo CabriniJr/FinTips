@@ -46,7 +46,9 @@ CHANNELS = (
     "other",
 )
 
-CATEGORIES = (
+# Mantida apenas como referência histórica da partida a frio. A taxonomia real
+# vive em data/taxonomia.yaml e pertence ao usuário (ver taxonomy.py).
+CATEGORIES_SUGERIDAS = (
     "alimentacao",
     "mercado",
     "transporte",
@@ -88,6 +90,10 @@ class Transaction:
     city: str = ""
     tags: list[str] = field(default_factory=list)
     account_id: str = ""
+    # proveniência da classificação: heuristica < importacao < agente < usuario
+    category_source: str = "heuristica"
+    category_confidence: float = 0.4
+    rule_id: str = ""
 
     @property
     def day(self) -> date:
@@ -108,7 +114,11 @@ class Transaction:
             "categoria": self.category,
             "contraparte": self.counterparty,
             "tipo_contraparte": self.counterparty_kind,
+            "origem_categoria": self.category_source,
+            "confianca_categoria": round(self.category_confidence, 2),
         }
+        if self.rule_id:
+            d["regra"] = self.rule_id
         if self.city:
             d["cidade"] = self.city
         if self.tags:
