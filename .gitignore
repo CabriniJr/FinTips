@@ -20,3 +20,9 @@ build/
 
 # gerado por quem instala (UID local) — não versionar
 .env
+
+# build do Kotlin (kotlin/motor/src É versionado; o resto é artefato)
+kotlin/.gradle/
+kotlin/build/
+kotlin/*/build/
+.gradle/

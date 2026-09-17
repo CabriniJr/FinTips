@@ -1,0 +1,203 @@
+{
+  "o_que_e": "leitura de valor e divisão com arredondamento meio-para-o-par",
+  "gerado_por": "fintips.parsers.ofx.parse_amount + Decimal.quantize",
+  "leituras": [
+    {
+      "texto": "-23.21",
+      "centavos": -2321,
+      "decimal": "-23.21"
+    },
+    {
+      "texto": "R$ 1.234,56",
+      "centavos": 123456,
+      "decimal": "1234.56"
+    },
+    {
+      "texto": "1,234.56",
+      "centavos": 123456,
+      "decimal": "1234.56"
+    },
+    {
+      "texto": "1.234",
+      "centavos": 123,
+      "decimal": "1.234"
+    },
+    {
+      "texto": "1.23",
+      "centavos": 123,
+      "decimal": "1.23"
+    },
+    {
+      "texto": "1,234",
+      "centavos": 123,
+      "decimal": "1.234"
+    },
+    {
+      "texto": "5",
+      "centavos": 500,
+      "decimal": "5"
+    },
+    {
+      "texto": "5,5",
+      "centavos": 550,
+      "decimal": "5.5"
+    },
+    {
+      "texto": "0",
+      "centavos": 0,
+      "decimal": "0"
+    },
+    {
+      "texto": "",
+      "centavos": 0,
+      "decimal": "0"
+    },
+    {
+      "texto": "12,30",
+      "centavos": 1230,
+      "decimal": "12.30"
+    },
+    {
+      "texto": "-1.234,56",
+      "centavos": -123456,
+      "decimal": "-1234.56"
+    },
+    {
+      "texto": "(45.60)",
+      "centavos": -4560,
+      "decimal": "-45.60"
+    },
+    {
+      "texto": "1.2345",
+      "centavos": 123,
+      "decimal": "1.2345"
+    },
+    {
+      "texto": "1.235",
+      "centavos": 124,
+      "decimal": "1.235"
+    },
+    {
+      "texto": "1.005",
+      "centavos": 100,
+      "decimal": "1.005"
+    },
+    {
+      "texto": "1.015",
+      "centavos": 102,
+      "decimal": "1.015"
+    },
+    {
+      "texto": "0.005",
+      "centavos": 0,
+      "decimal": "0.005"
+    },
+    {
+      "texto": "0.015",
+      "centavos": 2,
+      "decimal": "0.015"
+    },
+    {
+      "texto": "1234567.89",
+      "centavos": 123456789,
+      "decimal": "1234567.89"
+    },
+    {
+      "texto": "-0.01",
+      "centavos": -1,
+      "decimal": "-0.01"
+    },
+    {
+      "texto": "  42,00  ",
+      "centavos": 4200,
+      "decimal": "42.00"
+    }
+  ],
+  "divisoes": [
+    {
+      "centavos": 5,
+      "divisor": 2,
+      "esperado": 2
+    },
+    {
+      "centavos": 7,
+      "divisor": 2,
+      "esperado": 4
+    },
+    {
+      "centavos": 3,
+      "divisor": 2,
+      "esperado": 2
+    },
+    {
+      "centavos": 1,
+      "divisor": 2,
+      "esperado": 0
+    },
+    {
+      "centavos": 10,
+      "divisor": 3,
+      "esperado": 3
+    },
+    {
+      "centavos": 11,
+      "divisor": 3,
+      "esperado": 4
+    },
+    {
+      "centavos": 100,
+      "divisor": 7,
+      "esperado": 14
+    },
+    {
+      "centavos": -5,
+      "divisor": 2,
+      "esperado": -2
+    },
+    {
+      "centavos": -7,
+      "divisor": 2,
+      "esperado": -4
+    },
+    {
+      "centavos": -10,
+      "divisor": 3,
+      "esperado": -3
+    },
+    {
+      "centavos": -1,
+      "divisor": 2,
+      "esperado": 0
+    },
+    {
+      "centavos": 6001,
+      "divisor": 3,
+      "esperado": 2000
+    },
+    {
+      "centavos": 0,
+      "divisor": 5,
+      "esperado": 0
+    },
+    {
+      "centavos": 123456,
+      "divisor": 6,
+      "esperado": 20576
+    },
+    {
+      "centavos": 99999,
+      "divisor": 7,
+      "esperado": 14286
+    },
+    {
+      "centavos": 250,
+      "divisor": 4,
+      "esperado": 62
+    },
+    {
+      "centavos": 150,
+      "divisor": 4,
+      "esperado": 38
+    }
+  ]
+}
