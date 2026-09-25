@@ -173,7 +173,8 @@ quando a anterior tem ouro fechando.
 | 7b | `gasto invisível` — depende das etiquetas da heurística | a fazer |
 | 8 | `Score` — cinco dimensões, pesos, alavanca de maior ganho | **pronto** |
 | 8b | `Projecao` — cenários, planos consumindo a sobra, reserva | **pronto** |
-| 8c | `Planos`, `Compras` | a fazer |
+| 8c | `Planos` — viabilidade, ritmo e gasto já feito no plano | **pronto** |
+| 8d | `Compras` — arrependimento, estratégias e veredito | a fazer |
 | 9 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | a fazer |
 | 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |
 | 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |

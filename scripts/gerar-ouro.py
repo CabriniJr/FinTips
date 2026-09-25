@@ -515,6 +515,147 @@ def ouro_projecao() -> dict:
     }
 
 
+def ouro_planos() -> dict:
+    """Planos: viabilidade, ritmo necessário e o que o extrato já gastou neles.
+
+    Três armadilhas de porte moram aqui, e as três são silenciosas.
+
+    **`if meses` trata zero como ausente.** Prazo vencido devolve `0` em
+    `months_until`, e `0` é falso em Python: o aporte necessário vira o valor
+    inteiro que falta, não uma divisão por zero. Uma porta que teste
+    `meses != null` divide por zero ou devolve infinito.
+
+    **Os limiares são `<=`, não `<`.** Um plano cujo aporte necessário bate
+    exatamente em 60% da capacidade é *confortável*; exatamente na capacidade é
+    *apertado*. Os dois casos de borda estão no ouro de propósito.
+
+    **O ritmo arredonda para cima.** Faltando R$ 1.000,01 com aporte de
+    R$ 500,00 são três meses, não dois — quem trunca promete uma data que não
+    acontece.
+    """
+    from datetime import date as _date
+
+    from fintips import plans as plans_mod
+
+    hoje = _date(2026, 6, 15)
+
+    # um extrato com gastos que os planos vão querer reconhecer como seus
+    stmt = _extrato_sintetico([
+        {"mes": "2026-04", "renda_centavos": 500000, "despesa_centavos": 120000,
+         "categoria": "viagem", "contraparte": "Companhia Aérea"},
+        {"mes": "2026-05", "renda_centavos": 500000, "despesa_centavos": 80000,
+         "categoria": "educacao", "contraparte": "Curso de Inglês"},
+        {"mes": "2026-06", "renda_centavos": 500000, "despesa_centavos": 60000,
+         "categoria": "outros", "contraparte": "Padaria"},
+    ])
+
+    entradas = [
+        # prazo folgado: necessário bem abaixo de 60% da capacidade
+        {"nome": "confortavel", "sobra": 3000.0,
+         "plano": {"id": "viagem", "nome": "Viagem", "tipo": "viagem",
+                   "custo_alvo": 6000.0, "data_alvo": "2027-06-01",
+                   "aporte_mensal": 500.0, "guardado": 0.0,
+                   "categorias": ["viagem"]}},
+
+        # borda exata do limiar de 60%: necessário == 0.6 * capacidade
+        {"nome": "borda_exata_dos_60_pct", "sobra": 1000.0,
+         "plano": {"id": "borda", "nome": "Borda", "custo_alvo": 3600.0,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # borda exata da capacidade: necessário == capacidade
+        {"nome": "borda_exata_da_capacidade", "sobra": 600.0,
+         "plano": {"id": "limite", "nome": "No limite", "custo_alvo": 3600.0,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # um centavo além da capacidade: vira inviável
+        {"nome": "um_centavo_alem_da_capacidade", "sobra": 600.0,
+         "plano": {"id": "estourou", "nome": "Estourou", "custo_alvo": 3600.06,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # prazo vencido: months_until devolve 0, e 0 é falso em Python
+        {"nome": "prazo_vencido_nao_divide_por_zero", "sobra": 2000.0,
+         "plano": {"id": "atrasado", "nome": "Atrasado", "custo_alvo": 1500.0,
+                   "data_alvo": "2026-01-01", "guardado": 200.0}},
+
+        # sem prazo nenhum
+        {"nome": "sem_prazo", "sobra": 2000.0,
+         "plano": {"id": "algum_dia", "nome": "Algum dia", "custo_alvo": 9000.0,
+                   "guardado": 1000.0}},
+
+        # já concluído: guardado passou do alvo
+        {"nome": "concluido", "sobra": 1000.0,
+         "plano": {"id": "feito", "nome": "Feito", "custo_alvo": 2000.0,
+                   "data_alvo": "2026-12-01", "guardado": 2500.0}},
+
+        # sobra negativa: a capacidade vira zero, não um número negativo
+        {"nome": "sobra_negativa_zera_a_capacidade", "sobra": -800.0,
+         "plano": {"id": "sonho", "nome": "Sonho", "custo_alvo": 5000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0}},
+
+        # custo alvo zero: progresso não pode dividir por zero
+        {"nome": "custo_alvo_zero", "sobra": 1000.0,
+         "plano": {"id": "vazio", "nome": "Vazio", "custo_alvo": 0.0,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # ritmo que não divide exato: arredonda para cima
+        {"nome": "ritmo_arredonda_para_cima", "sobra": 2000.0,
+         "plano": {"id": "ritmo", "nome": "Ritmo", "custo_alvo": 1000.01,
+                   "aporte_mensal": 500.0, "guardado": 0.0}},
+
+        # divisão que não fecha em centavo: 1000 / 3
+        {"nome": "aporte_necessario_nao_fecha_em_centavo", "sobra": 2000.0,
+         "plano": {"id": "terco", "nome": "Um terço", "custo_alvo": 1000.0,
+                   "data_alvo": "2026-09-01", "guardado": 0.0}},
+
+        # casamento por contraparte, com acento e caixa diferentes
+        {"nome": "casa_por_contraparte_com_acento", "sobra": 2000.0,
+         "plano": {"id": "ingles", "nome": "Inglês", "custo_alvo": 4000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0,
+                   "merchants": ["CURSO DE INGLES"]}},
+
+        # casamento por categoria
+        {"nome": "casa_por_categoria", "sobra": 2000.0,
+         "plano": {"id": "viagem2", "nome": "Viagem 2", "custo_alvo": 8000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0,
+                   "categorias": ["viagem"]}},
+
+        # nem contraparte nem categoria: não conta gasto nenhum
+        {"nome": "sem_casamento_nao_conta_gasto", "sobra": 2000.0,
+         "plano": {"id": "solto", "nome": "Solto", "custo_alvo": 3000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0}},
+    ]
+
+    casos = []
+    for e in entradas:
+        plano = plans_mod.Plan.from_dict(e["plano"])
+        base = {"sobra_media_mes": e["sobra"]}
+        casos.append({
+            "nome": e["nome"],
+            "entrada": {"plano": e["plano"], "sobra_media_mes": e["sobra"]},
+            "saida": plans_mod.evaluate(plano, stmt, base, today=hoje),
+        })
+
+    meses_ate = [
+        {"alvo": alvo, "meses": plans_mod.months_until(
+            _date.fromisoformat(alvo) if alvo else None, hoje)}
+        for alvo in ("2026-06-01", "2026-06-30", "2026-07-01", "2027-06-15",
+                     "2025-01-01", "2026-12-31", None)
+    ]
+
+    return {
+        "o_que_e": "planos: viabilidade, ritmo necessário e gasto já feito no plano",
+        "gerado_por": "fintips.plans",
+        "hoje_fixo": hoje.isoformat(),
+        "extrato": [
+            {"id": t.id, "dia": t.day.isoformat(), "valor_centavos": centavos(t.amount),
+             "fluxo": t.flow, "categoria": t.category, "contraparte": t.counterparty}
+            for t in stmt.transactions
+        ],
+        "meses_ate_o_alvo": meses_ate,
+        "casos": casos,
+    }
+
+
 def ouro_texto() -> dict:
     """Normalização caractere a caractere.
 
@@ -956,6 +1097,7 @@ GERADORES = {
     "analise.json": ouro_analise,
     "score.json": ouro_score,
     "projecao.json": ouro_projecao,
+    "planos.json": ouro_planos,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
