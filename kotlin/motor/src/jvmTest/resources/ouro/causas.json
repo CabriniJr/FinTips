@@ -1,0 +1,386 @@
+{
+  "o_que_e": "causas: as recusas de gravação, os filtros por prazo e a cobertura da despesa",
+  "gerado_por": "fintips.causes",
+  "hoje_fixo": "2026-06-15",
+  "efeitos": [
+    "categoria",
+    "contraparte",
+    "padrao",
+    "mes",
+    "plano",
+    "compromisso"
+  ],
+  "extrato": [
+    {
+      "id": "i0",
+      "dia": "2026-05-05",
+      "valor_centavos": 500000,
+      "fluxo": "income",
+      "categoria": "renda",
+      "contraparte": "Empregador"
+    },
+    {
+      "id": "e0",
+      "dia": "2026-05-15",
+      "valor_centavos": -40000,
+      "fluxo": "expense",
+      "categoria": "alimentacao",
+      "contraparte": "Delivery"
+    },
+    {
+      "id": "i1",
+      "dia": "2026-06-05",
+      "valor_centavos": 500000,
+      "fluxo": "income",
+      "categoria": "renda",
+      "contraparte": "Empregador"
+    },
+    {
+      "id": "e1",
+      "dia": "2026-06-15",
+      "valor_centavos": -30000,
+      "fluxo": "expense",
+      "categoria": "transporte",
+      "contraparte": "App de Corrida"
+    }
+  ],
+  "causas": [
+    {
+      "id": "c1",
+      "efeito": {
+        "tipo": "categoria",
+        "ref": "alimentacao"
+      },
+      "alvo": "categoria:alimentacao",
+      "natureza": "gatilho",
+      "enunciado": "chego destruído às 22h",
+      "atitude": "aceitar",
+      "atitude_nota": "",
+      "evidencia": [],
+      "revisar_em": null,
+      "vencida": false,
+      "criado_em": "2026-06-15T10:30:00",
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa contou",
+        "evidencia": [],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    },
+    {
+      "id": "c2",
+      "efeito": {
+        "tipo": "contraparte",
+        "ref": "App de Corrida"
+      },
+      "alvo": "contraparte:App de Corrida",
+      "natureza": "necessidade",
+      "enunciado": "não tem ônibus nesse horário",
+      "atitude": "nenhuma",
+      "atitude_nota": "",
+      "evidencia": [],
+      "revisar_em": "2026-12-31",
+      "vencida": false,
+      "criado_em": "2026-06-15T10:30:00",
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa contou",
+        "evidencia": [],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    },
+    {
+      "id": "c3",
+      "efeito": {
+        "tipo": "categoria",
+        "ref": "transporte"
+      },
+      "alvo": "categoria:transporte",
+      "natureza": "evento",
+      "enunciado": "obra na linha do metrô",
+      "atitude": "observar",
+      "atitude_nota": "",
+      "evidencia": [],
+      "revisar_em": "2026-03-01",
+      "vencida": true,
+      "criado_em": "2026-06-15T10:30:00",
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa contou",
+        "evidencia": [],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    }
+  ],
+  "recusas": [
+    {
+      "caso": "origem_heuristica",
+      "recusou": true,
+      "erro": "causa só aceita origem 'agente' ou 'usuario'. Não existe causa derivada dos dados: o extrato mostra o gasto, nunca o motivo"
+    },
+    {
+      "caso": "origem_importacao",
+      "recusou": true,
+      "erro": "causa só aceita origem 'agente' ou 'usuario'. Não existe causa derivada dos dados: o extrato mostra o gasto, nunca o motivo"
+    },
+    {
+      "caso": "porque_vazio",
+      "recusou": true,
+      "erro": "gravar uma causa exige `porque` — o que te fez concluir isso"
+    },
+    {
+      "caso": "enunciado_vazio",
+      "recusou": true,
+      "erro": "causa sem enunciado é rótulo; escreva a frase que a pessoa disse"
+    },
+    {
+      "caso": "efeito_tipo_invalido",
+      "recusou": true,
+      "erro": "efeito_tipo deve ser um de ('categoria', 'contraparte', 'padrao', 'mes', 'plano', 'compromisso')"
+    },
+    {
+      "caso": "efeito_ref_vazio",
+      "recusou": true,
+      "erro": "causa precisa apontar o que ela explica (efeito_ref)"
+    },
+    {
+      "caso": "atitude_invalida",
+      "recusou": true,
+      "erro": "atitude deve ser uma de ('nenhuma', 'aceitar', 'reduzir', 'eliminar', 'substituir', 'automatizar', 'observar')"
+    },
+    {
+      "caso": "natureza_vazia",
+      "recusou": true,
+      "erro": "causa precisa de natureza — ver NATUREZAS_SUGERIDAS, mas a lista é aberta"
+    }
+  ],
+  "ids_estaveis": [
+    {
+      "efeito_tipo": "categoria",
+      "efeito_ref": "alimentacao",
+      "natureza": "gatilho",
+      "id": "causa-e368a67c"
+    },
+    {
+      "efeito_tipo": "categoria",
+      "efeito_ref": "alimentacao",
+      "natureza": "habito",
+      "id": "causa-c09b3993"
+    },
+    {
+      "efeito_tipo": "contraparte",
+      "efeito_ref": "delivery",
+      "natureza": "gatilho",
+      "id": "causa-3838a722"
+    },
+    {
+      "efeito_tipo": "categoria",
+      "efeito_ref": "alimentação",
+      "natureza": "gatilho",
+      "id": "causa-9a248f48"
+    }
+  ],
+  "cenarios": [
+    {
+      "nome": "sem_causa_nenhuma",
+      "hoje": "2026-06-15",
+      "causas": [],
+      "saida": {
+        "cobertura": {
+          "despesa_total": 700.0,
+          "com_causa": 0.0,
+          "sem_causa": 700.0,
+          "cobertura_pct": 0.0,
+          "causas": 0,
+          "sem_atitude": 0,
+          "a_revisar": 0,
+          "maiores_sem_causa": [
+            {
+              "categoria": "alimentacao",
+              "total": 400.0,
+              "por_mes": 200.0
+            },
+            {
+              "categoria": "transporte",
+              "total": 300.0,
+              "por_mes": 150.0
+            }
+          ],
+          "explicacao": "percentual da despesa que alguém explicou. O resto é dinheiro saindo por um motivo que ninguém escreveu ainda"
+        },
+        "ativas": [],
+        "vencidas": [],
+        "sem_atitude": [],
+        "por_alvo": {}
+      }
+    },
+    {
+      "nome": "com_as_tres",
+      "hoje": "2026-06-15",
+      "causas": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "saida": {
+        "cobertura": {
+          "despesa_total": 700.0,
+          "com_causa": 700.0,
+          "sem_causa": 0.0,
+          "cobertura_pct": 100.0,
+          "causas": 3,
+          "sem_atitude": 1,
+          "a_revisar": 1,
+          "maiores_sem_causa": [],
+          "explicacao": "percentual da despesa que alguém explicou. O resto é dinheiro saindo por um motivo que ninguém escreveu ainda"
+        },
+        "ativas": [
+          "c1",
+          "c2"
+        ],
+        "vencidas": [
+          "c3"
+        ],
+        "sem_atitude": [
+          "c2"
+        ],
+        "por_alvo": {
+          "categoria:alimentacao": [
+            "c1"
+          ],
+          "contraparte:App de Corrida": [
+            "c2"
+          ],
+          "categoria:transporte": [
+            "c3"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "antes_de_vencer",
+      "hoje": "2026-02-01",
+      "causas": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "saida": {
+        "cobertura": {
+          "despesa_total": 700.0,
+          "com_causa": 700.0,
+          "sem_causa": 0.0,
+          "cobertura_pct": 100.0,
+          "causas": 3,
+          "sem_atitude": 1,
+          "a_revisar": 0,
+          "maiores_sem_causa": [],
+          "explicacao": "percentual da despesa que alguém explicou. O resto é dinheiro saindo por um motivo que ninguém escreveu ainda"
+        },
+        "ativas": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "vencidas": [],
+        "sem_atitude": [
+          "c2"
+        ],
+        "por_alvo": {
+          "categoria:alimentacao": [
+            "c1"
+          ],
+          "contraparte:App de Corrida": [
+            "c2"
+          ],
+          "categoria:transporte": [
+            "c3"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "so_a_vencida_explica_o_transporte",
+      "hoje": "2026-06-15",
+      "causas": [
+        "c1",
+        "c3"
+      ],
+      "saida": {
+        "cobertura": {
+          "despesa_total": 700.0,
+          "com_causa": 400.0,
+          "sem_causa": 300.0,
+          "cobertura_pct": 57.1,
+          "causas": 2,
+          "sem_atitude": 0,
+          "a_revisar": 1,
+          "maiores_sem_causa": [
+            {
+              "categoria": "transporte",
+              "total": 300.0,
+              "por_mes": 150.0
+            }
+          ],
+          "explicacao": "percentual da despesa que alguém explicou. O resto é dinheiro saindo por um motivo que ninguém escreveu ainda"
+        },
+        "ativas": [
+          "c1"
+        ],
+        "vencidas": [
+          "c3"
+        ],
+        "sem_atitude": [],
+        "por_alvo": {
+          "categoria:alimentacao": [
+            "c1"
+          ],
+          "categoria:transporte": [
+            "c3"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "a_mesma_antes_de_vencer",
+      "hoje": "2026-02-01",
+      "causas": [
+        "c1",
+        "c3"
+      ],
+      "saida": {
+        "cobertura": {
+          "despesa_total": 700.0,
+          "com_causa": 700.0,
+          "sem_causa": 0.0,
+          "cobertura_pct": 100.0,
+          "causas": 2,
+          "sem_atitude": 0,
+          "a_revisar": 0,
+          "maiores_sem_causa": [],
+          "explicacao": "percentual da despesa que alguém explicou. O resto é dinheiro saindo por um motivo que ninguém escreveu ainda"
+        },
+        "ativas": [
+          "c1",
+          "c3"
+        ],
+        "vencidas": [],
+        "sem_atitude": [],
+        "por_alvo": {
+          "categoria:alimentacao": [
+            "c1"
+          ],
+          "categoria:transporte": [
+            "c3"
+          ]
+        }
+      }
+    }
+  ]
+}

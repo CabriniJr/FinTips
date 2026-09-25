@@ -850,6 +850,142 @@ def ouro_compras() -> dict:
     }
 
 
+def ouro_causas() -> dict:
+    """Causas: o que o motor recusa gravar, e quanto da despesa tem explicação.
+
+    Aqui o que se protege é mais regra de produto do que aritmética. As cinco
+    recusas de `gravar` são o desenho do FinTips em código — se a porta aceitar
+    uma causa de origem `importacao`, o app passa a deduzir motivo do extrato,
+    que é exatamente o erro que este projeto existe para não cometer.
+
+    A cobertura tem duas sutilezas de conta:
+
+    - o `por_mes` divide pelo número de meses **distintos** do extrato, não
+      pelo período em dias;
+    - causa vencida **sai** do conjunto que explica dinheiro, então a cobertura
+      cai sozinha quando o prazo de revisão passa. É o que faz a fila de
+      triagem voltar a cobrar.
+    """
+    from datetime import date as _date
+
+    from fintips import causes as causes_mod
+    from fintips.contracts import Causa, Proveniencia
+
+    hoje = _date(2026, 6, 15)
+
+    def prov(origem="usuario", porque="a pessoa contou", confianca=1.0):
+        return Proveniencia(origem=origem, confianca=confianca, porque=porque,
+                            quando=QUANDO_FIXO, por_quem="claude")
+
+    # extrato com três categorias e contrapartes repetidas em dois meses
+    stmt = _extrato_sintetico([
+        {"mes": "2026-05", "renda_centavos": 500000, "despesa_centavos": 40000,
+         "categoria": "alimentacao", "contraparte": "Delivery"},
+        {"mes": "2026-06", "renda_centavos": 500000, "despesa_centavos": 30000,
+         "categoria": "transporte", "contraparte": "App de Corrida"},
+    ])
+
+    # as cinco recusas, uma a uma
+    recusas = []
+    base = dict(efeito_tipo="categoria", efeito_ref="alimentacao", natureza="gatilho",
+                enunciado="peço delivery depois do plantão")
+    for nome, kw in [
+        ("origem_heuristica", {"proveniencia": prov(origem="heuristica")}),
+        ("origem_importacao", {"proveniencia": prov(origem="importacao")}),
+        ("porque_vazio", {"proveniencia": prov(porque="")}),
+        ("enunciado_vazio", {"enunciado": "   ", "proveniencia": prov()}),
+        ("efeito_tipo_invalido", {"efeito_tipo": "chute", "proveniencia": prov()}),
+        ("efeito_ref_vazio", {"efeito_ref": "  ", "proveniencia": prov()}),
+        ("atitude_invalida", {"atitude": "sumir", "proveniencia": prov()}),
+        ("natureza_vazia", {"natureza": " ", "proveniencia": prov()}),
+    ]:
+        args = dict(base); args.update(kw)
+        loja = causes_mod.CauseStore(RAIZ / ".ouro-tmp-causas.yaml")
+        try:
+            loja.gravar(**args)
+            recusas.append({"caso": nome, "recusou": False, "erro": None})
+        except ValueError as e:
+            recusas.append({"caso": nome, "recusou": True, "erro": str(e)})
+    (RAIZ / ".ouro-tmp-causas.yaml").unlink(missing_ok=True)
+
+    # ids estáveis: mesma tripla, mesmo id
+    ids = []
+    for tipo, ref, nat in [
+        ("categoria", "alimentacao", "gatilho"),
+        ("categoria", "alimentacao", "habito"),
+        ("contraparte", "delivery", "gatilho"),
+        ("categoria", "alimentação", "gatilho"),
+    ]:
+        from fintips.contracts import novo_id
+        ids.append({"efeito_tipo": tipo, "efeito_ref": ref, "natureza": nat,
+                    "id": novo_id("causa", tipo, ref, nat)})
+
+    # o conjunto que a cobertura enxerga
+    causas = [
+        Causa(id="c1", efeito_tipo="categoria", efeito_ref="alimentacao",
+              natureza="gatilho", enunciado="chego destruído às 22h",
+              atitude="aceitar", proveniencia=prov(), criado_em=QUANDO_FIXO),
+        Causa(id="c2", efeito_tipo="contraparte", efeito_ref="App de Corrida",
+              natureza="necessidade", enunciado="não tem ônibus nesse horário",
+              atitude="nenhuma", proveniencia=prov(), criado_em=QUANDO_FIXO,
+              revisar_em="2026-12-31"),
+        # vencida: sai das ativas e para de explicar dinheiro
+        Causa(id="c3", efeito_tipo="categoria", efeito_ref="transporte",
+              natureza="evento", enunciado="obra na linha do metrô",
+              atitude="observar", proveniencia=prov(), criado_em=QUANDO_FIXO,
+              revisar_em="2026-03-01"),
+    ]
+
+    def cobertura_com(lista, quando):
+        loja = causes_mod.CauseStore(RAIZ / ".ouro-tmp-cob.yaml")
+        loja.causas = {c.id: c for c in lista}
+        out = {
+            "cobertura": loja.cobertura(stmt, hoje=quando),
+            "ativas": sorted(c.id for c in loja.ativas(quando)),
+            "vencidas": sorted(c.id for c in loja.vencidas(quando)),
+            "sem_atitude": sorted(c.id for c in loja.sem_atitude()),
+            "por_alvo": {k: sorted(x["id"] for x in v) for k, v in loja.por_alvo().items()},
+        }
+        (RAIZ / ".ouro-tmp-cob.yaml").unlink(missing_ok=True)
+        return out
+
+    cenarios = [
+        {"nome": "sem_causa_nenhuma", "causas": [], "hoje": hoje.isoformat()},
+        {"nome": "com_as_tres", "causas": [c.id for c in causas], "hoje": hoje.isoformat()},
+        # antes de a c3 vencer, a cobertura é maior
+        {"nome": "antes_de_vencer", "causas": [c.id for c in causas], "hoje": "2026-02-01"},
+        # aqui o transporte só é explicado pela causa vencida: quando o prazo
+        # passa, a cobertura cai sozinha e a triagem volta a cobrar. É este par
+        # de cenários que trava a regra do vencimento
+        {"nome": "so_a_vencida_explica_o_transporte", "causas": ["c1", "c3"],
+         "hoje": hoje.isoformat()},
+        {"nome": "a_mesma_antes_de_vencer", "causas": ["c1", "c3"], "hoje": "2026-02-01"},
+    ]
+    por_cenario = []
+    for c in cenarios:
+        lista = [x for x in causas if x.id in c["causas"]]
+        por_cenario.append({
+            "nome": c["nome"], "hoje": c["hoje"], "causas": c["causas"],
+            "saida": cobertura_com(lista, _date.fromisoformat(c["hoje"])),
+        })
+
+    return {
+        "o_que_e": "causas: as recusas de gravação, os filtros por prazo e a cobertura da despesa",
+        "gerado_por": "fintips.causes",
+        "hoje_fixo": hoje.isoformat(),
+        "efeitos": list(causes_mod.EFEITOS),
+        "extrato": [
+            {"id": t.id, "dia": t.day.isoformat(), "valor_centavos": centavos(t.amount),
+             "fluxo": t.flow, "categoria": t.category, "contraparte": t.counterparty}
+            for t in stmt.transactions
+        ],
+        "causas": [c.to_dict() for c in causas],
+        "recusas": recusas,
+        "ids_estaveis": ids,
+        "cenarios": por_cenario,
+    }
+
+
 def ouro_texto() -> dict:
     """Normalização caractere a caractere.
 
@@ -1293,6 +1429,7 @@ GERADORES = {
     "projecao.json": ouro_projecao,
     "planos.json": ouro_planos,
     "compras.json": ouro_compras,
+    "causas.json": ouro_causas,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
