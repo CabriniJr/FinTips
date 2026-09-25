@@ -167,14 +167,25 @@ _SPEC = {
 # ==========================================================================
 
 @mcp.tool()
-def analise_completa() -> str:
-    """Contexto inteiro: baseline, score, meses, categorias, contrapartes, regras,
-    custos fixos definidos, candidatos, projeção, contexto do usuário e triagem.
-    Primeira parada de quase toda conversa."""
+def analise_completa(topo: int = 8) -> str:
+    """Panorama: baseline, score, meses, estrutura de custo, gasto invisível,
+    conciliação, patrimônio e contexto do usuário — inteiros.
+
+    Os blocos que têm ferramenta própria vêm resumidos, cada um com `quantas` e
+    `detalhe_em` apontando para ela: perfil, taxonomia, contrapartes, triagem,
+    projeção, causas, decisões e regras. Isso é corte de tamanho, não de
+    informação — se a resposta depender do que não veio, chame a ferramenta que
+    o bloco indica em vez de supor.
+
+    O relatório completo continua sendo gravado em `relatorios/analise.yaml` a
+    cada chamada, e o painel lê aquele, não este.
+
+    `topo` ajusta quantos itens vêm nas listas resumidas (contrapartes maiores,
+    primeiros da triagem)."""
     ws = _ws()
     data = report.analyze(ws)
     report.save_report(ws, data)
-    return _json(data)
+    return _json(report.para_agente(data, topo=topo))
 
 
 @mcp.tool()

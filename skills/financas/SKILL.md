@@ -22,9 +22,11 @@ números que enquadram, as causas ativas com a atitude tomada, e o que está em
 aberto. Cada bloco traz `expandir_com` — o nome da ferramenta que devolve
 aquilo em detalhe.
 
-Puxe o detalhe quando precisar, não por precaução. `analise_completa` é o
-contexto inteiro e custa caro; na maior parte das conversas o briefing mais uma
-chamada dirigida resolve melhor.
+Puxe o detalhe quando precisar, não por precaução. `analise_completa` traz o
+panorama com os blocos pesados resumidos, cada um com `detalhe_em` apontando a
+ferramenta que devolve o resto — leia aquele ponteiro em vez de supor o que não
+veio. Na maior parte das conversas, o briefing mais uma chamada dirigida
+resolve melhor que o panorama inteiro.
 
 Leia o `cabecalho` antes de tudo. As três coberturas — classificação, perfil e
 causal — dizem quanto disso alguém decidiu e quanto ainda é o app achando
@@ -221,7 +223,7 @@ Duas cautelas:
 | Ler | Para quê |
 |---|---|
 | `briefing` | Retrato enxuto com ponteiros. **Primeira parada de toda conversa.** |
-| `analise_completa` | Contexto inteiro. Caro — use quando o briefing não bastar. |
+| `analise_completa` | Panorama, com os blocos pesados resumidos e `detalhe_em`. |
 | `triagem` | A fila de decisões em aberto, por impacto. |
 | `investigar` | Evidência sobre contraparte, categoria, texto ou transação. |
 | `listar_taxonomia` / `listar_regras` | O que existe e quem decidiu. |

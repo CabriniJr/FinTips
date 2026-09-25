@@ -236,9 +236,12 @@ mensagem útil.
 - **Alavanca não é dica.** O motor entrega a régua — número e efeito
   recalculado. O conselho depende de saber se aquele gasto é a única coisa boa
   da semana da pessoa, e isso o extrato não conta.
-- **Resumo com ponteiro.** O briefing que o agente carrega é enxuto, mas cada
-  bloco diz qual ferramenta devolve o detalhe. Resumir escondendo é pior que
-  não resumir: o agente passa a supor.
+- **Resumo com ponteiro.** O briefing que o agente carrega é enxuto, e
+  `analise_completa` corta os blocos que têm ferramenta própria — perfil,
+  taxonomia, contrapartes, projeção — de 12 mil para 3,4 mil tokens no fixture.
+  Mas cada bloco cortado diz quantos itens existem e qual ferramenta devolve o
+  detalhe. Resumir escondendo é pior que não resumir: o agente passa a supor.
+  O relatório em disco e o painel continuam lendo a análise inteira.
 - **PII fica em casa.** Conta vira hash; pessoa física vira apelido local ou
   pseudônimo estável. As regras públicas só citam marcas nacionais — a padaria da
   sua esquina vai em `data/regras-locais.yaml`, fora do Git, porque a lista de
