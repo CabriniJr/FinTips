@@ -358,6 +358,163 @@ def ouro_contratos() -> dict:
     }
 
 
+def ouro_projecao() -> dict:
+    """Projeção de caixa: cenários, consumo da sobra pelos planos e reserva.
+
+    O ponto delicado deste módulo não é a fórmula, é **quando se arredonda**. O
+    Python multiplica a renda pelo fator do cenário em `Decimal` de precisão
+    cheia e só arredonda na saída de cada mês; o patrimônio, porém, acumula o
+    valor **não arredondado** ao longo dos doze meses. Uma porta que arredonde
+    a renda para centavos antes do laço acerta o primeiro mês e erra o décimo
+    segundo por alguns centavos — o tipo de divergência que ninguém vê revisando
+    código e que aparece como saldo estranho no app.
+
+    Por isso os casos incluem renda que não fecha em centavo depois do fator
+    (3333.33 × 0.9 = 2999.997) e cenário conservador, que multiplica o variável
+    por 1.15. Sem eles o ouro passa e o erro dorme.
+
+    O segundo caso de fronteira é o mês da reserva: o Python compara o
+    patrimônio **já arredondado** da linha contra o alvo **não arredondado**.
+    Trocar uma coisa pela outra muda o mês em que a meta fecha, que é a
+    pergunta que o usuário faz.
+    """
+    from datetime import date as _date
+
+    from fintips import projection
+
+    def plano(pid, nome, falta, prioridade="media", aporte=None, status="em_andamento"):
+        d = {"id": pid, "nome": nome, "falta": falta, "prioridade": prioridade,
+             "status": status}
+        if aporte is not None:
+            d["aporte_planejado_mes"] = aporte
+        return d
+
+    casos = []
+    entradas = [
+        # o caso simples: sobra folgada, nenhum plano, reserva fecha cedo
+        {"nome": "sem_planos", "cenario": "base", "meses": 6,
+         "baseline": {"renda_media_mes": 5000.0, "despesa_media_mes": 3000.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1200.0, "saldo_conta": 2000.0, "patrimonio": 5000.0,
+         "planos": []},
+
+        # renda que não fecha em centavo depois do fator: 3333.33 * 0.9
+        {"nome": "fator_nao_fecha_em_centavo", "cenario": "conservador", "meses": 12,
+         "baseline": {"renda_media_mes": 3333.33, "despesa_media_mes": 2222.22,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1111.11, "saldo_conta": 500.0, "patrimonio": 1500.0,
+         "planos": []},
+
+        # o variável multiplicado por 1.15, com plano consumindo a sobra
+        {"nome": "conservador_com_planos", "cenario": "conservador", "meses": 12,
+         "baseline": {"renda_media_mes": 6000.0, "despesa_media_mes": 4000.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1500.0, "saldo_conta": 3000.0, "patrimonio": 10000.0,
+         "planos": [plano("viagem", "Viagem", 8000.0, "alta", 500.0),
+                    plano("notebook", "Notebook", 4000.0, "baixa"),
+                    plano("curso", "Curso", 2000.0, "media", 300.0)]},
+
+        # otimista: renda 1.05, variável 0.90
+        {"nome": "otimista", "cenario": "otimista", "meses": 12,
+         "baseline": {"renda_media_mes": 4500.0, "despesa_media_mes": 3100.0,
+                      "reserva_alvo_meses": 3},
+         "fixed_monthly": 900.0, "saldo_conta": 1000.0, "patrimonio": 4000.0,
+         "planos": [plano("reforma", "Reforma", 15000.0, "alta")]},
+
+        # sobra negativa todo mês: o caixa afunda e a reserva nunca fecha
+        {"nome": "sobra_negativa", "cenario": "base", "meses": 12,
+         "baseline": {"renda_media_mes": 2500.0, "despesa_media_mes": 3200.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 2000.0, "saldo_conta": 4000.0, "patrimonio": 6000.0,
+         "planos": [plano("divida", "Quitar dívida", 3000.0, "alta")]},
+
+        # plano concluído entra? não deve. E o custo fixo maior que a despesa
+        # total zera o variável em vez de virar negativo.
+        {"nome": "fixo_maior_que_despesa", "cenario": "base", "meses": 4,
+         "baseline": {"renda_media_mes": 5000.0, "despesa_media_mes": 1000.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1800.0, "saldo_conta": 1000.0, "patrimonio": 2000.0,
+         "planos": [plano("feito", "Já concluído", 0.0, "alta", status="concluido"),
+                    plano("aberto", "Em aberto", 1200.0, "media")]},
+
+        # renda zero: fixo_pct_da_renda não pode dividir por zero
+        {"nome": "renda_zero", "cenario": "base", "meses": 3,
+         "baseline": {"renda_media_mes": 0.0, "despesa_media_mes": 800.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 500.0, "saldo_conta": 900.0, "patrimonio": 900.0,
+         "planos": []},
+
+        # resto de plano que NÃO fecha em centavo: o Python serializa
+        # `falta_ao_fim` sem quantize, então 2666.674 sai com três casas. Uma
+        # porta que guarde o resto em centavos arredonda e diverge.
+        {"nome": "resto_de_plano_com_mais_de_duas_casas", "cenario": "conservador",
+         "meses": 12,
+         "baseline": {"renda_media_mes": 3333.33, "despesa_media_mes": 2222.22,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1111.11, "saldo_conta": 0.0, "patrimonio": 0.0,
+         "planos": [plano("longo", "Plano longo", 10000.0, "alta")]},
+
+        # O mês da reserva compara o patrimônio **já arredondado** da linha
+        # contra o alvo **não arredondado**. Aqui o alvo exato é 14333,6640 e o
+        # publicado é 14333,66 — o patrimônio do primeiro mês bate exatamente no
+        # publicado, e a resposta certa mesmo assim é o segundo mês. Sem este
+        # caso, uma porta que compare contra o alvo arredondado passa limpa: foi
+        # o que aconteceu na primeira rodada deste harness.
+        {"nome": "reserva_no_fio_do_sub_centavo", "cenario": "conservador", "meses": 4,
+         "baseline": {"renda_media_mes": 3333.33, "despesa_media_mes": 2222.27,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1111.11, "saldo_conta": 0.0, "patrimonio": 13722.61,
+         "planos": []},
+
+        # cenário desconhecido cai no base, em vez de estourar
+        {"nome": "cenario_desconhecido", "cenario": "inventado", "meses": 3,
+         "baseline": {"renda_media_mes": 4000.0, "despesa_media_mes": 2500.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1000.0, "saldo_conta": 1000.0, "patrimonio": 1000.0,
+         "planos": []},
+
+        # o plano de prioridade alta come a sobra antes, e a ordem entre dois
+        # de mesma prioridade é a de entrada (ordenação estável)
+        {"nome": "prioridade_ordena_e_empate_mantem_ordem", "cenario": "base", "meses": 8,
+         "baseline": {"renda_media_mes": 5000.0, "despesa_media_mes": 3500.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 2000.0, "saldo_conta": 0.0, "patrimonio": 0.0,
+         "planos": [plano("b_baixa", "Baixa", 2000.0, "baixa"),
+                    plano("m1", "Média primeira", 1000.0, "media"),
+                    plano("m2", "Média segunda", 1000.0, "media"),
+                    plano("a_alta", "Alta", 3000.0, "alta")]},
+    ]
+
+    for e in entradas:
+        saida = projection.project(
+            baseline=e["baseline"], fixed_monthly=e["fixed_monthly"],
+            saldo_conta=e["saldo_conta"], patrimonio=e["patrimonio"],
+            planos=e["planos"], meses=e["meses"], cenario=e["cenario"],
+            inicio=_date(2026, 6, 15),
+        )
+        casos.append({"nome": e["nome"], "entrada": e, "saida": saida})
+
+    # a virada de ano dentro do laço: _add_months tem que somar mês, não dia
+    virada = projection.project(
+        baseline={"renda_media_mes": 4000.0, "despesa_media_mes": 2000.0,
+                  "reserva_alvo_meses": 6},
+        fixed_monthly=800.0, saldo_conta=0.0, patrimonio=0.0, planos=[],
+        meses=14, cenario="base", inicio=_date(2026, 11, 30),
+    )
+
+    return {
+        "o_que_e": "projeção de caixa: cenários, consumo da sobra pelos planos e mês da reserva",
+        "gerado_por": "fintips.projection",
+        "inicio_fixo": "2026-06-15",
+        "cenarios": projection.CENARIOS,
+        "casos": casos,
+        "virada_de_ano": {
+            "inicio": "2026-11-30",
+            "meses": [l["mes"] for l in virada["linhas"]],
+        },
+    }
+
+
 def ouro_texto() -> dict:
     """Normalização caractere a caractere.
 
@@ -798,6 +955,7 @@ GERADORES = {
     "regras.json": ouro_regras,
     "analise.json": ouro_analise,
     "score.json": ouro_score,
+    "projecao.json": ouro_projecao,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências

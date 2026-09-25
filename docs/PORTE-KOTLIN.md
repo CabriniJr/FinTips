@@ -172,7 +172,8 @@ quando a anterior tem ouro fechando.
 | 7 | `Analise` — baseline, meses, recorrências, atípicos | **pronto** |
 | 7b | `gasto invisível` — depende das etiquetas da heurística | a fazer |
 | 8 | `Score` — cinco dimensões, pesos, alavanca de maior ganho | **pronto** |
-| 8b | `Projecao`, `Planos`, `Compras` | a fazer |
+| 8b | `Projecao` — cenários, planos consumindo a sobra, reserva | **pronto** |
+| 8c | `Planos`, `Compras` | a fazer |
 | 9 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | a fazer |
 | 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |
 | 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
@@ -180,6 +181,34 @@ quando a anterior tem ouro fechando.
 
 O painel React continua funcionando durante tudo isso, porque fala JSON e não
 sabe quem serve.
+
+## O harness cego de novo, e como se fecha o buraco
+
+Na porta da projeção, as três sabotagens de praxe deram dois resultados e uma
+surpresa:
+
+| O que quebrei | O que o harness disse |
+|---|---|
+| arredondar a sobra para centavos antes do laço | `mês 11 patrimonio_projetado: python 8222.22, kotlin 8222.21` |
+| inverter a ordem de prioridade dos planos | `mês 5 aportes_em_planos: python 1025.0, kotlin 800.0` |
+| comparar a reserva contra o alvo **arredondado** | **nada. Passou.** |
+
+O terceiro é o interessante. O Python compara o patrimônio já arredondado da
+linha contra o alvo **não** arredondado, e nenhum dos dez casos do ouro
+distinguia as duas coisas — a diferença só aparece quando o patrimônio de um
+mês cai exatamente sobre o alvo arredondado, e o alvo exato está alguns décimos
+de centavo acima.
+
+Procurar por força bruta não achou. O caso teve de ser **construído** pela
+aritmética: o fator 1,15 sobre um variável terminado em 6 centavos produz um
+alvo de `14333,6640`, que publica como `14333,66`; com o patrimônio inicial
+posto para o primeiro mês fechar em `14333,66` exatos, a resposta certa é o
+**segundo** mês, e a porta sabotada respondia o primeiro.
+
+Com `reserva_no_fio_do_sub_centavo` no ouro, a mesma sabotagem passou a falhar
+nomeando o mês. A lição repete a do leitor OFX: **o harness não estava cego; o
+ouro é que não fazia a pergunta.** E quando a pergunta é sobre um caso raro,
+procurar não basta — às vezes é preciso derivá-lo.
 
 ## Rodar
 
