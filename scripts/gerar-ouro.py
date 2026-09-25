@@ -656,6 +656,200 @@ def ouro_planos() -> dict:
     }
 
 
+def ouro_compras() -> dict:
+    """Consultor de compras: sinais de arrependimento, estratégias e veredito.
+
+    Só a parte **calculável** entra aqui. `contexto_pessoal` e `precedentes`
+    dependem de Perfil, Causas e Decisões, que são o item 9 da ordem do porte —
+    e a regra é que cada linha só começa quando a anterior tem ouro fechando.
+
+    Os pontos que mordem:
+
+    - **A mediana do ticket cai no meio centavo** com contagem par, e o Python
+      a guarda em `float` de propósito. O múltiplo do preço sai dessa divisão.
+    - **A janela de 60 dias conta a partir do fim do período**, não de hoje, e
+      a comparação é `>=` — o gasto que cai exatamente no limite entra.
+    - **"Compra de porte parecido" é `>= 50% do preço`**, também `>=`.
+    - **A parcela sem juros divide em `Decimal`**: 2599,99 ÷ 2 dá 1300,00, e
+      não 1299,99 como daria arredondando o `float`. Com juros, a fórmula Price
+      em `Decimal` e em `Double` bateu nas 105 combinações testadas.
+    - **O risco satura em 100** (20 por sinal), e a prudência tem piso em 0.
+    """
+    from datetime import date as _date, datetime, timedelta, timezone
+    from decimal import Decimal
+
+    from fintips import purchases
+    from fintips.models import Account, Statement, Transaction
+
+    tz = timezone(timedelta(hours=-3))
+    fim = _date(2026, 6, 30)
+
+    def tx(n, dias_antes, valor, categoria="eletronicos", contraparte="Loja",
+           fluxo="expense"):
+        d = fim - timedelta(days=dias_antes)
+        return Transaction(
+            id=f"t{n}", ts=datetime(d.year, d.month, d.day, 12, 0, tzinfo=tz),
+            amount=Decimal(str(valor)), memo_raw="", flow=fluxo,
+            category=categoria, counterparty=contraparte,
+        )
+
+    # histórico com contagem PAR na categoria: a mediana cai no meio centavo
+    transacoes = [
+        tx(1, 10, "-100.01"), tx(2, 20, "-100.02"),
+        tx(3, 30, "-900.01"), tx(4, 40, "-1200.00"),
+        # exatamente na borda dos 60 dias: entra
+        tx(5, 60, "-1000.00"),
+        # um dia fora: não entra
+        tx(6, 61, "-1100.00"),
+        # outra categoria, casada por palavra-chave
+        tx(7, 15, "-250.00", categoria="outros", contraparte="Fone Store"),
+        tx(8, 5, "-80.00", categoria="alimentacao", contraparte="Mercado"),
+        # categoria de valores miúdos: a mediana dá 0,57, e 10x disso é 5,70.
+        # Em Double, 5.70/0.57 é 10.000000000000002 — dispararia o sinal que o
+        # Decimal do Python não dispara. É o caso que trava a comparação inteira.
+        tx(13, 3, "-0.50", categoria="miudezas", contraparte="Banca"),
+        tx(14, 4, "-0.57", categoria="miudezas", contraparte="Banca"),
+        tx(15, 6, "-0.57", categoria="miudezas", contraparte="Banca"),
+        tx(16, 7, "-2.00", categoria="miudezas", contraparte="Banca"),
+        tx(9, 12, "5000.00", categoria="renda", contraparte="Empregador", fluxo="income"),
+        tx(10, 8, "60.00", fluxo="refund", contraparte="Devolucao 1"),
+        tx(11, 9, "70.00", fluxo="refund", contraparte="Devolucao 2"),
+        tx(12, 11, "80.00", fluxo="refund", contraparte="Devolucao 3"),
+    ]
+    stmt = Statement(
+        account=Account(id_hash="acct:teste"),
+        period_start=_date(2026, 1, 1), period_end=fim,
+        ledger_balance=Decimal("0"), balance_as_of=fim,
+        transactions=transacoes, source="sintetico",
+    )
+
+    def entrada(nome, **kw):
+        d = {"nome": nome, "item": "Fone X", "preco": 1800.0, "categoria": "eletronicos",
+             "urgencia": "media", "parcelas_possiveis": 1, "juros_parcelamento": 0.0,
+             "substitui": "", "tags": [], "saldo_conta": 5000.0, "patrimonio": 10000.0,
+             "reserva_alvo_meses": 6.0,
+             "baseline": {"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0},
+             "planos": []}
+        d.update(kw)
+        return d
+
+    plano_apertado = {"nome": "Viagem", "status": "apertado",
+                      "aporte_necessario_mes": 800.0}
+    plano_concluido = {"nome": "Feito", "status": "concluido",
+                       "aporte_necessario_mes": 500.0}
+    plano_sem_aporte = {"nome": "Sem aporte", "status": "confortavel",
+                        "aporte_necessario_mes": 0.0}
+
+    entradas = [
+        entrada("caso_base"),
+
+        # sem histórico nenhum na categoria: ticket médio 0, múltiplo nulo
+        entrada("sem_historico_na_categoria", categoria="viagem", preco=500.0),
+
+        # o múltiplo do ticket é `> 10`: exatamente 10x não dispara o sinal,
+        # e um centavo acima dispara. Com a mediana em 950,005, 10x é 9500,05.
+        entrada("multiplo_exatamente_10x", preco=9500.05, patrimonio=90000.0,
+                saldo_conta=30000.0,
+                baseline={"despesa_media_mes": 12000.0, "sobra_media_mes": 9000.0}),
+        entrada("multiplo_um_centavo_acima_de_10x", preco=9500.06, patrimonio=90000.0,
+                saldo_conta=30000.0,
+                baseline={"despesa_media_mes": 12000.0, "sobra_media_mes": 9000.0}),
+
+        # urgência alta sem substituir nada: um sinal a mais
+        entrada("urgente_sem_substituir", urgencia="alta"),
+        entrada("urgente_mas_substitui", urgencia="alta", substitui="fone antigo"),
+
+        # preço maior que um mês inteiro de despesa
+        entrada("preco_maior_que_um_mes_de_despesa", preco=2500.0,
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0}),
+
+        # casamento por palavra-chave fora da categoria
+        entrada("casa_por_palavra_chave", categoria="outros", tags=["fone"]),
+
+        # parcelamento sem juros que cai no meio centavo: 2599.99 / 2
+        entrada("parcela_sem_juros_no_meio_centavo", preco=2599.99,
+                parcelas_possiveis=2),
+
+        # parcelamento com juros: fórmula Price
+        entrada("parcelado_com_juros", preco=1800.0, parcelas_possiveis=12,
+                juros_parcelamento=1.99),
+        entrada("parcelado_juros_alto_longo", preco=12345.67, parcelas_possiveis=36,
+                juros_parcelamento=3.49),
+
+        # sobra zero: juntar_e_comprar não tem quantos meses
+        entrada("sobra_zero_nao_tem_ritmo",
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 0.0}),
+
+        # sobra negativa
+        entrada("sobra_negativa",
+                baseline={"despesa_media_mes": 3000.0, "sobra_media_mes": -400.0}),
+
+        # fura a reserva e custa mais de 3 meses de sobra: nao_agora
+        entrada("fura_reserva_e_custa_caro", preco=9000.0, saldo_conta=1000.0,
+                patrimonio=2000.0),
+
+        # cabe folgado: pode_comprar
+        entrada("cabe_folgado", preco=800.0, patrimonio=60000.0, saldo_conta=20000.0,
+                categoria="viagem"),
+
+        # conflito com plano
+        entrada("conflito_com_plano", preco=1200.0, patrimonio=60000.0,
+                saldo_conta=20000.0, categoria="viagem",
+                planos=[plano_apertado, plano_concluido, plano_sem_aporte]),
+
+        # 10x exatos sobre uma mediana que o Double não representa: a comparação
+        # inteira diz "não dispara", e a em Double diria "dispara"
+        entrada("multiplo_10x_que_o_double_erraria", preco=5.70, categoria="miudezas",
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0}),
+        entrada("multiplo_um_centavo_acima_no_miudo", preco=5.71, categoria="miudezas",
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0}),
+
+        # gasto que vale exatamente metade do preço: a comparação é `>=`
+        entrada("porte_parecido_na_borda_exata", preco=1800.02),
+
+        # preço zero: exercita os dois ramos em que o Python trata 0 como falso
+        # (`custo_em_meses` e `atraso_em_meses` saem nulos, não zero)
+        entrada("preco_zero_e_o_ramo_falso_do_python", preco=0.0,
+                planos=[plano_apertado]),
+
+        # risco alto o bastante para saturar em 100
+        entrada("risco_saturado", preco=200.0, urgencia="alta",
+                baseline={"despesa_media_mes": 150.0, "sobra_media_mes": 100.0}),
+    ]
+
+    casos = []
+    for e in entradas:
+        intent = purchases.PurchaseIntent.from_dict({
+            "item": e["item"], "preco": e["preco"], "categoria": e["categoria"],
+            "urgencia": e["urgencia"], "parcelas_possiveis": e["parcelas_possiveis"],
+            "juros_parcelamento": e["juros_parcelamento"], "substitui": e["substitui"],
+            "tags": e["tags"],
+        })
+        saida = purchases.evaluate(
+            intent, stmt, e["baseline"], e["planos"],
+            saldo_conta=Decimal(str(e["saldo_conta"])),
+            patrimonio=Decimal(str(e["patrimonio"])),
+            reserva_alvo_meses=e["reserva_alvo_meses"],
+        )
+        # o que depende de Perfil/Causas/Decisões fica para o item 9
+        saida.pop("contexto_pessoal", None)
+        saida.pop("precedentes", None)
+        casos.append({"nome": e["nome"], "entrada": e, "saida": saida})
+
+    return {
+        "o_que_e": "consultor de compras: arrependimento, estratégias e veredito (parte calculável)",
+        "gerado_por": "fintips.purchases",
+        "fora_do_escopo": ["contexto_pessoal", "precedentes"],
+        "periodo_fim": fim.isoformat(),
+        "extrato": [
+            {"id": t.id, "dia": t.day.isoformat(), "valor_centavos": centavos(t.amount),
+             "fluxo": t.flow, "categoria": t.category, "contraparte": t.counterparty}
+            for t in transacoes
+        ],
+        "casos": casos,
+    }
+
+
 def ouro_texto() -> dict:
     """Normalização caractere a caractere.
 
@@ -1098,6 +1292,7 @@ GERADORES = {
     "score.json": ouro_score,
     "projecao.json": ouro_projecao,
     "planos.json": ouro_planos,
+    "compras.json": ouro_compras,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
