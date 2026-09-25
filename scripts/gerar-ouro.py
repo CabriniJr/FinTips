@@ -986,6 +986,205 @@ def ouro_causas() -> dict:
     }
 
 
+def ouro_perfil() -> dict:
+    """Perfil: o catálogo casado por número, e a assinatura que só gente dá.
+
+    Três coisas separadas moram aqui, e a porta erra em cada uma de um jeito:
+
+    **O formato `:g`.** A evidência sai como `"taxa_poupanca = 0.9926 (esperado
+    ≥ 0.2)"`, e aquele número passa por `f"{v:g}"` — seis dígitos
+    significativos, zeros à direita cortados, notação científica abaixo de 1e-4
+    e a partir de 1e+6. Kotlin não tem equivalente direto, e uma aproximação
+    ("tira o .0 do fim") acerta os casos comuns e escreve `99.99999` onde o
+    Python escreve `100`. A tabela abaixo é o que trava isso.
+
+    **O empate.** `casar` ordena por aderência decrescente com ordenação
+    **estável** e, se os dois primeiros empatam, devolve `sugerido: None` com o
+    motivo. Não ter leitura é estado honesto — a triagem prefere perguntar a
+    chutar. Uma porta com ordenação instável devolve um arquétipo diferente a
+    cada execução, sem nunca acusar empate.
+
+    **A assinatura.** Heurística e importação não assinam perfil, por
+    definição. E um traço de autoridade menor não derruba um maior: o palpite
+    do agente não apaga o que a pessoa afirmou.
+    """
+    from fintips import profile as profile_mod
+    from fintips.contracts import Proveniencia
+
+    catalogo = profile_mod.carregar_catalogo()
+
+    # 1. o formato :g, com as bordas da notação científica
+    valores_g = [0, 0.0, 1, 100, 100.0, 0.9926, 0.2, 35, 121.4, 2.5, 0.5,
+                 99.99999, 0.30000000000000004, -3.75, 0.0001, 1e-05, 1.2e-05,
+                 999999.0, 1000000, 1234567.0, 12345678, 0.123456789, 1.5e-07,
+                 # o arredondamento para 6 dígitos empurra para a próxima
+                 # potência e vira a chave da notação científica: 999999,5 sai
+                 # como 1e+06, e 9,999999e-05 sai como 0,0001. Sem estes, uma
+                 # porta que não reconfira o expoente passa limpa
+                 999999.4, 999999.5, 999999.9, 9.999999e-05]
+    formato_g = [{"valor": v, "texto": f"{v:g}"} for v in valores_g]
+
+    # 2. o catálogo inteiro, para o Kotlin montar sem depender de YAML
+    catalogo_json = [
+        {"id": e.id, "nome": e.nome, "o_que_e": e.o_que_e, "minimo": e.minimo,
+         "arquetipos": [
+             {"id": a.id, "nome": a.nome, "descricao": a.descricao,
+              "o_que_muda": a.o_que_muda, "eixo": a.eixo,
+              "sinais": [{"indicador": s.indicador, "min": s.minimo,
+                          "max": s.maximo, "peso": s.peso} for s in a.sinais]}
+             for a in e.arquetipos
+         ]}
+        for e in catalogo
+    ]
+
+    # 3. conjuntos de indicadores que exercitam casamento, empate e piso
+    conjuntos = [
+        {"nome": "tudo_ausente", "ind": {}},
+        {"nome": "poupador_disciplinado", "ind": {
+            "taxa_poupanca": 0.35, "meses_de_reserva": 8.0, "meses_no_vermelho": 0.0,
+            "volatilidade_despesa": 0.08, "comprometido_pct_renda": 22.0,
+            "despesa_em_micro_pct": 5.0, "transacoes_micro_pct": 20.0,
+            "concentracao_top3_categorias": 55.0, "renda_variacao": 0.02,
+            "meses_com_renda_pct": 1.0}},
+        {"nome": "sufocado", "ind": {
+            "taxa_poupanca": -0.05, "meses_de_reserva": 0.2, "meses_no_vermelho": 3.0,
+            "volatilidade_despesa": 0.4, "comprometido_pct_renda": 82.0,
+            "despesa_em_micro_pct": 30.0, "transacoes_micro_pct": 60.0,
+            "concentracao_top3_categorias": 40.0, "renda_variacao": 0.5,
+            "meses_com_renda_pct": 0.6}},
+        {"nome": "renda_variavel", "ind": {
+            "taxa_poupanca": 0.15, "meses_de_reserva": 4.0, "meses_no_vermelho": 1.0,
+            "volatilidade_despesa": 0.25, "comprometido_pct_renda": 45.0,
+            "despesa_em_micro_pct": 12.0, "transacoes_micro_pct": 45.0,
+            "concentracao_top3_categorias": 62.0, "renda_variacao": 0.35,
+            "meses_com_renda_pct": 0.75}},
+        # as faixas do catálogo são inclusivas dos dois lados, então 35,0 casa
+        # com 'enxuto' (máx 35) e 'carregado' (mín 35) ao mesmo tempo, e 0,2
+        # casa com 'estavel' e 'oscilante'. Dá empate com aderência 1.0 — acima
+        # do mínimo do eixo, que é o único empate capaz de virar sugestão falsa
+        {"nome": "empate_acima_do_minimo", "ind": {
+            "taxa_poupanca": 0.2, "meses_de_reserva": 3.0, "meses_no_vermelho": 0.0,
+            "volatilidade_despesa": 0.2, "comprometido_pct_renda": 35.0,
+            "despesa_em_micro_pct": 8.0, "transacoes_micro_pct": 30.0,
+            "concentracao_top3_categorias": 70.0, "renda_variacao": 0.1,
+            "meses_com_renda_pct": 1.0}},
+        # o do fixture: sobra altíssima de um mês só
+        {"nome": "fixture_um_mes_so", "ind": {
+            "taxa_poupanca": 0.9926, "meses_de_reserva": 0.0, "meses_no_vermelho": 0.0,
+            "volatilidade_despesa": 0.0, "comprometido_pct_renda": 0.0,
+            "despesa_em_micro_pct": 100.0, "transacoes_micro_pct": 100.0,
+            "concentracao_top3_categorias": 100.0, "renda_variacao": None,
+            "meses_com_renda_pct": 1.0}},
+    ]
+
+    casamentos = []
+    for c in conjuntos:
+        ind = dict.fromkeys(
+            ["taxa_poupanca", "meses_de_reserva", "meses_no_vermelho",
+             "volatilidade_despesa", "comprometido_pct_renda", "comprometido_pct_despesa",
+             "despesa_em_micro_pct", "transacoes_micro_pct",
+             "concentracao_top3_categorias", "renda_variacao", "meses_com_renda_pct",
+             "meses_observados"],
+        )
+        ind.update(c["ind"])
+        ctx_falso = {"__indicadores__": ind}
+        # `casar` chama `indicadores(ctx)`; aqui o teste quer controlar os
+        # números, então o casamento é feito arquétipo a arquétipo
+        eixos = []
+        for eixo in catalogo:
+            avaliados = sorted((a.avaliar(ind) for a in eixo.arquetipos),
+                               key=lambda d: d["aderencia"], reverse=True)
+            melhor = avaliados[0] if avaliados else None
+            empate = (len(avaliados) > 1 and melhor is not None
+                      and avaliados[1]["aderencia"] == melhor["aderencia"])
+            sugerido = (melhor if melhor and melhor["aderencia"] >= eixo.minimo
+                        and not empate else None)
+            eixos.append({
+                "eixo": eixo.id, "nome": eixo.nome, "o_que_e": eixo.o_que_e,
+                "minimo": eixo.minimo, "sugerido": sugerido, "candidatos": avaliados,
+                "sem_leitura_porque": (
+                    None if sugerido
+                    else "empate entre arquétipos" if empate
+                    else "nenhum arquétipo atingiu a aderência mínima"),
+            })
+        casamentos.append({"nome": c["nome"], "indicadores": ind, "eixos": eixos})
+
+    # 4. as recusas de assinatura
+    def tenta(**kw):
+        loja = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil.yaml")
+        try:
+            loja.assinar(catalogo=catalogo, **kw)
+            return {"recusou": False, "erro": None}
+        except ValueError as e:
+            return {"recusou": True, "erro": str(e)}
+        finally:
+            (RAIZ / ".ouro-tmp-perfil.yaml").unlink(missing_ok=True)
+
+    def prov(origem="usuario", porque="sou PJ e recebo por projeto"):
+        return Proveniencia(origem=origem, confianca=1.0, porque=porque,
+                            quando=QUANDO_FIXO, por_quem="claude")
+
+    recusas = [
+        {"caso": "origem_heuristica", **tenta(
+            eixo="renda", arquetipo="variavel", proveniencia=prov(origem="heuristica"))},
+        {"caso": "origem_importacao", **tenta(
+            eixo="renda", arquetipo="variavel", proveniencia=prov(origem="importacao"))},
+        {"caso": "porque_vazio", **tenta(
+            eixo="renda", arquetipo="variavel", proveniencia=prov(porque=""))},
+        {"caso": "eixo_desconhecido", **tenta(
+            eixo="signo", arquetipo="variavel", proveniencia=prov())},
+        {"caso": "arquetipo_fora_do_eixo", **tenta(
+            eixo="renda", arquetipo="acumulacao", proveniencia=prov())},
+        {"caso": "personalizado_sem_nome", **tenta(
+            eixo="renda", arquetipo="personalizado", proveniencia=prov())},
+        {"caso": "personalizado_sem_descricao", **tenta(
+            eixo="renda", arquetipo="personalizado", nome="Meu jeito",
+            proveniencia=prov())},
+        {"caso": "personalizado_completo", **tenta(
+            eixo="renda", arquetipo="personalizado", nome="Meu jeito",
+            descricao="recebo por projeto e por aluguel", proveniencia=prov())},
+    ]
+
+    # 5. autoridade: agente não derruba usuário, e o inverso derruba
+    loja = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil2.yaml")
+    loja.assinar(eixo="renda", arquetipo="variavel", catalogo=catalogo,
+                 proveniencia=prov(origem="usuario", porque="a pessoa afirmou"))
+    depois_do_agente = loja.assinar(
+        eixo="renda", arquetipo="fixa", catalogo=catalogo,
+        proveniencia=prov(origem="agente", porque="o agente concluiu")).to_dict()
+    loja2 = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil3.yaml")
+    loja2.assinar(eixo="renda", arquetipo="variavel", catalogo=catalogo,
+                  proveniencia=prov(origem="agente", porque="o agente concluiu"))
+    depois_do_usuario = loja2.assinar(
+        eixo="renda", arquetipo="fixa", catalogo=catalogo,
+        proveniencia=prov(origem="usuario", porque="a pessoa corrigiu")).to_dict()
+    # autoridade IGUAL substitui: a pessoa muda de ideia sobre o próprio perfil,
+    # e a segunda afirmação dela vale. Com `>=` no lugar de `>`, a primeira
+    # assinatura trancaria o eixo para sempre
+    loja3 = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil4.yaml")
+    loja3.assinar(eixo="renda", arquetipo="variavel", catalogo=catalogo,
+                  proveniencia=prov(origem="usuario", porque="achei que era isso"))
+    mesma_autoridade = loja3.assinar(
+        eixo="renda", arquetipo="mista", catalogo=catalogo,
+        proveniencia=prov(origem="usuario", porque="pensando melhor, é mista")).to_dict()
+    for f in (".ouro-tmp-perfil2.yaml", ".ouro-tmp-perfil3.yaml", ".ouro-tmp-perfil4.yaml"):
+        (RAIZ / f).unlink(missing_ok=True)
+
+    return {
+        "o_que_e": "perfil: formato :g, casamento do catálogo, empate e as recusas de assinatura",
+        "gerado_por": "fintips.profile",
+        "formato_g": formato_g,
+        "catalogo": catalogo_json,
+        "casamentos": casamentos,
+        "recusas": recusas,
+        "autoridade": {
+            "agente_nao_derruba_usuario": depois_do_agente,
+            "usuario_derruba_agente": depois_do_usuario,
+            "mesma_autoridade_substitui": mesma_autoridade,
+        },
+    }
+
+
 def ouro_texto() -> dict:
     """Normalização caractere a caractere.
 
@@ -1430,6 +1629,7 @@ GERADORES = {
     "planos.json": ouro_planos,
     "compras.json": ouro_compras,
     "causas.json": ouro_causas,
+    "perfil.json": ouro_perfil,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências

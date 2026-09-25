@@ -176,7 +176,7 @@ quando a anterior tem ouro fechando.
 | 8c | `Planos` — viabilidade, ritmo e gasto já feito no plano | **pronto** |
 | 8d | `Compras` — arrependimento, estratégias e veredito | **pronto** (menos perfil/causas) |
 | 9a | `Causas` — recusas, prazo de revisão e cobertura da despesa | **pronto** (sem persistência) |
-| 9b | `Perfil` — catálogo, casamento e assinatura | a fazer |
+| 9b | `Perfil` — catálogo, casamento e assinatura | **pronto** (`indicadores` espera o contexto) |
 | 9c | `Alavancas`, `Triagem`, `Dossie` — e com elas o `contexto_pessoal` e os `precedentes` das compras | a fazer |
 | 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |
 | 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
