@@ -178,7 +178,8 @@ quando a anterior tem ouro fechando.
 | 9a | `Causas` — recusas, prazo de revisão e cobertura da despesa | **pronto** (sem persistência) |
 | 9b | `Perfil` — catálogo, casamento e assinatura | **pronto** (`indicadores` espera o contexto) |
 | 9c | `Alavancas`, `Triagem`, `Dossie` — e com elas o `contexto_pessoal` e os `precedentes` das compras | a fazer |
-| 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |
+| 10a | YAML — **escrita**, byte a byte como o PyYAML | **pronto** |
+| 10b | YAML — **leitura** (destrava catálogo, causas, perfil e o item 6b) | a fazer |
 | 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
 | 12 | Compose Multiplatform no lugar do painel React | a fazer |
 

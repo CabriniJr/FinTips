@@ -1185,6 +1185,168 @@ def ouro_perfil() -> dict:
     }
 
 
+def ouro_yaml() -> dict:
+    """O YAML que o Python grava, caractere por caractere.
+
+    Este é o ouro que protege a migração. Se o motor Kotlin gravar um arquivo
+    que o Python leia diferente — ou não leia —, a pessoa perde o histórico, e
+    **isso não aparece em cálculo nenhum**: aparece como arquivo estranho
+    semanas depois.
+
+    O que parece detalhe de formatação e não é:
+
+    - `hora: '10:00'` sai com aspas e `hora: 08:00` sai sem. YAML 1.1 lê
+      `10:00` como inteiro sexagesimal (600 minutos), e o PyYAML cita para
+      impedir isso; `08:00` começa com zero, não casa o padrão sexagesimal, e
+      fica em texto puro. Os dois estão no mesmo arquivo canônico hoje.
+    - `-a` é texto puro, `- a` precisa de aspas: o indicador só vale seguido de
+      espaço.
+    - `nan` é texto puro e `.nan` é citado; `1e3` é puro e `1.5` é citado.
+    - sequência dentro de mapa **não indenta** no PyYAML: `transacoes:` e o
+      `- id:` começam na mesma coluna.
+
+    Nenhuma dessas regras é adivinhável. Todas estão aqui como caso.
+    """
+    import yaml as _yaml
+
+    def emitir(obj):
+        return _yaml.safe_dump(obj, allow_unicode=True, sort_keys=False,
+                               default_flow_style=False)
+
+    # 1. escalares: o corpus que decide quando citar
+    escalares = [
+        # texto que colide com outro tipo do YAML 1.1
+        "10:00", "08:00", "1:30", "60:00", "0:00", "123", "0123", "0x1f", "12_3",
+        "1.5", "1e3", "+12", "-12", "0", "0o17",
+        "yes", "no", "true", "True", "false", "on", "off", "y", "n", "Y", "N",
+        "null", "Null", "NULL", "~", ".inf", "-.inf", ".nan", "nan", "inf",
+        "2026-06-15", "2026-6-5", "2026-06-15T10:30:00",
+        # vazio, espaço e indicadores
+        "", " ", "  ", "a b", "a: b", "a:b", "a #b", "a#b", "#a", "-a", "- a",
+        "-", "?", "a?", "? a", ":", ":a", "[a]", "{a}", "*a", "&a", "!a", "|a",
+        ">a", "%a", "@a", "`a", '"a', "'a", "a'b", 'a"b', ",a", "a,b",
+        "  começo", "fim  ", "---", "...", "a\tb", "a\nb",
+        # o que o projeto de fato grava
+        "acentuação", "é", "alimentacao", "Gelato Roma", "EMV CMT",
+        "acct:b125ff343a", "ofx:PagSeguro Internet S/A", "dec-87cc5cf5",
+        "peço delivery depois do plantão", "não tem ônibus nesse horário",
+        "transporte.reembolsado_pela_empresa", "R$ 1.234,56",
+        "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+    ]
+    casos_escalares = [
+        {"valor": v, "linha": emitir({"k": v}).rstrip("\n")} for v in escalares
+    ]
+
+    # 1b. float: o `repr` do Python vira científico só a partir de 1e16, e o
+    # `toString` do Kotlin vira em 1e7. Um patrimônio de dez milhões sairia
+    # como `1.0E7` e o Python leria outra coisa
+    floats = [0.0, -0.0, 1.0, 100.0, 4533.1, -0.01, 0.9926, 1.5, 0.1, 1234.56,
+              1e6, 1e7, 1e15, 1e16, 1e17, 1e-3, 1e-4, 1e-5, 123456789.12,
+              1 / 3, 2 / 3, 1e22, 1e-300, 2.2250738585072014e-308,
+              1.7976931348623157e308]
+    # Fora: `5e-324`, o menor subnormal. Ali o `Double.toString` da JVM devolve
+    # "4.9E-324" e o `repr` do Python devolve "5e-324" — os dois fazem
+    # round-trip, e os dois discordam sobre qual é a forma mais curta. Numa
+    # amostra de 8 mil doubles (metade em faixa de dinheiro, metade em padrões
+    # de bits aleatórios) foi a única discordância encontrada, e é um valor que
+    # não existe em extrato. Fica registrado aqui em vez de escondido.
+    casos_floats = [{"valor_repr": repr(f), "linha": emitir({"k": f}).rstrip("\n")}
+                    for f in floats]
+
+    # 2. os outros tipos que os arquivos carregam
+    outros = [
+        {"nome": "inteiro", "obj": {"k": 42}},
+        {"nome": "inteiro_negativo", "obj": {"k": -7}},
+        {"nome": "zero", "obj": {"k": 0}},
+        {"nome": "float", "obj": {"k": 1.5}},
+        {"nome": "float_inteiro", "obj": {"k": 100.0}},
+        {"nome": "float_negativo", "obj": {"k": -0.01}},
+        {"nome": "float_longo", "obj": {"k": 0.9926}},
+        {"nome": "bool_true", "obj": {"k": True}},
+        {"nome": "bool_false", "obj": {"k": False}},
+        {"nome": "nulo", "obj": {"k": None}},
+        {"nome": "lista_vazia", "obj": {"k": []}},
+        {"nome": "mapa_vazio", "obj": {"k": {}}},
+        {"nome": "lista_de_texto", "obj": {"k": ["a", "b"]}},
+        {"nome": "lista_de_mapas", "obj": {"k": [{"a": 1}, {"a": 2}]}},
+        {"nome": "mapa_aninhado", "obj": {"k": {"a": {"b": {"c": 1}}}}},
+        {"nome": "lista_em_mapa_em_lista",
+         "obj": {"k": [{"a": ["x", "y"]}, {"a": []}]}},
+        {"nome": "chave_que_precisa_de_aspas", "obj": {"10:00": "v", "sim": 1}},
+        {"nome": "raiz_lista", "obj": [{"a": 1}, {"b": 2}]},
+        {"nome": "ordem_preservada",
+         "obj": {"z": 1, "a": 2, "m": 3, "b": 4}},
+    ]
+    casos_outros = [{"nome": o["nome"], "texto": emitir(o["obj"])} for o in outros]
+
+    # 3. documentos inteiros, no formato exato que o motor grava
+    documentos = [
+        {"nome": "causas", "obj": {
+            "schema_version": 1,
+            "atualizado_em": "2026-06-15T10:30:00",
+            "causas": [{
+                "id": "causa-abc",
+                "efeito": {"tipo": "categoria", "ref": "alimentacao"},
+                "alvo": "categoria:alimentacao",
+                "natureza": "gatilho",
+                "enunciado": "peço delivery depois do plantão",
+                "atitude": "aceitar",
+                "atitude_nota": "é o custo de trabalhar à noite",
+                "evidencia": ["tx-9", "tx-12"],
+                "revisar_em": "2027-01-01",
+                "vencida": False,
+                "criado_em": "2026-06-15T10:30:00",
+                "proveniencia": {
+                    "origem": "usuario", "confianca": 1.0,
+                    "porque": "a pessoa afirmou", "evidencia": [],
+                    "quando": "2026-06-15T10:30:00", "por_quem": "claude",
+                },
+            }],
+        }},
+        {"nome": "canonico_com_hora", "obj": {
+            "schema_version": 1,
+            "gerado_em": "2026-09-25T18:07:53",
+            "origem": "ofx:PagSeguro Internet S/A",
+            "conta": {"id_hash": "acct:b125ff343a", "bank_id": "290",
+                      "type": "CHECKING", "currency": "BRL"},
+            "periodo": {"inicio": "2026-06-01", "fim": "2026-06-15"},
+            "saldo": {"conta": 4533.1, "em": "2026-06-30"},
+            "transacoes": [
+                {"id": "f1", "data": "2026-06-01", "hora": "10:00",
+                 "valor": -100.0, "fluxo": "savings_out"},
+                {"id": "f2", "data": "2026-06-05", "hora": "08:00",
+                 "valor": -50.25, "fluxo": "expense"},
+            ],
+        }},
+        {"nome": "patrimonio", "obj": {
+            "atualizado_em": "2026-06-15",
+            "posicoes": [
+                {"nome": "Conta corrente", "tipo": "conta", "valor": 1500.0,
+                 "liquidez": "imediata"},
+                {"nome": "CDB", "tipo": "renda_fixa", "valor": 20000.0,
+                 "liquidez": "d_mais_1"},
+            ],
+        }},
+        {"nome": "vazios", "obj": {
+            "schema_version": 1, "itens": [], "mapa": {}, "nada": None,
+            "texto_vazio": "",
+        }},
+    ]
+    casos_documentos = [
+        {"nome": d["nome"], "objeto_json": d["obj"], "texto": emitir(d["obj"])}
+        for d in documentos
+    ]
+
+    return {
+        "o_que_e": "o YAML que o Python grava: quando citar, como indentar, e os documentos inteiros",
+        "gerado_por": "yaml.safe_dump(allow_unicode=True, sort_keys=False)",
+        "escalares": casos_escalares,
+        "floats": casos_floats,
+        "outros_tipos": casos_outros,
+        "documentos": casos_documentos,
+    }
+
+
 def ouro_texto() -> dict:
     """Normalização caractere a caractere.
 
@@ -1630,6 +1792,7 @@ GERADORES = {
     "compras.json": ouro_compras,
     "causas.json": ouro_causas,
     "perfil.json": ouro_perfil,
+    "yaml.json": ouro_yaml,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
