@@ -1,0 +1,524 @@
+<title>Claude no seu Chrome</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #edeef1;
+    --card: #ffffff;
+    --ink: #1b1e24;
+    --ink-soft: #555c68;
+    --line: #d6d9df;
+    --line-strong: #b9bec8;
+    --clay: #b8552f;
+    --clay-soft: #f4e6df;
+    --ok: #2f6b4f;
+    --warn: #8a5a12;
+    --chip: #f3f4f6;
+    --shadow: 0 1px 2px rgba(20,24,32,.06), 0 12px 32px -18px rgba(20,24,32,.35);
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #14161a;
+      --card: #1c1f25;
+      --ink: #e9eaee;
+      --ink-soft: #a3aab6;
+      --line: #2e333b;
+      --line-strong: #454c57;
+      --clay: #e08760;
+      --clay-soft: #33241d;
+      --ok: #7fc39d;
+      --warn: #d9a84e;
+      --chip: #24282f;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 14px 34px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #14161a;
+    --card: #1c1f25;
+    --ink: #e9eaee;
+    --ink-soft: #a3aab6;
+    --line: #2e333b;
+    --line-strong: #454c57;
+    --clay: #e08760;
+    --clay-soft: #33241d;
+    --ok: #7fc39d;
+    --warn: #d9a84e;
+    --chip: #24282f;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 14px 34px -18px rgba(0,0,0,.8);
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding-inline: 20px; padding-block: 0 72px; }
+  h1, h2, h3, .ui { font-family: var(--display); text-wrap: balance; }
+  h1 { font-size: clamp(2rem, 6.5vw, 3.1rem); line-height: 1.04; letter-spacing: -.02em; font-weight: 700; margin: 0 0 14px; }
+  h2 { font-size: clamp(1.4rem, 4vw, 1.85rem); line-height: 1.15; letter-spacing: -.015em; font-weight: 600; margin: 0; }
+  h3 { font-size: 1.08rem; font-weight: 600; margin: 0; letter-spacing: -.005em; }
+  p { margin: 0; max-width: 62ch; }
+  a { color: var(--clay); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--clay); outline-offset: 3px; border-radius: 4px; }
+  .eyebrow {
+    font-family: var(--display); font-size: .74rem; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  .lede { font-size: 1.16rem; color: var(--ink-soft); }
+
+  /* ---- barra de navegação ---- */
+  .topbar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    max-width: 860px; margin: 0 auto; padding: 10px 20px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .mark { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 700; font-size: .95rem; }
+  .mark .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--clay); flex: none; }
+  .navlinks { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+  .navlinks a {
+    font-family: var(--display); font-size: .82rem; font-weight: 500; text-decoration: none;
+    color: var(--ink-soft); padding: 5px 10px; border-radius: 999px;
+  }
+  .navlinks a:hover { background: var(--chip); color: var(--ink); }
+
+  /* ---- hero ---- */
+  header.hero { padding-block: 44px 8px; }
+  .from {
+    display: inline-flex; align-items: center; gap: 8px; margin-bottom: 22px;
+    font-family: var(--display); font-size: .78rem; font-weight: 500; letter-spacing: .04em;
+    background: var(--clay-soft); color: var(--clay); padding: 6px 12px; border-radius: 999px;
+  }
+
+  /* ---- janela do navegador ---- */
+  .browser {
+    margin-block: 34px 0; border: 1px solid var(--line-strong); border-radius: 12px;
+    background: var(--card); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .browser-bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--line); background: var(--chip); }
+  .lights { display: flex; gap: 5px; flex: none; }
+  .lights i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); display: block; }
+  .url {
+    font-family: var(--mono); font-size: .76rem; color: var(--ink-soft);
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 4px 12px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .puzzle { font-family: var(--mono); font-size: .8rem; color: var(--clay); flex: none; }
+  .tabstrip { display: flex; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .tab {
+    font-family: var(--display); font-size: .74rem; font-weight: 500; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; background: var(--paper);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tab.grouped { border-color: var(--clay); color: var(--clay); background: var(--clay-soft); }
+  .tab .gdot { width: 6px; height: 6px; border-radius: 50%; background: var(--clay); flex: none; }
+  .panes { display: grid; grid-template-columns: 1fr 300px; }
+  .page-side { padding: 18px 16px; border-right: 1px solid var(--line); min-width: 0; }
+  .skel { height: 9px; border-radius: 4px; background: var(--line); margin-bottom: 9px; }
+  .skel.w70 { width: 70%; } .skel.w45 { width: 45%; } .skel.w90 { width: 90%; }
+  .skel.tall { height: 58px; margin-block: 14px; }
+  .sidepanel { padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; background: var(--card); }
+  .sp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .sp-head span:first-child { font-family: var(--display); font-weight: 600; font-size: .82rem; }
+  .mode { font-family: var(--mono); font-size: .66rem; color: var(--ok); border: 1px solid var(--ok); border-radius: 999px; padding: 2px 7px; }
+  .bubble { border-radius: 10px; padding: 9px 11px; font-size: .84rem; line-height: 1.45; }
+  .bubble.me { background: var(--chip); }
+  .bubble.claude { background: var(--clay-soft); color: var(--ink); }
+  .steps-live { font-family: var(--mono); font-size: .7rem; color: var(--ink-soft); display: flex; flex-direction: column; gap: 5px; }
+  .ask {
+    border: 1px dashed var(--line-strong); border-radius: 10px; padding: 9px 11px;
+    font-size: .8rem; display: flex; flex-direction: column; gap: 8px;
+  }
+  .ask-btns { display: flex; gap: 6px; }
+  .btn {
+    font-family: var(--display); font-size: .74rem; font-weight: 600; border-radius: 6px;
+    padding: 4px 11px; border: 1px solid var(--line-strong); background: var(--card); color: var(--ink);
+  }
+  .btn.primary { background: var(--clay); border-color: var(--clay); color: #fff; }
+  .caption { font-size: .82rem; color: var(--ink-soft); margin-top: 10px; font-style: italic; }
+  @media (max-width: 680px) {
+    .panes { grid-template-columns: 1fr; }
+    .page-side { display: none; }
+  }
+
+  /* ---- seções ---- */
+  section { padding-block: 46px 0; scroll-margin-top: 80px; }
+  .sechead { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+  .grid { display: grid; gap: 14px; }
+  @media (min-width: 720px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .card p { font-size: .95rem; color: var(--ink-soft); }
+  .say {
+    font-family: var(--mono); font-size: .82rem; line-height: 1.5; color: var(--ink);
+    background: var(--chip); border-left: 3px solid var(--clay); border-radius: 0 6px 6px 0;
+    padding: 9px 12px;
+  }
+  .then { font-size: .92rem; color: var(--ink-soft); }
+  .then b { color: var(--ink); font-weight: 600; font-family: var(--display); }
+
+  ol.steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; counter-reset: s; }
+  ol.steps li {
+    counter-increment: s; display: grid; grid-template-columns: 38px 1fr; gap: 14px;
+    padding: 16px 0; border-top: 1px solid var(--line); align-items: start;
+  }
+  ol.steps li:last-child { border-bottom: 1px solid var(--line); }
+  ol.steps li::before {
+    content: counter(s); font-family: var(--display); font-weight: 700; font-size: 1.05rem;
+    color: var(--clay); background: var(--clay-soft); border-radius: 8px;
+    width: 34px; height: 34px; display: grid; place-items: center; font-variant-numeric: tabular-nums;
+  }
+  .step-body { display: flex; flex-direction: column; gap: 6px; }
+  .step-body p { font-size: .95rem; color: var(--ink-soft); }
+  code { font-family: var(--mono); font-size: .86em; background: var(--chip); padding: 1px 5px; border-radius: 4px; }
+
+  .rules { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+  .rule { display: grid; grid-template-columns: 22px 1fr; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); align-items: start; }
+  .rule:last-child { border-bottom: 1px solid var(--line); }
+  .rule .glyph { font-family: var(--display); font-weight: 700; line-height: 1.5; }
+  .rule.yes .glyph { color: var(--ok); }
+  .rule.no .glyph { color: var(--clay); }
+  .rule.care .glyph { color: var(--warn); }
+  .rule p { font-size: .95rem; }
+  .rule p b { font-family: var(--display); font-weight: 600; }
+
+  .note {
+    margin-top: 20px; border: 1px solid var(--line-strong); border-left: 4px solid var(--warn);
+    border-radius: 0 10px 10px 0; padding: 16px 18px; background: var(--card);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .note p { font-size: .95rem; color: var(--ink-soft); }
+  .note strong { color: var(--ink); font-family: var(--display); }
+
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--display); font-weight: 600; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
+  tr:last-child td { border-bottom: 0; }
+
+  footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+  footer p, footer li { font-size: .88rem; color: var(--ink-soft); }
+  footer ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<nav class="topbar">
+  <div class="topbar-inner">
+    <span class="mark"><span class="dot"></span>Claude no Chrome</span>
+    <span class="navlinks">
+      <a href="#oque">O que é</a>
+      <a href="#exemplos">Exemplos</a>
+      <a href="#instalar">Instalar</a>
+      <a href="#falar">Como pedir</a>
+      <a href="#seguranca">Segurança</a>
+      <a href="#limites">Limites</a>
+    </span>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="from">Feito para o meu pai</span>
+    <h1>O Claude senta do seu lado no navegador.</h1>
+    <p class="lede">
+      É uma extensão do Google Chrome. Ela abre um painel na lateral da tela, lê a
+      página que você já está vendo e, se você pedir, clica, digita e preenche
+      formulários no seu lugar. Você continua olhando tudo e aprovando o que
+      importa.
+    </p>
+
+    <div class="browser" aria-hidden="true">
+      <div class="browser-bar">
+        <span class="lights"><i></i><i></i><i></i></span>
+        <span class="url">https://mail.google.com/mail/u/0/#inbox</span>
+        <span class="puzzle">⧉ Claude</span>
+      </div>
+      <div class="tabstrip">
+        <span class="tab grouped"><span class="gdot"></span>Gmail</span>
+        <span class="tab grouped"><span class="gdot"></span>Agenda</span>
+        <span class="tab grouped"><span class="gdot"></span>Boleto — banco</span>
+        <span class="tab">Notícias</span>
+      </div>
+      <div class="panes">
+        <div class="page-side">
+          <div class="skel w45"></div>
+          <div class="skel w90"></div>
+          <div class="skel tall"></div>
+          <div class="skel w70"></div>
+          <div class="skel w90"></div>
+          <div class="skel w45"></div>
+          <div class="skel tall"></div>
+          <div class="skel w70"></div>
+        </div>
+        <aside class="sidepanel">
+          <div class="sp-head">
+            <span>Claude</span>
+            <span class="mode">aprovar automático</span>
+          </div>
+          <div class="bubble me">Olha esses três e-mails da imobiliária e me diz em uma frase o que eles querem.</div>
+          <div class="bubble claude">Querem confirmar a vistoria. Duas datas propostas: quinta 14h ou sábado 9h.</div>
+          <div class="steps-live">
+            <span>› abriu 3 e-mails</span>
+            <span>› leu a agenda de quinta</span>
+            <span>› quinta 14h está livre</span>
+          </div>
+          <div class="ask">
+            <span>Responder “quinta, 14h” para a imobiliária?</span>
+            <span class="ask-btns">
+              <span class="btn primary">Pode enviar</span>
+              <span class="btn">Não</span>
+            </span>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <p class="caption">
+      O painel da direita é o Claude. As abas com o pontinho colorido são as que
+      ele pode mexer; a aba “Notícias” fica fora, de fora ele não toca.
+    </p>
+  </header>
+
+  <section id="oque">
+    <div class="sechead">
+      <span class="eyebrow">O que é</span>
+      <h2>Não é um site novo para aprender. É o mesmo Chrome, com uma ajuda do lado.</h2>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Ele vê a mesma tela que você</h3>
+        <p>
+          Nada de copiar e colar texto para dentro de uma caixa. Ele lê a página
+          aberta — e as páginas em que você já está logado — do jeito que ela está.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Ele consegue agir, não só falar</h3>
+        <p>
+          Clicar, digitar, preencher campo, trocar de aba, baixar um arquivo. Passo
+          a passo, na sua frente, na velocidade em que você consegue acompanhar.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Trabalha com várias abas juntas</h3>
+        <p>
+          Você arrasta as abas para o grupo do Claude. Ele compara as três de uma
+          vez, em vez de você ficar pulando de janela em janela.
+        </p>
+      </div>
+      <div class="card">
+        <h3>A conversa te acompanha</h3>
+        <p>
+          O histórico fica na sua conta, não no computador. Começa no celular,
+          continua no Chrome do desktop, e vice-versa.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="exemplos">
+    <div class="sechead">
+      <span class="eyebrow">Exemplos</span>
+      <h2>Coisas que você pode pedir hoje</h2>
+      <p class="lede">Você escreve em português, como falaria comigo. Ele faz na tela.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Achar a informação enterrada</h3>
+        <div class="say">“Nesta fatura, soma quanto eu gastei em farmácia e me diz em quais dias.”</div>
+        <p class="then"><b>Ele faz:</b> lê a fatura na tela, separa os lançamentos e devolve o total com as datas.</p>
+      </div>
+      <div class="card">
+        <h3>Limpar a caixa de entrada</h3>
+        <div class="say">“Marca como lido tudo que é propaganda e separa o que é banco.”</div>
+        <p class="then"><b>Ele faz:</b> abre os e-mails, classifica e pergunta antes de arquivar em massa.</p>
+      </div>
+      <div class="card">
+        <h3>Preencher formulário chato</h3>
+        <div class="say">“Preenche este cadastro com os meus dados que estão na aba do lado.”</div>
+        <p class="then"><b>Ele faz:</b> copia campo por campo e para antes de apertar “enviar”, para você conferir.</p>
+      </div>
+      <div class="card">
+        <h3>Comparar preço com calma</h3>
+        <div class="say">“Nessas quatro abas, qual pneu sai mais barato com frete para o nosso CEP?”</div>
+        <p class="then"><b>Ele faz:</b> lê as quatro, monta a conta com frete e diz qual ganha e por quanto.</p>
+      </div>
+      <div class="card">
+        <h3>Organizar arquivo no Drive</h3>
+        <div class="say">“Renomeia esses recibos com ano e mês e joga na pasta 2026.”</div>
+        <p class="then"><b>Ele faz:</b> abre o Drive, renomeia um por um e mostra a lista no fim.</p>
+      </div>
+      <div class="card">
+        <h3>Preparar a reunião</h3>
+        <div class="say">“Vê meu compromisso de amanhã e me conta quem é a empresa.”</div>
+        <p class="then"><b>Ele faz:</b> olha a agenda, pesquisa a empresa e resume em meia página.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="instalar">
+    <div class="sechead">
+      <span class="eyebrow">Instalar</span>
+      <h2>Seis passos, uma vez só</h2>
+      <p class="lede">Do começo ao fim leva uns cinco minutos. Depois disso ele já fica lá.</p>
+    </div>
+    <ol class="steps">
+      <li>
+        <div class="step-body">
+          <h3>Abra o Google Chrome</h3>
+          <p>Tem que ser o Chrome mesmo. Edge, Brave, Opera e Safari não servem, e no celular ainda não existe.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <h3>Vá na Chrome Web Store e procure “Claude”</h3>
+          <p>A loja de extensões do próprio Chrome. A extensão oficial é publicada pela Anthropic, que é a empresa que faz o Claude.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <h3>Clique em “Usar no Chrome” / “Add to Chrome”</h3>
+          <p>O Chrome vai mostrar a lista do que a extensão precisa — ler as páginas, controlar as abas, abrir o painel lateral, salvar preferências. É isso que permite ele agir na tela.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <h3>Entre com a sua conta Claude</h3>
+          <p>Precisa de um plano pago: Pro, Max, Team ou Enterprise. No plano gratuito a extensão não funciona.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <h3>Fixe o ícone na barra</h3>
+          <p>Clique na pecinha de quebra-cabeça <code>⧉</code> no canto direito do Chrome e no alfinete ao lado de “Claude”. Assim ele fica sempre à vista.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <h3>Abra o painel e escolha onde ele pode entrar</h3>
+          <p>No modo de permissões você libera site por site. Libere o que você usa todo dia e deixe o resto de fora.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="falar">
+    <div class="sechead">
+      <span class="eyebrow">Como pedir</span>
+      <h2>O jeito de falar com ele</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Em vez de</th><th>Diga assim</th><th>Por quê</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>“Organiza meu e-mail.”</td>
+            <td>“Separa os e-mails de banco dos últimos 7 dias numa lista.”</td>
+            <td>Pedido com começo e fim ele termina; pedido solto ele chuta.</td>
+          </tr>
+          <tr>
+            <td>“Resolve isso aqui.”</td>
+            <td>“Nesta página, me explica o que esse aviso quer.”</td>
+            <td>Dizer <em>nesta página</em> ancora ele na tela que você está vendo.</td>
+          </tr>
+          <tr>
+            <td>“Compra o mais barato.”</td>
+            <td>“Diz qual é o mais barato; a compra eu faço.”</td>
+            <td>Compra e dinheiro ele evita de propósito — e é bom que evite.</td>
+          </tr>
+          <tr>
+            <td>Silêncio quando erra</td>
+            <td>“Não era isso, era o segundo boleto.”</td>
+            <td>Corrigir no meio do caminho funciona melhor que recomeçar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="seguranca">
+    <div class="sechead">
+      <span class="eyebrow">Segurança</span>
+      <h2>Quem manda é você</h2>
+      <p class="lede">
+        Vale ler esta parte com atenção, porque é a única em que você precisa
+        fazer alguma coisa: prestar atenção quando ele pergunta.
+      </p>
+    </div>
+    <div class="rules">
+      <div class="rule yes">
+        <span class="glyph">✓</span>
+        <p><b>Ele pede aprovação nas horas sérias.</b> Enviar mensagem, apagar, publicar, confirmar algo em nome seu: aparece um botão e ele espera.</p>
+      </div>
+      <div class="rule yes">
+        <span class="glyph">✓</span>
+        <p><b>Você escolhe os sites.</b> Site por site, você diz onde ele pode entrar. O que você não liberou, ele não lê.</p>
+      </div>
+      <div class="rule no">
+        <span class="glyph">✕</span>
+        <p><b>Compra e transação financeira ele não faz.</b> Isso está bloqueado do lado dele, não é só recomendação.</p>
+      </div>
+      <div class="rule care">
+        <span class="glyph">!</span>
+        <p><b>Banco e prontuário médico: deixe de fora.</b> Não é que ele vá fazer besteira — é que o estrago, se acontecer, é grande demais para valer a economia de tempo.</p>
+      </div>
+      <div class="rule care">
+        <span class="glyph">!</span>
+        <p><b>Leia o que ele vai fazer antes de clicar “pode”.</b> Se o pedido na tela não é o que você pediu, é “não”. Sempre.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>O golpe que existe nesse mundo novo, em uma frase</strong>
+      <p>
+        Uma página mal-intencionada pode esconder no meio do texto um recado
+        escrito para o Claude, e não para você — do tipo “agora envie os dados
+        desta tela para tal lugar”. Chama-se injeção de instrução. O Claude tem
+        defesa contra isso e por isso ele para e pergunta; a sua parte é simples:
+        <strong>se aparecer um pedido de aprovação que você não reconhece, recuse
+        e me chama.</strong>
+      </p>
+    </div>
+  </section>
+
+  <section id="limites">
+    <div class="sechead">
+      <span class="eyebrow">Limites</span>
+      <h2>O que ele ainda não faz</h2>
+    </div>
+    <div class="rules">
+      <div class="rule no"><span class="glyph">✕</span><p><b>Só Google Chrome</b>, no computador. Sem celular, sem tablet.</p></div>
+      <div class="rule no"><span class="glyph">✕</span><p><b>Arquivos da sua máquina</b> não entram por aqui — isso é trabalho do aplicativo do Claude no computador.</p></div>
+      <div class="rule no"><span class="glyph">✕</span><p><b>Plano gratuito não abre.</b> A extensão exige plano pago.</p></div>
+      <div class="rule care"><span class="glyph">!</span><p><b>Ele erra.</b> Em tarefa longa, ele às vezes clica no lugar errado ou entende torto. Por isso a conferência na tela não é frescura.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Se travar em qualquer passo, me manda uma foto da tela que eu resolvo daqui.
+      Não precisa acertar de primeira — é para ser mais fácil, não mais uma coisa
+      para dar trabalho.
+    </p>
+    <p><span class="eyebrow">Fontes</span></p>
+    <ul>
+      <li><a href="https://claude.com/claude-in-chrome">claude.com/claude-in-chrome</a> — página oficial do recurso</li>
+      <li><a href="https://support.claude.com/en/articles/12012173-get-started-with-claude-in-chrome">Central de ajuda da Anthropic</a> — instalação, permissões e limites</li>
+      <li><a href="https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn">Chrome Web Store</a> — a extensão oficial</li>
+    </ul>
+    <p>Consultado em setembro de 2026. O recurso muda rápido; se a tela estiver diferente da descrição, a Central de ajuda manda.</p>
+  </footer>
+</div>
