@@ -7,7 +7,7 @@ pergunta e registra; você assina. Um painel local mostra tudo.
 ```
                        ┌─ painel local (React, 127.0.0.1)
 extrato.ofx ─┐         │
-             ├─ motor ─┼─ agente Claude (MCP: 33 primitivas + 2 recursos)
+             ├─ motor ─┼─ agente Claude (MCP: 39 primitivas + 2 recursos)
 Open Finance ┘         │
   (Pluggy)             └─ YAML no seu disco (fonte de verdade)
 ```
@@ -52,6 +52,13 @@ decisão e quanto ainda é palpite**. Começa em 0%.
 - **Contexto híbrido**: núcleo demarcado para o que é universal (moradia, cartão,
   renda, reserva) + chave livre para o que é só seu
   (`transporte.reembolsado_pela_empresa`).
+- **Registra a decisão, não só o gasto.** O celular quebrou: consertar por
+  R$ 700 ou trocar por R$ 2.500? O motor compara pelo que decide a troca —
+  R$ 87,50 contra R$ 69,44 por mês de uso — e guarda a pergunta, as
+  alternativas **com o motivo de cada descarte**, os números da época e, depois,
+  no que deu. Na próxima vez que a mesma pergunta aparecer (o notebook, a
+  geladeira), ela chega com o precedente junto, em vez de ser refeita do zero.
+  Ver `docs/DECISOES.md`.
 - **Guarda o porquê, não só o quanto.** Uma causa liga um padrão de gasto ao
   motivo dele, nas palavras da pessoa, mais a atitude tomada — inclusive
   `aceitar`, que é decisão legítima e tira o gasto da lista de culpa. Causa
@@ -144,6 +151,8 @@ fintips contexto --gravar moradia.situacao --valor com_familia
 fintips perfil                                 # sugestões, assinaturas, cobertura
 fintips perfil --assinar renda --arquetipo variavel --porque "sou PJ"
 fintips alavancas                              # o que muda o número, e quanto
+fintips decisoes --historico "celular"         # precedentes de um assunto
+fintips mcp-config                             # config pronta do cliente MCP
 fintips serve                                  # painel em http://127.0.0.1:8420
 ```
 
@@ -161,6 +170,7 @@ FinTips/
     contexto.yaml      fatos sobre você, com evidência
     perfil.yaml        traços assinados, um por eixo
     causas.yaml        por que o dinheiro sai, e o que se decidiu
+    decisoes.yaml      bifurcações: alternativas, escolha e desfecho
     custos-fixos.yaml  compromissos definidos
     triagem.yaml       o que já foi resolvido ou adiado
     regras-locais.yaml estabelecimentos do seu dia a dia (fora do Git)
@@ -182,30 +192,32 @@ pessoa, causas ativas, o que está aberto) e `fintips://spec` (a regra de
 proveniência e os vocabulários) o cliente lê sozinho, sem gastar um turno. Os
 prompts `conversa_de_compra` e `entender_um_gasto` trazem roteiro pronto.
 
-As 33 ferramentas se dividem em ler (`analise_completa`, `triagem`, `investigar`,
+As 39 ferramentas se dividem em ler (`analise_completa`, `triagem`, `investigar`,
 `listar_taxonomia`, `listar_regras`, `contexto_do_usuario`, `custos_fixos`,
 `buscar_transacoes`, `projecao`, `perfil`, `alavancas`, `briefing`,
-`listar_causas`), simular
+`listar_causas`, `listar_decisoes`, `historico_de_decisoes`), simular
 (`simular_regra`) e escrever (`criar_categoria`, `definir_regra`,
 `remover_regra`, `definir_custo_fixo`, `remover_custo_fixo`, `gravar_fato`,
 `esquecer_fato`, `assinar_perfil`, `esquecer_traco`, `gravar_causa`,
-`decidir_causa`, `esquecer_causa`, `resolver_item`,
+`decidir_causa`, `esquecer_causa`, `abrir_decisao`, `escolher_alternativa`,
+`registrar_desfecho`, `esquecer_decisao`, `resolver_item`,
 `salvar_plano`, `avaliar_compra`, `patrimonio`, `ingerir_extrato`).
 
 Toda escrita exige `porque` — é o que torna a decisão auditável depois.
 
-Para usar fora do plugin:
+Para usar fora do plugin, peça a config ao próprio CLI:
 
-```json
-{
-  "mcpServers": {
-    "fintips": {
-      "command": "python",
-      "args": ["-m", "fintips.mcp_server", "--root", "C:/Users/<voce>/Documents/FinTips"]
-    }
-  }
-}
+```bash
+fintips mcp-config                 # JSON para o Claude Desktop
+fintips mcp-config --claude-code   # o comando `claude mcp add-json` pronto
 ```
+
+Ele imprime o caminho absoluto do interpretador onde o fintips está instalado,
+e não `"command": "python"`. A diferença importa: o cliente MCP sobe o servidor
+a partir de um diretório qualquer, e o `python` do PATH quase nunca é o
+interpretador certo — num venv, num pyenv, ou num Debian onde `python` sequer
+existe. O sintoma é o servidor aparecer como falho no cliente sem nenhuma
+mensagem útil.
 
 ## Decisões que sustentam o resto
 
@@ -260,4 +272,6 @@ for t in tests/test_*.py; do python "$t" || break; done
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
 - `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem
 - `docs/PRIVACIDADE.md` — modelo de ameaça e o que nunca sai da máquina
+- `docs/DECISOES.md` — o ADR financeiro: alternativas, números da época, desfecho
+- `docs/PORTE-KOTLIN.md` — a porta para Kotlin, que é o destino do projeto
 - `docs/OPEN-FINANCE.md` — por que via agregador e como plugar

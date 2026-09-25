@@ -22,7 +22,7 @@ from typing import Any
 
 import yaml
 
-from . import analysis, causes as causes_mod, commitments, discovery, mapping
+from . import analysis, causes as causes_mod, commitments, decisions, discovery, mapping
 from . import plans as plans_mod
 from . import profile as profile_mod, projection
 from . import score as score_mod, taxonomy as tax_mod, triage
@@ -56,6 +56,7 @@ def stores(ws: Workspace) -> dict[str, Any]:
         "triagem": triage.TriageStore(ws.triagem_path),
         "perfil": profile_mod.PerfilStore(ws.perfil_path),
         "causas": causes_mod.CauseStore(ws.causas_path),
+        "decisoes": decisions.DecisionStore(ws.decisoes_path),
     }
 
 
@@ -249,6 +250,15 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         "por_alvo": st["causas"].por_alvo(),
     }
 
+    # decisões: o histórico não entra inteiro na análise — o que interessa aqui
+    # é o que está em aberto e o que já se aprendeu. O detalhe sai por
+    # `historico_de_decisoes`, que é onde ele é útil.
+    ctx["decisoes"] = {
+        "aprendizados": st["decisoes"].aprendizados(),
+        "linha_do_tempo": st["decisoes"].linha_do_tempo()[:12],
+        "abertas": [d.to_dict() for d in st["decisoes"].abertas()],
+    }
+
     ctx["projecao"] = projection.project(
         baseline=ctx["baseline"],
         fixed_monthly=fixo_mes,
@@ -266,6 +276,7 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         candidatos_fixos=candidatos,
         store=st["triagem"],
         causas=st["causas"],
+        decisoes=st["decisoes"],
         fallback=tax_mod.FALLBACK,
     )
     ctx["triagem"] = {

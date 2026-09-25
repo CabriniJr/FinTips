@@ -24,6 +24,7 @@ from typing import Any
 from mcp.server.fastmcp import FastMCP
 
 from . import causes as causes_mod
+from . import decisions
 from . import dossier, levers, mapping, plans as plans_mod
 from . import projection as proj_mod
 from . import purchases, report
@@ -779,6 +780,11 @@ def avaliar_compra(item: str, preco: float, categoria: str = "compras",
         reserva_alvo_meses=float(ctx["baseline"].get("reserva_alvo_meses", 6)),
         perfil=ctx.get("perfil"),
         causas=(ctx.get("causas") or {}).get("itens"),
+        precedentes=st["decisoes"].semelhantes(
+            f"{intent.item} {intent.categoria}", tipo="compra",
+            ligacoes=[f"categoria:{intent.categoria}"],
+        ),
+        aprendizados=(ctx.get("decisoes") or {}).get("aprendizados"),
     ))
 
 
@@ -904,6 +910,140 @@ def entender_um_gasto(alvo: str) -> str:
 6. Se for algo que provavelmente muda (projeto que acaba, obra, estágio),
    marque `revisar_em` — a causa vai voltar para a fila quando vencer.
 7. `resolver_item` no item da triagem, dizendo o que foi gravado."""
+
+
+# ==========================================================================
+# decisões: a bifurcação, o que se considerou, e no que deu
+# ==========================================================================
+
+
+@mcp.tool()
+def abrir_decisao(titulo: str, situacao: str, pergunta: str, alternativas: list[dict],
+                  porque: str, tipo: str = "outro", ligacoes: list[str] | None = None,
+                  revisar_em: str = "", substitui: str = "",
+                  origem: str = "agente", confianca: float = 0.9) -> str:
+    """Abre o registro de uma decisão: a situação, a pergunta e os caminhos.
+
+    Use **antes** de a pessoa escolher, não depois. Alternativa listada depois
+    da escolha vira justificativa: ela lembra melhor das opções que confirmam o
+    que já fez. Escritas antes, são comparação de verdade — e são elas que
+    sobram para a próxima vez que a mesma pergunta aparecer.
+
+    O app congela sozinho os números do motor no momento da abertura (sobra,
+    reserva, score, planos em risco). É o que permite julgar a escolha, depois,
+    pelo que se sabia na época — e não pelo que se sabe hoje.
+
+    `alternativas`: no mínimo duas, cada uma
+    `{nome, custo, custo_mensal, horizonte_meses, consequencia, risco,
+    descartada_porque}`. Preencha `horizonte_meses` sempre que a opção tiver
+    prazo de validade: é o que deixa o motor comparar R$ 700 que duram 8 meses
+    com R$ 2.500 que duram 36 — a conta que decide a maioria das trocas e que
+    ninguém faz de cabeça.
+    `tipo`: troca | compra | contrato | divida | investimento | renda | moradia | outro.
+    `ligacoes`: "categoria:eletronicos", "plano:viagem" — é por elas que esta
+    decisão vai aparecer como precedente da próxima.
+    `substitui`: id da decisão que esta substitui, quando se muda de ideia (a
+    anterior não some do histórico; passa a apontar para esta)."""
+    ws = _ws()
+    st = report.stores(ws)
+    try:
+        ctx = report.analyze(ws, st=st)
+        dec = st["decisoes"].abrir(
+            titulo=titulo, situacao=situacao, pergunta=pergunta,
+            alternativas=alternativas, tipo=tipo, ligacoes=ligacoes or [],
+            instantaneo=decisions.instantaneo_de(ctx),
+            revisar_em=revisar_em or None, substitui=substitui or None,
+            proveniencia=_prov(origem, confianca, porque),
+        )
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    return _json({
+        "decisao": dec.to_dict(),
+        "proximo_passo": (
+            "compare `custo_por_mes_de_uso` das alternativas com a pessoa e chame "
+            "`escolher_alternativa` quando ela decidir"
+        ),
+    })
+
+
+@mcp.tool()
+def escolher_alternativa(decisao_id: str, alternativa: str, porque: str,
+                         revisar_em: str = "") -> str:
+    """Registra qual caminho foi tomado, e por quê.
+
+    O `porque` nas palavras dela é o que o registro tem de mais útil depois: o
+    número volta a ser calculável a qualquer momento, o motivo não.
+
+    `revisar_em` (AAAA-MM-DD) para escolha que tem prazo de conferência — o
+    conserto que precisa durar até o meio do ano, o plano que tem fidelidade."""
+    st = report.stores(_ws())
+    try:
+        dec = st["decisoes"].escolher(decisao_id, alternativa, porque,
+                                      revisar_em=revisar_em or None)
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    return _json({"decisao": dec.to_dict()})
+
+
+@mcp.tool()
+def registrar_desfecho(decisao_id: str, veredito: str, nota: str = "",
+                       custo_real: float | None = None) -> str:
+    """No que deu. É isto que transforma histórico em base para decidir.
+
+    `veredito`: funcionou | arrependi | indiferente | cedo_para_saber.
+    `cedo_para_saber` é resposta boa: a decisão continua na fila e volta a ser
+    perguntada depois, em vez de virar um aprendizado que ninguém verificou.
+    `custo_real` quando saiu diferente do previsto — a diferença entre o
+    estimado e o real é, sozinha, um aprendizado sobre como ela orça."""
+    st = report.stores(_ws())
+    try:
+        dec = st["decisoes"].registrar_desfecho(decisao_id, veredito, nota,
+                                                custo_real=custo_real)
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    return _json({"decisao": dec.to_dict()})
+
+
+@mcp.tool()
+def listar_decisoes(apenas_abertas: bool = False) -> str:
+    """Histórico de decisões e o que ele já permite afirmar."""
+    st = report.stores(_ws())
+    loja = st["decisoes"]
+    if apenas_abertas:
+        return _json({"abertas": [d.to_dict() for d in loja.abertas()]})
+    return _json({
+        "linha_do_tempo": loja.linha_do_tempo(),
+        "aprendizados": loja.aprendizados(),
+        "detalhe": "use `historico_de_decisoes` para os precedentes de um assunto",
+    })
+
+
+@mcp.tool()
+def historico_de_decisoes(assunto: str, tipo: str = "",
+                          ligacoes: list[str] | None = None) -> str:
+    """Decisões passadas parecidas com a que está sendo tomada agora.
+
+    Chame isto **antes** de ajudar em qualquer escolha — inclusive antes de
+    `avaliar_compra`. É o que evita refazer do zero uma conta que já foi feita,
+    e o que traz de volta o detalhe que sempre some: por que a alternativa
+    óbvia foi descartada da última vez.
+
+    Cada precedente vem com `numeros_da_epoca`. Use-os: a mesma escolha com
+    quatro meses de reserva e com duas semanas de caixa são decisões
+    diferentes, e cobrar coerência entre elas é injusto com a pessoa."""
+    st = report.stores(_ws())
+    return _json({
+        "assunto": assunto,
+        "precedentes": st["decisoes"].semelhantes(assunto, tipo=tipo, ligacoes=ligacoes),
+        "aprendizados": st["decisoes"].aprendizados(),
+    })
+
+
+@mcp.tool()
+def esquecer_decisao(decisao_id: str) -> str:
+    """Apaga uma decisão registrada por engano."""
+    st = report.stores(_ws())
+    return _json({"removida": st["decisoes"].esquecer(decisao_id)})
 
 
 @mcp.tool()

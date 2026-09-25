@@ -204,7 +204,8 @@ def ouro_contratos() -> dict:
     e quem estiver migrando perde o histórico de decisões.
     """
     from fintips.contracts import (
-        AUTORIDADE, ATITUDES, Causa, Condicao, CustoFixo, Efeito, Fato,
+        AUTORIDADE, ATITUDES, STATUS_DECISAO, TIPOS_DECISAO, VEREDITOS,
+        Alternativa, Causa, Condicao, CustoFixo, Decisao, Efeito, Fato,
         ItemDeTriagem, Proveniencia, Regra, novo_id,
     )
 
@@ -266,6 +267,7 @@ def ouro_contratos() -> dict:
                  "candidato_custo_fixo", "classificacao_fraca",
                  "evento_sem_explicacao", "fato_vencido",
                  "causa_ausente", "causa_a_revisar", "causa_sem_atitude",
+                 "decisao_aberta", "decisao_a_revisar", "decisao_sem_desfecho",
                  "tipo_que_nao_existe"):
         for impacto in (100.0, 33.33, 0.0, -50.0):
             it = ItemDeTriagem(id="t", tipo=tipo, titulo="", impacto_mensal=impacto,
@@ -287,6 +289,48 @@ def ouro_contratos() -> dict:
         base_ref="transporte-trabalho", valor_mensal=79.5,
         metodo="mediana_meses_completos", natureza="rotina", proveniencia=prov,
     )
+    # Alternativas: a conta que decide troca. Os casos de fronteira são o que
+    # o ouro existe para travar — sem horizonte não há custo por mês de uso, e
+    # horizonte zero não pode virar divisão por zero em nenhum dos dois motores.
+    alternativas = []
+    for nome, desembolso, mensal, horizonte in (
+        ("consertar", 700.0, 0.0, 8),
+        ("comprar novo", 2500.0, 0.0, 36),
+        ("com plano", 0.0, 90.0, 36),
+        ("sem horizonte", 700.0, 0.0, None),
+        ("horizonte zero", 700.0, 0.0, 0),
+        ("empate de arredondamento", 100.0, 0.0, 3),
+        ("centavo", 0.01, 0.0, 3),
+    ):
+        a = Alternativa(nome=nome, custo=desembolso, custo_mensal=mensal,
+                        horizonte_meses=horizonte)
+        alternativas.append({
+            "nome": nome, "custo": desembolso, "custo_mensal": mensal,
+            "horizonte_meses": horizonte,
+            "custo_no_horizonte": a.custo_no_horizonte,
+            "custo_por_mes_de_uso": a.custo_por_mes_de_uso,
+        })
+
+    decisao = Decisao(
+        id="dec-abc", titulo="Celular quebrou",
+        situacao="caiu na terça, tela e carregamento",
+        pergunta="consertar, trocar ou aguentar?", tipo="troca",
+        alternativas=[
+            Alternativa(nome="consertar", custo=700.0, horizonte_meses=8,
+                        consequencia="volta a funcionar, sem garantia de placa",
+                        descartada_porque="assistência não cobre a placa"),
+            Alternativa(nome="comprar novo", custo=2500.0, horizonte_meses=36,
+                        consequencia="resolve por três anos"),
+        ],
+        escolhida="comprar novo", porque="o conserto não cobria o que quebrou",
+        status="revisada", ligacoes=["categoria:eletronicos"],
+        instantaneo={"em": "2026-06-15", "sobra_media_mes": 4963.1, "score": 55.0},
+        desfecho={"veredito": "funcionou", "nota": "durou", "custo_real": 2480.0,
+                  "em": QUANDO_FIXO},
+        revisar_em="2027-01-01", proveniencia=prov,
+        criado_em=QUANDO_FIXO, decidido_em=QUANDO_FIXO,
+    )
+
     fato = Fato(chave="moradia.situacao", valor="com_familia", tipo="texto",
                 proveniencia=prov, expira_em=None, substituiu=None)
 
@@ -296,6 +340,10 @@ def ouro_contratos() -> dict:
         "quando_fixo": QUANDO_FIXO,
         "autoridade": autoridade,
         "atitudes": list(ATITUDES),
+        "status_decisao": list(STATUS_DECISAO),
+        "tipos_decisao": list(TIPOS_DECISAO),
+        "vereditos": list(VEREDITOS),
+        "custo_de_alternativa": alternativas,
         "ids": ids,
         "especificidade": especificidade,
         "prioridade_de_regra": regras,
@@ -303,6 +351,7 @@ def ouro_contratos() -> dict:
         "serializacao": {
             "proveniencia": prov.to_dict(),
             "causa": causa.to_dict(),
+            "decisao": decisao.to_dict(),
             "custo_fixo": custo.to_dict(),
             "fato": fato.to_dict(),
         },

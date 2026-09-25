@@ -130,6 +130,41 @@ sabe.
 O prompt `entender_um_gasto` traz esse roteiro pronto; `conversa_de_compra`
 carrega perfil, causas e planos antes de discutir uma compra.
 
+## Decisões: a bifurcação, e o que ela ensina na próxima
+
+Causa explica o que se repete. **Decisão registra a hora em que alguém parou e
+escolheu** — o celular que quebrou na terça, o plano que valia a pena trocar, a
+dívida que dava para antecipar. Acontece uma vez, some, e some justamente antes
+da próxima igual.
+
+Quando aparecer uma escolha na conversa, o roteiro é este:
+
+1. **`historico_de_decisoes` primeiro, sempre.** Antes de opinar, antes de
+   `avaliar_compra`. É o que evita refazer do zero uma conta que já foi feita, e
+   o que devolve o detalhe que sempre se perde: por que a alternativa óbvia foi
+   descartada da última vez.
+2. **`abrir_decisao` antes de a pessoa escolher**, não depois. Alternativa
+   escrita depois da escolha vira justificativa — ela lembra melhor das opções
+   que confirmam o que já fez. Escritas antes, são comparação de verdade.
+3. **Preencha `horizonte_meses`** sempre que a opção tiver prazo de validade. É
+   o que deixa o motor comparar R$ 700 que duram 8 meses com R$ 2.500 que duram
+   36 — R$ 87,50 contra R$ 69,44 por mês de uso. Essa é a conta que decide a
+   maioria das trocas, e é a que ninguém faz de cabeça.
+4. **`descartada_porque` na alternativa recusada.** É metade do valor do
+   registro: daqui a um ano "comprei um celular novo" não informa nada, e
+   "a assistência não cobria a placa" evita reabrir a investigação inteira.
+5. **`escolher_alternativa` com o `porque` nas palavras dela.** O número volta a
+   ser calculável a qualquer momento; o motivo, não.
+6. **`registrar_desfecho` quando der para saber.** É isto que transforma
+   histórico em base para decidir. `cedo_para_saber` é resposta boa — a decisão
+   volta para a fila em vez de virar aprendizado que ninguém verificou.
+
+O app congela sozinho os números do dia (sobra, reserva, score, planos em
+risco). Use-os ao trazer um precedente: a mesma escolha com quatro meses de
+reserva e com duas semanas de caixa são decisões diferentes, e cobrar coerência
+entre elas é injusto. **Precedente não é regra** — ter se arrependido de uma
+compra parecida não torna esta errada.
+
 ## O perfil: onde é mais fácil errar
 
 O motor casa arquétipos contra os seus números e devolve isso em `perfil`. É
@@ -196,6 +231,8 @@ Duas cautelas:
 | `perfil` | Arquétipos sugeridos, traços assinados e cobertura do perfil. |
 | `alavancas` | O que muda cada número, com o motor rodado de novo. |
 | `listar_causas` | Por que o dinheiro sai, e quanto da despesa já tem explicação. |
+| `historico_de_decisoes` | Precedentes de um assunto. **Antes de ajudar em qualquer escolha.** |
+| `listar_decisoes` | Linha do tempo e o que o histórico já permite afirmar. |
 
 | Simular / Escrever | Para quê |
 |---|---|
@@ -205,6 +242,8 @@ Duas cautelas:
 | `gravar_fato`, `esquecer_fato` | Contexto do usuário. |
 | `assinar_perfil`, `esquecer_traco` | Perfil, um eixo por vez. Só depois de conversar. |
 | `gravar_causa`, `decidir_causa`, `esquecer_causa` | O porquê e a atitude. Nunca derivados. |
+| `abrir_decisao`, `escolher_alternativa` | A bifurcação e o caminho tomado. Abra antes de escolher. |
+| `registrar_desfecho`, `esquecer_decisao` | No que deu — é o que vira aprendizado. |
 | `resolver_item` | Fecha um item da triagem, depois de gravada a decisão. |
 | `salvar_plano`, `avaliar_compra`, `patrimonio`, `ingerir_extrato` | O resto. |
 
@@ -248,6 +287,12 @@ traga o valor mensal e o que ele custa em um ano.
 **"Como estão minhas finanças?"** → `analise_completa` + `triagem` → score, as
 duas maiores fugas de dinheiro, uma ação para o próximo mês, e **uma** decisão da
 fila conduzida até o fim.
+
+**"Quebrou / preciso decidir entre A e B"** → `historico_de_decisoes` +
+`abrir_decisao` → traga os precedentes com as condições da época, compare
+`custo_por_mes_de_uso` das alternativas, e só então pergunte o que ela prefere.
+`escolher_alternativa` quando ela decidir; `registrar_desfecho` na conversa
+seguinte em que o assunto voltar.
 
 **"Vale a pena comprar X?"** → `briefing` + `avaliar_compra` + `listar_causas`
 → veredito primeiro, com o número que o sustenta; o que a compra atrasa em cada

@@ -1,6 +1,6 @@
 [project]
 name = "fintips"
-version = "0.5.0"
+version = "0.6.0"
 description = "Motor financeiro pessoal: extrato -> objetos -> causas -> perfil, score, custos fixos, planos, projeção e alavancas, com painel local e agente Claude"
 requires-python = ">=3.10"
 license = { text = "MIT" }
