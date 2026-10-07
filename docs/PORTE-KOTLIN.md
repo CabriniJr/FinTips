@@ -181,11 +181,46 @@ quando a anterior tem ouro fechando.
 O painel React continua funcionando durante tudo isso, porque fala JSON e não
 sabe quem serve.
 
+## Os dois motores lado a lado
+
+O harness de ouro prova paridade, mas prova em arquivo de teste e fala por
+`assert`. Para ver com os próprios olhos, sobre o **seu** extrato:
+
+```bash
+python3 scripts/comparar-motores.py ~/Documents/FinTips/data/extratos/seu.ofx
+```
+
+Ele roda os dois motores, imprime duas colunas e marca cada linha com ✓ ou ✗:
+leitura do OFX (hash da conta, período, saldo, conciliação, cada transação em
+id, data, hora, valor e memo), baseline e score dimensão por dimensão. Sai com
+código 1 se algo divergir, então serve em CI sem adaptação.
+
+Duas honestidades embutidas na saída:
+
+- **Cobre só o que foi portado.** Nenhum dos dois lados roda a heurística de
+  classificação, porque ela ainda não existe no Kotlin. Por isso toda transação
+  fica no fluxo padrão, a renda aparece zerada e o score sai baixo. Não é erro:
+  é a pergunta exata que os dois conseguem responder hoje, feita igual para os
+  dois.
+- **A saída da JVM é forçada para UTF-8.** Sem isso "Aplicação" sai como
+  "Aplica??o" e o comparador acusaria divergência falsa, mandando alguém caçar
+  um bug que não existe.
+
+Confirmado quebrando de propósito: mudar a pena por mês no vermelho de 25% para
+20% no Kotlin derruba duas linhas e o código de saída.
+
+```
+SCORE
+✗ score                34.3                       35.1
+✗   estabilidade       11.2                       12.0
+```
+
 ## Rodar
 
 ```bash
 cd kotlin && gradle :motor:jvmTest        # motor + harness diferencial
 python3 scripts/gerar-ouro.py             # regrava o ouro a partir do Python
+python3 scripts/comparar-motores.py X.ofx # os dois motores lado a lado
 ```
 
 O alvo Android está desligado por propriedade (`fintips.android=false`) porque

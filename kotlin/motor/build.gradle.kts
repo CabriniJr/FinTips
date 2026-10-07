@@ -41,6 +41,29 @@ kotlin {
     }
 }
 
+/**
+ * Roda o motor Kotlin sobre um extrato de verdade:
+ *
+ *     gradle :motor:rodar --args="/caminho/extrato.ofx sal-opcional"
+ *
+ * Registrado à mão em vez de usar o plugin `application` porque o alvo JVM de
+ * um projeto multiplataforma não é um projeto JVM comum — o `application`
+ * esperaria um `sourceSets.main` que não existe aqui.
+ */
+tasks.register<JavaExec>("rodar") {
+    group = "application"
+    description = "Executa o motor Kotlin sobre um .ofx e imprime JSON"
+    val principal = kotlin.jvm().compilations.getByName("main")
+    classpath = files(principal.output.allOutputs, principal.runtimeDependencyFiles)
+    mainClass.set("com.fintips.motor.MotorCliKt")
+
+    // Sem isto a JVM escreve a saída na codificação do console, e "Aplicação"
+    // sai como "Aplica??o". Num comparador de motores isso é pior que feio:
+    // vira divergência falsa, e manda alguém caçar um bug que não existe.
+    defaultCharacterEncoding = "UTF-8"
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
+}
+
 if (comAndroid) {
     // Placeholder consciente: o alvo Android precisa do plugin AGP e do SDK,
     // que não existem nesta máquina. Quando for ligar, acrescente aqui

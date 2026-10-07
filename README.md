@@ -258,6 +258,7 @@ for t in tests/test_*.py; do python "$t" || break; done
 ## Documentos
 
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
+- `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
 - `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem
 - `docs/PRIVACIDADE.md` — modelo de ameaça e o que nunca sai da máquina
 - `docs/OPEN-FINANCE.md` — por que via agregador e como plugar
