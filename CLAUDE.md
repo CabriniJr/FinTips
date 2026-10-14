@@ -37,11 +37,30 @@ Não existe detecção de motivo, nem de escolha. O extrato mostra que o dinheir
 saiu; ele nunca diz por quê, nem o que a pessoa considerou antes. `causes.py` e
 `decisions.py` não têm, e não devem ter, função que deduza isso do extrato.
 
+## Toda lista paralela ao código envelhece
+
+Três telas deste projeto afirmam coisas sobre o próprio app: onde os dados
+moram, que código de terceiros viaja junto, e o que é sensível. As três já
+mentiram, e nenhuma por descuido pontual — mentiram porque eram listas escritas
+à mão ao lado de um código que mudou.
+
+A regra que saiu disso: **declare uma vez, derive o resto, e cruze no portão.**
+
+| O que | Declarado em | Derivado por | Cobrado por |
+|---|---|---|---|
+| arquivos do workspace | `contracts.DEPOSITOS` | a aba de configuração e a varredura de PII | `fintips config --conferir` |
+| licenças de terceiros | manifestos + `rules/licencas.yaml` | a tela de licenças | idem |
+
+Acrescentar um arquivo ao `Workspace` sem declará-lo no registro quebra o
+portão. Subir o `schema_version` de um depósito sem escrever o migrador no
+mesmo commit também — o arquivo antigo já está na máquina de alguém, e não há
+como implantar correção nele.
+
 ## Onde as coisas ficam
 
 | Camada | Arquivo | O que guarda |
 |---|---|---|
-| contratos | `fintips/contracts.py` | tipos da fronteira app/agente |
+| contratos | `fintips/contracts.py` | tipos da fronteira app/agente, e o registro de depósitos |
 | causas | `fintips/causes.py` | por que o dinheiro sai, e o que se decidiu |
 | decisões | `fintips/decisions.py` | bifurcações pontuais, alternativas e desfecho |
 | análise | `fintips/report.py` | `analyze()` — única fonte do contexto |

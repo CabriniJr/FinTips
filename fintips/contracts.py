@@ -710,3 +710,146 @@ class Decisao:
             decidido_em=d.get("decidido_em"),
             proveniencia=Proveniencia.from_dict(d.get("proveniencia")),
         )
+
+
+# --------------------------------------------------------------------------
+# O registro dos depósitos
+# --------------------------------------------------------------------------
+#
+# Cada arquivo que o app escreve na máquina da pessoa, declarado num lugar só.
+#
+# Isto nasceu de um erro concreto, e vale contar porque o erro é instrutivo: a
+# aba de configuração mostra "onde os seus dados moram", e essa lista foi
+# escrita à mão. O `Workspace` tinha dezenove arquivos; a lista tinha onze.
+# Faltavam oito, entre eles `regras-locais.yaml`, que é um dos sensíveis. A
+# tela afirmava mostrar onde os dados moram e mostrava pouco mais da metade.
+#
+# O mecanismo que impede isso é o mesmo das licenças: uma declaração única,
+# cruzada contra o código, com o portão quebrando quando divergem. Acrescentar
+# um depósito ao `Workspace` e esquecer de declará-lo aqui para de ser um erro
+# silencioso e passa a ser um teste vermelho.
+#
+# A segunda coisa que o registro resolve é a migração. Dezenove arquivos
+# carregam `schema_version`, e por muito tempo exatamente um deles sabia subir
+# de versão. Os outros dezoito tinham um número que ninguém lia — e o dia em
+# que um formato mudasse, o app leria um arquivo que não entende e escolheria
+# entre recusar o perfil de alguém ou interpretá-lo errado em silêncio. Aqui
+# cada depósito declara o esquema que escreve e o migrador que o acompanha, e
+# a regra é simples: **esquema acima de 1 sem migrador é recusado**. Ninguém
+# precisa escrever migrador antes da hora; quem bumpar a versão é obrigado a
+# escrever o degrau no mesmo commit.
+
+
+@dataclass(frozen=True)
+class Deposito:
+    """Um arquivo que o app escreve, e o que o app promete sobre ele."""
+
+    chave: str
+    atributo: str          # a propriedade do Workspace que dá o caminho
+    guarda: str            # o que mora ali, em português, para a tela
+    formato: str           # yaml | jsonl | texto | diretorio
+    esquema: int = 1
+    # Dado pessoal que o `check-pii.sh` colhe para impedir que vaze num commit.
+    sensivel: bool = False
+    # "modulo:funcao" que sobe uma versão antiga para a atual, se existir.
+    migrador: str = ""
+    # Só o app escreve, ou a pessoa edita à mão?
+    editavel_a_mao: bool = True
+
+    @property
+    def precisa_de_migrador(self) -> bool:
+        return self.esquema > 1
+
+
+DEPOSITOS: tuple[Deposito, ...] = (
+    Deposito("config", "config_path", "seus nomes em Pix e apelidos de pessoas",
+             "yaml", sensivel=True),
+    Deposito("salt", "salt_path",
+             "o segredo que pseudonimiza nomes — sem ele os apelidos não voltam",
+             "texto", sensivel=True, editavel_a_mao=False),
+    Deposito("taxonomia", "taxonomia_path", "suas categorias, com quem as criou", "yaml"),
+    Deposito("regras", "regras_path", "regras de classificação com proveniência", "yaml"),
+    Deposito("regras_locais", "regras_locais_path",
+             "estabelecimentos do seu dia a dia", "yaml", sensivel=True),
+    Deposito("contexto", "contexto_path", "fatos sobre você, com evidência", "yaml",
+             sensivel=True),
+    Deposito("perfil", "perfil_path", "traços de perfil assinados por você", "yaml",
+             esquema=2, migrador="fintips.profile:migrar"),
+    Deposito("causas", "causas_path", "por que o dinheiro sai, nas suas palavras",
+             "yaml", sensivel=True),
+    Deposito("decisoes", "decisoes_path",
+             "bifurcações: alternativas, escolha e desfecho", "yaml", sensivel=True),
+    Deposito("custos_fixos", "custos_fixos_path", "compromissos definidos", "yaml"),
+    Deposito("contrapartes", "contrapartes_path",
+             "quem recebe o seu dinheiro, agrupado", "yaml", sensivel=True),
+    Deposito("triagem", "triagem_path", "o que já foi resolvido ou adiado", "yaml"),
+    Deposito("planos", "planos_path", "metas financeiras", "yaml"),
+    Deposito("patrimonio", "patrimonio_path", "saldo e investimentos", "yaml",
+             sensivel=True),
+    Deposito("compras", "compras_path", "intenções de compra em avaliação", "yaml"),
+    Deposito("missoes", "missoes_path",
+             "as seis frentes e as regras que você assinou", "yaml", sensivel=True),
+    Deposito("registros", "registros_path",
+             "cumprimento das missões, em append", "jsonl", editavel_a_mao=False),
+    Deposito("objetivos", "objetivos_path",
+             "objetivos, etapas, prazos e custos", "yaml", sensivel=True),
+    Deposito("checks", "checks_path",
+             "etapas marcadas como feitas, em append", "jsonl", editavel_a_mao=False),
+)
+
+POR_CHAVE: dict[str, Deposito] = {d.chave: d for d in DEPOSITOS}
+
+
+def conferir_depositos(workspace_cls: Any) -> dict:
+    """O registro ainda descreve o `Workspace` de verdade?
+
+    Duas direções, e as duas são jeitos de a tela de configuração mentir:
+    depósito que existe no código e não está declarado some da tela; depósito
+    declarado que não existe mais no código aparece numa tela apontando para
+    um arquivo que ninguém escreve.
+
+    A terceira pergunta é sobre migração: esquema acima de 1 sem migrador
+    significa que alguém mudou o formato de um arquivo que mora na máquina da
+    pessoa sem escrever o degrau para subir o que já está lá.
+    """
+    no_codigo = {
+        n for n in dir(workspace_cls)
+        if n.endswith("_path") and isinstance(getattr(workspace_cls, n, None), property)
+    }
+    declarados = {d.atributo for d in DEPOSITOS}
+    sem_migrador = [
+        d.chave for d in DEPOSITOS if d.precisa_de_migrador and not d.migrador
+    ]
+    return {
+        "ok": not (no_codigo - declarados or declarados - no_codigo or sem_migrador),
+        "no_codigo_e_nao_declarados": sorted(no_codigo - declarados),
+        "declarados_e_fora_do_codigo": sorted(declarados - no_codigo),
+        "esquema_novo_sem_migrador": sorted(sem_migrador),
+        "quantos": len(DEPOSITOS),
+        "como_corrigir": (
+            "declare o depósito em contracts.DEPOSITOS, ou remova a declaração "
+            "se o arquivo saiu. Se o esquema subiu, escreva o migrador no mesmo "
+            "commit — o arquivo antigo já está na máquina de alguém"
+        ),
+    }
+
+
+def migrar(chave: str, data: dict) -> dict:
+    """Sobe um arquivo lido do disco para o esquema de hoje.
+
+    Despacha para o migrador que o depósito declara. Depósito sem migrador
+    devolve o dado como veio — o que é correto enquanto o esquema for 1, e
+    `conferir_depositos` é quem garante que continue sendo.
+    """
+    dep = POR_CHAVE.get(chave)
+    if dep is None:
+        raise ValueError(
+            f"depósito '{chave}' não existe. Os declarados são "
+            f"{', '.join(sorted(POR_CHAVE))}"
+        )
+    if not dep.migrador:
+        return data
+    import importlib
+
+    modulo, _, funcao = dep.migrador.partition(":")
+    return getattr(importlib.import_module(modulo), funcao)(data)

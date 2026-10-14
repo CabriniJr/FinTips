@@ -530,6 +530,23 @@ def cmd_config(args) -> None:
     raiz = Path(__file__).resolve().parent.parent
 
     if args.conferir:
+        from .contracts import conferir_depositos
+
+        dep = conferir_depositos(type(ws))
+        if not dep["ok"]:
+            print("REGISTRO DE DEPÓSITOS DESATUALIZADO:")
+            for chave, rotulo in (
+                ("no_codigo_e_nao_declarados", "existe no Workspace e não está declarado"),
+                ("declarados_e_fora_do_codigo", "declarado e já não existe no código"),
+                ("esquema_novo_sem_migrador", "esquema acima de 1 sem migrador"),
+            ):
+                for item in dep[chave]:
+                    print(f"  {item}: {rotulo}")
+            print()
+            print(dep["como_corrigir"])
+            raise SystemExit(1)
+        print(f"ok: {dep['quantos']} depósitos declarados batem com o Workspace")
+
         r = lic_mod.conferir(raiz)
         if r["ok"]:
             c = r["conferidos"]

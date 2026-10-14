@@ -501,7 +501,7 @@ diz por quê.
 ```bash
 bash scripts/check-pii.sh --all
 python3 scripts/gerar-ouro.py --conferir     # o ouro ainda é o do Python?
-fintips config --conferir                    # as licenças ainda batem?
+fintips config --conferir                    # depósitos e licenças ainda batem?
 cp scripts/check-pii.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 

@@ -1249,6 +1249,12 @@ def configuracao(licencas_de: str = "") -> str:
 
       `permissoes_do_app`   o que o APK realmente pede — hoje, nada
       `licencas`            derivadas dos manifestos, com conferência cruzada
+      `dados.arquivos`      derivados do registro de depósitos do código
+
+    `dados.sensiveis` nomeia os depósitos que guardam dado pessoal e que a
+    varredura de PII colhe antes de cada commit. Use isso quando a pessoa
+    perguntar "o que exatamente é sensível aqui" — a resposta é uma lista do
+    código, não uma categoria vaga.
 
     Se `conferencia_ok` for falso, **diga que a lista pode estar incompleta**.
     Apresentá-la como completa é o único erro grave possível nesta tela.

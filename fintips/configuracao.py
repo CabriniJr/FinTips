@@ -38,6 +38,7 @@ import re
 from pathlib import Path
 
 from . import licencas as lic
+from .contracts import DEPOSITOS, conferir_depositos
 
 CONFIG_SCHEMA = 1
 
@@ -87,25 +88,43 @@ def _flag_do_manifesto(raiz: Path, atributo: str) -> str | None:
 def onde_os_dados_moram(ws) -> list[dict]:
     """Cada arquivo do workspace, com o que ele guarda e se entra no Git.
 
-    A coluna que importa é a última. `missoes.yaml` e `objetivos.yaml` são os
+    **Derivado de `contracts.DEPOSITOS`, não escrito aqui.** A primeira versão
+    desta função tinha a lista à mão: o `Workspace` tinha dezenove arquivos e a
+    lista tinha onze. Faltavam oito, entre eles `regras-locais.yaml`, que é um
+    dos sensíveis — a tela afirmava mostrar onde os dados moram e mostrava
+    pouco mais da metade. Uma tela de prestação de contas incompleta é pior que
+    ausente, porque a pessoa lê o que está lá como se fosse tudo.
+
+    A coluna que importa é `sensivel`. `missoes.yaml` e `objetivos.yaml` são os
     arquivos mais sensíveis que este projeto produz — eles têm salário,
     empregador, nome de gente, hora de dormir e data de prova —, e a pessoa tem
     o direito de ver, numa tela, que eles nunca saem daqui.
     """
-    return [
-        {"arquivo": str(ws.config_path), "guarda": "seus nomes em Pix, apelidos", "no_git": False},
-        {"arquivo": str(ws.canonico), "guarda": "o extrato convertido, com PII já pseudonimizada", "no_git": False},
-        {"arquivo": str(ws.planos_path), "guarda": "metas financeiras", "no_git": False},
-        {"arquivo": str(ws.patrimonio_path), "guarda": "saldo e investimentos", "no_git": False},
-        {"arquivo": str(ws.perfil_path), "guarda": "traços de perfil assinados por você", "no_git": False},
-        {"arquivo": str(ws.causas_path), "guarda": "por que o dinheiro sai, nas suas palavras", "no_git": False},
-        {"arquivo": str(ws.decisoes_path), "guarda": "bifurcações, alternativas e desfecho", "no_git": False},
-        {"arquivo": str(ws.missoes_path), "guarda": "as seis frentes e as regras que você assinou", "no_git": False},
-        {"arquivo": str(ws.registros_path), "guarda": "cumprimento das missões, em append", "no_git": False},
-        {"arquivo": str(ws.objetivos_path), "guarda": "objetivos, etapas, prazos e custos", "no_git": False},
-        {"arquivo": str(ws.checks_path), "guarda": "etapas marcadas como feitas, em append", "no_git": False},
-        {"arquivo": str(ws.salt_path), "guarda": "o segredo que pseudonimiza nomes — sem ele os apelidos não voltam", "no_git": False},
-    ]
+    saida = []
+    for d in DEPOSITOS:
+        saida.append({
+            "chave": d.chave,
+            "arquivo": str(getattr(ws, d.atributo)),
+            "guarda": d.guarda,
+            "formato": d.formato,
+            "sensivel": d.sensivel,
+            "editavel_a_mao": d.editavel_a_mao,
+            # Nenhum deles. `data/` inteiro está fora do Git, e esta coluna
+            # existe para dizer isso em vez de deixar a pessoa supor.
+            "no_git": False,
+        })
+    # O canônico é diretório, não depósito: ele guarda o extrato convertido, que
+    # é derivado e não editado. Entra na lista porque ocupa disco e tem PII.
+    saida.append({
+        "chave": "canonico",
+        "arquivo": str(ws.canonico),
+        "guarda": "o extrato convertido, com PII já pseudonimizada",
+        "formato": "diretorio",
+        "sensivel": True,
+        "editavel_a_mao": False,
+        "no_git": False,
+    })
+    return saida
 
 
 def ligacao_com_a_ia(ws, executavel: str = "") -> dict:
@@ -177,6 +196,8 @@ def montar(ws, raiz: str | Path = ".", executavel: str = "") -> dict:
         },
         "dados": {
             "arquivos": onde_os_dados_moram(ws),
+            "sensiveis": [d.chave for d in DEPOSITOS if d.sensivel],
+            "registro_confere": conferir_depositos(type(ws))["ok"],
             "nada_sincroniza": True,
             "aviso": (
                 "desinstalar apaga tudo, porque não existe cópia em lugar "

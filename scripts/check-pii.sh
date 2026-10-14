@@ -47,7 +47,14 @@ fi
 [ -f data/regras-locais.yaml ] && grep -oE '^[[:space:]]+-[[:space:]]+.+' data/regras-locais.yaml \
   | sed 's/^[[:space:]]*-[[:space:]]*//' >> "$TERMS"
 
-# missões, regras declaradas e registros — data/missoes.yaml e data/registros.jsonl
+# Todo depósito marcado `sensivel` em contracts.DEPOSITOS.
+#
+# A lista vem do registro, e não daqui. Antes eram cinco arquivos escolhidos à
+# mão contra dez marcados como sensíveis no código: `objetivos.yaml` ficava de
+# fora — com nome de curso pago, data de prova e custo —, e `causas.yaml` e
+# `decisoes.yaml` também, que guardam as palavras da própria pessoa sobre por
+# que o dinheiro sai. Varredura de PII com lista paralela é a pior lista
+# paralela que existe, porque o buraco só aparece depois do vazamento.
 #
 # Colhido com o YAML de verdade, e não com grep, por um motivo concreto: as
 # frases mais sensíveis do plano estão em bloco dobrado (`porque: >`), e grep
@@ -57,7 +64,7 @@ fi
 # única genérica — "Leitura", "Dentista", "tablet" — daria falso positivo em
 # qualquer doc do projeto, e varredura que grita por tudo é varredura que se
 # aprende a ignorar. Frase copiada do plano, essa sim só aparece se vazou.
-if [ -f data/missoes.yaml ] || [ -f data/registros.jsonl ]; then
+if [ -d data ] || [ -f config.yaml ]; then
   python3 -I - <<'PYEOF' >> "$TERMS"
 import json, pathlib
 try:
@@ -87,15 +94,29 @@ def anda(no):
         for x in no:
             anda(x)
 
-m = pathlib.Path("data/missoes.yaml")
-if m.exists():
-    anda(yaml.safe_load(m.read_text(encoding="utf-8")) or {})
+# Os caminhos saem do registro de depósitos. `-I` isola o interpretador, então
+# o pacote é importado do diretório do repositório explicitamente.
+import sys
+sys.path.insert(0, str(pathlib.Path.cwd()))
+try:
+    from fintips.contracts import DEPOSITOS
+    from fintips.workspace import Workspace
+except Exception:
+    raise SystemExit(0)
 
-r = pathlib.Path("data/registros.jsonl")
-if r.exists():
-    for linha in r.read_text(encoding="utf-8").splitlines():
-        if linha.strip():
-            anda(json.loads(linha))
+ws = Workspace(pathlib.Path.cwd())
+for dep in DEPOSITOS:
+    if not dep.sensivel or dep.formato not in ("yaml", "jsonl"):
+        continue
+    caminho = pathlib.Path(getattr(ws, dep.atributo))
+    if not caminho.exists():
+        continue
+    if dep.formato == "yaml":
+        anda(yaml.safe_load(caminho.read_text(encoding="utf-8")) or {})
+    else:
+        for linha in caminho.read_text(encoding="utf-8").splitlines():
+            if linha.strip():
+                anda(json.loads(linha))
 
 for t in saida:
     t = t.strip()

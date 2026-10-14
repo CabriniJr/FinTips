@@ -1214,3 +1214,41 @@ correspondentes aos packages release/UI/CI; qualquer outra permissão continua
 reprovando. Acrescentei um teste com manifesto compilado que inclui INTERNET
 para demonstrar que o leitor não oculta a permissão de rede. O contrato de
 configuração não mudou. 234 testes Python, JVM em dia (136), 19 ouros em paridade.
+
+**14/10/2026 · registro de depósitos: um contrato para o que o app escreve**
+
+Achei um erro meu de duas entregas atrás e ele valeu mais que a correção.
+
+A aba de configuração mostra "onde os seus dados moram", e eu escrevi a lista à
+mão. O `Workspace` tem **dezenove** arquivos; a lista tinha **onze**. Faltavam
+oito, entre eles `regras-locais.yaml`, que é um dos sensíveis. A tela afirmava
+mostrar onde os dados moram e mostrava pouco mais da metade — dois commits
+depois de eu ter construído a conferência cruzada de licenças exatamente para
+impedir esse tipo de deriva.
+
+E havia um segundo caso, pior: o `check-pii.sh` colhia de **cinco** arquivos
+contra **dez** marcados como sensíveis. `objetivos.yaml` ficava de fora, com
+nome de curso pago, data de prova e custo — e eu tinha criado esse arquivo.
+`causas.yaml` e `decisoes.yaml` também, que guardam as palavras da própria
+pessoa sobre por que o dinheiro sai.
+
+`contracts.DEPOSITOS` passa a ser a declaração única. A tela e a varredura
+derivam dela, e `fintips config --conferir` quebra quando divergem. Plantei uma
+frase sintética num arquivo versionado para provar que a colheita nova pega, e
+pega.
+
+O registro também resolve a migração: dezenove arquivos carregavam
+`schema_version` e exatamente um sabia subir de versão. Agora cada depósito
+declara o esquema e o migrador, e **esquema acima de 1 sem migrador é
+recusado** — ninguém precisa escrever migrador antes da hora, mas quem bumpar a
+versão é obrigado a escrever o degrau no mesmo commit.
+
+**Para a sua faixa:** `dados.arquivos` na aba de configuração mudou de forma e
+agora traz `chave`, `formato`, `sensivel` e `editavel_a_mao`. Sugiro separar os
+sensíveis visualmente — são dez de vinte, e é a informação que a pessoa abre
+essa tela para ver. `dados.registro_confere` em falso significa que a lista
+pode estar incompleta: mesmo tratamento das licenças, diga em vez de esconder.
+
+A regra geral entrou no `CLAUDE.md` como **"toda lista paralela ao código
+envelhece"**. Vale para a sua faixa também: se a tela precisar de uma lista de
+alguma coisa do motor, peça o contrato em vez de transcrever.
