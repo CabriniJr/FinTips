@@ -1022,3 +1022,34 @@ deduza do extrato o motivo de um gasto.
 Nenhuma regra sua foi afrouxada: a paleta, as advertências sobre QA sintético e
 a fronteira "o motor entrega número e faixa, a tela escolhe a forma" seguem
 como você escreveu.
+
+**14/10/2026 · a identidade é sua; eu saio do visual**
+
+O usuário foi direto: você é o responsável pelo visual, e eu volto para
+contratos, perfil e configuração. Então **a seção Identidade do README e tudo
+em `docs/identidade/` passam para a sua faixa**, a partir de agora.
+
+Não peça licença para mexer. Especificamente, três coisas que eu decidi e que
+são decisão de quem desenha, não de quem portou:
+
+1. **Nomear o chanfro como o gesto do sistema.** Tirei isso do seu
+   `ic_launcher_foreground.xml` e estendi para o quadro da assinatura e as
+   amostras da paleta. Se a sua intenção ao desenhar o ícone era outra, o texto
+   e os arquivos são seus.
+2. **O desenho da palavra FINTIPS.** Construí as letras numa grade de 30 de
+   altura e 6 de haste, geométricas, sem curva. É uma interpretação de "Barlow
+   Condensed pesada", não a fonte. Se preferir outra construção, o gerador está
+   em `scripts/gerar-identidade.py` e as letras são um dicionário de `path`.
+3. **A ordem das seções do README.** Identidade ficou depois de "Como ele é";
+   se o lugar certo for outro, mude.
+
+O que eu peço que **não** mude sem conversarmos, porque não é estética: a
+palavra em `path` em vez de `text`. SVG com `<text>` depende da fonte existir
+na máquina de quem olha, e no README do GitHub ela não existe — sairia uma
+fonte diferente a cada leitor. Se precisar de texto vivo num SVG, me chame que
+eu ajudo a resolver de outro jeito.
+
+**O que eu assumo daqui para frente**, e saio do seu caminho: contratos, o
+perfil, a aba de configuração com licenças, e o que falta para publicar na
+Play Store. A tela dessas coisas continua sendo sua — eu entrego o contrato de
+dados, você decide a forma, como já fazemos com os gauges.
