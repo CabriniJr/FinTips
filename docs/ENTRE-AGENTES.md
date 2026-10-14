@@ -64,14 +64,16 @@ confiar.
 
 | Branch | O que carrega |
 |---|---|
-| `main` (`483fb72`) | tudo até o porte do score |
-| `claude/keen-tesla-5tolwd` (`3c1a352`) | porte 8b–10a: Projecao, Planos, Compras, Causas, Perfil, escrita de YAML. Mais `CLAUDE.md`, `docs/DECISOES.md`, `fintips/decisions.py` |
-| `claude/fintips-profile-predictions-9zbm1s` (`20c0b2e`) | as seis frentes: `vida/Vida.kt`, `fintips/life.py`, contexto de compra e de plano, `ouro/vida.json`, trava de PII sobre os dados de vida |
+| `main` | porte 8b–10a **mesclado** (PR #3) + as seis frentes (PR #4) |
+| `claude/keen-tesla-5tolwd` | mesclada em `main` por PR #3 |
+| `claude/fintips-profile-predictions-9zbm1s` | mesclada em `main` por PR #4, e segue ativa para V3–V6 |
+| `claude/showcase-claude-chrome-extension-ai96m6` | **não mesclada, de propósito**: é um `showcase/index.html` sobre o Claude no Chrome, sem relação com o FinTips. Repositório focado não recebe conteúdo de outro assunto; decisão a cargo do usuário |
 
-Nenhuma das duas está em `main`. **As duas precisam ser mescladas, e a ordem
-importa menos que alguém conferir os conflitos abaixo.**
+As duas trilhas estão em `main`. A seção de colisões abaixo fica como registro
+do que foi resolvido, e como receita para a próxima vez — porque vai acontecer
+de novo.
 
-## Colisões abertas
+## Colisões resolvidas (PR #3 e #4)
 
 Simulado com `git merge --no-commit` entre as duas branches: **seis arquivos,
 sete hunks, todos do tipo "os dois acrescentaram no mesmo ponto".** Nenhum é
@@ -352,3 +354,35 @@ A lição, para quem portar qualquer razão daqui para frente:
   Quando duas implementações da mesma função convivem no repositório — e
   convivem, porque o `arredondar` mudou de forma numa branch e não na outra —
   o ouro precisa de casos que quebrem as duas.
+
+**2026-10-14 · as duas trilhas estão em `main`**
+
+Avaliei e mesclei. O porte entrou primeiro (PR #3) porque é maior, entra limpo
+em `main` e é a base; a trilha de vida entrou depois (PR #4) com a resolução dos
+seis conflitos feita **do lado de quem chegou depois**, que é o certo — quem
+chega não faz o outro refazer.
+
+Antes de mesclar o porte, rodei num worktree limpo: 102 testes Python, 86
+Kotlin, PII limpo, nenhuma função de detecção em `fintips/`, `decisions.py`
+recusando escrita sem `porque`. E **sabotei o harness dele em vez de só
+executá-lo**: trocar `Dinheiro(escalado).dividir(ESCALA)` por divisão inteira
+crua em `Projecao.kt` derruba o ouro nomeando o caso e o mês. Ouro que não morde
+é decorativo; esse morde.
+
+A resolução foi mecânica como previsto — sete hunks, ficar com os dois lados em
+todos. O que confirmou que nada se perdeu foi a aritmética que este documento
+mandava conferir: **135 testes Python = 108 + 27, e 108 Kotlin com todas as
+classes dos dois lados presentes.** Se o merge tivesse comido um bloco, a soma
+não fecharia.
+
+Uma coisa mudou debaixo de mim e vale registrar: o `arredondar` da árvore agora
+é o `expect`/`actual` com `BigDecimal(double)`, não mais a minha versão. Era a
+dependência cruzada que eu havia declarado, e ela se resolveu sozinha porque o
+`ouro/vida.json` já exercitava os casos de empate que distinguem as duas
+implementações. **Dependência declarada e exercitada por ouro não precisa de
+coordenação — ela se defende.** É o argumento mais forte que este repositório
+tem para a regra "o que entra no motor entra no ouro".
+
+Em aberto, sem mudança: o pedido 3 (costura em `Compras.kt`) agora é mais fácil,
+porque `Compras.kt` está em `main` e a ponte de vida também. Quem pegar 9c
+encontra as duas coisas no mesmo lugar.

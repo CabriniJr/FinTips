@@ -22,7 +22,7 @@ from typing import Any
 
 import yaml
 
-from . import analysis, causes as causes_mod, commitments, discovery, mapping
+from . import analysis, causes as causes_mod, commitments, decisions, discovery, mapping
 from . import life
 from . import plans as plans_mod
 from . import profile as profile_mod, projection
@@ -66,6 +66,7 @@ def stores(ws: Workspace) -> dict[str, Any]:
         "triagem": triage.TriageStore(ws.triagem_path),
         "perfil": profile_mod.PerfilStore(ws.perfil_path),
         "causas": causes_mod.CauseStore(ws.causas_path),
+        "decisoes": decisions.DecisionStore(ws.decisoes_path),
     }
 
 
@@ -259,6 +260,15 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         "por_alvo": st["causas"].por_alvo(),
     }
 
+    # decisões: o histórico não entra inteiro na análise — o que interessa aqui
+    # é o que está em aberto e o que já se aprendeu. O detalhe sai por
+    # `historico_de_decisoes`, que é onde ele é útil.
+    ctx["decisoes"] = {
+        "aprendizados": st["decisoes"].aprendizados(),
+        "linha_do_tempo": st["decisoes"].linha_do_tempo()[:12],
+        "abertas": [d.to_dict() for d in st["decisoes"].abertas()],
+    }
+
     ctx["projecao"] = projection.project(
         baseline=ctx["baseline"],
         fixed_monthly=fixo_mes,
@@ -276,6 +286,7 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         candidatos_fixos=candidatos,
         store=st["triagem"],
         causas=st["causas"],
+        decisoes=st["decisoes"],
         fallback=tax_mod.FALLBACK,
     )
     ctx["triagem"] = {
@@ -302,3 +313,174 @@ def save_report(ws: Workspace, data: dict, name: str = "analise.yaml") -> Path:
         yaml.safe_dump(data, allow_unicode=True, sort_keys=False), encoding="utf-8"
     )
     return out
+
+
+# --------------------------------------------------------------------------
+# a análise vista pelo agente
+# --------------------------------------------------------------------------
+
+# Blocos que o contexto completo carrega inteiros e que o agente quase nunca
+# usa inteiros: cada um tem ferramenta própria que devolve o detalhe. O valor
+# é o nome dessa ferramenta — nenhum bloco sai daqui sem dizer por onde voltar.
+DETALHE_EM = {
+    "perfil": "perfil",
+    "taxonomia": "listar_taxonomia",
+    "categorias_nao_revisadas": "listar_taxonomia",
+    "contrapartes": "investigar",
+    "triagem": "triagem",
+    "projecao": "projecao",
+    "causas": "listar_causas",
+    "decisoes": "listar_decisoes",
+    "regras": "listar_regras",
+}
+
+
+def para_agente(ctx: dict[str, Any], *, topo: int = 8) -> dict[str, Any]:
+    """O contexto único, cortado para caber numa conversa.
+
+    `analyze()` continua devolvendo tudo — é a fonte única, e o painel, o CLI e
+    o relatório em disco dependem disso. O corte acontece só na fronteira do
+    agente, e por um motivo prático: a análise de um fixture de nove transações
+    já passa de 12 mil tokens, e cresce com o extrato. O agente gastava a
+    janela inteira antes da primeira pergunta, recebendo por precaução catálogo
+    de arquétipo, taxonomia com proveniência e projeção mês a mês.
+
+    A regra aqui é a mesma do dossiê: **resumo com ponteiro, nunca resumo que
+    esconde**. Todo bloco cortado diz quantos itens existem e qual ferramenta
+    devolve o resto. Um agente que recebe "12 contrapartes" e o nome da
+    ferramenta busca o detalhe quando precisa; um que recebe as três maiores
+    sem saber que existem doze passa a supor — e supor é exatamente o que este
+    projeto existe para não fazer.
+    """
+    out = {k: v for k, v in ctx.items() if k not in DETALHE_EM}
+
+    out["perfil"] = _perfil_curto(ctx.get("perfil") or {})
+    out["taxonomia"] = _taxonomia_curta(ctx.get("taxonomia") or [])
+    out["contrapartes"] = _contrapartes_curtas(ctx.get("contrapartes") or [], topo)
+    out["triagem"] = _triagem_curta(ctx.get("triagem") or {}, topo)
+    out["projecao"] = _projecao_curta(ctx.get("projecao") or {})
+    out["causas"] = _causas_curtas(ctx.get("causas") or {})
+    out["decisoes"] = _decisoes_curtas(ctx.get("decisoes") or {})
+
+    nao_revisadas = ctx.get("categorias_nao_revisadas") or []
+    out["categorias_nao_revisadas"] = {
+        "quantas": len(nao_revisadas),
+        "ids": [c["id"] for c in nao_revisadas],
+        "detalhe_em": DETALHE_EM["categorias_nao_revisadas"],
+    }
+
+    regras = ctx.get("regras") or []
+    out["regras"] = {"quantas": len(regras), "detalhe_em": DETALHE_EM["regras"]}
+
+    out["como_ler"] = (
+        "resumo com ponteiro: cada bloco cortado traz `quantas` e `detalhe_em` "
+        "com a ferramenta que devolve o resto. Se a resposta depender do que "
+        "não está aqui, chame a ferramenta — não suponha"
+    )
+    return out
+
+
+def _perfil_curto(perfil: dict) -> dict:
+    """Os cinco eixos sem o catálogo: o que foi assinado, e o que é palpite."""
+    eixos = []
+    for e in perfil.get("eixos") or []:
+        assinado, sugerido = e.get("assinado"), e.get("sugerido")
+        eixos.append({
+            "eixo": e.get("eixo"),
+            "assinado": (
+                {"arquetipo": assinado["nome"],
+                 "porque": assinado["proveniencia"]["porque"]}
+                if assinado else None
+            ),
+            # a evidência do palpite fica de fora de propósito: ela é longa e
+            # serve para conversar sobre o eixo, que é o que `perfil` faz
+            "sugerido": (
+                {"arquetipo": sugerido["nome"], "aderencia": sugerido["aderencia"]}
+                if sugerido else None
+            ),
+        })
+    return {
+        "cobertura": perfil.get("cobertura"),
+        "eixos": eixos,
+        "divergencias": perfil.get("divergencias"),
+        "detalhe_em": DETALHE_EM["perfil"],
+    }
+
+
+def _taxonomia_curta(taxonomia: list[dict]) -> dict:
+    """Só o que tem dinheiro em cima. Categoria sem uso não muda resposta."""
+    em_uso = [
+        {"id": c["id"], "nome": c["nome"], "total_no_periodo": c.get("total_no_periodo")}
+        for c in taxonomia if c.get("em_uso")
+    ]
+    em_uso.sort(key=lambda c: abs(c["total_no_periodo"] or 0), reverse=True)
+    return {
+        "quantas": len(taxonomia),
+        "em_uso": em_uso,
+        "detalhe_em": DETALHE_EM["taxonomia"],
+    }
+
+
+def _contrapartes_curtas(cps: list[dict], topo: int) -> dict:
+    maiores = sorted(cps, key=lambda c: abs(c.get("custo_mensal") or 0), reverse=True)
+    return {
+        "quantas": len(cps),
+        "maiores": [
+            {"id": c["id"], "nome": c["nome"], "categoria": c.get("categoria"),
+             "custo_mensal": c.get("custo_mensal"), "cadencia": c.get("cadencia"),
+             "transacoes": c.get("transacoes")}
+            for c in maiores[:topo]
+        ],
+        "detalhe_em": DETALHE_EM["contrapartes"],
+    }
+
+
+def _triagem_curta(triagem: dict, topo: int) -> dict:
+    itens = triagem.get("itens") or []
+    return {
+        "resumo": triagem.get("resumo"),
+        "primeiros": [
+            {"id": i["id"], "tipo": i["tipo"], "titulo": i["titulo"],
+             "prioridade": i["prioridade"], "porque_importa": i["porque_importa"]}
+            for i in itens[:topo]
+        ],
+        "quantos": len(itens),
+        "detalhe_em": DETALHE_EM["triagem"],
+    }
+
+
+def _projecao_curta(projecao: dict) -> dict:
+    """O destino e a reserva; o mês a mês é do gráfico, não da conversa."""
+    linhas = projecao.get("linhas") or []
+    return {
+        "cenario": projecao.get("cenario"),
+        "premissas": projecao.get("premissas"),
+        "reserva": projecao.get("reserva"),
+        "planos": projecao.get("planos"),
+        "primeiro_mes": linhas[0] if linhas else None,
+        "ultimo_mes": linhas[-1] if linhas else None,
+        "meses_projetados": len(linhas),
+        "detalhe_em": DETALHE_EM["projecao"],
+    }
+
+
+def _causas_curtas(causas: dict) -> dict:
+    itens = causas.get("itens") or []
+    return {
+        "cobertura": causas.get("cobertura"),
+        "quantas": len(itens),
+        "detalhe_em": DETALHE_EM["causas"],
+    }
+
+
+def _decisoes_curtas(decisoes: dict) -> dict:
+    abertas = decisoes.get("abertas") or []
+    return {
+        "aprendizados": decisoes.get("aprendizados"),
+        "abertas": [
+            {"id": d["id"], "titulo": d["titulo"], "pergunta": d["pergunta"],
+             "alternativas": [a["nome"] for a in d["alternativas"]]}
+            for d in abertas
+        ],
+        "detalhe_em": DETALHE_EM["decisoes"],
+    }

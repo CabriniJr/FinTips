@@ -156,6 +156,60 @@ class OuroContratosTest {
     // ---------------------------------------------------- formato de arquivo
 
     @Test
+    fun custo_de_alternativa_bate_inclusive_sem_horizonte_e_com_zero() {
+        // A conta que decide troca — e cujos dois casos de fronteira são
+        // exatamente onde uma porta ingênua diverge: sem horizonte o Python
+        // devolve nulo, e com horizonte zero também (o `if not` dele pega o
+        // zero junto com o nulo). Nenhum dos dois pode virar divisão por zero
+        // nem número inventado aqui.
+        val divergencias = mutableListOf<String>()
+        for (caso in ouro["custo_de_alternativa"]!!.jsonArray) {
+            val c = caso.jsonObject
+            val nome = c["nome"]!!.jsonPrimitive.content
+            val horizonte = c["horizonte_meses"]!!.jsonPrimitive.let {
+                if (it is JsonNull) null else it.content.toInt()
+            }
+            val alt = Alternativa(
+                nome = nome,
+                custo = c["custo"]!!.jsonPrimitive.content.toDouble(),
+                custoMensal = c["custo_mensal"]!!.jsonPrimitive.content.toDouble(),
+                horizonteMeses = horizonte,
+            )
+            for ((campo, esperadoJson, obtido) in listOf(
+                Triple("custo_no_horizonte", c["custo_no_horizonte"]!!, alt.custoNoHorizonte),
+                Triple("custo_por_mes_de_uso", c["custo_por_mes_de_uso"]!!, alt.custoPorMesDeUso),
+            )) {
+                val esperado = (esperadoJson as? JsonPrimitive)
+                    ?.takeIf { it !is JsonNull }?.content?.toDouble()
+                if (esperado != obtido) {
+                    divergencias += "  $nome.$campo: python $esperado, kotlin $obtido"
+                }
+            }
+        }
+        if (divergencias.isNotEmpty()) {
+            fail("custo de alternativa divergiu do motor Python:\n" + divergencias.joinToString("\n"))
+        }
+    }
+
+    @Test
+    fun vocabularios_de_decisao_batem_com_o_python() {
+        assertEquals(
+            ouro["status_decisao"]!!.jsonArray.map { it.jsonPrimitive.content },
+            StatusDecisao.entries.map { it.chave },
+            "os estados de decisão divergiram — a fila de triagem conta em cima deles",
+        )
+        assertEquals(
+            ouro["vereditos"]!!.jsonArray.map { it.jsonPrimitive.content },
+            Veredito.entries.map { it.chave },
+        )
+        assertEquals(
+            ouro["tipos_decisao"]!!.jsonArray.map { it.jsonPrimitive.content },
+            TipoDecisao.entries.map { it.chave },
+            "os tipos divergiram — é por eles que o histórico agrupa precedente",
+        )
+    }
+
+    @Test
     fun serializacao_mantem_chaves_e_ordem() {
         val s = ouro["serializacao"]!!.jsonObject
         val quando = ouro["quando_fixo"]!!.jsonPrimitive.content
@@ -174,6 +228,38 @@ class OuroContratosTest {
             revisarEm = "2027-01-01", criadoEm = quando,
         )
         confereMapa("causa", s["causa"]!!.jsonObject, causa.paraMapa(hoje))
+
+        // Decisão é o registro que mais custa perder numa migração: o número
+        // sempre pode ser recalculado a partir do extrato, o motivo escrito
+        // pela pessoa não pode.
+        val decisao = Decisao(
+            id = "dec-abc", titulo = "Celular quebrou",
+            situacao = "caiu na terça, tela e carregamento",
+            pergunta = "consertar, trocar ou aguentar?", tipo = TipoDecisao.TROCA,
+            alternativas = listOf(
+                Alternativa(
+                    nome = "consertar", custo = 700.0, horizonteMeses = 8,
+                    consequencia = "volta a funcionar, sem garantia de placa",
+                    descartadaPorque = "assistência não cobre a placa",
+                ),
+                Alternativa(
+                    nome = "comprar novo", custo = 2500.0, horizonteMeses = 36,
+                    consequencia = "resolve por três anos",
+                ),
+            ),
+            escolhida = "comprar novo", porque = "o conserto não cobria o que quebrou",
+            status = StatusDecisao.REVISADA, ligacoes = listOf("categoria:eletronicos"),
+            instantaneo = linkedMapOf(
+                "em" to "2026-06-15", "sobra_media_mes" to 4963.1, "score" to 55.0,
+            ),
+            desfecho = linkedMapOf(
+                "veredito" to "funcionou", "nota" to "durou",
+                "custo_real" to 2480.0, "em" to quando,
+            ),
+            revisarEm = "2027-01-01", proveniencia = prov,
+            criadoEm = quando, decididoEm = quando,
+        )
+        confereMapa("decisao", s["decisao"]!!.jsonObject, decisao.paraMapa(hoje))
 
         val custo = CustoFixo(
             id = "cf-abc", rotulo = "Transporte trabalho", baseTipo = "categoria",

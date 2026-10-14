@@ -25,6 +25,7 @@ from pathlib import Path
 import yaml
 
 from .causes import CauseStore
+from .decisions import DecisionStore
 from .contracts import ItemDeTriagem, agora, novo_id
 from .context import ContextStore
 from .entities import Counterparty
@@ -98,6 +99,7 @@ def construir(
     candidatos_fixos: list[dict],
     store: TriageStore,
     causas: "CauseStore | None" = None,
+    decisoes: "DecisionStore | None" = None,
     fallback: str = "outros",
     limite: int = 40,
 ) -> list[ItemDeTriagem]:
@@ -254,6 +256,58 @@ def construir(
                     "e tira o gasto da lista de culpa"
                 ),
                 evidencia={"causa_id": c.id, "alvo": c.alvo, "natureza": c.natureza},
+            ))
+
+    # 6b. bifurcações em aberto, e escolhas cujo resultado ninguém registrou
+    #
+    # Nenhum destes tem impacto em reais calculável — o custo de não decidir a
+    # troca do celular não está no extrato, está na vida. Eles entram pelo peso
+    # do tipo, e o valor em reais carrega o que a escolha custa quando existe,
+    # para a fila não os tratar como se fossem de graça.
+    if decisoes is not None:
+        for d in decisoes.abertas():
+            maior = max((a.custo for a in d.alternativas), default=0.0)
+            itens.append(ItemDeTriagem(
+                id=novo_id("da", d.id),
+                tipo="decisao_aberta",
+                titulo=f"decidir: {d.titulo[:60]}",
+                impacto_mensal=round(maior / 12, 2),
+                porque_importa=(
+                    "a pergunta está registrada e a resposta não. Enquanto isso, o "
+                    "dinheiro fica parado esperando ou sai sem que ninguém tenha "
+                    "comparado as alternativas que já foram escritas"
+                ),
+                evidencia={"decisao_id": d.id, "pergunta": d.pergunta,
+                           "alternativas": [a.nome for a in d.alternativas]},
+            ))
+
+        for d in decisoes.sem_desfecho():
+            itens.append(ItemDeTriagem(
+                id=novo_id("dd", d.id),
+                tipo="decisao_sem_desfecho",
+                titulo=f"no que deu: {d.titulo[:60]}",
+                impacto_mensal=0.0,
+                porque_importa=(
+                    "decisão sem desfecho é história, não aprendizado: a próxima "
+                    "escolha parecida vai ser feita do zero. E ainda dá para lembrar "
+                    "por que esta foi tomada"
+                ),
+                evidencia={"decisao_id": d.id, "escolheu": d.escolhida,
+                           "decidido_em": d.decidido_em, "custo": d.custo_da_escolha},
+            ))
+
+        for d in decisoes.a_revisar():
+            itens.append(ItemDeTriagem(
+                id=novo_id("dr", d.id),
+                tipo="decisao_a_revisar",
+                titulo=f"revisar decisão: {d.titulo[:60]}",
+                impacto_mensal=0.0,
+                porque_importa=(
+                    "o prazo que a própria decisão pediu para ser reaberta venceu — "
+                    "era o momento de conferir se a escolha ainda serve"
+                ),
+                evidencia={"decisao_id": d.id, "revisar_em": d.revisar_em,
+                           "escolheu": d.escolhida or "— ainda aberta"},
             ))
 
     # 7. eventos grandes sem explicação

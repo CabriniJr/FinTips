@@ -1,0 +1,656 @@
+{
+  "o_que_e": "o YAML que o Python grava: quando citar, como indentar, e os documentos inteiros",
+  "gerado_por": "yaml.safe_dump(allow_unicode=True, sort_keys=False)",
+  "escalares": [
+    {
+      "valor": "10:00",
+      "linha": "k: '10:00'"
+    },
+    {
+      "valor": "08:00",
+      "linha": "k: 08:00"
+    },
+    {
+      "valor": "1:30",
+      "linha": "k: '1:30'"
+    },
+    {
+      "valor": "60:00",
+      "linha": "k: '60:00'"
+    },
+    {
+      "valor": "0:00",
+      "linha": "k: 0:00"
+    },
+    {
+      "valor": "123",
+      "linha": "k: '123'"
+    },
+    {
+      "valor": "0123",
+      "linha": "k: '0123'"
+    },
+    {
+      "valor": "0x1f",
+      "linha": "k: '0x1f'"
+    },
+    {
+      "valor": "12_3",
+      "linha": "k: '12_3'"
+    },
+    {
+      "valor": "1.5",
+      "linha": "k: '1.5'"
+    },
+    {
+      "valor": "1e3",
+      "linha": "k: 1e3"
+    },
+    {
+      "valor": "+12",
+      "linha": "k: '+12'"
+    },
+    {
+      "valor": "-12",
+      "linha": "k: '-12'"
+    },
+    {
+      "valor": "0",
+      "linha": "k: '0'"
+    },
+    {
+      "valor": "0o17",
+      "linha": "k: 0o17"
+    },
+    {
+      "valor": "yes",
+      "linha": "k: 'yes'"
+    },
+    {
+      "valor": "no",
+      "linha": "k: 'no'"
+    },
+    {
+      "valor": "true",
+      "linha": "k: 'true'"
+    },
+    {
+      "valor": "True",
+      "linha": "k: 'True'"
+    },
+    {
+      "valor": "false",
+      "linha": "k: 'false'"
+    },
+    {
+      "valor": "on",
+      "linha": "k: 'on'"
+    },
+    {
+      "valor": "off",
+      "linha": "k: 'off'"
+    },
+    {
+      "valor": "y",
+      "linha": "k: y"
+    },
+    {
+      "valor": "n",
+      "linha": "k: n"
+    },
+    {
+      "valor": "Y",
+      "linha": "k: Y"
+    },
+    {
+      "valor": "N",
+      "linha": "k: N"
+    },
+    {
+      "valor": "null",
+      "linha": "k: 'null'"
+    },
+    {
+      "valor": "Null",
+      "linha": "k: 'Null'"
+    },
+    {
+      "valor": "NULL",
+      "linha": "k: 'NULL'"
+    },
+    {
+      "valor": "~",
+      "linha": "k: '~'"
+    },
+    {
+      "valor": ".inf",
+      "linha": "k: '.inf'"
+    },
+    {
+      "valor": "-.inf",
+      "linha": "k: '-.inf'"
+    },
+    {
+      "valor": ".nan",
+      "linha": "k: '.nan'"
+    },
+    {
+      "valor": "nan",
+      "linha": "k: nan"
+    },
+    {
+      "valor": "inf",
+      "linha": "k: inf"
+    },
+    {
+      "valor": "2026-06-15",
+      "linha": "k: '2026-06-15'"
+    },
+    {
+      "valor": "2026-6-5",
+      "linha": "k: 2026-6-5"
+    },
+    {
+      "valor": "2026-06-15T10:30:00",
+      "linha": "k: '2026-06-15T10:30:00'"
+    },
+    {
+      "valor": "",
+      "linha": "k: ''"
+    },
+    {
+      "valor": " ",
+      "linha": "k: ' '"
+    },
+    {
+      "valor": "  ",
+      "linha": "k: '  '"
+    },
+    {
+      "valor": "a b",
+      "linha": "k: a b"
+    },
+    {
+      "valor": "a: b",
+      "linha": "k: 'a: b'"
+    },
+    {
+      "valor": "a:b",
+      "linha": "k: a:b"
+    },
+    {
+      "valor": "a #b",
+      "linha": "k: 'a #b'"
+    },
+    {
+      "valor": "a#b",
+      "linha": "k: a#b"
+    },
+    {
+      "valor": "#a",
+      "linha": "k: '#a'"
+    },
+    {
+      "valor": "-a",
+      "linha": "k: -a"
+    },
+    {
+      "valor": "- a",
+      "linha": "k: '- a'"
+    },
+    {
+      "valor": "-",
+      "linha": "k: '-'"
+    },
+    {
+      "valor": "?",
+      "linha": "k: '?'"
+    },
+    {
+      "valor": "a?",
+      "linha": "k: a?"
+    },
+    {
+      "valor": "? a",
+      "linha": "k: '? a'"
+    },
+    {
+      "valor": ":",
+      "linha": "k: ':'"
+    },
+    {
+      "valor": ":a",
+      "linha": "k: :a"
+    },
+    {
+      "valor": "[a]",
+      "linha": "k: '[a]'"
+    },
+    {
+      "valor": "{a}",
+      "linha": "k: '{a}'"
+    },
+    {
+      "valor": "*a",
+      "linha": "k: '*a'"
+    },
+    {
+      "valor": "&a",
+      "linha": "k: '&a'"
+    },
+    {
+      "valor": "!a",
+      "linha": "k: '!a'"
+    },
+    {
+      "valor": "|a",
+      "linha": "k: '|a'"
+    },
+    {
+      "valor": ">a",
+      "linha": "k: '>a'"
+    },
+    {
+      "valor": "%a",
+      "linha": "k: '%a'"
+    },
+    {
+      "valor": "@a",
+      "linha": "k: '@a'"
+    },
+    {
+      "valor": "`a",
+      "linha": "k: '`a'"
+    },
+    {
+      "valor": "\"a",
+      "linha": "k: '\"a'"
+    },
+    {
+      "valor": "'a",
+      "linha": "k: '''a'"
+    },
+    {
+      "valor": "a'b",
+      "linha": "k: a'b"
+    },
+    {
+      "valor": "a\"b",
+      "linha": "k: a\"b"
+    },
+    {
+      "valor": ",a",
+      "linha": "k: ',a'"
+    },
+    {
+      "valor": "a,b",
+      "linha": "k: a,b"
+    },
+    {
+      "valor": "  começo",
+      "linha": "k: '  começo'"
+    },
+    {
+      "valor": "fim  ",
+      "linha": "k: 'fim  '"
+    },
+    {
+      "valor": "---",
+      "linha": "k: '---'"
+    },
+    {
+      "valor": "...",
+      "linha": "k: '...'"
+    },
+    {
+      "valor": "a\tb",
+      "linha": "k: \"a\\tb\""
+    },
+    {
+      "valor": "a\nb",
+      "linha": "k: 'a\n\n  b'"
+    },
+    {
+      "valor": "acentuação",
+      "linha": "k: acentuação"
+    },
+    {
+      "valor": "é",
+      "linha": "k: é"
+    },
+    {
+      "valor": "alimentacao",
+      "linha": "k: alimentacao"
+    },
+    {
+      "valor": "Gelato Roma",
+      "linha": "k: Gelato Roma"
+    },
+    {
+      "valor": "EMV CMT",
+      "linha": "k: EMV CMT"
+    },
+    {
+      "valor": "acct:b125ff343a",
+      "linha": "k: acct:b125ff343a"
+    },
+    {
+      "valor": "ofx:PagSeguro Internet S/A",
+      "linha": "k: ofx:PagSeguro Internet S/A"
+    },
+    {
+      "valor": "dec-87cc5cf5",
+      "linha": "k: dec-87cc5cf5"
+    },
+    {
+      "valor": "peço delivery depois do plantão",
+      "linha": "k: peço delivery depois do plantão"
+    },
+    {
+      "valor": "não tem ônibus nesse horário",
+      "linha": "k: não tem ônibus nesse horário"
+    },
+    {
+      "valor": "transporte.reembolsado_pela_empresa",
+      "linha": "k: transporte.reembolsado_pela_empresa"
+    },
+    {
+      "valor": "R$ 1.234,56",
+      "linha": "k: R$ 1.234,56"
+    },
+    {
+      "valor": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+      "linha": "k: sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo"
+    }
+  ],
+  "floats": [
+    {
+      "valor_repr": "0.0",
+      "linha": "k: 0.0"
+    },
+    {
+      "valor_repr": "-0.0",
+      "linha": "k: -0.0"
+    },
+    {
+      "valor_repr": "1.0",
+      "linha": "k: 1.0"
+    },
+    {
+      "valor_repr": "100.0",
+      "linha": "k: 100.0"
+    },
+    {
+      "valor_repr": "4533.1",
+      "linha": "k: 4533.1"
+    },
+    {
+      "valor_repr": "-0.01",
+      "linha": "k: -0.01"
+    },
+    {
+      "valor_repr": "0.9926",
+      "linha": "k: 0.9926"
+    },
+    {
+      "valor_repr": "1.5",
+      "linha": "k: 1.5"
+    },
+    {
+      "valor_repr": "0.1",
+      "linha": "k: 0.1"
+    },
+    {
+      "valor_repr": "1234.56",
+      "linha": "k: 1234.56"
+    },
+    {
+      "valor_repr": "1000000.0",
+      "linha": "k: 1000000.0"
+    },
+    {
+      "valor_repr": "10000000.0",
+      "linha": "k: 10000000.0"
+    },
+    {
+      "valor_repr": "1000000000000000.0",
+      "linha": "k: 1000000000000000.0"
+    },
+    {
+      "valor_repr": "1e+16",
+      "linha": "k: 1.0e+16"
+    },
+    {
+      "valor_repr": "1e+17",
+      "linha": "k: 1.0e+17"
+    },
+    {
+      "valor_repr": "0.001",
+      "linha": "k: 0.001"
+    },
+    {
+      "valor_repr": "0.0001",
+      "linha": "k: 0.0001"
+    },
+    {
+      "valor_repr": "1e-05",
+      "linha": "k: 1.0e-05"
+    },
+    {
+      "valor_repr": "123456789.12",
+      "linha": "k: 123456789.12"
+    },
+    {
+      "valor_repr": "0.3333333333333333",
+      "linha": "k: 0.3333333333333333"
+    },
+    {
+      "valor_repr": "0.6666666666666666",
+      "linha": "k: 0.6666666666666666"
+    },
+    {
+      "valor_repr": "1e+22",
+      "linha": "k: 1.0e+22"
+    },
+    {
+      "valor_repr": "1e-300",
+      "linha": "k: 1.0e-300"
+    },
+    {
+      "valor_repr": "2.2250738585072014e-308",
+      "linha": "k: 2.2250738585072014e-308"
+    },
+    {
+      "valor_repr": "1.7976931348623157e+308",
+      "linha": "k: 1.7976931348623157e+308"
+    }
+  ],
+  "outros_tipos": [
+    {
+      "nome": "inteiro",
+      "texto": "k: 42\n"
+    },
+    {
+      "nome": "inteiro_negativo",
+      "texto": "k: -7\n"
+    },
+    {
+      "nome": "zero",
+      "texto": "k: 0\n"
+    },
+    {
+      "nome": "float",
+      "texto": "k: 1.5\n"
+    },
+    {
+      "nome": "float_inteiro",
+      "texto": "k: 100.0\n"
+    },
+    {
+      "nome": "float_negativo",
+      "texto": "k: -0.01\n"
+    },
+    {
+      "nome": "float_longo",
+      "texto": "k: 0.9926\n"
+    },
+    {
+      "nome": "bool_true",
+      "texto": "k: true\n"
+    },
+    {
+      "nome": "bool_false",
+      "texto": "k: false\n"
+    },
+    {
+      "nome": "nulo",
+      "texto": "k: null\n"
+    },
+    {
+      "nome": "lista_vazia",
+      "texto": "k: []\n"
+    },
+    {
+      "nome": "mapa_vazio",
+      "texto": "k: {}\n"
+    },
+    {
+      "nome": "lista_de_texto",
+      "texto": "k:\n- a\n- b\n"
+    },
+    {
+      "nome": "lista_de_mapas",
+      "texto": "k:\n- a: 1\n- a: 2\n"
+    },
+    {
+      "nome": "mapa_aninhado",
+      "texto": "k:\n  a:\n    b:\n      c: 1\n"
+    },
+    {
+      "nome": "lista_em_mapa_em_lista",
+      "texto": "k:\n- a:\n  - x\n  - y\n- a: []\n"
+    },
+    {
+      "nome": "chave_que_precisa_de_aspas",
+      "texto": "'10:00': v\nsim: 1\n"
+    },
+    {
+      "nome": "raiz_lista",
+      "texto": "- a: 1\n- b: 2\n"
+    },
+    {
+      "nome": "ordem_preservada",
+      "texto": "z: 1\na: 2\nm: 3\nb: 4\n"
+    }
+  ],
+  "documentos": [
+    {
+      "nome": "causas",
+      "objeto_json": {
+        "schema_version": 1,
+        "atualizado_em": "2026-06-15T10:30:00",
+        "causas": [
+          {
+            "id": "causa-abc",
+            "efeito": {
+              "tipo": "categoria",
+              "ref": "alimentacao"
+            },
+            "alvo": "categoria:alimentacao",
+            "natureza": "gatilho",
+            "enunciado": "peço delivery depois do plantão",
+            "atitude": "aceitar",
+            "atitude_nota": "é o custo de trabalhar à noite",
+            "evidencia": [
+              "tx-9",
+              "tx-12"
+            ],
+            "revisar_em": "2027-01-01",
+            "vencida": false,
+            "criado_em": "2026-06-15T10:30:00",
+            "proveniencia": {
+              "origem": "usuario",
+              "confianca": 1.0,
+              "porque": "a pessoa afirmou",
+              "evidencia": [],
+              "quando": "2026-06-15T10:30:00",
+              "por_quem": "claude"
+            }
+          }
+        ]
+      },
+      "texto": "schema_version: 1\natualizado_em: '2026-06-15T10:30:00'\ncausas:\n- id: causa-abc\n  efeito:\n    tipo: categoria\n    ref: alimentacao\n  alvo: categoria:alimentacao\n  natureza: gatilho\n  enunciado: peço delivery depois do plantão\n  atitude: aceitar\n  atitude_nota: é o custo de trabalhar à noite\n  evidencia:\n  - tx-9\n  - tx-12\n  revisar_em: '2027-01-01'\n  vencida: false\n  criado_em: '2026-06-15T10:30:00'\n  proveniencia:\n    origem: usuario\n    confianca: 1.0\n    porque: a pessoa afirmou\n    evidencia: []\n    quando: '2026-06-15T10:30:00'\n    por_quem: claude\n"
+    },
+    {
+      "nome": "canonico_com_hora",
+      "objeto_json": {
+        "schema_version": 1,
+        "gerado_em": "2026-09-25T18:07:53",
+        "origem": "ofx:PagSeguro Internet S/A",
+        "conta": {
+          "id_hash": "acct:b125ff343a",
+          "bank_id": "290",
+          "type": "CHECKING",
+          "currency": "BRL"
+        },
+        "periodo": {
+          "inicio": "2026-06-01",
+          "fim": "2026-06-15"
+        },
+        "saldo": {
+          "conta": 4533.1,
+          "em": "2026-06-30"
+        },
+        "transacoes": [
+          {
+            "id": "f1",
+            "data": "2026-06-01",
+            "hora": "10:00",
+            "valor": -100.0,
+            "fluxo": "savings_out"
+          },
+          {
+            "id": "f2",
+            "data": "2026-06-05",
+            "hora": "08:00",
+            "valor": -50.25,
+            "fluxo": "expense"
+          }
+        ]
+      },
+      "texto": "schema_version: 1\ngerado_em: '2026-09-25T18:07:53'\norigem: ofx:PagSeguro Internet S/A\nconta:\n  id_hash: acct:b125ff343a\n  bank_id: '290'\n  type: CHECKING\n  currency: BRL\nperiodo:\n  inicio: '2026-06-01'\n  fim: '2026-06-15'\nsaldo:\n  conta: 4533.1\n  em: '2026-06-30'\ntransacoes:\n- id: f1\n  data: '2026-06-01'\n  hora: '10:00'\n  valor: -100.0\n  fluxo: savings_out\n- id: f2\n  data: '2026-06-05'\n  hora: 08:00\n  valor: -50.25\n  fluxo: expense\n"
+    },
+    {
+      "nome": "patrimonio",
+      "objeto_json": {
+        "atualizado_em": "2026-06-15",
+        "posicoes": [
+          {
+            "nome": "Conta corrente",
+            "tipo": "conta",
+            "valor": 1500.0,
+            "liquidez": "imediata"
+          },
+          {
+            "nome": "CDB",
+            "tipo": "renda_fixa",
+            "valor": 20000.0,
+            "liquidez": "d_mais_1"
+          }
+        ]
+      },
+      "texto": "atualizado_em: '2026-06-15'\nposicoes:\n- nome: Conta corrente\n  tipo: conta\n  valor: 1500.0\n  liquidez: imediata\n- nome: CDB\n  tipo: renda_fixa\n  valor: 20000.0\n  liquidez: d_mais_1\n"
+    },
+    {
+      "nome": "vazios",
+      "objeto_json": {
+        "schema_version": 1,
+        "itens": [],
+        "mapa": {},
+        "nada": null,
+        "texto_vazio": ""
+      },
+      "texto": "schema_version: 1\nitens: []\nmapa: {}\nnada: null\ntexto_vazio: ''\n"
+    }
+  ]
+}

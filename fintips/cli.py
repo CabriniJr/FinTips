@@ -13,6 +13,8 @@
     fintips contexto        [--gravar chave --valor V]
     fintips categorias      [--criar id --nome "Nome"]
     fintips regras          [--remover ID]
+    fintips decisoes        [--abertas] [--historico ASSUNTO]
+    fintips mcp-config      [--nome fintips]   config do cliente MCP
 """
 
 from __future__ import annotations
@@ -149,6 +151,11 @@ def cmd_buy(args) -> None:
         reserva_alvo_meses=float(base.get("reserva_alvo_meses", 6)),
         perfil=ctx.get("perfil"),
         causas=(ctx.get("causas") or {}).get("itens"),
+        precedentes=st["decisoes"].semelhantes(
+            f"{intent.item} {intent.categoria}", tipo="compra",
+            ligacoes=[f"categoria:{intent.categoria}"],
+        ),
+        aprendizados=(ctx.get("decisoes") or {}).get("aprendizados"),
     )
     print(json.dumps(res, ensure_ascii=False, indent=2))
 
@@ -308,6 +315,81 @@ def cmd_regras(args) -> None:
     print(f"\n{len(loja.regras)} regra(s)")
 
 
+def cmd_decisoes(args) -> None:
+    from .decisions import DecisionStore
+
+    loja = DecisionStore(_ws(args).decisoes_path)
+
+    if args.historico:
+        precedentes = loja.semelhantes(args.historico)
+        if not precedentes:
+            print(f"nenhuma decisão parecida com '{args.historico}' no histórico")
+            return
+        for d in precedentes:
+            print(f"{d['quando']}  {d['titulo']}")
+            print(f"   escolheu: {d['escolheu']}  (R$ {d['custo']:.2f})  → {d['deu_em']}")
+            print(f"   porque: {d['porque']}")
+            for alt in d["descartou"]:
+                print(f"   descartou {alt['nome']}: {alt['descartada_porque']}")
+            print()
+        return
+
+    decisoes = loja.abertas() if args.abertas else list(
+        sorted(loja.decisoes.values(), key=lambda d: d.criado_em, reverse=True))
+    if not decisoes:
+        print("nenhuma decisão registrada."
+              if not args.abertas else "nenhuma decisão em aberto.")
+        print("o agente abre uma com `abrir_decisao` quando a pergunta aparecer.")
+        return
+
+    for d in decisoes:
+        marca = "•" if d.status == "aberta" else " "
+        print(f"{marca} {d.id}  [{d.status}] {d.titulo}")
+        print(f"   {d.pergunta}")
+        for a in d.alternativas:
+            escolha = "→" if a.nome == d.escolhida else " "
+            por_mes = (f"  R$ {a.custo_por_mes_de_uso:.2f}/mês de uso"
+                       if a.custo_por_mes_de_uso is not None else "")
+            print(f"   {escolha} {a.nome}: R$ {a.custo:.2f}{por_mes}")
+        if d.desfecho:
+            print(f"   deu em: {d.desfecho['veredito']}  {d.desfecho.get('nota', '')}")
+        print()
+
+    ap = loja.aprendizados()
+    print(f"{ap['decisoes_registradas']} decisão(ões), {ap['abertas']} em aberto, "
+          f"{ap['com_desfecho']} com desfecho ({ap['cobertura_de_desfecho_pct']}% das tomadas)")
+
+
+def cmd_mcp_config(args) -> None:
+    """Imprime a config do cliente MCP com os caminhos desta máquina.
+
+    Existe porque a config genérica (`"command": "python"`) falha calado na
+    maioria das instalações: o cliente sobe o servidor de um diretório
+    qualquer, e o `python` do PATH quase nunca é o interpretador onde o
+    fintips foi instalado — venv, pyenv, ou um Debian onde `python` sequer
+    existe. O caminho absoluto de `sys.executable` não tem esse problema.
+    """
+    import sys
+
+    ws = _ws(args)
+    servidor = {
+        "command": sys.executable,
+        "args": ["-m", "fintips.mcp_server", "--root", str(ws.root)],
+    }
+    config = {"mcpServers": {args.nome: servidor}}
+
+    if args.claude_code:
+        print(f"claude mcp add-json {args.nome} '{json.dumps(servidor)}'")
+        return
+
+    print(json.dumps(config, ensure_ascii=False, indent=2))
+    print(f"\n# interpretador: {sys.executable}", file=sys.stderr)
+    print(f"# workspace:     {ws.root}", file=sys.stderr)
+    print("#", file=sys.stderr)
+    print("# Claude Desktop: cole em claude_desktop_config.json", file=sys.stderr)
+    print("# Claude Code:    fintips mcp-config --claude-code", file=sys.stderr)
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="fintips", description="motor financeiro pessoal")
     p.add_argument("--root", help="pasta do workspace", default=None)
@@ -368,6 +450,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     al = sub.add_parser("alavancas"); al.add_argument("--limite", type=int, default=8)
     al.set_defaults(func=cmd_alavancas)
+
+    de = sub.add_parser("decisoes")
+    de.add_argument("--abertas", action="store_true", help="só o que ainda não foi decidido")
+    de.add_argument("--historico", metavar="ASSUNTO", help="precedentes parecidos com ASSUNTO")
+    de.set_defaults(func=cmd_decisoes)
+
+    mc = sub.add_parser("mcp-config")
+    mc.add_argument("--nome", default="fintips", help="nome do servidor no cliente")
+    mc.add_argument("--claude-code", action="store_true",
+                    help="imprime o comando `claude mcp add-json` em vez do JSON")
+    mc.set_defaults(func=cmd_mcp_config)
     return p
 
 
