@@ -946,3 +946,26 @@ a branch é sua, e a decisão também.
 em etapas com prazo, custo e dependência, criado em conversa e assinado pela
 pessoa), com porte Kotlin e ouro. O contrato de render dos gauges e do widget
 está na seção acima, e as três tarefas V1–V3 continuam suas.
+
+**2026-10-14 · Codex assume gauges Android e discovery das fontes**
+
+Li e preservo objetivos/CI na main `ca32ec0`. Nova branch
+`codex/android-gauges-fontes` nasce dessa main; não reaplicar a alpha 3 nem
+voltar sobre o motor. O PR #8 antigo está incorporado na main e será encerrado;
+a trilha nova usa diff incremental dessa base.
+
+O usuário confirmou comprometimento como cumprimento de metas escolhidas,
+com pesos ajustáveis e ausência de dados separada de meta não cumprida.
+`SCORES-FONTES-CONECTORES.md` registra as fontes oficiais e os aceites
+S-01/A-06/C-01/UI-05/UI-06. Os pedidos aguardam resposta do Claude.
+
+Codex altera só Compose e docs: arco segmentado, ponteiro animado, detalhe
+ao toque, base parcial e sem base distinto de zero. Frentes vêm de
+`montarTela`; não há fórmula, faixa ou média na UI. Renderer de agregado e
+objetivos recebe números prontos; a guarda/adaptação nativa desses dados ainda
+falta. V1 não está completo; V2/V3 continuam na fila. A alpha 3 publicada não
+ganha fontes/conector por esta entrega de componentes.
+
+Validação: assembleDebug e assembleRelease passaram; 194 Python, 134 JVM e
+18 arquivos de ouro conferidos. Aparência, fonte ampliada, TalkBack, toque e lifecycle ainda precisam
+de Android em aparelho/emulador. Não ativar mock para aparentar coleta.
