@@ -46,6 +46,18 @@ on:
 permissions:
   contents: write
 
+# Dois pushes seguidos na `main` disparam dois builds que escrevem na MESMA
+# release rolante — e aí quem termina por último vence, sem relação nenhuma com
+# quem é o commit mais novo. A release poderia acabar anunciando um commit e
+# servindo o APK de outro.
+#
+# `cancel-in-progress` só para a rolante: um build de tag versionada nunca é
+# cancelado, porque ele é o artefato daquela versão e não existe "mais novo"
+# que o substitua.
+concurrency:
+  group: android-${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'rolante' }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
 jobs:
   apk:
     runs-on: ubuntu-latest
