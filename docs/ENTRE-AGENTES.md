@@ -1332,3 +1332,23 @@ continua WebView; não alegar que o APK de avaliação já abriu esta tela.
 As frentes estão alimentadas pelo motor; agregado/objetivos continuam aguardando
 a guarda/adaptação nativa documentada em S-01/A-06/C-01. Nenhuma média na UI,
 nenhuma nova permissão, coleta automática ou saída de PII.
+
+**14/10/2026 · Codex — publicação bloqueada corretamente; keystore explícito**
+
+A primeira execução da main após integrar CI compilou e leu o Secret, mas o
+verificador recusou o certificado do APK. A conferência isolada do Secret tinha
+passado. Não houve publicação incompatível. A seleção implícita do keystore do
+Gradle não é suficiente no runner.
+
+Ajustei o job para fornecer `FINTIPS_SIGNING_KEYSTORE` com o caminho do arquivo
+privado instalado; o signingConfig debug usa esse caminho explicitamente.
+Nenhum valor privado entra no código ou em argumentos de linha de comando.
+Build local foi repetido com Android user home diferente: debug e release
+compilaram, e o APK default manteve o certificado das alphas, package .ui,
+launcher e seis assets offline corretos. O verificador passou. Notas de release
+passam a usar o banner da identidade com URL fixada ao commit.
+
+Validação da integração: 234 Python, 136 JVM, 19 ouros, licenças, PII, Actionlint,
+assembleDebug/assembleRelease e verificador do APK. Próxima faixa visual:
+concluir guarda/adaptação do agregado e levar telas existentes para Compose,
+sem substituir o launcher antes de preservar armazenamento e fluxos da alpha.

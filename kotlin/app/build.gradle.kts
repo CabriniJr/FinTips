@@ -16,6 +16,18 @@ android {
         versionName = "0.6.0"
     }
     buildFeatures { compose = true }
+    // O runner pode definir outro Android user home. Na publicação, apontar
+    // explicitamente para o keystore validado, sem depender desse default.
+    signingConfigs {
+        getByName("debug") {
+            providers.environmentVariable("FINTIPS_SIGNING_KEYSTORE").orNull?.let { caminho ->
+                storeFile = file(caminho)
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
     buildTypes {
         getByName("debug") {
             val ci = providers.gradleProperty("fintips.ciPreview").orNull == "true"
