@@ -54,6 +54,14 @@ permissions:
 # `cancel-in-progress` só para a rolante: um build de tag versionada nunca é
 # cancelado, porque ele é o artefato daquela versão e não existe "mais novo"
 # que o substitua.
+#
+# A trava **não protege retroativamente**, e isso custou uma corrida de
+# verdade no commit em que ela entrou: o GitHub usa a versão do workflow do
+# commit que disparou o run, então os runs já em voo, lançados de commits
+# anteriores a esta linha, não pertencem a grupo nenhum e continuam podendo
+# sobrescrever a rolante com um APK mais velho. Vale para toda introdução de
+# `concurrency`: a primeira janela depois dela ainda é insegura, e a conferência
+# é olhar o `commit` do `build-info.json` publicado contra o topo da `main`.
 concurrency:
   group: android-${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'rolante' }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
