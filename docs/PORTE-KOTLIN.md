@@ -155,48 +155,33 @@ baseline divergiu do motor Python:
   [mes_no_vermelho]     volatilidade: python 0.229, kotlin 0.281
 ```
 
-## Ordem dos módulos
+## O ouro que nasceu depois do Kotlin
 
-**A ordem virou no meio do caminho.** O escopo do app deixou de ser finança e
-passou a ser vida em seis frentes, com dinheiro como uma delas
-([`APP-DE-VIDA.md`](APP-DE-VIDA.md)). O Android era o módulo 12, a última
-linha da tabela; agora é o produto. O que isso muda na prática:
+O domínio de vida (as seis frentes) é o único módulo em que o **Kotlin veio
+primeiro** — ele não existia no Python, então não havia o que replicar. Depois
+o Python ganhou `fintips/life.py`, porque é o Python que serve o agente e o
+painel hoje, e isso criou o risco que o resto da porta não tem: dois motores
+sem nada obrigando a concordar.
 
-- o **domínio de vida** entrou na frente de tudo que faltava portar — ele não
-  depende de nada do Python, porque não existe no Python;
-- a **persistência** (módulo 10) subiu, porque sem ela missão não sobrevive a
-  fechar o app;
-- **projeção, planos, compras e dossiê** (8b e 9) desceram. Continuam valendo
-  no Python, que continua sendo o produto que funciona;
-- o motor já portado — dinheiro, OFX, contratos, regras, análise, score —
-  continua testado contra o Python e vira o pilar OURO. Ele só deixou de ser a
-  frente de ataque.
-
-O domínio de vida nasceu sem ouro, porque não existia motor Python para
-comparar com. Os 14 testes dele cobram outra coisa — propriedade de produto,
-cada uma com uma frase do plano atrás: `presumido` não conta como cumprido, o
-recorde não zera na recaída, hoje ainda não cumprido não quebra a sequência, as
-seis barras aparecem mesmo vazias.
-
-Depois o Python ganhou `fintips/life.py`, porque é o Python que serve o agente
-e o painel hoje. Isso cria o risco que o resto da porta não tem: **dois motores
-sem nada obrigando a concordar**, e o Kotlin dessa vez chegou primeiro. Por
-isso nasceu `ouro/vida.json`, cobrado na direção de sempre, com o Python como
-referência. Ele achou divergência na primeira execução:
+A saída foi a de sempre, só com a ordem de nascimento invertida: gerar
+`ouro/vida.json` e cobrar o Kotlin contra ele, **com o Python como
+referência**. Achou divergência na primeira execução:
 
 ```
 barras divergiram do motor Python:
   [um_de_tres_e_um_terco/FOC] pct: python 33.3, kotlin 33.33333333333333
 ```
 
-Uma missão de três. O Python arredonda em uma casa, o Kotlin dividia cru.
-Nenhum teste de propriedade pegaria — as duas respostas parecem certas, e a
-diferença só apareceria quando alguém comparasse a barra do app com o número
-do painel.
+Uma missão cumprida de três. O Python arredonda em uma casa, o Kotlin dividia
+cru. Nenhum teste de propriedade pegaria — as duas respostas parecem certas, e
+a diferença só apareceria quando alguém comparasse a barra do app com o número
+do painel. A regra vale também quando o Kotlin chega antes: **quem define é o
+Python.**
+
+## Ordem dos módulos
 
 Do que não depende de nada para o que depende de tudo. Cada linha só começa
-quando a anterior tem ouro fechando — ou, no caso do domínio de vida, os
-testes de propriedade.
+quando a anterior tem ouro fechando.
 
 | # | Módulo | Estado |
 |---|---|---|
@@ -210,15 +195,30 @@ testes de propriedade.
 | 7 | `Analise` — baseline, meses, recorrências, atípicos | **pronto** |
 | 7b | `gasto invisível` — depende das etiquetas da heurística | a fazer |
 | 8 | `Score` — cinco dimensões, pesos, alavanca de maior ganho | **pronto** |
-| 8b | `Projecao`, `Planos`, `Compras` | adiado |
-| 9 | `Vida` — atributos, missões, registro, sequência, cobertura | **pronto** |
-| 9b | `ouro/vida.json` — paridade com `fintips/life.py` | **pronto** |
-| 10 | Persistência YAML (`expect`/`actual` por alvo) — missões primeiro | a fazer |
-| 11 | App Android: as seis barras e a lista do dia | a fazer |
-| 12 | Sensores (tempo de tela, passos) como registro `sensor` | a fazer |
-| 13 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
-| 14 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | adiado |
-| 15 | Compose Multiplatform no lugar do painel React | adiado |
+| 8b | `Projecao`, `Planos`, `Compras` | a fazer |
+| 9 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | a fazer |
+| 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |
+| 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
+| 12 | Compose Multiplatform no lugar do painel React | a fazer |
+
+### Fora da fila: o domínio de vida e o Android
+
+Esta trilha corre **em paralelo** à de cima, e numerá-la junto seria mentir
+sobre a dependência: ela não espera módulo nenhum da fila, porque não porta
+nada — o domínio de vida nasceu em Kotlin. Ela também muda a prioridade do
+Android, que na tabela acima é o último item e na prática virou o produto
+([`APP-DE-VIDA.md`](APP-DE-VIDA.md)).
+
+| # | O que | Estado |
+|---|---|---|
+| V1 | `vida/Vida.kt` — atributos, missões, registro, sequência, cobertura | **pronto** |
+| V2 | `ouro/vida.json` — paridade travada contra `fintips/life.py` | **pronto** |
+| V3 | App Android: as seis barras e a lista do dia | a fazer |
+| V4 | Sensores (tempo de tela, passos) como registro `sensor` | a fazer |
+
+As duas trilhas se encontram num ponto só: a persistência YAML (módulo 10), de
+que as missões também precisam. Quem chegar primeiro resolve para os dois —
+ver [`ENTRE-AGENTES.md`](ENTRE-AGENTES.md).
 
 O painel React continua funcionando durante tudo isso, porque fala JSON e não
 sabe quem serve.
