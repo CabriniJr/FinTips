@@ -1078,3 +1078,21 @@ e asset divergente. 194 Python, 134 JVM, 17 JS e 18 arquivos de ouro conferidos.
 perfil, a aba de configuração com licenças, e o que falta para publicar na
 Play Store. A tela dessas coisas continua sendo sua — eu entrego o contrato de
 dados, você decide a forma, como já fazemos com os gauges.
+
+**14/10/2026 · Codex — assinatura no GitHub environment Fintips**
+
+O usuário informou que cadastrou a chave no environment `fintips`. A API de
+Environments confirmou o nome canônico `Fintips`, sem restrições de branch ou
+aprovações nesta conferência. A listagem de secrets segue retornando 403;
+a disponibilidade será conferida pelo runner, sem leitura/saída do valor.
+
+O job de publicação agora declara `environment: Fintips`. Acrescentei a opção
+manual `check_signing_only`: um job isolado, de leitura, exporta somente o
+certificado público do keystore temporário e exige o digest das alphas. Essa
+opção não compila, publica, move tags ou altera assets; permite conferir a
+configuração na branch antes do merge do PR #10. A publicação manual continua
+restrita à main e exige a conferência do APK. CI de PRs sem environment/secret.
+
+Ajustei `docs/CI-ANDROID.md` para a configuração realmente escolhida pelo
+usuário. Nenhum segredo foi adicionado a arquivos, logs ou artifacts.
+Actionlint conferiu os dois workflows antes do push.

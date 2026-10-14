@@ -26,6 +26,11 @@ on:
         description: "tag da release (vazio = rolante android-main)"
         required: false
         default: ""
+      check_signing_only:
+        description: "Conferir o secret do environment Fintips sem compilar/publicar"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -37,10 +42,46 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  assinatura:
+    if: github.event_name == 'workflow_dispatch' && inputs.check_signing_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: Fintips
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Conferir a chave das alphas sem revelar o secret
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          EXPECTED_CERT: 3b2b3a83eec0f218c80f27541a3e27a918d87f7ecda890aecb2e5afbf3afc467
+        run: |
+          set -euo pipefail
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 não está disponível no environment Fintips."
+            exit 1
+          fi
+          umask 077
+          CHECK_DIR=$(mktemp -d)
+          trap 'rm -rf "$CHECK_DIR"' EXIT
+          printf '%s' "$KEYSTORE_B64" | base64 -d > "$CHECK_DIR/debug.keystore"
+          keytool -exportcert -keystore "$CHECK_DIR/debug.keystore" \
+            -alias androiddebugkey -storepass android > "$CHECK_DIR/certificate.der"
+          CERT=$(sha256sum "$CHECK_DIR/certificate.der" | cut -d' ' -f1)
+          if [ "$CERT" != "$EXPECTED_CERT" ]; then
+            echo "::error::Certificado diferente das alphas; não publicar uma atualização com esta chave."
+            exit 1
+          fi
+          echo 'Chave do environment disponível e compatível com as alphas.'
+          echo "Certificado público SHA-256: $CERT" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Assinatura conferida. Nenhum APK ou release foi alterado.' >> "$GITHUB_STEP_SUMMARY"
+
   apk:
-    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    if: (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main') && !inputs.check_signing_only
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    environment: Fintips
     permissions:
       contents: write
     steps:
@@ -100,7 +141,7 @@ jobs:
             mkdir -p "$HOME/.android"
             echo "$KEYSTORE_B64" | base64 -d > "$HOME/.android/debug.keystore"
             echo "propria=true" >> "$GITHUB_OUTPUT"
-            echo "Chave do repositório instalada: a atualização instala por cima."
+            echo "Chave do environment instalada; a compatibilidade será conferida no APK."
           else
             echo "::error::Configure ANDROID_KEYSTORE_BASE64 com a chave das alphas anteriores."
             echo "Publicação bloqueada para preservar a atualização e os registros locais."
