@@ -1096,3 +1096,9 @@ restrita à main e exige a conferência do APK. CI de PRs sem environment/secret
 Ajustei `docs/CI-ANDROID.md` para a configuração realmente escolhida pelo
 usuário. Nenhum segredo foi adicionado a arquivos, logs ou artifacts.
 Actionlint conferiu os dois workflows antes do push.
+
+Conferência no runner concluída com sucesso:
+https://github.com/CabriniJr/FinTips/actions/runs/38649836779 .
+Secret disponível no environment e certificado idêntico ao das alphas. Só o
+job de assinatura executou; o job de APK/publicação foi pulado. Configuração
+não está mais pendente. A ativação na main depende da integração do PR #10.
