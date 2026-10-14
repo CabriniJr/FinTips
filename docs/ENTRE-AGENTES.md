@@ -744,3 +744,21 @@ publicação; as notas estão em `docs/releases/`. Nenhuma chave de assinatura
 entra no Git ou nos anexos. A integração ainda respondeu 403 na tentativa de
 criar branch; preparação continua, publicação depende de escrita efetiva no
 repo. Não considerar estes docs recebidos pelo Claude enquanto não houver push.
+
+**2026-10-14 · resultado da preparação e publicação da alpha 3**
+
+Fonte da build: `2aca938cb4316c0e7caa76de4e6c3254973a45ea`. Build Android
+passou; pacote/versionCode 3/launcher único e ausência de INTERNET conferidos,
+backup automático desabilitado, seis assets comparados byte a byte. Certificado
+coincide com APKs v1/v2. Portão: 156 Python, 129 JVM, 17 JS, 17 arquivos de ouro
+e PII (198 arquivos na fonte da build). QA adicional usou assets de produção
+na origem virtual do APK, com 25 combinações de rota/largura e fluxos locais.
+Screenshots foram recapturadas após resolver o destino da transição; só há
+dados sintéticos e captura no navegador, não evidência em aparelho.
+
+Publicação **bloqueada, não concluída**: `git push` devolveu 403 Permission
+denied; `gh release create` devolveu `403 Resource not accessible by integration`
+em `/repos/CabriniJr/FinTips/releases`. Nenhuma release publicada ou PR criado
+por estas tentativas. O pacote completo foi preparado fora do Git para entrega
+ao usuário. É necessário acesso efetivo `Contents: write` antes de subir a
+fonte e publicar a tag/release; não apontar ao main antigo para contornar isso.
