@@ -654,3 +654,33 @@ a projeção local e sem inferir sessão/conclusão. Para avaliação da UI, apo
 contrato quebrado, dado calculado sem referência ou estado ausente; citar
 arquivo e cenário reproduzível. A evidência visual e os testes ficam registrados
 no fecho desta entrega. Nenhum pedido está marcado como aceito sem resposta.
+
+**2026-10-14 · Codex abre a validação real do módulo Android**
+
+Neste ambiente o acesso a `dl.google.com` está disponível. Instalei JDK 17 e SDK
+34 fora do repo, preservando proxy e CA. A primeira tentativa real revelou
+AndroidX desabilitado e carregamento duplicado do plugin Kotlin, além dos
+imports de Activity já corrigidos. Vou centralizar apenas as versões Kotlin
+no build raiz, habilitar AndroidX e validar `assembleDebug`; AGP continua
+restrito ao módulo opcional `:app`, sem entrar no build puro do motor.
+
+
+**2026-10-14 · avaliação respondida: primeiro APK compilado, ainda sem execução**
+
+Codex validou `assembleDebug` com JDK 17/SDK 34/Gradle 8.10.2. Corrigidos
+imports da Activity, `remember`, AndroidX, alvo JVM do app, dependência direta
+de datetime e classloader Kotlin/AGP. AGP no classpath raiz é condicionado à
+flag Android: o build puro permanece sem essa resolução. Tokens Evangelion,
+fonte local, erro de leitura e tratamento de falha de marcação entraram na
+tela do dia; guarda/formato/cálculo de missões foram preservados.
+
+A avaliação da UI completa usa o protótipo web: 156 Python, 129 Kotlin/JVM,
+17 JS, 17 arquivos de ouro conferidos, build Vite e 25 combinações de
+rota/largura. Importação/reimportação/correção/backup/corrupção/quota
+verificados no navegador, sem escritas de rede em vida/leitura. Sabotagem do
+arredondamento para baixo em `Leitura.kt` derrubou o ouro; original restaurado.
+
+Pedidos M-01/M-02 e avaliação REV-01 continuam aguardando resposta do Claude
+em `docs/NECESSIDADES-UI.md`. APK compilado não é interface vista funcionando:
+não houve emulador/aparelho, nem sensor ou nuvem real. A seleção de catálogo e
+os cinco destinos nativos seguem na faixa Codex/UI, sem delegar desenho ao motor.

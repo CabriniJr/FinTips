@@ -143,7 +143,7 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
   const isToday = selectedDay === localDay();
   return <>
     <PageHeading overline={isToday ? "Rotina diária" : "Histórico da rotina"} title={isToday ? "Hoje" : "Seu dia"}
-      description="Sua vida tem mais de uma dimensão. Dê espaço a cada uma."/>
+      description="Seu dia, em seis áreas da vida."/>
     <div className="week-strip" aria-label="Selecionar dia da semana">{Array.from({ length: 7 }, (_, i) => {
       const d = shiftDay(start, i), date = new Date(`${d}T12:00:00`);
       return <button key={d} aria-pressed={d === selectedDay} aria-label={date.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
@@ -156,7 +156,7 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
       <button className="icon-button" aria-label="Próxima semana" onClick={() => setDay(shiftDay(selectedDay, 7))}><Icon name="arrow" size={18}/></button>
       {!isToday && <button className="text-button" onClick={() => setDay(localDay())}>Hoje</button>}</div>
     <section className="day-summary"><div><div className="eyebrow">Progresso registrado</div><h2>{progress.total ? `${progress.done} de ${progress.total} tarefas feitas` : "Pronto para começar"}</h2>
-      <p>{progress.total ? "O progresso vem do que você registra, uma tarefa de cada vez." : "Comece pelo que faz sentido para você."}</p></div>
+      {!progress.total && <p>Adicione uma tarefa para acompanhar o dia.</p>}</div>
       <div className="daily-gauge"><div className="daily-value" aria-label={`${progress.pct}% das tarefas concluídas`}>{progress.total ? <>{progress.pct}<small>%</small></> : "—"}</div><div className="daily-track" aria-hidden="true"><i style={{ width: `${progress.pct}%` }}/></div><small>{progress.total ? "tarefas concluídas" : "sem tarefas ainda"}</small></div>
     </section>
     <Tasks life={life} selectedDay={selectedDay} add={() => setForm(true)} toast={toast}/>
@@ -169,11 +169,16 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
 
 export function LifeAreas({ life, selectedDay, areaId, setArea, toast, ir }) {
   const [form, setForm] = useState(false);
+  const tabs = useRef(null);
   const area = AREAS.find((a) => a.id === areaId) || AREAS[0];
+  useEffect(() => {
+    const row = tabs.current, active = row?.querySelector('[aria-pressed="true"]');
+    if (active) row.scrollTo({ left: row.scrollLeft + active.getBoundingClientRect().left - row.getBoundingClientRect().left - (row.clientWidth - active.offsetWidth) / 2 });
+  }, [area.id]);
   const plans = life.state.planos.filter((p) => p.atributo === area.id && !p.concluido);
   return <>
     <PageHeading code="02" overline="Seis áreas · uma vida" title="Vida" description="Você escolhe o que cultivar em cada uma."/>
-    <div className="area-tabs" aria-label="Áreas da vida">{AREAS.map((a) => <button key={a.id} aria-pressed={area.id === a.id} onClick={() => setArea(a.id)}><Icon name={a.icone} size={18}/>{a.nome}</button>)}</div>
+    <div ref={tabs} className="area-tabs" aria-label="Áreas da vida">{AREAS.map((a) => <button key={a.id} aria-pressed={area.id === a.id} onClick={() => setArea(a.id)}><Icon name={a.icone} size={18}/>{a.nome}</button>)}</div>
     <section className="area-feature" style={{ "--area": area.cor }}><AreaBadge id={area.id}/><h2>{area.detalhe}</h2><p>{area.id === "OURO" ? "Suas escolhas financeiras também fazem parte da vida que você está construindo." : "Defina a sua intenção. Transforme-a em um passo possível para hoje."}</p>
       <div className="area-feature-stats"><span><b>{dailyProgress(life.state, selectedDay, area.id).total}</b> tarefas neste dia</span><span><b>{plans.length}</b> planos em andamento</span></div>
       {area.id === "OURO" && <button className="life-button" onClick={() => ir("visao")}>Abrir finanças <Icon name="arrow" size={17}/></button>}

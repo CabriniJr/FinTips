@@ -62,7 +62,8 @@ precisa do motor no próprio aparelho para usar essa parte.
 
 - Coleta automática de estatísticas e permissões Android/iOS.
 - Compartilhamento do novo contexto com ChatGPT.
-- APK, app iOS ou interface Compose nativa.
+- Os cinco destinos e tracker completos em Compose; o APK compilado nesta
+  entrega tem somente a tela do dia. App iOS permanece pendente.
 - Migração e sincronização entre navegadores, dispositivos e motor Kotlin.
 - Sincronização direta com a nuvem do Librera; a importação de arquivo local
   já funciona. [Discovery do formato e limites do pacing](LEITURA-LIBRERA.md).

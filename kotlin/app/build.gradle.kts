@@ -1,8 +1,8 @@
-// Invólucro Android. NUNCA FOI COMPILADO — ver o aviso em motor/build.gradle.kts.
+// Android opcional. assembleDebug validado em 14/10/2026; ver docs/VISUAL.md.
 plugins {
-    id("com.android.application") version "8.5.2"
-    kotlin("android") version "2.0.21"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21"
+    id("com.android.application")
+    kotlin("android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -22,8 +22,17 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
+}
+
 dependencies {
     implementation(project(":motor"))
+    // Esta tela importa Clock/LocalDate diretamente; não depender da
+    // dependência implementation interna do motor para compilá-los.
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
     val compose = "1.7.5"
     implementation("androidx.compose.ui:ui:$compose")
     implementation("androidx.compose.foundation:foundation:$compose")

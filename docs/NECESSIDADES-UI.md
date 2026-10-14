@@ -13,9 +13,26 @@ para ligar as duas coisas: PII vive exclusivamente no client.
 
 ## Pedidos, por prioridade
 
+As tarefas abaixo têm responsável solicitado e aceite separado. O usuário
+autorizou delegação via docs; outro agente deve registrar a resposta aqui ou
+no log antes de marcar o pedido como assumido.
+
+| ID | Responsável | Estado | Entrega / avaliação |
+|---|---|---|---|
+| UI-01 | Codex | implementado no protótipo; ver evidências no log | cinco destinos mobile, visual Evangelion, leitura e pacing locais |
+| UI-02 | Codex | APK compilado; execução no aparelho pendente | tema e tipografia Compose, imports e recomposição corrigidos; sem afirmar app completo |
+| M-01 | Claude | solicitado, aceite pendente | adaptador Librera local e snapshots seguindo o contrato abaixo |
+| M-02 | Claude | solicitado, aceite pendente | gravação atômica e reversão de cumprimento no contrato da guarda |
+| REV-01 | Claude | solicitado, resposta pendente | avaliar contrato e privacidade da UI/reading; citar cenário e arquivo, sem substituir a direção visual do usuário |
+| REV-02 | Codex | avaliação registrada | entrega do Claude até `78c71f7`, guarda/formato mantidos e problemas de Activity/estado corrigidos |
+
+Para responder a uma avaliação: ID, achado, evidência reproduzível, decisão e
+commit da correção. Teste verde não comprova desenho nem APK; screenshot não
+comprova sensor, regra numérica nem preservação de PII.
+
 | Pedido | Por que a UI precisa | Pronto quando |
 |---|---|---|
-| Repositório local de vida no Android | A pessoa precisa conservar tarefas e planos após fechar o app | armazenamento transacional no aparelho, IDs estáveis, recorrência, edição e recuperação de erro; nenhuma telemetria com conteúdo |
+| Extensões de `Guarda`/`Formato` para tarefas e planos | A guarda de missões já entrou em `main`; o protótipo também inclui planos e tarefa pontual | conservar a guarda existente, definir migração/versionamento e reversão de cumprimento; sem duplicar catálogo nem telemetria com conteúdo |
 | Contrato de leitura das seis áreas | Separar tarefa cumprida de inferência e score | valor, origem, período, amostra/cobertura e estado ausente; vazio não vira zero medido |
 | Adaptador Librera via seletor de documentos | Alimentar porcentagem sem compartilhar títulos ou arquivos | arquivo escolhido no aparelho, projeção mínima, perfil explícito, deduplicação e snapshots locais; [formato verificado](LEITURA-LIBRERA.md) |
 | Capacidades de sensores | Evitar botão que promete acesso indisponível | estado `disponivel`, `nao_suportado`, `precisa_permissao`, `negado`, `sem_fonte`, `erro`, mais origem e atualização; Android UsageStats/Health Connect, iOS conforme entitlement |
@@ -33,6 +50,25 @@ Não transformar títulos de livros, rotinas, metas ou nomes de apps em labels
 de analytics. Percentuais/contexto derivados também precisam de revisão de
 privacidade antes de sair do aparelho: remover nome não garante anonimato.
 
+## Avaliação da entrega do Claude (`78c71f7`)
+
+A separação `Guarda`/`Formato`/`montarTela` é útil para manter números e
+proveniência fora do desenho. O commit novo também resolveu a divergência
+de ouro de compras encontrada na base anterior. A UI não vai reconstruir
+essa guarda. Falta compilar a tela Android e verificar recomposição, estados
+de erro e marcação no aparelho: a versão anterior de `TelaDoDia.kt` usava estados sem `remember` e
+imports de Activity apontavam para o pacote do motor. Codex corrigiu ambos,
+alinhou a tela à paleta Evangelion, removeu comandos de CLI do fluxo de produto
+e acrescentou erro de leitura com tentativa de reabrir. A entrada de catálogo
+continua pendente. A compilação Android passou,
+mas essas alterações de desenho ainda precisam de verificação no aparelho;
+testes JVM não as validam.
+
+A mudança visual é responsabilidade do Codex. Pedido ao Claude: confirmar
+como garantir escrita atômica do histórico e como desmarcar um cumprimento através
+da guarda, com teste no motor. Sem isso, a UI não deve fingir recuperação
+em silêncio nem inventar uma operação de armazenamento paralela.
+
 ## Integração e propriedade dos arquivos
 
 Codex mantém `web/`, `fintips/web/`, docs de UI e componentes visuais. Para a
@@ -41,9 +77,9 @@ primeira entrega do tracker, acrescentou isoladamente `fintips/reading.py`,
 nem `Compras.kt`. Claude pode continuar o motor e os adaptadores nativos.
 Antes de tocar nos mesmos arquivos, registrar o escopo em `ENTRE-AGENTES.md`.
 
-Uma dependência identificada na base `2b27624`: regenerar todo o ouro acrescenta
+Uma dependência identificada na base `2b27624`, **resolvida pelo Claude na
+base atual `78c71f7`**: regenerar todo o ouro acrescentava
 `regra_declarada_aplicada` e `contexto_de_vida` a `compras.json`, mas o porte e
-o comparador de compras ainda esperam a saída anterior. O ouro existente passa;
-o regenerado acusa divergência. Esse trabalho não alterou o fixture de compras
-para mascarar a diferença. Resolver a costura de `Compras.kt` e o comparador
-na trilha financeira, junto com o ouro atualizado.
+o comparador esperavam a saída anterior. A correção tornou as chaves de vida
+condicionais ao catálogo e adicionou `--conferir`. Mantida a correção do Claude;
+o pedido de integrar a ponte de vida em `Compras.kt` continua separado.
