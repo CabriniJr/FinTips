@@ -730,3 +730,17 @@ adaptadores Librera/UsageStats/Health Connect, com aceite pendente. Validação
 de teclado, Voltar, insets, recriação, acessibilidade e movimento deve ocorrer
 em Android; web/iOS deixam de ser prioridade de novas entregas. PII permanece
 exclusivamente no client e automação continua objetivo de produto.
+
+**2026-10-14 · build Android e release solicitadas pelo usuário**
+
+O usuário aprovou a UI e autorizou publicar build/release no GitHub. Codex
+prepara `android-v0.6.0-alpha.3`: mesmo pacote e assinatura das entregas
+anteriores, versionCode 3, UI offline aprovada, notas com funcionalidades reais
+e pendências. O APK permanece WebView nesta alpha; não é migração Compose
+concluída. Não substituir pela variante release com uma única tela.
+
+`RELEASES-ANDROID.md` descreve build, evidências, arquivos, tag/rascunho e
+publicação; as notas estão em `docs/releases/`. Nenhuma chave de assinatura
+entra no Git ou nos anexos. A integração ainda respondeu 403 na tentativa de
+criar branch; preparação continua, publicação depende de escrita efetiva no
+repo. Não considerar estes docs recebidos pelo Claude enquanto não houver push.

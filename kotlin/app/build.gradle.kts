@@ -12,14 +12,14 @@ android {
         applicationId = "com.fintips.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
+        versionCode = 3
         versionName = "0.6.0"
     }
     buildFeatures { compose = true }
     buildTypes {
         getByName("debug") {
             applicationIdSuffix = ".ui"
-            versionNameSuffix = "-ui-preview.2"
+            versionNameSuffix = "-ui-preview.3"
         }
     }
     // APK de avaliação: a UI revisada roda sem servidor no próprio aparelho.
