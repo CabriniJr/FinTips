@@ -73,31 +73,46 @@ importa menos que alguém conferir os conflitos abaixo.**
 
 ## Colisões abertas
 
-Simulado com `git merge --no-commit` entre as duas branches: **seis arquivos
-em conflito de conteúdo.** Não são erro de ninguém — são dois trabalhos
-honestos no mesmo arquivo. O que cada um precisa:
+Simulado com `git merge --no-commit` entre as duas branches: **seis arquivos,
+sete hunks, todos do tipo "os dois acrescentaram no mesmo ponto".** Nenhum é
+reescrita disputada, e nenhum exige escolher um lado — a resolução é *ficar com
+os dois*, em qualquer ordem.
 
-| Arquivo | O que colide | Proposta |
-|---|---|---|
-| `fintips/report.py` | `analyze()` reescrito de um lado; `load_vida()` acrescentado do outro | ficar com o `analyze()` dele e reaplicar `load_vida()` por cima — são blocos independentes |
-| `fintips/mcp_server.py` | ferramentas novas nos dois lados, e a `_SPEC` editada nos dois | as ferramentas somam; a `_SPEC` precisa ser lida pelos dois pedaços e refeita à mão uma vez |
-| `fintips/purchases.py` | `evaluate()` ganhou parâmetro nos dois lados (`precedentes` lá, `vida` aqui) | somar os dois parâmetros; a ordem no veredito precisa de decisão humana — ver abaixo |
-| `fintips/api.py` | rotas novas nos dois lados | somam; conflito é só de vizinhança |
-| `README.md` | seção "O que ele faz" com item novo nos dois | somam |
-| `docs/PORTE-KOTLIN.md` | a tabela da fila, reescrita nos dois | **já reduzido**: a trilha de vida saiu da fila e virou tabela própria (`V1`–`V4`), para as linhas numeradas serem só da fila do porte |
+| Arquivo | Hunks | O que colide | Resolução |
+|---|---|---|---|
+| `fintips/report.py` | 1 | linha de `import` (`life` de um lado, `decisions` do outro) | importar os dois |
+| `fintips/mcp_server.py` | 2 | `import`, e os argumentos novos em `avaliar_compra` | os dois |
+| `fintips/purchases.py` | 1 | `evaluate()` ganhou parâmetro nos dois lados: `vida`/`hoje` aqui, `precedentes`/`aprendizados` lá | os quatro parâmetros |
+| `fintips/api.py` | 1 | os mesmos argumentos, na rota `/api/purchase` | os dois |
+| `README.md` | 1 | item novo na seção "O que ele faz" | os dois |
+| `docs/PORTE-KOTLIN.md` | 1 | duas **seções novas** no mesmo ponto: "Os dois motores lado a lado" e "O harness cego de novo" | as duas, uma depois da outra |
 
-### A colisão que não é de texto
+A tabela da fila do porte **não** colide mais: a trilha de vida saiu das linhas
+numeradas e virou tabela própria (`V1`–`V4`), para as linhas `8b`/`9`/`10` serem
+só da fila do porte.
 
-Em `purchases.evaluate`, os dois lados acrescentaram coisa que **mexe no
-veredito**. Isso não é merge, é decisão de produto, e ela não é de agente
-nenhum:
+Depois de resolver, rodar as duas suítes e a trava de PII antes de qualquer
+push. `purchases.evaluate` com quatro parâmetros novos é o ponto onde um erro de
+merge passaria em silêncio: os dois blocos de contexto entram na saída em
+chaves diferentes (`contexto_de_vida` e `precedentes`), então os testes dos dois
+lados devem passar juntos sem adaptação. Se um deles falhar, o merge comeu um
+bloco.
 
-- a regra de espera declarada (`espera_antes_de_comprar`) — do lado da vida;
-- o que a trilha do porte acrescentou ao redor de precedentes e perfil.
+### A convergência que vale registrar
 
-Quando duas regras podem mudar o mesmo veredito, a ordem entre elas é uma
-escolha com consequência visível na tela. **Isso vai para o usuário, não para
-o merge.**
+Os dois lados acrescentaram contexto a `purchases.evaluate` sem combinar nada,
+e os dois chegaram à mesma fronteira. Do lado dos precedentes, escrita no
+código: *"isto não move o veredito, e a omissão é deliberada. Ter se
+arrependido de uma compra parecida não torna esta errada."* Do lado da vida:
+colisão de missão, sequência e meses de aporte informam; só a regra que a
+pessoa assinou mexe no veredito, e mexe porque é decisão já tomada, não leitura
+do motor.
+
+Isso não é coincidência bonita — é a regra de proveniência fazendo o trabalho
+dela em dois agentes que não se falaram. **Quem mexer em `evaluate` daqui para
+frente herda essa fronteira:** contexto novo entra informando. Se algo novo
+precisar mover o veredito, ele precisa ser uma decisão da própria pessoa, com
+`porque`, e precisa aparecer nomeado na saída.
 
 ## Protocolo
 
@@ -174,3 +189,16 @@ Duas coisas para quem escrever fixture ou exemplo daqui para frente:
   do plano ficam em bloco dobrado (`porque: >`) e `grep` de linha pega só o
   `>`. Se você acrescentar campo de texto livre a um arquivo de `data/`,
   acrescente o nome do campo ao conjunto `TEXTO` no script.
+
+**2026-10-14 · correção da entrada acima, por quem a escreveu**
+
+A primeira versão desta seção de colisões dizia que havia uma **decisão de
+produto pendente** em `purchases.evaluate`, porque os dois lados teriam
+acrescentado coisa que mexe no veredito. Está errado, e a correção importa mais
+que o erro: o lado dos precedentes diz explicitamente, no docstring, que não
+move o veredito. Não há ordem a decidir, nem nada a levar ao usuário.
+
+Eu afirmei isso antes de ler o código do outro lado — tinha lido só o nome dos
+parâmetros no hunk de conflito. A lição é a de sempre neste repositório, agora
+aplicada a mim: **ler o hunk não é ler o código.** O merge inteiro é mecânico,
+sete hunks, ficar com os dois lados em todos.
