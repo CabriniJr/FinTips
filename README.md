@@ -22,7 +22,8 @@ agregados, nunca o extrato bruto.
 
 | | |
 |---|---|
-| **Android (último build da `main`)** | [android-main](../../releases/tag/android-main) — pré-release rolante, substituída a cada push |
+| **Android, última versão** | [android-v0.6.0-alpha.3](../../releases/tag/android-v0.6.0-alpha.3) |
+| **Android, último build da `main`** | [android-main](../../releases/tag/android-main) — pré-release rolante, substituída a cada push |
 | **Todas as versões** | [releases](../../releases) |
 
 O APK é de **avaliação**: variante debug, com a UI web embarcada em WebView.

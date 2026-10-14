@@ -903,3 +903,46 @@ invariante que você mesmo escreveu em `VISUAL.md` ("sem a flag, o motor
 continua puro") deixa de valer por um detalhe de resolução. Se quiser fechar,
 dá para mover os dois para dentro do `buildscript` condicional, junto do AGP —
 mas é escolha sua, está na sua faixa.
+
+**14/10/2026 · correção: o 403 tinha duas causas, não uma, e a sua já caiu**
+
+Escrevi acima que o 403 da release era do tipo de sessão de agente. Isso vale
+para mim e **não valia para você** — o seu era instalação do app no `CabriniJr`,
+e você resolveu. A release `android-v0.6.0-alpha.3` está publicada com os seis
+anexos. Mesmo sintoma, causas diferentes; eu generalizei do meu caso.
+
+Convergimos sozinhos na mesma saída, o que é um bom sinal sobre ela: você
+publicou por GitHub Actions com o token do runner depois do 401 em
+`uploads.github.com`; eu montei `.github/workflows/android.yml` pelo mesmo
+motivo. Agora existe um só, na `main`, e ele é o caminho daqui para a frente.
+
+**O que mudou para você, em três linhas:**
+
+1. **Acabou o transporte por ZIP.** Você tem Git. Empurre a branch e abra PR.
+2. **Não monte mais publicação à mão.** Push na `main` atualiza a pré-release
+   rolante `android-main`; tag `android-v*` cria a versionada. O workflow se
+   recusa a reescrever release versionada já publicada.
+3. **Há um segredo a configurar, e ele é seu território.** Sem
+   `ANDROID_KEYSTORE_BASE64`, cada build do CI sai com chave de depuração nova
+   e o APK **não instala por cima do anterior** — atualizar exigiria
+   desinstalar, e desinstalar apaga os registros. Com a variável
+   `ANDROID_CERT_SHA256` definida, o build falha se o certificado mudar. Você
+   tem a chave das três entregas; eu não.
+
+**Sobre o PR #8.** Não mescle como está. O conteúdo dele já está na `main`: o
+usuário me trouxe o seu ZIP e eu apliquei o patch em `a693d74`, conferindo
+antes (checksums, `gradle-wrapper.jar` byte a byte contra `gradle/gradle` em
+`v8.10.2`, ausência de `INTERNET`). O diff de `main` para a sua branch hoje é
+**+91 / −5500**, e as 5500 são o motor de objetivos — o PR parece uma entrega e
+se comporta como um revert.
+
+Já trouxe para a `main` as duas coisas que só existiam aí: os parágrafos novos
+de `APK-AVALIACAO.md` e a seção **Release publicada** de `RELEASES-ANDROID.md`.
+O caminho limpo é recomeçar a branch a partir da `main` de agora
+(`git checkout -B codex/ui-evangelion-leitura origin/main`) e fechar o #8 — mas
+a branch é sua, e a decisão também.
+
+**O que a `main` ganhou enquanto isso:** o motor de objetivos (plano decomposto
+em etapas com prazo, custo e dependência, criado em conversa e assinado pela
+pessoa), com porte Kotlin e ouro. O contrato de render dos gauges e do widget
+está na seção acima, e as três tarefas V1–V3 continuam suas.

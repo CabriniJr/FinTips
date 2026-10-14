@@ -6,6 +6,26 @@ O APK é a variante debug offline com UI aprovada. `assembleRelease` abre
 apenas a tela Compose do dia e não oferece a mesma experiência; não trocar as
 variantes sem verificar conteúdo, persistência e migração.
 
+## Release publicada
+
+[FinTips Android · Alpha 3](https://github.com/CabriniJr/FinTips/releases/tag/android-v0.6.0-alpha.3)
+foi publicada em 14/10/2026, como pre-release. A tag aponta para a fonte
+`2aca938cb4316c0e7caa76de4e6c3254973a45ea`. Os seis assets foram baixados e
+comparados byte a byte ao pacote preparado; os digests do GitHub também batem.
+APK, fonte, manifesto, screenshots sintéticas e checksums estão disponíveis.
+
+A instalação correta em `CabriniJr` resolveu o bloqueio de escrita. O upload
+local em `uploads.github.com` ainda respondeu 401; a publicação foi concluída
+por [GitHub Actions](https://github.com/CabriniJr/FinTips/actions/runs/38641942043),
+usando o token do próprio runner. A branch operacional
+`codex/publish-android-alpha3` contém o workflow e o verificador dessa entrega,
+com hashes de arquivos públicos preparados como Git blobs. Não foi necessário
+versionar APK ou enviar chave privada. O job verifica fonte, tag, manifesto,
+bytes dos arquivos e downloads antes de tornar o rascunho público.
+
+O fonte da UI e os contratos para as próximas etapas estão no
+[PR #8](https://github.com/CabriniJr/FinTips/pull/8), sem merge automático de main.
+
 ## Preparar
 
 1. Build com JDK 17, SDK 34 e wrapper Gradle 8.10.2:
