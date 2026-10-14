@@ -1,9 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/identidade/assinatura.svg">
-    <source media="(prefers-color-scheme: light)" srcset="docs/identidade/assinatura-clara.svg">
-    <img src="docs/identidade/assinatura.svg" alt="FinTips — uma vida em perspectiva" width="760">
-  </picture>
+  <img src="docs/identidade/banner-readme.png" alt="FinTips — uma vida em perspectiva; FT âmbar e instrumentos vermelhos sobre preto" width="960">
 </p>
 
 <p align="center">
@@ -212,12 +208,12 @@ na mesma forma. Chanfro em todos os cantos vira losango e perde o sentido.
 
 ### A palavra
 
-`FINTIPS` em caixa alta, condensada e pesada, com as contraformas retangulares
-— sem curva em lugar nenhum. A assinatura alinha a altura do painel da marca
+`FINTIPS` em Barlow Condensed Black: caixa alta, condensada e pesada, usando a
+mesma família tipográfica do app. A assinatura alinha a altura do painel da marca
 com a altura da caixa alta da palavra, e é isso que faz as duas lerem como uma
 peça só em vez de um ícone encostado num texto.
 
-A linha `UMA VIDA EM PERSPECTIVA` vem em monoespaçada, espaçada, em texto
+A linha `UMA VIDA EM PERSPECTIVA` vem em Barlow Condensed SemiBold, espaçada, em texto
 secundário. Ela é posicionamento, não slogan: o app não é sobre dinheiro, é
 sobre uma vida da qual o dinheiro é uma das seis frentes.
 
@@ -265,9 +261,11 @@ Esta é a parte da identidade que não se vê e é a que mais define o produto.
 
 ### Usando
 
-Os arquivos estão em [`docs/identidade/`](docs/identidade/) e são gerados, não
-desenhados à mão — `marca.svg`, `assinatura.svg`, `assinatura-clara.svg` e
-`paleta.svg`.
+O [kit de identidade](docs/identidade/README.md) contém ícones, logos
+transparentes em versões clara, escura e de uma tinta, favicons e banners
+para README, social preview do GitHub, Open Graph e releases. SVG, PNG e ICO
+são reproduzidos com `python3 scripts/gerar-identidade.py`; a ilustração de
+campanha é uma peça complementar. Fontes e instruções estão no kit.
 
 Não estique a marca fora de proporção, não gire o chanfro, não troque o âmbar
 por outra cor para "combinar" com um fundo, e não ponha a assinatura sobre

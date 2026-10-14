@@ -1152,3 +1152,46 @@ custo o deixaria no fim da lista para sempre.
 Ouro novo: `perfil-tempo.json`, com a aritmética de meses de calendário. As
 sabotagens mostraram que `dias / 30` erra exatamente na virada de mês, que é
 quando o app começa a perguntar.
+
+**14/10/2026 · Codex — kit público de identidade, após o handoff visual**
+
+Pedido do usuário: ícone, logos, banners e assets fora do aplicativo.
+Faixa desta entrega: `docs/identidade/`, os geradores em `scripts/` e somente
+cabeçalho/texto de identidade do README. Base: `c682891`. Motor, telas,
+permissões e APK não foram alterados.
+
+O FT conserva os contornos do launcher Android, agora com contraformas
+transparentes. Ícone externo com margem para avatar circular (64 a 1024 px),
+favicon com margem menor, logos claros/escuros e de uma tinta, banners para
+README, GitHub social preview, Open Graph e releases. Troquei a palavra
+geométrica por Barlow Condensed Black, a família do app. **Todas as letras,
+inclusive frases e rótulos, continuam em paths**: nenhum SVG depende de uma
+fonte instalada no leitor. Aviso OFL e origem no guia do kit.
+
+`python3 scripts/gerar-identidade.py` exporta SVG, PNG e ICO usando as
+ferramentas fixadas em `docs/identidade/requirements.txt`. `campanha.png` é uma
+ilustração complementar gerada com a ferramenta de imagem do ChatGPT; não é a
+fonte do logo e não é reescrita pelo gerador. Os instrumentos são decorativos,
+sem registros pessoais ou scores inventados.
+
+**Para Claude reutilizar:** escolha os arquivos pelo guia
+`docs/identidade/README.md`; não recopie os paths nem crie outra palavra-marca.
+Use `banner-release.png` com URL fixada à tag nas próximas notas de release.
+O social preview está pronto como arquivo, mas não foi configurado nas
+Settings do GitHub. O launcher do aplicativo segue como estava.
+
+Conferência: inspeção das peças renderizadas, exportação idêntica em duas
+execuções (inclusive fora da raiz), transparência dos logos, tamanhos PNG/ICO,
+SVGs sem fontes, scripts ou recursos externos; 233 testes Python, 136 JVM e
+19 arquivos de ouro conferidos. Varredura de PII antes do push.
+
+**CI da trilha paralela:** PR #10 (`codex/ci-android-watch`) passou no Actions
+em `2a24593`. Compilação debug/release, verificador offline e upload do artefato
+concluídos em https://github.com/CabriniJr/FinTips/actions/runs/38646830962 .
+O APK isolado `com.fintips.app.ci` está no artefato
+https://github.com/CabriniJr/FinTips/actions/runs/38646830962/artifacts/11932832911 .
+O download local do artefato foi bloqueado pelo proxy no domínio de armazenamento;
+a conferência desse APK foi executada no runner, não repetida localmente.
+O usuário decidiu configurar `ANDROID_KEYSTORE_BASE64` depois: não gerar uma
+nova assinatura para uma atualização de `com.fintips.app.ui`. PR #10 mantém a
+publicação compatível bloqueada até receber a chave das alphas.
