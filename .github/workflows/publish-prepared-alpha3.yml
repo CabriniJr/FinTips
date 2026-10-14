@@ -1,0 +1,23 @@
+name: Publish verified FinTips Android alpha 3
+
+on:
+  push:
+    branches: [codex/publish-android-alpha3]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-fintips-android-alpha3
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify prepared assets, upload, verify downloads, publish alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/publish_prepared_alpha3.py

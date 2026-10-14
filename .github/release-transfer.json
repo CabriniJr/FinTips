@@ -1,0 +1,44 @@
+{
+  "repository": "CabriniJr/FinTips",
+  "release_id": 413204503,
+  "tag": "android-v0.6.0-alpha.3",
+  "source_commit": "2aca938cb4316c0e7caa76de4e6c3254973a45ea",
+  "assets": [
+    {
+      "name": "FinTips-Android-v0.6.0-alpha.3.apk",
+      "blob_sha": "cd040511a0fdd1cf6a341e3832e3d42658df83d4",
+      "size": 9686545,
+      "sha256": "917dcac3bf0ae59a0f2c12fbdc150508ea1d9fcf78b747bc905289b967f23e1c"
+    },
+    {
+      "name": "FinTips-Android-v0.6.0-alpha.3-source.zip",
+      "blob_sha": "a2b15bbe1fa0b3e01539c206a16b280583b27ccc",
+      "size": 970981,
+      "sha256": "42dee1680c3a6a2f725a348eb09b2101b40bb5c8626237ddb3fcff6564f43deb"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "blob_sha": "307aff88bf336c4bee93257c2f0be384cd9d37f4",
+      "size": 444,
+      "sha256": "0782b4bb172bb0df569c84ddaa31c426e24954739c9f1d04e18fa1a20d898167"
+    },
+    {
+      "name": "build-info.json",
+      "blob_sha": "b204a5a3adc83dd2cb8a8ada4f8246f733fc52ca",
+      "size": 1322,
+      "sha256": "a7e2e256d77657a970d443fb97b429503d93f8d2bd26d4d273369c2f5b6b6a20"
+    },
+    {
+      "name": "hoje.png",
+      "blob_sha": "61429e32118ec2afa890b1f5861497dc3a82bef7",
+      "size": 40065,
+      "sha256": "d3604f0d19893c62bafa4c6c088f2192859704946d43e74365347d19508d078a"
+    },
+    {
+      "name": "leitura.png",
+      "blob_sha": "6a8b10234400791939457e1f78fef37e26cf90c6",
+      "size": 123507,
+      "sha256": "1f9985772ff31aa6e192cbb653a0d4c03ecd69592a9230375542a4f8769f4886"
+    }
+  ]
+}
