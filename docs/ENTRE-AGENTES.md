@@ -45,7 +45,8 @@ resolver.
 | Faixa | Arquivos | Quem toca |
 |---|---|---|
 | **Porte financeiro** | `kotlin/motor/src/*/com/fintips/motor/*.kt` (raiz), `ouro/{projecao,planos,compras,causas,perfil,yaml,contratos}.json`, `docs/PORTE-KOTLIN.md` (tabela da fila) | quem está portando a fila |
-| **Vida e Android** | `fintips/life.py`, `kotlin/.../motor/vida/`, `ouro/vida.json`, `docs/APP-DE-VIDA.md`, `fintips/rules/exemplo-missoes.yaml` | quem está no app de vida |
+| **Vida e motor do aparelho** | `fintips/life.py`, `kotlin/.../motor/vida/`, `ouro/vida.json`, `docs/APP-DE-VIDA.md`, `fintips/rules/exemplo-missoes.yaml` | quem está no app de vida |
+| **Visual** | `kotlin/app/` (tela Compose, `:app`), `web/src/*.css`, `web/src/*.jsx`, `docs/VISUAL.md` | **a trilha visual** — ver a entrega no log |
 | **Compartilhado** | `fintips/report.py`, `mcp_server.py`, `api.py`, `purchases.py`, `contracts.py`, `workspace.py`, `scripts/gerar-ouro.py`, `README.md`, `pyproject.toml` | **os dois — avise no log** |
 
 Na faixa compartilhada, duas regras que evitam quase todo conflito:
@@ -129,10 +130,11 @@ de pronto volta meio feita.
 | 6b | `Heuristica` — o piso de categorias | porte | livre, **depende de 10b** | ouro da classificação fecha com o Python sobre o fixture |
 | 7b | gasto invisível | porte | livre, depende de 6b | ouro fecha; o comparador deixa de mostrar renda zerada |
 | 9c | `Alavancas`, `Triagem`, `Dossie` | porte | livre | com elas fecham o `contexto_pessoal` e os `precedentes` das compras no Kotlin |
-| V3 | App Android: as seis barras e a lista do dia | vida | **lógica pronta** (16 testes, inclusive "sobrevive a fechar o app"); a tela Compose e o módulo `:app` **não compilaram** — sem SDK nesta máquina | falta: abrir no Android Studio e ver rodar |
+| V3 | Motor do aparelho: formato, guarda, estado da tela | vida | **pronto**, 16 testes, inclusive "sobrevive a fechar o app" | feito |
+| V3-tela | A tela do dia em Compose, dentro do sistema visual | **visual** | **entregue à trilha visual** — ver a entrega no log | compila, roda no aparelho, usa os tokens de `docs/VISUAL.md`, tem o gesto e tem tema escuro |
 | V4 | Sensores (tempo de tela, passos) como registro `sensor` | vida | assumido pela trilha de vida, **depende de V3** | `cobertura_de_evidencia` sai de 0% sem ninguém digitar nada |
 | V5 | Ponte de vida em Kotlin (`contextoDeCompra`, `contextoDePlanos`) | vida | **pronto o cálculo**; a ligação ainda espera a costura em `Compras.kt` — pedido 3 | feito: `ouro/vida.json` tem 57 casos e o Kotlin fecha com `fintips/life.py` |
-| V6 | Painel: as seis barras ao lado do score | vida | assumido pela trilha de vida | aba lendo `/api/life`, sem número inventado quando o catálogo está vazio |
+| V6 | Painel: as seis barras ao lado do score | **visual** | **entregue à trilha visual** | aba lendo `/api/life`, sem número inventado quando o catálogo está vazio |
 | — | **Mesclar as duas branches no `main`** | — | **do usuário** | sete hunks, receita acima; ninguém mescla a branch do outro por conta própria |
 
 ## Pedidos diretos à trilha do porte
@@ -447,3 +449,108 @@ Duas correções, as duas valendo para os dois lados:
 
 Quem for mesclar qualquer coisa daqui para frente: **rode `--conferir` depois do
 merge, não antes.** O conflito de texto você vê; o ouro velho, não.
+
+---
+
+## Entrega da faixa visual
+
+A partir daqui, **a tela é da trilha visual**: a tela Compose do Android, o
+painel web e o sistema em `docs/VISUAL.md`. O motor continua do outro lado.
+
+O corte não é "quem gosta de design" — é onde o teste existe. Número tem
+harness; desenho não tem e não vai ter, porque desenho errado se vê na tela e
+número errado, não. Então a fronteira é o contrato abaixo, e ela é estreita de
+propósito.
+
+### O que vem pronto
+
+| O que | Onde | Estado |
+|---|---|---|
+| sistema visual escrito | `docs/VISUAL.md` | **novo**: tokens, gesto, tempo, regra da cor |
+| estado da tela, pronto para desenhar | `montarTela(vida, hoje)` em `vida/Tela.kt` | 16 testes |
+| a tela, escrita e **nunca compilada** | `kotlin/app/.../TelaDoDia.kt` | ponto de partida, não entrega |
+| guarda e formato do aparelho | `vida/Guarda.kt`, `vida/Formato.kt` | prontos; a tela só chama |
+| o painel inteiro | `web/src/` | funcionando |
+
+`montarTela` devolve tudo que a tela precisa e nada além: as seis frentes com
+percentual, a lista do dia com título, sequência, recorde, se foi medido por
+aparelho, e a cobertura de evidência. **Se faltar um dado para desenhar algo,
+peça no log** — o campo nasce em `Tela.kt`, com teste, e não numa conta dentro
+do Compose.
+
+### O contrato
+
+Quatro regras, as quatro com motivo e três com teste:
+
+1. **A tela não calcula.** Todo número vem de `montarTela` ou de `/api/*`.
+   Cálculo na camada de desenho não tem harness atrás.
+2. **A tela não elogia e não cobra.** O resumo é "1 de 2 hoje". Há teste
+   proibindo palavra de elogio (`o_resumo_nao_elogia_nem_cobra`). "Você está
+   indo bem" é o app opinando sobre o dia de alguém com base em caixas
+   marcadas, e é a frase que faz desinstalar no primeiro dia ruim.
+3. **A tela não esconde o vazio.** As seis frentes aparecem sempre; a vazia
+   mostra `—`. Frente sem missão é informação.
+4. **A tela não marca nada sozinha.** Toque é origem `usuario`; o app nunca
+   grava `presumido`.
+
+Dentro disso, **a decisão visual é da trilha visual, sem pedir licença**:
+tipografia, espaçamento, ordem, animação, como a barra cresce, se a lista é
+cartão ou linha, tema escuro, acessibilidade. Não preciso ser consultado para
+nada disso, e não vou "revisar" desenho.
+
+### A primeira tarefa, e ela é minha dívida
+
+`TelaDoDia.kt` **está fora do sistema visual**, e a culpa é minha: usei uma
+paleta cinza-azulada que não é a do projeto, enquanto resolvia o problema de
+armazenamento, e ninguém conferiu porque a tela não compila nesta máquina.
+
+```kotlin
+TINTA = 0xFF1B1E24   // deveria ser --ink: #000000
+PAPEL = 0xFFEDEEF1   // deveria ser --paper: #f4f3f0
+LINHA = 0xFFB9BEC8   // deveria ser --line: tinta cheia
+```
+
+Mais três dívidas no mesmo arquivo, listadas em `docs/VISUAL.md`: não há tema
+escuro, **o gesto não existe** (o cartão não anda na direção da sombra ao
+toque — e o gesto é a linguagem, não enfeite) e a sombra está simulada por uma
+`Box` deslocada em vez do `--lift` de tinta cheia.
+
+Sinta-se livre para **jogar o arquivo fora e reescrever**. Ele é ponto de
+partida porque alguém precisava escrever algo que chamasse `montarTela`, não
+porque o desenho esteja certo.
+
+### Como ver rodando
+
+```bash
+cd kotlin && ./gradlew -Pfintips.android=true :app:assembleDebug
+```
+
+Aviso que economiza uma hora: **isto nunca rodou.** Escrevi `app/build.gradle.kts`
+e o manifesto numa máquina sem SDK e com `dl.google.com` respondendo 403, então
+AGP e androidx não foram resolvidos nenhuma vez. Trate os dois arquivos como
+rascunho — se a configuração estiver errada, corrija sem cerimônia e diga no log
+o que era, porque eu não tenho como descobrir daqui.
+
+Para desenhar, você não precisa do workspace de ninguém:
+
+```bash
+fintips aparelho --exemplo --saida missoes.json   # o molde do pacote
+```
+
+Exporta as 14 missões do molde genérico, com as duas pontas que a tela precisa
+exercitar: uma missão com `valor_mensal`, uma com `colide_com`, missões em cinco
+cadências e as frentes `AGI`, `VIT` e `OURO` **vazias no dia** — que é o caso em
+que a barra tem de mostrar `—` em vez de zero disfarçado. Zero dado pessoal: é o
+mesmo arquivo que o `check-pii.sh` confere.
+
+Com o catálogo de verdade de quem usa o app, é sem `--exemplo`:
+
+```bash
+fintips aparelho --saida missoes.json     # e copie para o aparelho
+```
+
+### O que eu continuo fazendo
+
+Motor, formato, guarda, ponte com o dinheiro, sensores (V4) e o canal. Se a tela
+precisar de um dado novo, de um campo diferente ou de outra forma de agrupar,
+**é pedido no log e eu faço** — com teste, do lado onde teste existe.

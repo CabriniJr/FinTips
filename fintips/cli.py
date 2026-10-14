@@ -29,6 +29,7 @@ from pathlib import Path
 import yaml
 
 from . import levers
+from . import life
 from . import plans as plans_mod
 from . import purchases, report
 from .analysis import baseline
@@ -368,6 +369,24 @@ def cmd_aparelho(args) -> None:
     foi marcado no aparelho.
     """
     ws = _ws(args)
+
+    if args.exemplo:
+        # O molde genérico do pacote, não o catálogo da pessoa. Existe para
+        # quem trabalha na tela: desenhar precisa de dado, e exigir o workspace
+        # de alguém para ver uma barra desenhada é fricção sem motivo. Zero
+        # dado pessoal aqui — é o mesmo arquivo que o `check-pii.sh` conferiu.
+        molde = Path(__file__).parent / "rules" / "exemplo-missoes.yaml"
+        vida = life.carregar(molde)
+        payload = life.exportar_para_aparelho(vida)
+        texto = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+        if args.saida:
+            Path(args.saida).expanduser().write_text(texto, encoding="utf-8")
+            print(f"{len(payload['missoes'])} missões de EXEMPLO em {args.saida}")
+            print("é o molde do pacote, não o seu catálogo — serve para desenhar a tela")
+        else:
+            print(texto, end="")
+        return
+
     vida = report.load_vida(ws)
 
     if args.registros:
@@ -500,6 +519,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--saida", metavar="ARQUIVO", help="grava em vez de imprimir")
     ap.add_argument("--registros", metavar="JSONL",
                     help="absorve o histórico que voltou do aparelho")
+    ap.add_argument("--exemplo", action="store_true",
+                    help="exporta o molde do pacote em vez do seu catálogo "
+                         "(para trabalhar na tela sem workspace)")
     ap.set_defaults(func=cmd_aparelho)
 
     mc = sub.add_parser("mcp-config")

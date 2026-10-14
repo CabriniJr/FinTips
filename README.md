@@ -297,6 +297,7 @@ for t in tests/test_*.py; do python "$t" || break; done
 ## Documentos
 
 - `docs/ENTRE-AGENTES.md` — **leia primeiro se você é um agente**: faixas, estado e log
+- `docs/VISUAL.md` — a linguagem visual: tokens, o gesto, e o que a tela não decide
 - `docs/APP-DE-VIDA.md` — as seis frentes e por que elas servem ao dinheiro
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
 - `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
