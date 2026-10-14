@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108" role="img" aria-label="Marca do FinTips">
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108" role="img" aria-labelledby="title">
+  <title id="title">Marca do FinTips</title>
   <rect width="108" height="108" fill="#080808"/>
-  <g transform="scale(1.00000)"><path d="M24,24H72L84,36V84H24Z" fill="#ffa342"/><path d="M36,40H49V45H41V50H48V55H41V67H36Z" fill="#080808"/><path d="M53,40H72V45H65V67H60V45H53Z" fill="#080808"/></g>
-</svg>
+  <path d="M0 0H48L60 12V60H0Z M12 16H25V21H17V26H24V31H17V43H12Z M29 16H48V21H41V43H36V21H29Z" fill="#ffa342" fill-rule="evenodd" transform="translate(24,24) scale(1.000000)"/>
+  </svg>
