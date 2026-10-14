@@ -1105,3 +1105,50 @@ O APK é debug, e a chave de assinatura de um app Android não pode ser trocada
 depois — publicar com a errada significa nunca mais conseguir atualizar. O
 caminho está escrito no documento (upload key + Play App Signing), e é decisão
 do usuário, não nossa.
+
+**14/10/2026 · perfil: história, envelhecimento e migração**
+
+Três dívidas estruturais do perfil pagas — as três do tipo que, deixadas para
+depois, só se consertam mexendo no arquivo que mora na máquina da pessoa.
+
+**1. O perfil tinha amnésia.** Reassinar um eixo guardava só o nome do
+arquétipo anterior em `substituiu`; o `porque`, a data e a evidência de quem
+assinou antes sumiam. Num projeto cuja premissa é guardar o porquê, o perfil
+era o único lugar onde ele se perdia. Agora há `perfil-historico.jsonl`, em
+append, e `travessias()` devolve os pontos em que a pessoa deixou de ser uma
+coisa e virou outra, com o `porque` dos dois lados. Reconfirmar não é mudar:
+reassinar o mesmo arquétipo entra no histórico e não vira travessia.
+
+**2. A assinatura não envelhecia.** Um traço de três anos atrás continuava
+contando 100% de cobertura. Cada eixo passa a declarar `validade_em_meses` —
+consumo 6, renda 12, fase de vida 36 —, a cobertura separa `pct` de
+`pct_valido`, e a **triagem passa a perguntar**. Essa última parte é o que
+impede o envelhecimento de ser só um campo bonito num JSON: o app saberia que o
+traço está velho e nunca perguntaria.
+
+O traço envelhecido **não some e não deixa de valer**. O app só passa a
+perguntar se ainda é assim.
+
+**3. Não havia degrau de migração.** `migrar()` existe antes de ser
+necessário, e é de propósito: o arquivo está na máquina da pessoa e não há como
+implantar correção nele. Quando o formato mudar sem migração, o app escolhe
+entre recusar o perfil inteiro ou interpretá-lo errado em silêncio. Versão do
+futuro é recusada em vez de adivinhada.
+
+**Para a sua faixa**, duas coisas novas de render:
+
+- `/api/portrait` — o retrato: os cinco eixos financeiros, as frentes fracas de
+  hoje e os compromissos com prazo, numa leitura só. **Não há número agregado,
+  de propósito** — índice único de perfil descreveria todo mundo. Se a tela
+  precisar de um número grande, use `ainda_valido_pct`, não invente um.
+- `/api/profile/history` — as travessias. A tela boa aqui é uma linha do tempo
+  com os dois `porque` lado a lado; é o que responde "o que mudou em mim".
+
+E um item novo na triagem, `perfil_a_reconfirmar`, que precisa de tratamento
+visual diferente dos outros: ele não é um problema a resolver, é uma pergunta
+sobre quem a pessoa é hoje. `impacto_mensal` é 0 de propósito — ordenar por
+custo o deixaria no fim da lista para sempre.
+
+Ouro novo: `perfil-tempo.json`, com a aritmética de meses de calendário. As
+sabotagens mostraram que `dias / 30` erra exatamente na virada de mês, que é
+quando o app começa a perguntar.

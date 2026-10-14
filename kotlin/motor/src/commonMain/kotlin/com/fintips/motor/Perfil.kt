@@ -1,5 +1,6 @@
 package com.fintips.motor
 
+import kotlinx.datetime.LocalDate
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.log10
@@ -408,5 +409,38 @@ object Perfil {
     private fun semZerosAtoa(texto: String): String {
         if (!texto.contains('.')) return texto
         return texto.trimEnd('0').trimEnd('.')
+    }
+
+    /**
+     * Há quantos meses a assinatura de um traço foi dada.
+     *
+     * **Meses de calendário, não dias.** De 31/01 para 01/02 é um mês, mesmo
+     * sendo um dia — porque a pergunta é "já virou mês suficiente para eu
+     * perguntar de novo?", e não "quantos dias se passaram". Uma porta que
+     * usasse `dias / 30` acertaria a maioria e erraria exatamente nas viradas
+     * de mês, que é quando o app começa a perguntar.
+     *
+     * `null` quando a proveniência não trouxe data legível. Devolver 0 ali
+     * afirmaria que a assinatura é de hoje, que é a mentira mais conveniente
+     * possível num campo sobre envelhecimento.
+     *
+     * Data no futuro devolve 0, e não negativo: "assinado daqui a dois meses"
+     * não é idade negativa, é relógio errado.
+     */
+    fun idadeEmMeses(quando: String, hoje: LocalDate): Int? {
+        if (quando.isBlank()) return null
+        val d = try {
+            LocalDate.parse(quando.take(10))
+        } catch (e: IllegalArgumentException) {
+            return null
+        }
+        val meses = (hoje.year - d.year) * 12 + (hoje.monthNumber - d.monthNumber)
+        return maxOf(meses, 0)
+    }
+
+    /** O traço passou do prazo em que o eixo dele ainda diz algo. */
+    fun envelhecido(quando: String, validadeEmMeses: Int, hoje: LocalDate): Boolean {
+        val idade = idadeEmMeses(quando, hoje) ?: return false
+        return idade >= validadeEmMeses
     }
 }

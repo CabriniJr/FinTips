@@ -229,6 +229,39 @@ def cmd_perfil(args) -> None:
                          ensure_ascii=False, indent=2))
         return
 
+    if args.historico:
+        loja = st["perfil"]
+        travessias = loja.travessias(args.eixo or "")
+        if not travessias:
+            print("nenhuma travessia registrada ainda.")
+            print("Reconfirmar não é mudar: só entra aqui quem virou outra coisa.")
+            return
+        for t in travessias:
+            print(f"{t['quando'][:10]}  {t['eixo']}: {t['de']} → {t['para']}")
+            if t["porque_antes"]:
+                print(f"    antes: {t['porque_antes']}")
+            print(f"    agora: {t['porque_agora']}")
+        return
+
+    if args.retrato:
+        r = report.analyze(ws).get("retrato") or {}
+        d = r.get("dinheiro", {})
+        print(f"decidido: {d.get('decidido_pct', 0)}%  "
+              f"ainda válido: {d.get('ainda_valido_pct', 0)}%")
+        for e in d.get("eixos") or []:
+            marca = " (reconfirmar)" if e["envelhecido"] else ""
+            print(f"  {e['eixo']:<12} {e['arquetipo'] or '—'}{marca}")
+            if e["porque"]:
+                print(f"       {e['porque']}")
+        c = r.get("compromissos", {})
+        print(f"\ncompromissos: {len(c.get('objetivos') or [])} objetivo(s), "
+              f"{c.get('etapas_atrasadas', 0)} etapa(s) atrasada(s), "
+              f"R$ {c.get('restante_a_pagar', 0):.2f} a pagar")
+        fracas = (r.get("vida") or {}).get("frentes_fracas_hoje") or []
+        if fracas:
+            print(f"frentes fracas hoje: {', '.join(fracas)}")
+        return
+
     perfil = report.analyze(ws, st=st)["perfil"]
     cob = perfil["cobertura"]
     print(f"perfil assinado: {cob['assinados']}/{cob['eixos']} eixos ({cob['pct']}%)")
@@ -629,6 +662,11 @@ def build_parser() -> argparse.ArgumentParser:
     pf.add_argument("--nome"); pf.add_argument("--descricao")
     pf.add_argument("--porque", help="obrigatório ao assinar")
     pf.add_argument("--esquecer", metavar="EIXO")
+    pf.add_argument("--historico", action="store_true",
+                    help="as travessias: onde ela deixou de ser uma coisa e virou outra")
+    pf.add_argument("--retrato", action="store_true",
+                    help="dinheiro, vida e compromissos numa leitura só")
+    pf.add_argument("--eixo", help="filtra o histórico por eixo")
     pf.set_defaults(func=cmd_perfil)
 
     al = sub.add_parser("alavancas"); al.add_argument("--limite", type=int, default=8)

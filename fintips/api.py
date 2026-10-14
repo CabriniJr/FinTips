@@ -23,6 +23,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from . import profile as profile_mod
 from . import configuracao as cfg_mod
 from . import licencas as lic_mod
 from . import objetivos as objetivos_mod
@@ -350,6 +351,20 @@ def propor_reajuste(objetivo_id: str) -> dict:
     if obj is None:
         raise HTTPException(404, f"objetivo '{objetivo_id}' não existe")
     return objetivos_mod.reajuste_proposto(obj, checks, date.today())
+
+
+@app.get("/api/portrait")
+def retrato() -> dict:
+    """Quem é a pessoa: dinheiro, vida e compromissos, numa leitura só."""
+    return cache.get(_ws()).get("retrato") or {}
+
+
+@app.get("/api/profile/history")
+def historico_de_perfil(eixo: str = "", so_travessias: bool = True) -> dict:
+    """Como o perfil mudou, com o `porque` dos dois lados de cada travessia."""
+    loja = profile_mod.PerfilStore(_ws().perfil_path)
+    dados = loja.travessias(eixo) if so_travessias else loja.historico(eixo)
+    return {"eixo": eixo or "todos", "itens": dados, "quantas": len(dados)}
 
 
 @app.get("/api/settings")

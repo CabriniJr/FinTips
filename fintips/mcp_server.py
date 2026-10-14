@@ -27,6 +27,7 @@ from mcp.server.fastmcp import FastMCP
 from . import causes as causes_mod
 from . import decisions
 from . import dossier, levers, life, mapping, plans as plans_mod
+from . import profile as profile_mod
 from . import configuracao as cfg_mod
 from . import licencas as lic_mod
 from . import objetivos as objetivos_mod
@@ -221,6 +222,8 @@ _SPEC = {
         "seis_frentes": "frentes",
         "aporte_contra_planos": "aporte_vs_planos",
         "privacidade_e_licencas": "configuracao",
+        "quem_e_a_pessoa": "retrato",
+        "como_o_perfil_mudou": "historico_de_perfil",
         "objetivos_e_prazos": "objetivos",
     },
     "erros_que_o_motor_recusa": [
@@ -1181,6 +1184,55 @@ def reajustar(objetivo_id: str, aplicar: bool = False, porque: str = "") -> str:
     loja.save()
     return _json({"aplicado": proposta["movimentos"],
                   "objetivo": loja.objetivos[objetivo_id].to_dict()})
+
+
+@mcp.tool()
+def retrato() -> str:
+    """Quem é esta pessoa. **Leia antes de qualquer conselho.**
+
+    Junta as três camadas: os cinco eixos financeiros, as frentes de vida de
+    hoje e os compromissos com prazo. Um agente que lê só os eixos responde
+    "cabe na sobra" para alguém cuja prova é em três semanas.
+
+    Duas leituras mudam o que você pode afirmar:
+
+    `dinheiro.a_reconfirmar` lista eixos assinados há tempo demais para o ritmo
+    daquele eixo — consumo envelhece em 6 meses, fase de vida em 36. O traço
+    não deixou de valer: **pergunte se ainda é assim antes de usar**.
+
+    `ainda_valido_pct` é a cobertura que conta. `decidido_pct` inclui decisão
+    de três anos atrás, e tratá-la como atual é citar uma conversa de outra
+    vida de volta para a pessoa.
+
+    Não há número agregado de perfil, de propósito: índice único descreveria
+    todo mundo e não mudaria conta nenhuma."""
+    return _json(report.analyze(_ws()).get("retrato") or {})
+
+
+@mcp.tool()
+def historico_de_perfil(eixo: str = "", so_travessias: bool = True) -> str:
+    """Como o perfil dela mudou, e com que motivo de cada lado.
+
+    `so_travessias` devolve só os pontos em que ela deixou de ser uma coisa e
+    passou a ser outra, com o `porque` de antes e o de agora lado a lado — que
+    é o que responde "o que mudou em mim". A lista completa de assinaturas
+    inclui reconfirmações, e elas não são mudança.
+
+    Use quando ela perguntar por que o app a descreve assim, ou quando um traço
+    antigo parecer não bater com o que ela está dizendo agora: a travessia
+    costuma explicar a diferença melhor que qualquer dos dois traços sozinho."""
+    ws = _ws()
+    loja = profile_mod.PerfilStore(ws.perfil_path)
+    dados = loja.travessias(eixo) if so_travessias else loja.historico(eixo)
+    return _json({
+        "eixo": eixo or "todos",
+        "travessias" if so_travessias else "assinaturas": dados,
+        "quantas": len(dados),
+        "nota": (
+            "reconfirmar não é mudar: reassinar o mesmo arquétipo entra no "
+            "histórico e não vira travessia"
+        ),
+    })
 
 
 @mcp.tool()

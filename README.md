@@ -314,6 +314,8 @@ fintips triagem                                # o que está em aberto
 fintips categorias --criar transporte-trabalho --nome "Transporte — trabalho"
 fintips contexto --gravar moradia.situacao --valor com_familia
 fintips perfil                                 # sugestões, assinaturas, cobertura
+fintips perfil --retrato                       # dinheiro, vida e compromissos juntos
+fintips perfil --historico                     # como o perfil mudou, e por quê
 fintips perfil --assinar renda --arquetipo variavel --porque "sou PJ"
 fintips alavancas                              # o que muda o número, e quanto
 fintips decisoes --historico "celular"         # precedentes de um assunto
