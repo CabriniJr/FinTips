@@ -15,10 +15,15 @@ tools = [Path(p).parent for p in glob.glob(str(sdk / "build-tools/*/apksigner"))
 tools.sort(key=lambda p: tuple(int(x) for x in re.findall(r"\d+", p.name)))
 if not tools:
     raise SystemExit("Android build-tools/apksigner indisponíveis")
-tools = tools[-1]
+preferred = sdk / "build-tools/34.0.0"
+tools = preferred if (preferred / "apksigner").is_file() else tools[-1]
 apk = root / "kotlin/app/build/outputs/apk/debug/app-debug.apk"
 cert = subprocess.check_output([str(tools / "apksigner"), "verify", "--print-certs", str(apk)], text=True)
-digest = re.search(r"Signer #1 certificate SHA-256 digest: ([0-9a-fA-F]{64})", cert).group(1).lower()
+digests = {value.lower() for value in re.findall(
+    r"certificate SHA-256 digest:\s*([0-9a-f]{64})", cert, re.I)}
+if len(digests) != 1:
+    raise SystemExit(f"Não foi possível identificar um certificado único no apksigner {tools.name}")
+digest = digests.pop()
 expected_cert = os.environ.get("FINTIPS_EXPECTED_CERT", "").lower()
 if expected_cert and digest != expected_cert:
     raise SystemExit("Assinatura incompatível com o certificado esperado; publicação bloqueada")
