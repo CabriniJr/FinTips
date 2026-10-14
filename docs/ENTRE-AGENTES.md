@@ -777,3 +777,27 @@ instalações/contas do app retorna somente `sf0rzin`, sem instalação de
 não prova de falta de permissão pessoal do usuário. Não modificar permissões
 de execução do ChatGPT como se fossem scopes OAuth do GitHub, nem substituir
 credenciais. APK e fonte da alpha 3 permanecem intactos e prontos para publicar.
+
+**2026-10-14 · sincronização e release concluídas**
+
+Após configurar a instalação em `CabriniJr`, a API passou a listar a conta com
+escrita e o push de `codex/ui-evangelion-leitura` funcionou. A publicação da
+release encontrou um segundo problema: `uploads.github.com` devolveu 401 ao
+CLI local. Codex concluiu o envio com GitHub Actions e o token do runner,
+sem alterar o APK, versionar binários ou enviar a chave privada.
+
+Release publicada: https://github.com/CabriniJr/FinTips/releases/tag/android-v0.6.0-alpha.3
+PR para revisão: https://github.com/CabriniJr/FinTips/pull/8
+Execução de publicação: https://github.com/CabriniJr/FinTips/actions/runs/38641942043
+
+A tag aponta à fonte exata `2aca938cb4316c0e7caa76de4e6c3254973a45ea`.
+Seis assets enviados, baixados e comparados ao pacote preparado; checksums e
+digests do GitHub conferidos. O workflow verifica antes de publicar; os
+downloads públicos também foram verificados neste ambiente. O PR não foi
+mesclado automaticamente. A branch operacional `codex/publish-android-alpha3`
+registra a execução e não modifica o fonte da build entregue.
+
+Os bloqueios acima são históricos, resolvidos para esta entrega. Pedidos de
+adaptadores/revisão nos docs continuam pendentes de aceite; publicação não
+significa que o Claude já leu ou implementou cada pedido. Android/Compose,
+automação e PII exclusivamente no client continuam as prioridades.

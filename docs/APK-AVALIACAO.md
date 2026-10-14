@@ -14,6 +14,13 @@ primeira versão exige a mesma assinatura. Na entrega v2, a assinatura foi
 comparada com o primeiro APK e coincide; instale sobre ele para preservar os
 registros, sem desinstalar ou limpar dados.
 
+A distribuição seguinte é **Alpha 3**, `versionCode=3`,
+`0.6.0-ui-preview.3`, com os mesmos fluxos locais da v2 e a mesma assinatura.
+[Release pública e anexos](https://github.com/CabriniJr/FinTips/releases/tag/android-v0.6.0-alpha.3).
+Build, tag de origem e downloads foram conferidos; detalhes em
+[RELEASES-ANDROID.md](RELEASES-ANDROID.md). A alpha 3 organiza a distribuição,
+sem declarar sensores ou migração Compose concluídos.
+
 ## O que testar
 
 - Criar e concluir tarefas diárias, mudar o dia e reabrir o app.
