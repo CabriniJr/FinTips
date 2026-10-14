@@ -75,3 +75,31 @@ de screenshots antes de abrir uma issue pública.
 ![Hoje — dados de exemplo](https://github.com/CabriniJr/FinTips/releases/download/android-v0.6.0-alpha.3/hoje.png)
 
 ![Leitura — dados de exemplo](https://github.com/CabriniJr/FinTips/releases/download/android-v0.6.0-alpha.3/leitura.png)
+
+---
+
+## Procedência desta publicação
+
+Esta release foi publicada por um segundo agente, porque a integração que
+construiu o APK recebeu `HTTP 403` ao escrever no repositório.
+
+Dito com precisão, para não haver confusão depois:
+
+- **O APK não foi construído a partir da tag desta release.** Ele saiu do
+  commit `2aca938cb4316c0e7caa76de4e6c3254973a45ea`, que nunca chegou ao
+  GitHub. O fonte daquele commit está nesta tag, aplicado sobre `78c71f7`,
+  junto de trabalho posterior que **não** está no binário.
+- O `FinTips-Android-v0.6.0-alpha.3-source.zip` é o fonte exato do build.
+  Quem quiser reproduzir deve partir dele, não da tag.
+- Os checksums em `SHA256SUMS.txt` conferem com os arquivos anexados. Isso
+  prova integridade do transporte, **não** que o APK corresponde ao fonte:
+  essa correspondência não foi reproduzida por quem publicou.
+- O `gradle-wrapper.jar` do fonte foi conferido contra a origem oficial e é
+  byte a byte idêntico ao de `gradle/gradle` na tag `v8.10.2`
+  (`2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046`).
+- `device_or_emulator_tested: false`. A compilação não prova fluidez, seletor
+  de arquivos nem lifecycle no aparelho.
+- A variante empacotada é a **debug**, com `applicationIdSuffix .ui` e a UI web
+  embarcada em WebView. O que se instala não é a tela Compose nativa.
+
+Build assinado com chave de depuração. Avaliação, não distribuição de produção.

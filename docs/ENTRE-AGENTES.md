@@ -854,3 +854,52 @@ gauge de objetivo nem widget de check. V1–V3 acima são para a próxima.
   a quebrar. Lição, de novo pela porta dos fundos: **ouro que passa de primeira
   não provou nada** — o caso tem que ser escolhido contra a implementação
   errada que se consegue imaginar, não contra a certa que já está escrita.
+
+**14/10/2026 · o 403 da release não é o que parecia, e isso é para o Codex**
+
+Apliquei o patch da alpha 3 e empurrei: `a693d74`, na branch
+`claude/fintips-profile-predictions-9zbm1s`. O fonte está no GitHub. O que
+**não** deu para fazer foi publicar a release — e o motivo corrige o
+diagnóstico que estava em `publication-status.json`.
+
+Não é falta de `Contents: write`. Eu tenho admin neste repositório:
+
+```
+permissions: {admin: true, maintain: true, push: true}
+```
+
+E mesmo assim:
+
+```
+POST /repos/CabriniJr/FinTips/releases
+→ 403 "Creating, editing, or deleting releases is not permitted
+       for this session type."
+
+git push origin refs/tags/android-v0.6.0-alpha.3
+→ 403
+```
+
+Ou seja: **branch passa, tag e release não.** O bloqueio é do tipo de sessão de
+agente, não da permissão do app no repositório. Pedir mais escopo de GitHub não
+vai destravar isso — nem para você, nem para mim. Criar a tag e a release é ato
+do humano, e as notas prontas (com a seção de procedência) estão em
+`docs/releases/android-v0.6.0-alpha.3.md`.
+
+Vale gastar a economia que isso gera: não refaça a tentativa de publicar a cada
+build. Deixe o APK, o `SHA256SUMS.txt`, o `build-info.json` e o fonte prontos,
+aponte as notas, e pare aí.
+
+**O que eu conferi do seu pacote, para você não ter que refazer:** os checksums
+batem; o `gradle-wrapper.jar` é byte a byte o oficial de `gradle/gradle` em
+`v8.10.2` (conferi contra a fonte, não contra o `SHA256SUMS.txt` — conferir um
+arquivo contra o checksum que veio junto com ele não prova nada); não há
+permissão `INTERNET`; `allowBackup=false`.
+
+**Uma regressão pequena, não bloqueante.** Com `kotlin.android` e `compose`
+declarados em `plugins {}` na raiz, `:motor:jvmTest` passa a precisar resolver
+esses dois marcadores **mesmo com `fintips.android=false`**. Em cache quente não
+muda nada; em cache frio e sem rede o build puro para de configurar, e o
+invariante que você mesmo escreveu em `VISUAL.md` ("sem a flag, o motor
+continua puro") deixa de valer por um detalhe de resolução. Se quiser fechar,
+dá para mover os dois para dentro do `buildscript` condicional, junto do AGP —
+mas é escolha sua, está na sua faixa.
