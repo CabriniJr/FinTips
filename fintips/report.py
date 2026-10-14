@@ -16,6 +16,7 @@ três interfaces ao mesmo tempo.
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,7 @@ import yaml
 
 from . import analysis, causes as causes_mod, commitments, decisions, discovery, mapping
 from . import life
+from . import objetivos as obj_mod
 from . import plans as plans_mod
 from . import profile as profile_mod, projection
 from . import score as score_mod, taxonomy as tax_mod, triage
@@ -49,6 +51,16 @@ def load_vida(ws: Workspace) -> life.Vida:
     inteiro funcionando, só sem a camada de contexto das seis frentes.
     """
     return life.carregar(ws.missoes_path, ws.registros_path)
+
+
+def load_objetivos(ws: Workspace) -> tuple[list, list]:
+    """Abre os objetivos e os checks, se existirem.
+
+    Como as missões: ausência não é erro. Quem nunca conversou sobre objetivo
+    tem o motor financeiro inteiro de pé, só sem a camada que correlaciona.
+    """
+    loja = obj_mod.ObjetivoStore(ws.objetivos_path)
+    return list(loja.objetivos.values()), obj_mod.carregar_checks(ws.checks_path)
 
 
 def stores(ws: Workspace) -> dict[str, Any]:
@@ -269,6 +281,26 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         "abertas": [d.to_dict() for d in st["decisoes"].abertas()],
     }
 
+    # objetivos: o plano decomposto. Entra DEPOIS dos planos porque a
+    # correlação financeira lê o resultado deles — e entra como camada
+    # adicional, nunca mexendo no que já estava no contexto.
+    # O bloco sai sempre, mesmo vazio — como `planos`. Ele está em `DETALHE_EM`,
+    # e bloco que aparece só às vezes quebra a promessa de que todo bloco
+    # cortado diz por onde voltar. Com catálogo vazio, `gauges` ainda devolve
+    # as seis frentes, que é exatamente o que a tela inicial precisa desenhar
+    # para quem ainda não tem objetivo nenhum.
+    objetivos, checks = load_objetivos(ws)
+    hoje_ = date.today()
+    vida_ = load_vida(ws)
+    ctx["objetivos"] = {
+        "sem_objetivos_cadastrados": not objetivos,
+        "gauges": obj_mod.gauges(objetivos, checks, vida_, hoje_, planos=plan_results),
+        "agenda": obj_mod.agenda(objetivos, checks, hoje_, dias=14),
+        "perfil": obj_mod.contexto_de_perfil(
+            objetivos, checks, vida_, hoje_, planos=plan_results
+        ),
+    }
+
     ctx["projecao"] = projection.project(
         baseline=ctx["baseline"],
         fixed_monthly=fixo_mes,
@@ -332,6 +364,7 @@ DETALHE_EM = {
     "causas": "listar_causas",
     "decisoes": "listar_decisoes",
     "regras": "listar_regras",
+    "objetivos": "objetivos",
 }
 
 
@@ -361,6 +394,7 @@ def para_agente(ctx: dict[str, Any], *, topo: int = 8) -> dict[str, Any]:
     out["projecao"] = _projecao_curta(ctx.get("projecao") or {})
     out["causas"] = _causas_curtas(ctx.get("causas") or {})
     out["decisoes"] = _decisoes_curtas(ctx.get("decisoes") or {})
+    out["objetivos"] = _objetivos_curtos(ctx.get("objetivos") or {})
 
     nao_revisadas = ctx.get("categorias_nao_revisadas") or []
     out["categorias_nao_revisadas"] = {
@@ -378,6 +412,33 @@ def para_agente(ctx: dict[str, Any], *, topo: int = 8) -> dict[str, Any]:
         "não está aqui, chame a ferramenta — não suponha"
     )
     return out
+
+
+def _objetivos_curtos(bloco: dict) -> dict:
+    """O que o agente precisa saber antes de aconselhar, em poucas linhas.
+
+    O catálogo inteiro não cabe numa conversa e nem ajuda: etapa que vence em
+    junho do ano que vem gasta janela sem mudar nada. O que muda a resposta é
+    quantos objetivos ela carrega, o que está atrasado, e quantos rascunhos
+    seus estão parados esperando que ela diga sim.
+    """
+    perfil = bloco.get("perfil") or {}
+    objetivos = perfil.get("objetivos") or []
+    atrasadas = perfil.get("etapas_atrasadas") or []
+    return {
+        "quantos": len(objetivos),
+        "em_atraso": sorted({i["objetivo"] for i in atrasadas}),
+        "etapas_atrasadas": len(atrasadas),
+        "proxima_etapa": min(
+            (i for i in (bloco.get("agenda") or []) if i["prazo"]),
+            key=lambda i: i["prazo"], default=None,
+        ),
+        "rascunhos_esperando_assinatura": len(
+            perfil.get("rascunhos_aguardando_assinatura") or []
+        ),
+        "compromisso_restante": perfil.get("compromisso_total_restante", 0.0),
+        "detalhe_em": DETALHE_EM["objetivos"],
+    }
 
 
 def _perfil_curto(perfil: dict) -> dict:

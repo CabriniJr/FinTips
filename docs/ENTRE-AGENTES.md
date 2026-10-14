@@ -633,3 +633,113 @@ errando, e as três já viraram teste ou trava:
   duas.
 - **chave opcional que aparece como `null` é mudança de contrato disfarçada de
   acréscimo.** Quem me ensinou isso foi um teste alheio, não o meu.
+
+---
+
+## Objetivos, gauges e widget — entrega e delegação (14/10/2026)
+
+### O que entrou no motor
+
+`fintips/objetivos.py` e `kotlin/.../vida/Objetivos.kt`: o plano decomposto em
+etapas com prazo, custo e dependência, criado pela conversa, correlacionado ao
+plano financeiro e às missões. Desenho inteiro em `docs/APP-DE-VIDA.md`, na
+seção **Objetivos: o plano decomposto**. O que importa para quem desenha tela:
+
+- objetivo nasce **rascunho**; só depois de assinado entra em agenda, gauge,
+  score e transporte para o aparelho;
+- `adiamento` é dimensão do score, porque senão empurrar prazo compraria nota;
+- **dimensão sem base não vira zero** — ela sai da conta e `peso_aplicado`
+  encolhe.
+
+Números: 38 testes Python novos (177 no total), 131 Kotlin, ouro
+`objetivos.json` com 42 casos, dos quais 10 são empates exatos de
+arredondamento.
+
+### O contrato de render — é isto que a trilha visual consome
+
+Duas funções, e **nenhuma delas devolve forma**:
+
+```
+gauges(objetivos, checks, vida, hoje, planos=...) -> {
+  frentes:   [ {chave, rotulo, valor: 0-100, faixa, legenda, sem_base} ] × 6
+  objetivos: [ {chave, rotulo, valor, faixa, legenda, status,
+                peso_aplicado, peso_total,
+                proxima_etapa, proximo_prazo, dias_para_o_proximo, sem_base} ]
+  hoje:      { linhas, feitos, total, resumo }
+}
+
+checks_de_hoje(objetivos, checks, vida, hoje) -> {
+  linhas: [ {tipo: "missao"|"etapa", id, titulo, contexto, feito,
+             marcar: {...}} ]
+  feitos, total, resumo
+}
+```
+
+`faixa` ∈ `em_dia | bom | atencao | em_risco | travado | sem_base`. O motor não
+sabe o que é ponteiro, arco ou barra — trocar a forma não pode exigir mudança
+aqui, e mudar a fórmula não pode exigir mudança na tela.
+
+Quatro regras que o render não pode quebrar, e as quatro têm motivo:
+
+1. **`sem_base` não desenha zero.** Frente sem missão e score sem base não são
+   fracasso: são ausência de medida. Zero ali afirma um fracasso que não
+   aconteceu. Desenhe vazio, tracejado, o que o desenho pedir — menos cheio.
+2. **`peso_aplicado < peso_total` precisa aparecer.** Score 100 sobre peso 15
+   quer dizer "nada falhou ainda". Mostrar 100 limpo é inventar notícia boa.
+3. **Nenhum texto elogia nem cobra.** `resumo` é "1 de 2 hoje", e é assim de
+   propósito. Não acrescente "falta pouco".
+4. **`marcar` volta como veio.** É o payload que o motor espera de volta; o
+   widget não monta esse objeto, ele devolve.
+
+### Três tarefas, da trilha visual
+
+**V1 — tela inicial com os gauges.** Seis frentes + um gauge por objetivo
+assinado. Pronto quando: `sem_base` é visivelmente diferente de zero, o peso
+parcial aparece, e a tela abre sem a análise financeira inteira (a rota é
+`/api/goals`).
+
+**V2 — widget de check na tela inicial do celular.** Este é o pedido literal:
+*"quero um widget para dar os checks, vai ficar sempre na minha tela inicial"*.
+Consome `/api/goals/today`, que existe e é curta justamente por isso — widget
+que espera a análise inteira para desenhar duas linhas é widget que o sistema
+mata. Pronto quando: marca, sobrevive a fechar o app, e não oferece etapa
+bloqueada.
+
+**V3 — a tela do reajuste.** `/api/goals/{id}/readjust` devolve os movimentos
+e a folga antes/depois. Pronto quando: mostra o que vai andar **antes** de
+aplicar, e aplicar exige o motivo escrito. A proposta nasce `assinado: false`
+e a tela não pode aplicar sozinha.
+
+Se o desenho precisar de um número que o motor não dá, **peça aqui em vez de
+calcular aí**. Número calculado na tela não tem ouro e diverge do Kotlin na
+primeira mudança de fórmula.
+
+### Sobre a alpha 3 que chegou por fora
+
+O APK da `android-v0.6.0-alpha.3` foi revisado: checksums conferem, o
+`gradle-wrapper.jar` é byte a byte o oficial do `gradle/gradle` em `v8.10.2`,
+não há permissão `INTERNET` e `allowBackup=false`. O `app/build.gradle.kts`
+corrigido resolve a dívida que eu tinha deixado nomeada — obrigado.
+
+Duas coisas para o log, sem crítica nenhuma: a variante que vira APK é a
+`debug`, com `applicationIdSuffix .ui` e a UI web embarcada em WebView, então
+**o que se instala não é a tela Compose** — está escrito nas notas, e vale
+repetir aqui porque o quadro de tarefas fala em Compose. E
+`device_or_emulator_tested: false`: a compilação não prova lifecycle nem
+seletor de arquivo.
+
+O motor de objetivos entrou **depois** desse corte, então a alpha 3 não tem
+gauge de objetivo nem widget de check. V1–V3 acima são para a próxima.
+
+### Log
+
+- **14/10/2026, trilha de vida.** Objetivos entregues: motor, ouro, MCP, API e
+  CLI. Quatro sabotagens no Kotlin antes de considerar o porte pronto; as duas
+  primeiras falharam como deviam, e **as duas últimas passaram** — a cascata do
+  reajuste só precisava de uma passada porque minhas etapas estavam em ordem de
+  dependência, e "vale o primeiro check" não estava no ouro. Os dois buracos
+  viraram caso (`cadeia declarada ao contrario precisa do ponto fixo` e
+  `dois checks na mesma etapa: vale o primeiro`) e as quatro sabotagens passaram
+  a quebrar. Lição, de novo pela porta dos fundos: **ouro que passa de primeira
+  não provou nada** — o caso tem que ser escolhido contra a implementação
+  errada que se consegue imaginar, não contra a certa que já está escrita.

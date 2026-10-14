@@ -2071,6 +2071,333 @@ def ouro_vida() -> dict:
     }
 
 
+
+def ouro_objetivos() -> dict:
+    """O plano decomposto: situação da etapa, score e cascata do reajuste.
+
+    Dois lugares onde os motores divergem sem ninguém notar, e os dois estão
+    cobertos aqui de propósito:
+
+    - **o arredondamento do score.** `round(x, 1)` do Python é HALF_EVEN; a
+      divisão crua de `Double` no Kotlin não é. Um score que cai exatamente em
+      `.x5` separa os dois motores por um décimo e nenhuma tela mostra isso.
+      A família `empates_de_arredondamento` existe só para esse caso.
+    - **a cascata do reajuste.** O empurrão se propaga pela cadeia de
+      dependências, e uma implementação que só olha o vizinho direto acerta a
+      cadeia curta e erra a longa. Há caso com três níveis.
+
+    A dimensão sem base é o terceiro: ela sai da conta e encolhe o peso. Um
+    porte que trocasse `null` por zero daria score menor sem errar fórmula
+    nenhuma — e o teste de paridade é o único lugar onde isso aparece.
+    """
+    from datetime import date
+
+    from fintips import objetivos as ob
+
+    def etapa(eid, prazo=None, custo="0", dep=(), obrig=True, orig=None, adi=0):
+        return {
+            "id": eid, "titulo": eid, "tipo": "curso",
+            "prazo": prazo, "prazo_original": orig or prazo,
+            "custo": custo, "depende_de": list(dep),
+            "obrigatoria": obrig, "adiamentos": adi,
+        }
+
+    def objetivo(oid, etapas, comecou="2026-09-01", alvo="2026-12-01"):
+        return {
+            "id": oid, "titulo": oid, "porque": "caso de ouro",
+            "comecou_em": comecou, "data_alvo": alvo,
+            "origem": "agente", "etapas": etapas,
+        }
+
+    def check(oid, eid, dia):
+        return {"objetivo_id": oid, "etapa_id": eid, "dia": dia, "origem": "usuario"}
+
+    # ------------------------------------------------- situação de cada etapa
+    situacoes = []
+    base = objetivo("o1", [
+        etapa("a", "2026-09-30"),
+        etapa("b", "2026-10-14", dep=["a"]),
+        etapa("c", "2026-10-20", dep=["b"]),
+        etapa("sem-prazo"),
+    ])
+    for nome, feitos, hoje in [
+        ("nada feito, a venceu", [], "2026-10-14"),
+        ("a feita libera b", [("a", "2026-09-28")], "2026-10-14"),
+        ("b feita libera c", [("a", "2026-09-28"), ("b", "2026-10-10")], "2026-10-14"),
+        ("tudo antes de qualquer prazo", [], "2026-09-01"),
+    ]:
+        o = ob.Objetivo.from_dict(base)
+        o.assinado_em = date(2026, 9, 1)
+        cs = [ob.Check.from_dict(check("o1", e, d)) for e, d in feitos]
+        d = date.fromisoformat(hoje)
+        feito = ob.cumprimento(o, cs)
+        situacoes.append({
+            "nome": nome,
+            "hoje": hoje,
+            "feitos": [{"etapa": e, "dia": dd} for e, dd in feitos],
+            "etapas": {
+                e.id: ob.situacao_da_etapa(e, feito, d) for e in o.etapas
+            },
+            "status": ob.status_do_objetivo(o, cs, d),
+        })
+
+    # ------------------------------------------------------------------ score
+    def caso_de_score(nome, obj, feitos, hoje, missoes_ligadas=0, missoes_de_pe=0,
+                      custo_restante=None, disponivel=None):
+        o = ob.Objetivo.from_dict(obj)
+        o.assinado_em = date(2026, 9, 1)
+        cs = [ob.Check.from_dict(check(obj["id"], e, d)) for e, d in feitos]
+        d = date.fromisoformat(hoje)
+        # A correlação entra pelo resultado, não pela busca: o Kotlin recebe os
+        # mesmos números e não precisa portar a resolução do plano para provar
+        # que a fórmula do score é a mesma.
+        corr = {
+            "custo_restante": custo_restante if custo_restante is not None else 0.0,
+            "cobertura_financeira": (
+                {"disponivel_ate_la": disponivel} if disponivel is not None else None
+            ),
+            "missoes": [{"de_pe": i < missoes_de_pe} for i in range(missoes_ligadas)],
+        }
+        sc = ob.score_do_objetivo(o, cs, d, correlacao=corr)
+        return {
+            "nome": nome,
+            "hoje": hoje,
+            "objetivo": obj,
+            "feitos": [{"etapa": e, "dia": dd} for e, dd in feitos],
+            "correlacao": {
+                "custo_restante": corr["custo_restante"],
+                "disponivel_ate_la": disponivel,
+                "missoes_ligadas": missoes_ligadas,
+                "missoes_de_pe": missoes_de_pe,
+            },
+            "esperado": {
+                "score": sc["score"],
+                "faixa": sc["faixa"],
+                "peso_aplicado": sc["peso_aplicado"],
+                "status": sc["status"],
+                "componentes": [
+                    {"dimensao": c["dimensao"], "valor": c["valor"], "pontos": c["pontos"]}
+                    for c in sc["componentes"]
+                ],
+            },
+        }
+
+    scores = [
+        caso_de_score(
+            "comecou hoje: so adiamento tem base",
+            objetivo("s1", [etapa("a", "2026-11-01")], comecou="2026-10-14"),
+            [], "2026-10-14",
+        ),
+        caso_de_score(
+            "as cinco dimensoes com base",
+            objetivo("s2", [
+                etapa("a", "2026-09-30", custo="120.00"),
+                etapa("b", "2026-10-10", custo="180.00", dep=["a"]),
+                etapa("c", "2026-11-20", custo="900.00", dep=["b"]),
+            ]),
+            [("a", "2026-09-28")], "2026-10-14",
+            missoes_ligadas=2, missoes_de_pe=1,
+            custo_restante=1080.0, disponivel=1000.0,
+        ),
+        caso_de_score(
+            "empurrada tres vezes: prazo sem base, adiamento no chao",
+            objetivo("s3", [etapa("a", "2026-11-01", orig="2026-10-01", adi=3)]),
+            [], "2026-10-14",
+        ),
+        caso_de_score(
+            "um terco das etapas em metade do tempo",
+            objetivo("s4", [
+                etapa("a", "2026-09-20"), etapa("b", "2026-10-20"), etapa("c", "2026-11-20"),
+            ], comecou="2026-09-01", alvo="2026-11-01"),
+            [("a", "2026-09-20")], "2026-10-01",
+        ),
+        caso_de_score(
+            "dinheiro de sobra nao passa de 1",
+            objetivo("s5", [etapa("a", "2026-11-01", custo="100.00")]),
+            [], "2026-10-14",
+            custo_restante=100.0, disponivel=5000.0,
+        ),
+        caso_de_score(
+            "etapa opcional nao entra no ritmo",
+            objetivo("s6", [
+                etapa("a", "2026-09-20"),
+                etapa("b", "2026-10-20", obrig=False),
+            ], comecou="2026-09-01", alvo="2026-11-01"),
+            [("a", "2026-09-20")], "2026-10-01",
+        ),
+        caso_de_score(
+            "cumprida depois do prazo nao conta como no prazo",
+            objetivo("s7", [etapa("a", "2026-09-30")]),
+            [("a", "2026-10-05")], "2026-10-14",
+        ),
+        caso_de_score(
+            # Marcar de novo não pode piorar a nota de quem marcou no prazo. Um
+            # motor que guarda o ÚLTIMO check lê 05/10 aqui e tira a etapa do
+            # prazo — e nenhuma tela mostra isso acontecendo.
+            "dois checks na mesma etapa: vale o primeiro",
+            objetivo("s8", [etapa("a", "2026-09-30")]),
+            [("a", "2026-10-05"), ("a", "2026-09-28")], "2026-10-14",
+        ),
+    ]
+
+    # ------------------------------- empates: onde round(x, 1) separa os dois
+    #
+    # A nota de cada dimensão é fração exata, então o score bruto cai em
+    # valores que o binário representa sem erro — e é justamente aí que o
+    # empate de meio décimo existe de verdade, em vez de ser mascarado por
+    # ruído de ponto flutuante.
+    empates = []
+    # As combinações abaixo não foram escolhidas a olho: são as que caem
+    # **exatamente** em `.x5` na fórmula real (peso 70, com ritmo), onde o
+    # HALF_EVEN do Python e a divisão crua do Kotlin discordam por um décimo.
+    # As três últimas são frações de denominador ímpar, onde o erro de ponto
+    # flutuante entra antes do arredondamento — e aí a ordem das operações é
+    # que tem de bater, não só a regra de desempate.
+    for n_etapas, feitas, adiadas, nome in [
+        (8, 0, 1, "empate em 18.75"),
+        (8, 5, 1, "empate em 81.25"),
+        (8, 6, 3, "empate em 81.25 por outro caminho"),
+        (8, 7, 5, "empate em 81.25 com mais adiamento"),
+        (16, 0, 2, "empate em 18.75 com o dobro de etapas"),
+        (16, 9, 0, "empate em 81.25 sem adiamento"),
+        (16, 13, 8, "empate em 81.25 na ponta alta"),
+        (3, 1, 1, "um terco no prazo, um terco adiado"),
+        (6, 1, 2, "um sexto no prazo, um terco adiado"),
+        (7, 2, 3, "setimos contra setimos"),
+    ]:
+        etapas = []
+        feitos = []
+        for i in range(n_etapas):
+            adi = 1 if i < adiadas else 0
+            etapas.append(etapa(
+                f"e{i}", "2026-09-10", adi=adi,
+                orig="2026-09-09" if adi else "2026-09-10",
+            ))
+            if i < feitas:
+                feitos.append((f"e{i}", "2026-09-09"))
+        o = ob.Objetivo.from_dict(objetivo(f"t{n_etapas}-{feitas}-{adiadas}", etapas))
+        o.assinado_em = date(2026, 9, 1)
+        cs = [ob.Check.from_dict(check(o.id, e, d)) for e, d in feitos]
+        d = date(2026, 10, 14)
+        sc = ob.score_do_objetivo(o, cs, d, correlacao={"custo_restante": 0.0, "missoes": []})
+        empates.append({
+            "nome": nome,
+            "etapas": n_etapas, "cumpridas_no_prazo": feitas, "adiadas": adiadas,
+            "hoje": "2026-10-14",
+            "esperado": {
+                "score": sc["score"],
+                "peso_aplicado": sc["peso_aplicado"],
+                "componentes": [
+                    {"dimensao": c["dimensao"], "valor": c["valor"], "pontos": c["pontos"]}
+                    for c in sc["componentes"]
+                ],
+            },
+        })
+
+    # --------------------------------------------------------------- reajuste
+    reajustes = []
+    for nome, obj, feitos, hoje in [
+        (
+            "cadeia de tres niveis anda junta",
+            objetivo("r1", [
+                etapa("a", "2026-09-30"),
+                etapa("b", "2026-10-10", dep=["a"]),
+                etapa("c", "2026-10-25", dep=["b"]),
+                etapa("d", "2026-11-05", dep=["c"]),
+            ]),
+            [], "2026-10-14",
+        ),
+        (
+            "so a atrasada e quem depende dela se movem",
+            objetivo("r2", [
+                etapa("a", "2026-09-30"),
+                etapa("b", "2026-10-10", dep=["a"]),
+                etapa("solta", "2026-11-15"),
+            ]),
+            [("a", "2026-09-28")], "2026-10-14",
+        ),
+        (
+            "o maior empurrao vence quando ha duas dependencias",
+            objetivo("r3", [
+                etapa("a", "2026-09-10"),
+                etapa("b", "2026-10-10"),
+                etapa("c", "2026-10-20", dep=["a", "b"]),
+            ]),
+            [], "2026-10-14",
+        ),
+        (
+            "atraso que estoura a data alvo",
+            objetivo("r4", [
+                etapa("a", "2026-09-30"),
+                etapa("b", "2026-11-20", dep=["a"]),
+            ]),
+            [], "2026-11-25",
+        ),
+        (
+            # As etapas vêm em ordem INVERSA à da dependência. Com a lista em
+            # ordem natural, uma passada só já propaga a cadeia inteira — e uma
+            # implementação sem ponto fixo passa no teste por sorte. Aqui ela
+            # precisa de três passadas, e não passa por sorte.
+            "cadeia declarada ao contrario precisa do ponto fixo",
+            {
+                "id": "r7", "titulo": "r7", "porque": "caso de ouro",
+                "comecou_em": "2026-09-01", "data_alvo": "2027-01-15",
+                "origem": "agente",
+                "etapas": [
+                    etapa("d", "2026-12-20", dep=["c"]),
+                    etapa("c", "2026-12-10", dep=["b"]),
+                    etapa("b", "2026-11-30", dep=["a"]),
+                    etapa("a", "2026-09-30"),
+                ],
+            },
+            [], "2026-10-14",
+        ),
+        (
+            "nada a reajustar",
+            objetivo("r5", [etapa("a", "2026-12-20")]),
+            [], "2026-10-14",
+        ),
+        (
+            "etapa feita nao se move mesmo vencida",
+            objetivo("r6", [
+                etapa("a", "2026-09-30"),
+                etapa("b", "2026-10-10", dep=["a"]),
+            ]),
+            [("a", "2026-10-05"), ("b", "2026-10-12")], "2026-10-14",
+        ),
+    ]:
+        o = ob.Objetivo.from_dict(obj)
+        o.assinado_em = date(2026, 9, 1)
+        cs = [ob.Check.from_dict(check(obj["id"], e, d)) for e, d in feitos]
+        p = ob.reajuste_proposto(o, cs, date.fromisoformat(hoje))
+        reajustes.append({
+            "nome": nome,
+            "hoje": hoje,
+            "objetivo": obj,
+            "feitos": [{"etapa": e, "dia": dd} for e, dd in feitos],
+            "esperado": {
+                "movimentos": [
+                    {"etapa": m["etapa"], "de": m["de"], "para": m["para"],
+                     "dias": m["dias"], "motivo": m["motivo"]}
+                    for m in p["movimentos"]
+                ],
+                "folga_antes_em_dias": p["folga_antes_em_dias"],
+                "folga_depois_em_dias": p["folga_depois_em_dias"],
+                "estoura_o_alvo": p["estoura_o_alvo"],
+            },
+        })
+
+    return {
+        "fonte": "fintips.objetivos",
+        "pesos": dict(ob.PESOS),
+        "tipos_de_etapa": list(ob.TIPOS_DE_ETAPA),
+        "situacoes": situacoes,
+        "scores": scores,
+        "empates_de_arredondamento": empates,
+        "reajustes": reajustes,
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
@@ -2091,6 +2418,7 @@ GERADORES = {
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
     "vida.json": ouro_vida,
+    "objetivos.json": ouro_objetivos,
 }
 
 

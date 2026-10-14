@@ -1,0 +1,1571 @@
+{
+  "fonte": "fintips.objetivos",
+  "pesos": {
+    "prazo": 30,
+    "adiamento": 15,
+    "ritmo": 25,
+    "dinheiro": 15,
+    "constancia": 15
+  },
+  "tipos_de_etapa": [
+    "curso",
+    "prova",
+    "leitura",
+    "pratica",
+    "compra",
+    "entrega",
+    "outro"
+  ],
+  "situacoes": [
+    {
+      "nome": "nada feito, a venceu",
+      "hoje": "2026-10-14",
+      "feitos": [],
+      "etapas": {
+        "a": "atrasada",
+        "b": "bloqueada",
+        "c": "bloqueada",
+        "sem-prazo": "sem_prazo"
+      },
+      "status": "atrasado"
+    },
+    {
+      "nome": "a feita libera b",
+      "hoje": "2026-10-14",
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-09-28"
+        }
+      ],
+      "etapas": {
+        "a": "feita",
+        "b": "hoje",
+        "c": "bloqueada",
+        "sem-prazo": "sem_prazo"
+      },
+      "status": "em_andamento"
+    },
+    {
+      "nome": "b feita libera c",
+      "hoje": "2026-10-14",
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-09-28"
+        },
+        {
+          "etapa": "b",
+          "dia": "2026-10-10"
+        }
+      ],
+      "etapas": {
+        "a": "feita",
+        "b": "feita",
+        "c": "a_vencer",
+        "sem-prazo": "sem_prazo"
+      },
+      "status": "em_andamento"
+    },
+    {
+      "nome": "tudo antes de qualquer prazo",
+      "hoje": "2026-09-01",
+      "feitos": [],
+      "etapas": {
+        "a": "a_vencer",
+        "b": "bloqueada",
+        "c": "bloqueada",
+        "sem-prazo": "sem_prazo"
+      },
+      "status": "em_andamento"
+    }
+  ],
+  "scores": [
+    {
+      "nome": "comecou hoje: so adiamento tem base",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "s1",
+        "titulo": "s1",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-10-14",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-11-01",
+            "prazo_original": "2026-11-01",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [],
+      "correlacao": {
+        "custo_restante": 0.0,
+        "disponivel_ate_la": null,
+        "missoes_ligadas": 0,
+        "missoes_de_pe": 0
+      },
+      "esperado": {
+        "score": 100.0,
+        "faixa": "em_dia",
+        "peso_aplicado": 15,
+        "status": "em_andamento",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "as cinco dimensoes com base",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "s2",
+        "titulo": "s2",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "120.00",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-10-10",
+            "prazo_original": "2026-10-10",
+            "custo": "180.00",
+            "depende_de": [
+              "a"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "c",
+            "titulo": "c",
+            "tipo": "curso",
+            "prazo": "2026-11-20",
+            "prazo_original": "2026-11-20",
+            "custo": "900.00",
+            "depende_de": [
+              "b"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-09-28"
+        }
+      ],
+      "correlacao": {
+        "custo_restante": 1080.0,
+        "disponivel_ate_la": 1000.0,
+        "missoes_ligadas": 2,
+        "missoes_de_pe": 1
+      },
+      "esperado": {
+        "score": 69.0,
+        "faixa": "atencao",
+        "peso_aplicado": 100,
+        "status": "atrasado",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.5,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.7054,
+            "pontos": 17.64
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": 0.9259,
+            "pontos": 13.89
+          },
+          {
+            "dimensao": "constancia",
+            "valor": 0.5,
+            "pontos": 7.5
+          }
+        ]
+      }
+    },
+    {
+      "nome": "empurrada tres vezes: prazo sem base, adiamento no chao",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "s3",
+        "titulo": "s3",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-11-01",
+            "prazo_original": "2026-10-01",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 3
+          }
+        ]
+      },
+      "feitos": [],
+      "correlacao": {
+        "custo_restante": 0.0,
+        "disponivel_ate_la": null,
+        "missoes_ligadas": 0,
+        "missoes_de_pe": 0
+      },
+      "esperado": {
+        "score": 0.0,
+        "faixa": "travado",
+        "peso_aplicado": 40,
+        "status": "em_andamento",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "um terco das etapas em metade do tempo",
+      "hoje": "2026-10-01",
+      "objetivo": {
+        "id": "s4",
+        "titulo": "s4",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-11-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-20",
+            "prazo_original": "2026-09-20",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-10-20",
+            "prazo_original": "2026-10-20",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "c",
+            "titulo": "c",
+            "tipo": "curso",
+            "prazo": "2026-11-20",
+            "prazo_original": "2026-11-20",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-09-20"
+        }
+      ],
+      "correlacao": {
+        "custo_restante": 0.0,
+        "disponivel_ate_la": null,
+        "missoes_ligadas": 0,
+        "missoes_de_pe": 0
+      },
+      "esperado": {
+        "score": 88.5,
+        "faixa": "em_dia",
+        "peso_aplicado": 70,
+        "status": "em_andamento",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 1.0,
+            "pontos": 30.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.6778,
+            "pontos": 16.94
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "dinheiro de sobra nao passa de 1",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "s5",
+        "titulo": "s5",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-11-01",
+            "prazo_original": "2026-11-01",
+            "custo": "100.00",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [],
+      "correlacao": {
+        "custo_restante": 100.0,
+        "disponivel_ate_la": 5000.0,
+        "missoes_ligadas": 0,
+        "missoes_de_pe": 0
+      },
+      "esperado": {
+        "score": 54.5,
+        "faixa": "em_risco",
+        "peso_aplicado": 55,
+        "status": "em_andamento",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "etapa opcional nao entra no ritmo",
+      "hoje": "2026-10-01",
+      "objetivo": {
+        "id": "s6",
+        "titulo": "s6",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-11-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-20",
+            "prazo_original": "2026-09-20",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-10-20",
+            "prazo_original": "2026-10-20",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": false,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-09-20"
+        }
+      ],
+      "correlacao": {
+        "custo_restante": 0.0,
+        "disponivel_ate_la": null,
+        "missoes_ligadas": 0,
+        "missoes_de_pe": 0
+      },
+      "esperado": {
+        "score": 100.0,
+        "faixa": "em_dia",
+        "peso_aplicado": 70,
+        "status": "concluido",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 1.0,
+            "pontos": 30.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "cumprida depois do prazo nao conta como no prazo",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "s7",
+        "titulo": "s7",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-10-05"
+        }
+      ],
+      "correlacao": {
+        "custo_restante": 0.0,
+        "disponivel_ate_la": null,
+        "missoes_ligadas": 0,
+        "missoes_de_pe": 0
+      },
+      "esperado": {
+        "score": 57.1,
+        "faixa": "atencao",
+        "peso_aplicado": 70,
+        "status": "concluido",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "dois checks na mesma etapa: vale o primeiro",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "s8",
+        "titulo": "s8",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-10-05"
+        },
+        {
+          "etapa": "a",
+          "dia": "2026-09-28"
+        }
+      ],
+      "correlacao": {
+        "custo_restante": 0.0,
+        "disponivel_ate_la": null,
+        "missoes_ligadas": 0,
+        "missoes_de_pe": 0
+      },
+      "esperado": {
+        "score": 100.0,
+        "faixa": "em_dia",
+        "peso_aplicado": 70,
+        "status": "concluido",
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 1.0,
+            "pontos": 30.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    }
+  ],
+  "empates_de_arredondamento": [
+    {
+      "nome": "empate em 18.75",
+      "etapas": 8,
+      "cumpridas_no_prazo": 0,
+      "adiadas": 1,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 18.7,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.875,
+            "pontos": 13.12
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "empate em 81.25",
+      "etapas": 8,
+      "cumpridas_no_prazo": 5,
+      "adiadas": 1,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 81.2,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.625,
+            "pontos": 18.75
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.875,
+            "pontos": 13.12
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "empate em 81.25 por outro caminho",
+      "etapas": 8,
+      "cumpridas_no_prazo": 6,
+      "adiadas": 3,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 81.3,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.75,
+            "pontos": 22.5
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.625,
+            "pontos": 9.38
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "empate em 81.25 com mais adiamento",
+      "etapas": 8,
+      "cumpridas_no_prazo": 7,
+      "adiadas": 5,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 81.2,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.875,
+            "pontos": 26.25
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.375,
+            "pontos": 5.62
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "empate em 18.75 com o dobro de etapas",
+      "etapas": 16,
+      "cumpridas_no_prazo": 0,
+      "adiadas": 2,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 18.7,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.875,
+            "pontos": 13.12
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.0,
+            "pontos": 0.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "empate em 81.25 sem adiamento",
+      "etapas": 16,
+      "cumpridas_no_prazo": 9,
+      "adiadas": 0,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 81.3,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.5625,
+            "pontos": 16.88
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 1.0,
+            "pontos": 15.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "empate em 81.25 na ponta alta",
+      "etapas": 16,
+      "cumpridas_no_prazo": 13,
+      "adiadas": 8,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 81.3,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.8125,
+            "pontos": 24.38
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.5,
+            "pontos": 7.5
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 1.0,
+            "pontos": 25.0
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "um terco no prazo, um terco adiado",
+      "etapas": 3,
+      "cumpridas_no_prazo": 1,
+      "adiadas": 1,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 53.8,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.3333,
+            "pontos": 10.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.6667,
+            "pontos": 10.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.7054,
+            "pontos": 17.64
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "um sexto no prazo, um terco adiado",
+      "etapas": 6,
+      "cumpridas_no_prazo": 1,
+      "adiadas": 2,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 34.0,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.1667,
+            "pontos": 5.0
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.6667,
+            "pontos": 10.0
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.3527,
+            "pontos": 8.82
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    },
+    {
+      "nome": "setimos contra setimos",
+      "etapas": 7,
+      "cumpridas_no_prazo": 2,
+      "adiadas": 3,
+      "hoje": "2026-10-14",
+      "esperado": {
+        "score": 46.1,
+        "peso_aplicado": 70,
+        "componentes": [
+          {
+            "dimensao": "prazo",
+            "valor": 0.2857,
+            "pontos": 8.57
+          },
+          {
+            "dimensao": "adiamento",
+            "valor": 0.5714,
+            "pontos": 8.57
+          },
+          {
+            "dimensao": "ritmo",
+            "valor": 0.6047,
+            "pontos": 15.12
+          },
+          {
+            "dimensao": "dinheiro",
+            "valor": null,
+            "pontos": null
+          },
+          {
+            "dimensao": "constancia",
+            "valor": null,
+            "pontos": null
+          }
+        ]
+      }
+    }
+  ],
+  "reajustes": [
+    {
+      "nome": "cadeia de tres niveis anda junta",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "r1",
+        "titulo": "r1",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-10-10",
+            "prazo_original": "2026-10-10",
+            "custo": "0",
+            "depende_de": [
+              "a"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "c",
+            "titulo": "c",
+            "tipo": "curso",
+            "prazo": "2026-10-25",
+            "prazo_original": "2026-10-25",
+            "custo": "0",
+            "depende_de": [
+              "b"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "d",
+            "titulo": "d",
+            "tipo": "curso",
+            "prazo": "2026-11-05",
+            "prazo_original": "2026-11-05",
+            "custo": "0",
+            "depende_de": [
+              "c"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [],
+      "esperado": {
+        "movimentos": [
+          {
+            "etapa": "a",
+            "de": "2026-09-30",
+            "para": "2026-10-14",
+            "dias": 14,
+            "motivo": "venceu sem check"
+          },
+          {
+            "etapa": "b",
+            "de": "2026-10-10",
+            "para": "2026-10-24",
+            "dias": 14,
+            "motivo": "venceu sem check"
+          },
+          {
+            "etapa": "c",
+            "de": "2026-10-25",
+            "para": "2026-11-08",
+            "dias": 14,
+            "motivo": "depende de etapa que atrasou"
+          },
+          {
+            "etapa": "d",
+            "de": "2026-11-05",
+            "para": "2026-11-19",
+            "dias": 14,
+            "motivo": "depende de etapa que atrasou"
+          }
+        ],
+        "folga_antes_em_dias": 26,
+        "folga_depois_em_dias": 12,
+        "estoura_o_alvo": false
+      }
+    },
+    {
+      "nome": "so a atrasada e quem depende dela se movem",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "r2",
+        "titulo": "r2",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-10-10",
+            "prazo_original": "2026-10-10",
+            "custo": "0",
+            "depende_de": [
+              "a"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "solta",
+            "titulo": "solta",
+            "tipo": "curso",
+            "prazo": "2026-11-15",
+            "prazo_original": "2026-11-15",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-09-28"
+        }
+      ],
+      "esperado": {
+        "movimentos": [
+          {
+            "etapa": "b",
+            "de": "2026-10-10",
+            "para": "2026-10-14",
+            "dias": 4,
+            "motivo": "venceu sem check"
+          }
+        ],
+        "folga_antes_em_dias": 16,
+        "folga_depois_em_dias": 16,
+        "estoura_o_alvo": false
+      }
+    },
+    {
+      "nome": "o maior empurrao vence quando ha duas dependencias",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "r3",
+        "titulo": "r3",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-10",
+            "prazo_original": "2026-09-10",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-10-10",
+            "prazo_original": "2026-10-10",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "c",
+            "titulo": "c",
+            "tipo": "curso",
+            "prazo": "2026-10-20",
+            "prazo_original": "2026-10-20",
+            "custo": "0",
+            "depende_de": [
+              "a",
+              "b"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [],
+      "esperado": {
+        "movimentos": [
+          {
+            "etapa": "a",
+            "de": "2026-09-10",
+            "para": "2026-10-14",
+            "dias": 34,
+            "motivo": "venceu sem check"
+          },
+          {
+            "etapa": "b",
+            "de": "2026-10-10",
+            "para": "2026-10-14",
+            "dias": 4,
+            "motivo": "venceu sem check"
+          },
+          {
+            "etapa": "c",
+            "de": "2026-10-20",
+            "para": "2026-11-23",
+            "dias": 34,
+            "motivo": "depende de etapa que atrasou"
+          }
+        ],
+        "folga_antes_em_dias": 42,
+        "folga_depois_em_dias": 8,
+        "estoura_o_alvo": false
+      }
+    },
+    {
+      "nome": "atraso que estoura a data alvo",
+      "hoje": "2026-11-25",
+      "objetivo": {
+        "id": "r4",
+        "titulo": "r4",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-11-20",
+            "prazo_original": "2026-11-20",
+            "custo": "0",
+            "depende_de": [
+              "a"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [],
+      "esperado": {
+        "movimentos": [
+          {
+            "etapa": "a",
+            "de": "2026-09-30",
+            "para": "2026-11-25",
+            "dias": 56,
+            "motivo": "venceu sem check"
+          },
+          {
+            "etapa": "b",
+            "de": "2026-11-20",
+            "para": "2027-01-15",
+            "dias": 56,
+            "motivo": "venceu sem check"
+          }
+        ],
+        "folga_antes_em_dias": 11,
+        "folga_depois_em_dias": -45,
+        "estoura_o_alvo": true
+      }
+    },
+    {
+      "nome": "cadeia declarada ao contrario precisa do ponto fixo",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "r7",
+        "titulo": "r7",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2027-01-15",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "d",
+            "titulo": "d",
+            "tipo": "curso",
+            "prazo": "2026-12-20",
+            "prazo_original": "2026-12-20",
+            "custo": "0",
+            "depende_de": [
+              "c"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "c",
+            "titulo": "c",
+            "tipo": "curso",
+            "prazo": "2026-12-10",
+            "prazo_original": "2026-12-10",
+            "custo": "0",
+            "depende_de": [
+              "b"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-11-30",
+            "prazo_original": "2026-11-30",
+            "custo": "0",
+            "depende_de": [
+              "a"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [],
+      "esperado": {
+        "movimentos": [
+          {
+            "etapa": "d",
+            "de": "2026-12-20",
+            "para": "2027-01-03",
+            "dias": 14,
+            "motivo": "depende de etapa que atrasou"
+          },
+          {
+            "etapa": "c",
+            "de": "2026-12-10",
+            "para": "2026-12-24",
+            "dias": 14,
+            "motivo": "depende de etapa que atrasou"
+          },
+          {
+            "etapa": "b",
+            "de": "2026-11-30",
+            "para": "2026-12-14",
+            "dias": 14,
+            "motivo": "depende de etapa que atrasou"
+          },
+          {
+            "etapa": "a",
+            "de": "2026-09-30",
+            "para": "2026-10-14",
+            "dias": 14,
+            "motivo": "venceu sem check"
+          }
+        ],
+        "folga_antes_em_dias": 26,
+        "folga_depois_em_dias": 12,
+        "estoura_o_alvo": false
+      }
+    },
+    {
+      "nome": "nada a reajustar",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "r5",
+        "titulo": "r5",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-12-20",
+            "prazo_original": "2026-12-20",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [],
+      "esperado": {
+        "movimentos": [],
+        "folga_antes_em_dias": -19,
+        "folga_depois_em_dias": -19,
+        "estoura_o_alvo": true
+      }
+    },
+    {
+      "nome": "etapa feita nao se move mesmo vencida",
+      "hoje": "2026-10-14",
+      "objetivo": {
+        "id": "r6",
+        "titulo": "r6",
+        "porque": "caso de ouro",
+        "comecou_em": "2026-09-01",
+        "data_alvo": "2026-12-01",
+        "origem": "agente",
+        "etapas": [
+          {
+            "id": "a",
+            "titulo": "a",
+            "tipo": "curso",
+            "prazo": "2026-09-30",
+            "prazo_original": "2026-09-30",
+            "custo": "0",
+            "depende_de": [],
+            "obrigatoria": true,
+            "adiamentos": 0
+          },
+          {
+            "id": "b",
+            "titulo": "b",
+            "tipo": "curso",
+            "prazo": "2026-10-10",
+            "prazo_original": "2026-10-10",
+            "custo": "0",
+            "depende_de": [
+              "a"
+            ],
+            "obrigatoria": true,
+            "adiamentos": 0
+          }
+        ]
+      },
+      "feitos": [
+        {
+          "etapa": "a",
+          "dia": "2026-10-05"
+        },
+        {
+          "etapa": "b",
+          "dia": "2026-10-12"
+        }
+      ],
+      "esperado": {
+        "movimentos": [],
+        "folga_antes_em_dias": 52,
+        "folga_depois_em_dias": 52,
+        "estoura_o_alvo": false
+      }
+    }
+  ]
+}

@@ -27,6 +27,7 @@ from mcp.server.fastmcp import FastMCP
 from . import causes as causes_mod
 from . import decisions
 from . import dossier, levers, life, mapping, plans as plans_mod
+from . import objetivos as objetivos_mod
 from . import projection as proj_mod
 from . import purchases, report
 from .analysis import baseline
@@ -178,6 +179,29 @@ _SPEC = {
             ),
         },
         "vida.cadencias": list(life.CADENCIAS),
+        "objetivo.tipos_de_etapa": list(objetivos_mod.TIPOS_DE_ETAPA),
+        "objetivo.nasce_rascunho": (
+            "você decompõe o que ela contou; ela assina. Até a assinatura o "
+            "objetivo não entra na agenda, nos gauges nem no score — agenda que "
+            "se enche sozinha de item não combinado é app desinstalado"
+        ),
+        "objetivo.lacos_sao_declarados": (
+            "`plano_id` e `missoes` só existem porque você escreveu. O motor "
+            "nunca descobre que um plano financia um objetivo. Laço apontando "
+            "para o vazio volta em `orfaos`, não some"
+        ),
+        "objetivo.score": {
+            "dimensoes": dict(objetivos_mod.PESOS),
+            "peso_aplicado": (
+                "dimensão sem base não vira zero — ela sai de fora da conta e o "
+                "peso aplicado encolhe. Score 100 sobre peso 15 quer dizer 'nada "
+                "falhou ainda', não 'está indo bem'"
+            ),
+            "adiar_custa": (
+                "`prazo_original` não se apaga e `adiamento` é dimensão própria. "
+                "Sem isso bastaria empurrar a data para estar sempre em dia"
+            ),
+        },
         "vida.sem_xp_e_sem_nivel": (
             "de propósito. Nível só sobe e não consegue dizer 'esta semana foi "
             "pior que a passada', que é a única informação que muda comportamento"
@@ -194,6 +218,7 @@ _SPEC = {
         "uma_contraparte": "investigar",
         "seis_frentes": "frentes",
         "aporte_contra_planos": "aporte_vs_planos",
+        "objetivos_e_prazos": "objetivos",
     },
     "erros_que_o_motor_recusa": [
         "assinar perfil ou gravar causa com origem heuristica/importacao",
@@ -947,6 +972,212 @@ def aporte_vs_planos() -> str:
     ws = _ws()
     ctx = report.analyze(ws)
     return _json(life.contexto_de_planos(report.load_vida(ws), ctx["planos"]))
+
+
+@mcp.tool()
+def objetivos(incluir_rascunhos: bool = True) -> str:
+    """Os objetivos da pessoa: etapas, prazos, score e o que está atrasado.
+
+    **Leia isto antes de aconselhar qualquer coisa.** É o perfil dela em
+    forma de compromisso: o que ela está perseguindo, com que prazo, quanto
+    disso custa e o que já escorregou. Uma recomendação de compra feita sem
+    saber que a prova dela é em três semanas não é um conselho, é um palpite.
+
+    Duas leituras que mudam o que você pode dizer:
+
+    `rascunhos_aguardando_assinatura` são objetivos que **você** propôs e ela
+    ainda não assinou. Não são compromisso dela — cobrar por eles é cobrar por
+    algo que ela não disse. Pergunte se ainda valem.
+
+    `peso_aplicado` em cada score diz sobre quanto o número foi calculado.
+    Score 100 sobre peso 15 significa "nada falhou ainda", não "está indo
+    bem". Dizer a segunda coisa é inventar notícia boa."""
+    ws = _ws()
+    lista, checks = report.load_objetivos(ws)
+    if not lista:
+        return _json({
+            "sem_objetivos_cadastrados": True,
+            "como_criar": (
+                "use `criar_objetivo`. Você decompõe o que ela contou em etapas "
+                "com prazo; ela assina depois. O molde está em "
+                "fintips/rules/exemplo-objetivos.yaml"
+            ),
+        })
+    ctx = report.analyze(ws)
+    vida = report.load_vida(ws)
+    perfil = objetivos_mod.contexto_de_perfil(
+        lista, checks, vida, date.today(), planos=ctx["planos"]
+    )
+    if not incluir_rascunhos:
+        perfil.pop("rascunhos_aguardando_assinatura", None)
+    return _json(perfil)
+
+
+@mcp.tool()
+def criar_objetivo(id: str, titulo: str, porque: str, etapas: list[dict],
+                   data_alvo: str = "", comecou_em: str = "",
+                   plano_id: str = "", missoes: list[str] | None = None) -> str:
+    """Transforma o que ela contou em objetos ligados. **Nasce rascunho.**
+
+    Este é o seu trabalho pesado neste app: ela descreve em texto corrido o
+    que quer, e você devolve a estrutura. Uma certificação não é uma linha de
+    R$ 2.000 em dezembro — são cursos com prazo cada um, uma prova marcada, e
+    o estudo diário que sustenta tudo.
+
+    Cada item de `etapas` aceita:
+
+      id            obrigatório, estável — é por ele que o check volta
+      titulo        o que ela vai ler no widget
+      tipo          curso | prova | leitura | pratica | compra | entrega | outro
+      prazo         AAAA-MM-DD
+      custo         "180.00" — só o que realmente sai do bolso nesta etapa
+      depende_de    ids de etapas DESTE objetivo que precisam vir antes
+      obrigatoria   false para o que ajuda mas não trava (padrão: true)
+      porque        por que esta etapa existe
+
+    `plano_id` e `missoes` são os dois laços, e **só existem se você escrever**:
+    o motor nunca descobre que um plano financia um objetivo nem que uma missão
+    o sustenta. Ligue o plano quando a etapa custa dinheiro; ligue a missão
+    quando há um hábito diário por trás — objetivo de prazo longo sem hábito
+    costuma falhar na etapa do meio.
+
+    Depois de criar, **mostre a decomposição e peça confirmação**. Enquanto ela
+    não assinar, nada disso entra na agenda dela, e isso é de propósito."""
+    ws = _ws()
+    loja = objetivos_mod.ObjetivoStore(ws.objetivos_path)
+    try:
+        obj = loja.criar({
+            "id": id, "titulo": titulo, "porque": porque, "etapas": etapas,
+            "data_alvo": data_alvo or None,
+            "comecou_em": comecou_em or date.today().isoformat(),
+            "plano_id": plano_id, "missoes": missoes or [],
+            "origem": "agente",
+            "porque_da_origem": porque,
+        })
+    except (ValueError, KeyError) as e:
+        return _json({"erro": str(e)})
+    loja.save()
+    ctx = report.analyze(ws)
+    corr = objetivos_mod.correlacionar(
+        obj, [], planos=ctx["planos"], vida=report.load_vida(ws), hoje=date.today()
+    )
+    return _json({
+        "criado": obj.to_dict(),
+        "assinado": False,
+        "correlacao": corr,
+        "proximo_passo": (
+            "mostre as etapas e os prazos para ela e chame `assinar_objetivo` "
+            "quando ela confirmar. Sem assinatura isto não entra na agenda, "
+            "nos gauges nem no score"
+        ),
+    })
+
+
+@mcp.tool()
+def assinar_objetivo(objetivo_id: str) -> str:
+    """Ela confirmou a decomposição. **Só chame depois de ela dizer que sim.**
+
+    A assinatura é o que separa "a IA propôs" de "eu me comprometi". Assinar
+    por conta própria porque a proposta parecia boa enche a agenda dela de
+    item que ela nunca combinou — que é o caminho mais curto para o app ser
+    desinstalado."""
+    ws = _ws()
+    loja = objetivos_mod.ObjetivoStore(ws.objetivos_path)
+    try:
+        obj = loja.assinar(objetivo_id)
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    loja.save()
+    _, checks = report.load_objetivos(ws)
+    return _json({
+        "assinado": obj.to_dict(),
+        "agenda_agora": objetivos_mod.agenda([obj], checks, date.today(), dias=14),
+    })
+
+
+@mcp.tool()
+def marcar_etapa(objetivo_id: str, etapa_id: str, origem: str = "agente",
+                 dia: str = "", nota: str = "") -> str:
+    """Grava que uma etapa foi feita, dizendo **como se soube**.
+
+    Mesma escada das missões: `presumido` nunca conta, `agente` é quando ela
+    te disse nesta conversa, `usuario` é quando ela marcou no app. "O prazo
+    era ontem, deve ter feito" é `presumido`, e `presumido` existe para não
+    contar.
+
+    A data importa mais do que parece: é `dia` contra o prazo da etapa que
+    decide se ela entrou como cumprida no prazo. Se ela fez na semana passada
+    e só está te contando agora, mande a data em que fez."""
+    ws = _ws()
+    lista, _ = report.load_objetivos(ws)
+    obj = next((o for o in lista if o.id == objetivo_id), None)
+    if obj is None:
+        return _json({"erro": f"objetivo '{objetivo_id}' não existe",
+                      "catalogo": [o.id for o in lista]})
+    if obj.etapa(etapa_id) is None:
+        return _json({"erro": f"etapa '{etapa_id}' não existe neste objetivo",
+                      "etapas": [e.id for e in obj.etapas]})
+    try:
+        c = objetivos_mod.Check.from_dict({
+            "objetivo_id": objetivo_id, "etapa_id": etapa_id,
+            "dia": dia or date.today().isoformat(), "origem": origem, "nota": nota,
+        })
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    objetivos_mod.marcar(ws.checks_path, c)
+
+    _, checks = report.load_objetivos(ws)
+    ctx = report.analyze(ws)
+    corr = objetivos_mod.correlacionar(
+        obj, checks, planos=ctx["planos"], vida=report.load_vida(ws), hoje=date.today()
+    )
+    return _json({
+        "gravado": c.to_dict(),
+        "conta_como_cumprido": c.conta_como_cumprido,
+        "score": objetivos_mod.score_do_objetivo(obj, checks, date.today(), correlacao=corr),
+    })
+
+
+@mcp.tool()
+def reajustar(objetivo_id: str, aplicar: bool = False, porque: str = "") -> str:
+    """"Não deu para fazer" vira conta: quanto a cadeia anda e quanto sobra.
+
+    Cada etapa atrasada vai para hoje e tudo que depende dela anda o mesmo
+    tanto de dias. O motor não corta etapa, não sugere trocar o objetivo e não
+    decide que ainda dá tempo — ele mostra a folga que restou até a data alvo
+    e se ela acabou.
+
+    Chame primeiro **sem** `aplicar`, mostre os movimentos e a folga, e só
+    aplique quando ela disser para aplicar, com o motivo dela em `porque`.
+
+    Adiar é permitido e **custa**: `prazo_original` não se apaga e o score tem
+    uma dimensão só para isso. Se não custasse, bastaria empurrar tudo para
+    estar sempre em dia — e o score não mediria nada."""
+    ws = _ws()
+    lista, checks = report.load_objetivos(ws)
+    obj = next((o for o in lista if o.id == objetivo_id), None)
+    if obj is None:
+        return _json({"erro": f"objetivo '{objetivo_id}' não existe"})
+
+    proposta = objetivos_mod.reajuste_proposto(obj, checks, date.today())
+    if not aplicar:
+        return _json({
+            "proposta": proposta,
+            "proximo_passo": (
+                "mostre os movimentos e a folga restante. Para aplicar, chame de "
+                "novo com aplicar=true e o `porque` que ela deu"
+            ),
+        })
+    loja = objetivos_mod.ObjetivoStore(ws.objetivos_path)
+    try:
+        objetivos_mod.aplicar_reajuste(
+            loja.objetivos[objetivo_id], proposta, porque=porque, origem="usuario"
+        )
+    except (ValueError, KeyError) as e:
+        return _json({"erro": str(e)})
+    loja.save()
+    return _json({"aplicado": proposta["movimentos"],
+                  "objetivo": loja.objetivos[objetivo_id].to_dict()})
 
 
 @mcp.tool()

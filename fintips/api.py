@@ -23,13 +23,14 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from . import objetivos as objetivos_mod
 from . import levers, life, mapping, plans as plans_mod, projection, purchases, report
 from .analysis import baseline
 from .categorize import norm
 from .contracts import Proveniencia
 from .workspace import Workspace
 
-API_VERSION = "0.6.0"
+API_VERSION = "0.7.0"
 WEB_DIR = Path(__file__).parent / "web"
 
 
@@ -298,6 +299,51 @@ def vida_e_planos() -> dict:
     """O aporte declarado contra o que os planos exigem por mês."""
     ws = _ws()
     return life.contexto_de_planos(report.load_vida(ws), cache.get(ws)["planos"])
+
+
+@app.get("/api/goals")
+def objetivos() -> dict:
+    """Os objetivos: gauges da tela inicial, agenda da janela e o perfil."""
+    ws = _ws()
+    lista, checks = report.load_objetivos(ws)
+    if not lista:
+        return {
+            "sem_objetivos_cadastrados": True,
+            "arquivo": str(ws.objetivos_path),
+            "molde": "fintips/rules/exemplo-objetivos.yaml",
+        }
+    hoje = date.today()
+    planos = cache.get(ws)["planos"]
+    v = report.load_vida(ws)
+    return {
+        "hoje": hoje.isoformat(),
+        "gauges": objetivos_mod.gauges(lista, checks, v, hoje, planos=planos),
+        "agenda": objetivos_mod.agenda(lista, checks, hoje, dias=14),
+        "perfil": objetivos_mod.contexto_de_perfil(lista, checks, v, hoje, planos=planos),
+    }
+
+
+@app.get("/api/goals/today")
+def checks_de_hoje() -> dict:
+    """A lista única do widget: missões do dia e etapas que vencem hoje.
+
+    Rota própria, e curta de propósito: é a que o widget da tela inicial do
+    celular chama, e widget que espera a análise inteira para desenhar duas
+    linhas é widget que o sistema mata."""
+    ws = _ws()
+    lista, checks = report.load_objetivos(ws)
+    return objetivos_mod.checks_de_hoje(lista, checks, report.load_vida(ws), date.today())
+
+
+@app.get("/api/goals/{objetivo_id}/readjust")
+def propor_reajuste(objetivo_id: str) -> dict:
+    """O que acontece com a cadeia se o atraso for absorvido. **Não aplica.**"""
+    ws = _ws()
+    lista, checks = report.load_objetivos(ws)
+    obj = next((o for o in lista if o.id == objetivo_id), None)
+    if obj is None:
+        raise HTTPException(404, f"objetivo '{objetivo_id}' não existe")
+    return objetivos_mod.reajuste_proposto(obj, checks, date.today())
 
 
 # --------------------------------------------------------------------------

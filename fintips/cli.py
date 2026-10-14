@@ -30,6 +30,7 @@ import yaml
 
 from . import levers
 from . import life
+from . import objetivos as objetivos_mod
 from . import plans as plans_mod
 from . import purchases, report
 from .analysis import baseline
@@ -419,6 +420,70 @@ def cmd_aparelho(args) -> None:
         print(texto, end="")
 
 
+def cmd_objetivos(args) -> None:
+    """Mostra os objetivos: agenda da janela, score e o que está atrasado.
+
+    Com `--reajustar`, calcula o que acontece com a cadeia se o atraso for
+    absorvido — e **não aplica**: imprime os movimentos e a folga restante.
+    Mexer na data de uma promessa é de quem fez a promessa, e pela CLI isso
+    significa confirmar com `--aplicar` e dizer `--porque`.
+    """
+    ws = _ws(args)
+    lista, checks = report.load_objetivos(ws)
+    if not lista:
+        raise SystemExit(
+            f"nenhum objetivo em {ws.objetivos_path}.\n"
+            "Eles nascem da conversa (ferramenta `criar_objetivo`), ou do molde "
+            "em fintips/rules/exemplo-objetivos.yaml"
+        )
+    hoje = date.today()
+
+    if args.reajustar:
+        loja = objetivos_mod.ObjetivoStore(ws.objetivos_path)
+        obj = loja.objetivos.get(args.reajustar)
+        if obj is None:
+            raise SystemExit(f"objetivo '{args.reajustar}' não existe")
+        proposta = objetivos_mod.reajuste_proposto(obj, checks, hoje)
+        for m in proposta["movimentos"]:
+            print(f"  {m['etapa']:<22} {m['de']} → {m['para']}  (+{m['dias']}d, {m['motivo']})")
+        if not proposta["movimentos"]:
+            print("  nada a reajustar: nenhuma etapa venceu sem check")
+        print(f"\nfolga até o alvo: {proposta['folga_antes_em_dias']}d → "
+              f"{proposta['folga_depois_em_dias']}d")
+        if proposta["estoura_o_alvo"]:
+            print("ESTOURA a data alvo")
+        if not args.aplicar:
+            print("\nnada foi gravado. Para aplicar: --aplicar --porque '...'")
+            return
+        if not args.porque:
+            raise SystemExit("--aplicar exige --porque")
+        objetivos_mod.aplicar_reajuste(obj, proposta, porque=args.porque, origem="usuario")
+        loja.save()
+        print(f"\naplicado em {ws.objetivos_path}")
+        return
+
+    planos = report.analyze(ws)["planos"] if ws.latest_canonical() else []
+    for g in objetivos_mod.gauges(lista, checks, report.load_vida(ws), hoje,
+                                  planos=planos)["objetivos"]:
+        parcial = "" if g["peso_aplicado"] == g["peso_total"] else \
+            f"  (sobre peso {g['peso_aplicado']} de {g['peso_total']})"
+        print(f"{g['valor']:>5.1f}  {g['faixa']:<10} {g['rotulo']}{parcial}")
+        print(f"        {g['legenda']} · próxima: {g['proxima_etapa'] or '—'} "
+              f"({g['proximo_prazo'] or 'sem prazo'})")
+
+    atrasadas = [i for i in objetivos_mod.agenda(lista, checks, hoje, dias=args.dias)
+                 if i["situacao"] == "atrasada"]
+    if atrasadas:
+        print(f"\n{len(atrasadas)} etapa(s) atrasada(s):")
+        for i in atrasadas:
+            print(f"  {i['prazo']}  {i['titulo']} ({i['objetivo_titulo']})")
+
+    for o in lista:
+        if not o.assinado and not o.arquivado:
+            print(f"\nrascunho esperando sua assinatura: {o.titulo} "
+                  f"({len(o.etapas)} etapas)")
+
+
 def cmd_mcp_config(args) -> None:
     """Imprime a config do cliente MCP com os caminhos desta máquina.
 
@@ -523,6 +588,15 @@ def build_parser() -> argparse.ArgumentParser:
                     help="exporta o molde do pacote em vez do seu catálogo "
                          "(para trabalhar na tela sem workspace)")
     ap.set_defaults(func=cmd_aparelho)
+
+    ob = sub.add_parser("objetivos", help="objetivos, agenda e score")
+    ob.add_argument("--dias", type=int, default=14, help="janela da agenda")
+    ob.add_argument("--reajustar", metavar="ID",
+                    help="calcula o reajuste de um objetivo (não aplica)")
+    ob.add_argument("--aplicar", action="store_true",
+                    help="grava o reajuste calculado; exige --porque")
+    ob.add_argument("--porque", default="", help="o motivo do reajuste")
+    ob.set_defaults(func=cmd_objetivos)
 
     mc = sub.add_parser("mcp-config")
     mc.add_argument("--nome", default="fintips", help="nome do servidor no cliente")
