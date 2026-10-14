@@ -100,6 +100,7 @@ def construir(
     store: TriageStore,
     causas: "CauseStore | None" = None,
     decisoes: "DecisionStore | None" = None,
+    perfil_a_reconfirmar: list[dict] | None = None,
     fallback: str = "outros",
     limite: int = 40,
 ) -> list[ItemDeTriagem]:
@@ -309,6 +310,31 @@ def construir(
                 evidencia={"decisao_id": d.id, "revisar_em": d.revisar_em,
                            "escolheu": d.escolhida or "— ainda aberta"},
             ))
+
+    # 6b. traços de perfil que passaram da validade do eixo
+    #
+    # Sem esta entrada, o envelhecimento seria só um campo bonito num JSON: o
+    # app saberia que o traço está velho e nunca perguntaria. A triagem é onde
+    # o que o motor sabe vira uma pergunta que alguém de fato responde.
+    for t in perfil_a_reconfirmar or []:
+        itens.append(ItemDeTriagem(
+            id=novo_id("pr", t["eixo"]),
+            tipo="perfil_a_reconfirmar",
+            titulo=f"ainda é '{t['arquetipo']}' em {t['eixo']}?",
+            impacto_mensal=0.0,
+            porque_importa=(
+                f"assinado há {t['assinado_ha_meses']} meses, e este eixo deixa "
+                f"de descrever alguém em {t['validade_em_meses']}. Enquanto não "
+                "for reconfirmado, a cobertura conta como decidido algo que "
+                "pode ser de outra fase da vida"
+            ),
+            evidencia={
+                "eixo": t["eixo"], "arquetipo": t["arquetipo"],
+                "assinado_ha_meses": t["assinado_ha_meses"],
+                "validade_em_meses": t["validade_em_meses"],
+                "porque_na_epoca": t["porque_na_epoca"],
+            },
+        ))
 
     # 7. eventos grandes sem explicação
     for t in sorted(stmt.transactions, key=lambda x: abs(x.amount), reverse=True)[:40]:

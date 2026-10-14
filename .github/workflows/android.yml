@@ -99,6 +99,7 @@ jobs:
           python -m pytest tests/ -q
           python scripts/gerar-ouro.py --conferir
           bash scripts/check-pii.sh --all
+          python -m fintips.cli config --conferir
 
       - uses: actions/setup-node@v4
         with:

@@ -21,6 +21,7 @@ gastador" — é horóscopo: descreve todo mundo e não muda conta nenhuma.
 
 from __future__ import annotations
 
+import json
 import statistics
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -28,9 +29,15 @@ from typing import Any
 
 import yaml
 
+from datetime import date
+
 from .contracts import Proveniencia, agora
 
-PROFILE_SCHEMA = 1
+PROFILE_SCHEMA = 2
+
+# Quando o eixo não declara, este é o prazo. Doze meses porque é o período em
+# que praticamente tudo que o perfil descreve pode ter mudado sem aviso.
+VALIDADE_PADRAO_EM_MESES = 12
 
 _CATALOGO_PATH = Path(__file__).parent / "rules" / "arquetipos.yaml"
 
@@ -106,6 +113,10 @@ class Eixo:
     o_que_e: str
     minimo: float
     arquetipos: list[Arquetipo]
+    # Por quantos meses a assinatura deste eixo continua dizendo algo. Não é
+    # prazo de validade de dado: o traço não some. É quando o app passa a
+    # perguntar se ainda é assim, e quando a cobertura para de contá-lo.
+    validade_em_meses: int = VALIDADE_PADRAO_EM_MESES
 
 
 def carregar_catalogo(path: str | Path | None = None) -> list[Eixo]:
@@ -138,6 +149,9 @@ def carregar_catalogo(path: str | Path | None = None) -> list[Eixo]:
                 o_que_e=e.get("o_que_e", ""),
                 minimo=float(e.get("minimo", 0.6)),
                 arquetipos=arqs,
+                validade_em_meses=int(
+                    e.get("validade_em_meses", VALIDADE_PADRAO_EM_MESES)
+                ),
             )
         )
     return eixos
@@ -265,6 +279,27 @@ class TracoDePerfil:
     proveniencia: Proveniencia = field(default_factory=Proveniencia)
     substituiu: str | None = None
 
+    def idade_em_meses(self, hoje: date | None = None) -> int | None:
+        """Há quantos meses esta assinatura foi dada.
+
+        `None` quando a proveniência não trouxe data legível — perfil antigo,
+        escrito antes de `quando` existir. Devolver 0 ali seria afirmar que a
+        assinatura é de hoje, que é a mentira mais conveniente possível.
+        """
+        quando = self.proveniencia.quando
+        if not quando:
+            return None
+        try:
+            d = date.fromisoformat(str(quando)[:10])
+        except ValueError:
+            return None
+        hoje = hoje or date.today()
+        return max((hoje.year - d.year) * 12 + (hoje.month - d.month), 0)
+
+    def envelhecido(self, validade_em_meses: int, hoje: date | None = None) -> bool:
+        idade = self.idade_em_meses(hoje)
+        return idade is not None and idade >= validade_em_meses
+
     def to_dict(self) -> dict:
         return {
             "eixo": self.eixo,
@@ -287,6 +322,39 @@ class TracoDePerfil:
         )
 
 
+def migrar(data: dict) -> dict:
+    """Traz um `perfil.yaml` de qualquer versão anterior para a de hoje.
+
+    Existe antes de ser necessária, e esse é o ponto. O arquivo mora na
+    máquina da pessoa e não há como implantar uma correção nele: quando o
+    formato mudar e não houver migração, o app vai ler um arquivo que não
+    entende e **escolher entre dois erros ruins** — recusar o perfil inteiro,
+    ou interpretar errado em silêncio. Ter o degrau pronto desde a versão 1
+    custa dez linhas; construí-lo depois do fato custa o perfil de alguém.
+
+    Migração é só para frente: quem abriu o arquivo com uma versão nova do app
+    e volta para a antiga não é um caminho que se sustenta, e fingir que sim
+    daria uma falsa garantia.
+    """
+    versao = int(data.get("schema_version", 1) or 1)
+    if versao > PROFILE_SCHEMA:
+        raise ValueError(
+            f"perfil.yaml está no esquema {versao} e este FinTips entende até "
+            f"{PROFILE_SCHEMA}. Atualize o app — ler um arquivo de versão "
+            "futura é adivinhar o que os campos novos significam"
+        )
+
+    if versao < 2:
+        # v1 → v2: nada a reescrever. A validade por eixo veio do catálogo e a
+        # história passou a viver num arquivo próprio, que nasce vazio para
+        # quem já tinha perfil. O passado anterior a esta versão não existe, e
+        # inventar linhas de história com data de hoje seria pior que não ter.
+        versao = 2
+
+    data["schema_version"] = versao
+    return data
+
+
 class PerfilStore:
     """O perfil que vale — um traço por eixo, cada um com quem assinou.
 
@@ -298,6 +366,10 @@ class PerfilStore:
 
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
+        # A história fica ao lado do estado, e em append. Ver `historico()`.
+        self.historico_path = self.path.with_name(
+            self.path.stem + "-historico.jsonl"
+        )
         self.tracos: dict[str, TracoDePerfil] = {}
         self._load()
 
@@ -305,8 +377,67 @@ class PerfilStore:
         if not self.path.exists():
             return
         data = yaml.safe_load(self.path.read_text(encoding="utf-8")) or {}
+        data = migrar(data)
         for d in data.get("tracos") or []:
             self.tracos[d["eixo"]] = TracoDePerfil.from_dict(d)
+
+    def _registrar(self, traco: TracoDePerfil, acao: str) -> None:
+        """Acrescenta uma linha à história. Nunca reescreve.
+
+        Sem isto, reassinar um eixo **apaga o passado**: sobrava o nome do
+        arquétipo anterior em `substituiu` e nada mais — nem o `porque`, nem a
+        data, nem a evidência de quem assinou antes. Num projeto cuja premissa
+        é guardar o porquê, o perfil era o único lugar onde ele se perdia.
+
+        E a pergunta que isso impedia de responder é das boas: *por que eu
+        mudei?* Ver a travessia de `aperto` para `folga` com os dois `porque`
+        lado a lado diz mais sobre a pessoa do que qualquer um dos dois
+        sozinho.
+        """
+        linha = {"acao": acao, "quando": agora(), **traco.to_dict()}
+        self.historico_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.historico_path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(linha, ensure_ascii=False) + "\n")
+
+    def historico(self, eixo: str = "") -> list[dict]:
+        """Tudo que já foi assinado, na ordem em que foi. Opcionalmente de um eixo."""
+        if not self.historico_path.exists():
+            return []
+        saida = []
+        for linha in self.historico_path.read_text(encoding="utf-8").splitlines():
+            linha = linha.strip()
+            if not linha:
+                continue
+            d = json.loads(linha)
+            if not eixo or d.get("eixo") == eixo:
+                saida.append(d)
+        return saida
+
+    def travessias(self, eixo: str = "") -> list[dict]:
+        """As mudanças de arquétipo, com o `porque` dos dois lados.
+
+        É a leitura que o agente quer quando a pessoa pergunta "o que mudou em
+        mim": não a lista de assinaturas, mas os pontos em que ela deixou de
+        ser uma coisa e passou a ser outra, com o motivo de cada ponta.
+        """
+        saida = []
+        por_eixo: dict[str, dict] = {}
+        for d in self.historico(eixo):
+            anterior = por_eixo.get(d["eixo"])
+            if anterior and anterior["arquetipo"] != d["arquetipo"]:
+                saida.append({
+                    "eixo": d["eixo"],
+                    "de": anterior["arquetipo"],
+                    "para": d["arquetipo"],
+                    "quando": d["quando"],
+                    "porque_antes": (anterior.get("proveniencia") or {}).get("porque", ""),
+                    "porque_agora": (d.get("proveniencia") or {}).get("porque", ""),
+                })
+            if d.get("acao") == "esquecer":
+                por_eixo.pop(d["eixo"], None)
+            else:
+                por_eixo[d["eixo"]] = d
+        return saida
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -376,15 +507,24 @@ class PerfilStore:
             substituiu=atual.arquetipo if atual and atual.arquetipo != arquetipo else None,
         )
         self.tracos[eixo] = traco
+        self._registrar(traco, "assinar")
         self.save()
         return traco
 
     def esquecer(self, eixo: str) -> bool:
-        if eixo in self.tracos:
-            del self.tracos[eixo]
-            self.save()
-            return True
-        return False
+        """Apaga o traço do estado atual — **não** da história.
+
+        Esquecer é dizer "isto não me descreve mais", e não "isto nunca foi
+        verdade". A linha fica, marcada como `esquecer`, porque o fato de a
+        pessoa ter se descrito assim um dia continua sendo informação sobre
+        ela.
+        """
+        traco = self.tracos.pop(eixo, None)
+        if traco is None:
+            return False
+        self._registrar(traco, "esquecer")
+        self.save()
+        return True
 
     # -------------------------------------------------------------- leitura
     def to_dicts(self) -> list[dict]:
@@ -394,7 +534,12 @@ class PerfilStore:
 # --------------------------------------------------------------------------
 # A visão que as três interfaces consomem
 # --------------------------------------------------------------------------
-def montar(ctx: dict, store: PerfilStore, catalogo: list[Eixo] | None = None) -> dict:
+def montar(
+    ctx: dict,
+    store: PerfilStore,
+    catalogo: list[Eixo] | None = None,
+    hoje: date | None = None,
+) -> dict:
     """Junta sugestão e assinatura, eixo a eixo, e mede quanto do perfil é decisão.
 
     `cobertura` responde à mesma pergunta que `cobertura_da_classificacao`
@@ -402,6 +547,7 @@ def montar(ctx: dict, store: PerfilStore, catalogo: list[Eixo] | None = None) ->
     é o app achando coisa. Começa em 0%.
     """
     catalogo = catalogo or carregar_catalogo()
+    por_id = {e.id: e for e in catalogo}
     leituras = casar(ctx, catalogo)
     eixos = []
     for leitura in leituras:
@@ -410,15 +556,23 @@ def montar(ctx: dict, store: PerfilStore, catalogo: list[Eixo] | None = None) ->
         diverge = bool(
             traco and sugerido and traco.arquetipo not in (sugerido["id"], "personalizado")
         )
+        validade = por_id[leitura["eixo"]].validade_em_meses
+        idade = traco.idade_em_meses(hoje) if traco else None
+        velho = bool(traco and traco.envelhecido(validade, hoje))
         eixos.append(
             {
                 **leitura,
                 "assinado": traco.to_dict() if traco else None,
                 "diverge_da_sugestao": diverge,
+                "validade_em_meses": validade,
+                "idade_em_meses": idade,
+                "envelhecido": velho,
+                "precisa_reconfirmar": velho,
             }
         )
 
     assinados = sum(1 for e in eixos if e["assinado"])
+    validos = sum(1 for e in eixos if e["assinado"] and not e["envelhecido"])
     return {
         "schema_version": PROFILE_SCHEMA,
         "indicadores": indicadores(ctx),
@@ -427,10 +581,109 @@ def montar(ctx: dict, store: PerfilStore, catalogo: list[Eixo] | None = None) ->
             "eixos": len(eixos),
             "assinados": assinados,
             "pct": round(assinados / len(eixos) * 100, 1) if eixos else 0.0,
+            # A métrica que vale é esta. Um eixo assinado há três anos continua
+            # assinado, mas parou de descrever alguém — contá-lo como decisão
+            # atual devolve 100% de cobertura para uma conversa de outra vida.
+            "validos": validos,
+            "pct_valido": round(validos / len(eixos) * 100, 1) if eixos else 0.0,
+            "envelhecidos": [e["eixo"] for e in eixos if e["envelhecido"]],
             "explicacao": (
                 "percentual dos eixos do perfil que alguém decidiu. O resto é "
                 "sugestão do catálogo contra os seus números — palpite, não perfil"
             ),
+            "explicacao_validos": (
+                "quanto do perfil foi decidido E ainda está dentro da validade "
+                "do eixo. Um traço envelhecido não some nem deixa de valer: o "
+                "app só passa a perguntar se ainda é assim"
+            ),
         },
         "divergencias": [e["eixo"] for e in eixos if e["diverge_da_sugestao"]],
+        "a_reconfirmar": [
+            {
+                "eixo": e["eixo"],
+                "arquetipo": e["assinado"]["arquetipo"],
+                "assinado_ha_meses": e["idade_em_meses"],
+                "validade_em_meses": e["validade_em_meses"],
+                "porque_na_epoca": (e["assinado"].get("proveniencia") or {}).get("porque", ""),
+            }
+            for e in eixos if e["envelhecido"]
+        ],
+    }
+
+
+# --------------------------------------------------------------------------
+# O retrato: o perfil inteiro, não só o financeiro
+# --------------------------------------------------------------------------
+
+def retrato(ctx: dict) -> dict:
+    """Quem é esta pessoa, para quem vai responder uma pergunta dela.
+
+    Os cinco eixos financeiros descrevem a relação dela com dinheiro. Isso era
+    o perfil inteiro enquanto o app era de finanças, e deixou de ser quando ele
+    passou a ter seis frentes e objetivos com prazo. Um agente que lê só os
+    eixos responde "pode comprar, cabe na sobra" para alguém cuja prova é em
+    três semanas e que está cortando vídeo curto há quarenta dias.
+
+    Este é o bloco curto que o agente lê **antes** de qualquer conselho. Ele
+    junta as três camadas e, em cada uma, diz a mesma coisa sobre si: o quanto
+    ali foi decidido e o quanto ainda é palpite do app.
+
+    Não há número agregado, e isso é escolha. Um "índice de perfil" único seria
+    exatamente o horóscopo que o catálogo de arquétipos existe para não ser.
+    """
+    perfil = ctx.get("perfil") or {}
+    objetivos = (ctx.get("objetivos") or {}).get("perfil") or {}
+    cobertura = perfil.get("cobertura") or {}
+
+    eixos = []
+    for e in perfil.get("eixos") or []:
+        assinado = e.get("assinado")
+        eixos.append({
+            "eixo": e["eixo"],
+            "nome": e.get("nome", e["eixo"]),
+            "arquetipo": assinado["arquetipo"] if assinado else None,
+            "como_se_sabe": "assinado" if assinado else "sugestão do catálogo",
+            "sugerido": (e.get("sugerido") or {}).get("id"),
+            "envelhecido": e.get("envelhecido", False),
+            "porque": (assinado.get("proveniencia") or {}).get("porque", "") if assinado else "",
+        })
+
+    frentes = (ctx.get("objetivos") or {}).get("gauges", {}).get("frentes") or []
+    fracas = [f["chave"] for f in frentes if not f.get("sem_base") and f.get("valor", 0) < 50]
+
+    return {
+        "schema_version": PROFILE_SCHEMA,
+        "dinheiro": {
+            "eixos": eixos,
+            "decidido_pct": cobertura.get("pct", 0.0),
+            "ainda_valido_pct": cobertura.get("pct_valido", 0.0),
+            "a_reconfirmar": perfil.get("a_reconfirmar") or [],
+        },
+        "vida": {
+            "frentes_fracas_hoje": fracas,
+            "nota": (
+                "frente fraca é o que ela não cumpriu na janela de hoje, não "
+                "um traço de personalidade. Não transforme um dia ruim em "
+                "diagnóstico"
+            ),
+        },
+        "compromissos": {
+            "objetivos": objetivos.get("objetivos") or [],
+            "etapas_atrasadas": len(objetivos.get("etapas_atrasadas") or []),
+            "restante_a_pagar": objetivos.get("compromisso_total_restante", 0.0),
+            "rascunhos_esperando": len(
+                objetivos.get("rascunhos_aguardando_assinatura") or []
+            ),
+        },
+        "como_usar": (
+            "cite o arquétipo pelo nome e o `porque` que ela escreveu, nunca o "
+            "sugerido pelo catálogo como se fosse dela. Eixo em "
+            "`a_reconfirmar` foi assinado há tempo demais para o ritmo daquele "
+            "eixo: pergunte se ainda é assim antes de usar. E rascunho não é "
+            "compromisso — ele está esperando a assinatura dela"
+        ),
+        "o_que_este_bloco_nao_e": (
+            "não há número agregado de perfil, de propósito. Um índice único "
+            "descreveria todo mundo e não mudaria conta nenhuma"
+        ),
     }

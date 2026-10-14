@@ -1,0 +1,103 @@
+{
+  "fonte": "fintips.profile",
+  "o_que_e": "idade da assinatura em meses de calendário, e a validade por eixo",
+  "validade_por_eixo": {
+    "fase": 36,
+    "renda": 12,
+    "custo": 12,
+    "consumo": 6,
+    "constancia": 6
+  },
+  "casos": [
+    {
+      "nome": "mesmo mês",
+      "quando": "2026-10-01T09:00:00",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 0,
+      "envelhecido_em_6": false,
+      "envelhecido_em_12": false,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "mês anterior, dia maior",
+      "quando": "2026-09-30T09:00:00",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 1,
+      "envelhecido_em_6": false,
+      "envelhecido_em_12": false,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "virada de ano",
+      "quando": "2025-12-31T23:59:59",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 10,
+      "envelhecido_em_6": true,
+      "envelhecido_em_12": false,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "doze meses exatos",
+      "quando": "2025-10-14T10:00:00",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 12,
+      "envelhecido_em_6": true,
+      "envelhecido_em_12": true,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "um dia antes de doze meses",
+      "quando": "2025-10-15T10:00:00",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 12,
+      "envelhecido_em_6": true,
+      "envelhecido_em_12": true,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "trinta e seis meses",
+      "quando": "2023-10-14T10:00:00",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 36,
+      "envelhecido_em_6": true,
+      "envelhecido_em_12": true,
+      "envelhecido_em_36": true
+    },
+    {
+      "nome": "data no futuro",
+      "quando": "2027-01-01T00:00:00",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 0,
+      "envelhecido_em_6": false,
+      "envelhecido_em_12": false,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "só a data, sem hora",
+      "quando": "2024-04-14",
+      "hoje": "2026-10-14",
+      "idade_em_meses": 30,
+      "envelhecido_em_6": true,
+      "envelhecido_em_12": true,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "sem data",
+      "quando": "",
+      "hoje": "2026-10-14",
+      "idade_em_meses": null,
+      "envelhecido_em_6": false,
+      "envelhecido_em_12": false,
+      "envelhecido_em_36": false
+    },
+    {
+      "nome": "data ilegível",
+      "quando": "ontem de manhã",
+      "hoje": "2026-10-14",
+      "idade_em_meses": null,
+      "envelhecido_em_6": false,
+      "envelhecido_em_12": false,
+      "envelhecido_em_36": false
+    }
+  ]
+}

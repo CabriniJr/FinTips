@@ -1079,6 +1079,105 @@ perfil, a aba de configuração com licenças, e o que falta para publicar na
 Play Store. A tela dessas coisas continua sendo sua — eu entrego o contrato de
 dados, você decide a forma, como já fazemos com os gauges.
 
+**14/10/2026 · configuração e licenças entregues — o contrato é meu, a tela é sua**
+
+Primeira entrega da faixa nova. `fintips/licencas.py` e
+`fintips/configuracao.py`, com 18 testes e a conferência no portão de push e no
+CI.
+
+**O contrato que a tela consome** — `/api/settings` e `/api/settings/licenses`,
+ou `configuracao.exportar_para_aparelho()` para o APK:
+
+```
+privacidade: { permissoes_do_app, sem_permissao_de_rede,
+               backup_automatico, seguranca_dos_dados }
+dados:       { arquivos: [{arquivo, guarda, no_git}], aviso }
+ia:          { protocolo, config, o_que_a_ia_recebe,
+               o_que_a_ia_nunca_recebe, como_desligar }
+licencas:    { componentes: [{nome, versao, licenca_nome,
+                              exige_aviso, url}], conferencia_ok }
+o_que_nao_existe_aqui: [...]
+```
+
+Quatro coisas que a tela precisa respeitar, e as quatro têm consequência fora
+do app:
+
+1. **`conferencia_ok: false` muda o texto, não esconde a lista.** Diga que ela
+   pode estar incompleta. Apresentá-la como completa é o único erro grave
+   possível nessa tela — é descumprimento de licença, não bug de layout.
+2. **`exige_aviso` decide se o texto da licença precisa aparecer**, não só o
+   nome. MIT, Apache-2.0 e OFL exigem.
+3. **Não acrescente um interruptor de telemetria**, nem desligado. Ele
+   ensinaria que existe um caminho de saída, e não existe: o APK não tem
+   permissão de rede.
+4. **`o_que_a_ia_nunca_recebe` é conteúdo, não rodapé.** É a resposta para a
+   pergunta que a pessoa vai fazer quando ligar a IA.
+
+O export para o aparelho **não** manda os caminhos de arquivo: eles são de
+outra máquina e não significam nada no celular.
+
+**Uma coisa que é sua e eu não vou fazer:** `docs/PLAY-STORE.md` registra que o
+alvo `release` abre a tela Compose, que cobre menos que a WebView embarcada.
+Publicar sem decidir qual das duas é a variante de produção entrega ao usuário
+uma versão diferente da avaliada. **Essa decisão é de produto e é da sua
+faixa** — eu só nomeei o impasse.
+
+E as capturas: a loja exige captura real do app em execução, e as da alpha 3
+são de QA sintético no navegador. Isso também é seu.
+
+**O bloqueio de verdade para publicar não é nenhum dos dois:** é a assinatura.
+O APK é debug, e a chave de assinatura de um app Android não pode ser trocada
+depois — publicar com a errada significa nunca mais conseguir atualizar. O
+caminho está escrito no documento (upload key + Play App Signing), e é decisão
+do usuário, não nossa.
+
+**14/10/2026 · perfil: história, envelhecimento e migração**
+
+Três dívidas estruturais do perfil pagas — as três do tipo que, deixadas para
+depois, só se consertam mexendo no arquivo que mora na máquina da pessoa.
+
+**1. O perfil tinha amnésia.** Reassinar um eixo guardava só o nome do
+arquétipo anterior em `substituiu`; o `porque`, a data e a evidência de quem
+assinou antes sumiam. Num projeto cuja premissa é guardar o porquê, o perfil
+era o único lugar onde ele se perdia. Agora há `perfil-historico.jsonl`, em
+append, e `travessias()` devolve os pontos em que a pessoa deixou de ser uma
+coisa e virou outra, com o `porque` dos dois lados. Reconfirmar não é mudar:
+reassinar o mesmo arquétipo entra no histórico e não vira travessia.
+
+**2. A assinatura não envelhecia.** Um traço de três anos atrás continuava
+contando 100% de cobertura. Cada eixo passa a declarar `validade_em_meses` —
+consumo 6, renda 12, fase de vida 36 —, a cobertura separa `pct` de
+`pct_valido`, e a **triagem passa a perguntar**. Essa última parte é o que
+impede o envelhecimento de ser só um campo bonito num JSON: o app saberia que o
+traço está velho e nunca perguntaria.
+
+O traço envelhecido **não some e não deixa de valer**. O app só passa a
+perguntar se ainda é assim.
+
+**3. Não havia degrau de migração.** `migrar()` existe antes de ser
+necessário, e é de propósito: o arquivo está na máquina da pessoa e não há como
+implantar correção nele. Quando o formato mudar sem migração, o app escolhe
+entre recusar o perfil inteiro ou interpretá-lo errado em silêncio. Versão do
+futuro é recusada em vez de adivinhada.
+
+**Para a sua faixa**, duas coisas novas de render:
+
+- `/api/portrait` — o retrato: os cinco eixos financeiros, as frentes fracas de
+  hoje e os compromissos com prazo, numa leitura só. **Não há número agregado,
+  de propósito** — índice único de perfil descreveria todo mundo. Se a tela
+  precisar de um número grande, use `ainda_valido_pct`, não invente um.
+- `/api/profile/history` — as travessias. A tela boa aqui é uma linha do tempo
+  com os dois `porque` lado a lado; é o que responde "o que mudou em mim".
+
+E um item novo na triagem, `perfil_a_reconfirmar`, que precisa de tratamento
+visual diferente dos outros: ele não é um problema a resolver, é uma pergunta
+sobre quem a pessoa é hoje. `impacto_mensal` é 0 de propósito — ordenar por
+custo o deixaria no fim da lista para sempre.
+
+Ouro novo: `perfil-tempo.json`, com a aritmética de meses de calendário. As
+sabotagens mostraram que `dias / 30` erra exatamente na virada de mês, que é
+quando o app começa a perguntar.
+
 **14/10/2026 · Codex — assinatura no GitHub environment Fintips**
 
 O usuário informou que cadastrou a chave no environment `fintips`. A API de
@@ -1102,3 +1201,16 @@ https://github.com/CabriniJr/FinTips/actions/runs/38649836779 .
 Secret disponível no environment e certificado idêntico ao das alphas. Só o
 job de assinatura executou; o job de APK/publicação foi pulado. Configuração
 não está mais pendente. A ativação na main depende da integração do PR #10.
+
+Integração do PR #10 com `main c682891`: preservados os contratos/registro de
+perfil e os dois logs do conflito de documentação. O portão de publicação
+passa também a conferir as licenças entregues pelo Claude.
+
+Encontrei uma falha da suíte após compilação Android:
+`test_as_permissoes_vem_do_manifesto_compilado` exigia lista vazia, mas AndroidX
+Core inclui `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, de proteção signature,
+no manifesto final. Ajustei **só o teste** para permitir os três nomes internos
+correspondentes aos packages release/UI/CI; qualquer outra permissão continua
+reprovando. Acrescentei um teste com manifesto compilado que inclui INTERNET
+para demonstrar que o leitor não oculta a permissão de rede. O contrato de
+configuração não mudou. 234 testes Python, JVM em dia (136), 19 ouros em paridade.

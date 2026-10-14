@@ -1,0 +1,105 @@
+# A licença de cada terceiro que o manifesto não publica.
+#
+# Isto NÃO é a lista de dependências: a lista de dependências são os
+# manifestos. Aqui mora só o que eles não dizem — a licença de cada uma, para
+# Gradle e Python, que não publicam esse campo.
+#
+# `fintips.licencas.conferir()` cruza os dois e **falha** quando divergem.
+# Dependência nova sem declaração quebra o portão; declaração de dependência
+# que já saiu do projeto também. É de propósito: uma tela de atribuições que
+# envelhece em silêncio afirma, para o usuário e para a loja, uma coisa que o
+# binário desmente.
+#
+# `embarca_em` decide em que tela a atribuição aparece. A loja cobra o que vai
+# no binário, e o APK não leva FastAPI.
+schema_version: 1
+
+componentes:
+  # ------------------------------------------------------------ no APK
+  - id: gradle:org.jetbrains.kotlin:kotlin-stdlib
+    nome: Kotlin Standard Library
+    licenca: Apache-2.0
+    url: https://github.com/JetBrains/kotlin
+    embarca_em: [apk]
+    nota: entra pelo plugin, não por linha de dependência — por isso é declarado à mão
+
+  - id: gradle:org.jetbrains.kotlinx:kotlinx-datetime
+    nome: kotlinx-datetime
+    licenca: Apache-2.0
+    url: https://github.com/Kotlin/kotlinx-datetime
+    embarca_em: [apk]
+
+  - id: gradle:org.jetbrains.kotlinx:kotlinx-serialization-json
+    nome: kotlinx.serialization
+    licenca: Apache-2.0
+    url: https://github.com/Kotlin/kotlinx.serialization
+    embarca_em: [apk]
+
+  - id: gradle:androidx.compose.ui:ui
+    nome: Jetpack Compose UI
+    licenca: Apache-2.0
+    url: https://developer.android.com/jetpack/compose
+    embarca_em: [apk]
+
+  - id: gradle:androidx.compose.foundation:foundation
+    nome: Jetpack Compose Foundation
+    licenca: Apache-2.0
+    url: https://developer.android.com/jetpack/compose
+    embarca_em: [apk]
+
+  - id: gradle:androidx.compose.material3:material3
+    nome: Material 3 para Compose
+    licenca: Apache-2.0
+    url: https://developer.android.com/jetpack/compose
+    embarca_em: [apk]
+
+  - id: gradle:androidx.activity:activity-compose
+    nome: AndroidX Activity Compose
+    licenca: Apache-2.0
+    url: https://developer.android.com/jetpack/androidx
+    embarca_em: [apk]
+
+  - id: gradle:androidx.webkit:webkit
+    nome: AndroidX WebKit
+    licenca: Apache-2.0
+    url: https://developer.android.com/jetpack/androidx
+    embarca_em: [apk]
+
+  - id: fonte:barlow-condensed
+    nome: Barlow Condensed
+    licenca: OFL-1.1
+    url: https://github.com/jpt/barlow
+    embarca_em: [apk, painel_web]
+    aviso_em: fintips/web/assets/BarlowCondensed-OFL.txt
+    nota: a fonte viaja no binário; a OFL exige o aviso junto
+
+  # --------------------------------------------- no pacote Python/painel
+  - id: pypi:pyyaml
+    nome: PyYAML
+    licenca: MIT
+    url: https://pyyaml.org
+    embarca_em: [pacote_python]
+
+  - id: pypi:fastapi
+    nome: FastAPI
+    licenca: MIT
+    url: https://fastapi.tiangolo.com
+    embarca_em: [pacote_python]
+
+  - id: pypi:uvicorn
+    nome: Uvicorn
+    licenca: BSD-3-Clause
+    url: https://www.uvicorn.org
+    embarca_em: [pacote_python]
+
+  - id: pypi:python-multipart
+    nome: python-multipart
+    licenca: Apache-2.0
+    url: https://github.com/Kludex/python-multipart
+    embarca_em: [pacote_python]
+
+  - id: pypi:mcp
+    nome: MCP Python SDK
+    licenca: MIT
+    url: https://github.com/modelcontextprotocol/python-sdk
+    embarca_em: [pacote_python]

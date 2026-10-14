@@ -41,6 +41,12 @@ jobs:
         run: python scripts/gerar-ouro.py --conferir
       - name: nenhum dado pessoal nos arquivos versionados
         run: bash scripts/check-pii.sh --all
+      # A tela de licenças é declaração legal: a Play Store cobra as
+      # atribuições e as próprias licenças exigem o aviso junto do binário.
+      # Uma lista escrita à mão envelhece em semanas — aqui ela é derivada dos
+      # manifestos, e esta linha é o que impede a derivação de divergir.
+      - name: licenças declaradas batem com os manifestos
+        run: python -m fintips.cli config --conferir
 
   kotlin:
     name: motor Kotlin
