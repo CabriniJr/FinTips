@@ -5,13 +5,19 @@ import com.fintips.motor.vida.Cadencia
 import com.fintips.motor.vida.Missao
 import com.fintips.motor.vida.OrigemDoRegistro
 import com.fintips.motor.vida.RegistroDeMissao
+import com.fintips.motor.vida.RegraDeclarada
+import com.fintips.motor.vida.Vida
 import com.fintips.motor.vida.coberturaDeEvidencia
+import com.fintips.motor.vida.contextoDeCompra
+import com.fintips.motor.vida.contextoDePlanos
+import com.fintips.motor.vida.mesesDeAporte
 import com.fintips.motor.vida.estadoDiario
 import com.fintips.motor.vida.forcaDosAtributos
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -259,6 +265,167 @@ class OuroVidaTest {
         }
         if (problemas.isNotEmpty()) {
             fail("cobertura divergiu do motor Python:\n  " + problemas.joinToString("\n  "))
+        }
+    }
+
+    // ------------------------------------------- a ponte com o dinheiro
+
+    @Test
+    fun o_empate_de_meio_centesimo_bate_com_o_decimal_do_python() {
+        // O caso que justifica o harness desta seção. O Python divide em
+        // `Decimal` exato e o empate de meio centésimo acontece de verdade.
+        // Em `Double` ele nunca existe — 0.005 não é representável, o valor
+        // cai um fio acima ou abaixo, e o meio-para-o-par nunca se aplica.
+        // Divergia em metade dos empates, nos dois sentidos.
+        val problemas = mutableListOf<String>()
+        for (caso in ouro["empates_de_meio_centesimo"]!!.jsonArray) {
+            val o = caso.jsonObject
+            val preco = Dinheiro(o["preco_centavos"]!!.jsonPrimitive.content.toLong())
+            val aporte = Dinheiro(o["aporte_centavos"]!!.jsonPrimitive.content.toLong())
+            val esperado = o["meses_de_aporte"]!!.jsonPrimitive.content.toDouble()
+            val obtido = mesesDeAporte(preco, aporte)
+            if (esperado != obtido) {
+                problemas += "preco=${preco.centavos} aporte=${aporte.centavos}: " +
+                    "python $esperado, kotlin $obtido"
+            }
+        }
+        if (problemas.isNotEmpty()) {
+            fail(
+                "razão em meses de aporte divergiu do motor Python:\n  " +
+                    problemas.joinToString("\n  "),
+            )
+        }
+    }
+
+    @Test
+    fun o_contexto_de_compra_bate_caso_a_caso() {
+        val problemas = mutableListOf<String>()
+        for (caso in ouro["compras"]!!.jsonArray) {
+            val o = caso.jsonObject
+            val nome = o["caso"]!!.jsonPrimitive.content
+
+            val tela = Missao(
+                id = "foc-tela", titulo = "Tela zero", atributo = Atributo.FOC,
+                cadencia = Cadencia.DIARIA, sensorPossivel = true,
+                porque = "corte total em vez de moderação",
+                colideCom = listOf("tablet", "assinatura de video"),
+            )
+            val aporte = Missao(
+                id = "ouro-aporte", titulo = "Aporte do mês", atributo = Atributo.OURO,
+                cadencia = Cadencia.MENSAL, valorMensal = Dinheiro.de("4300"),
+            )
+            val idsDoOuro = o["missoes"]!!.jsonArray.map { it.jsonPrimitive.content }
+            val missoes = listOf(tela, aporte).filter { it.id in idsDoOuro }
+            val registros = if (missoes.contains(tela)) {
+                (10..14).map {
+                    RegistroDeMissao("foc-tela", LocalDate(2026, 10, it), OrigemDoRegistro.SENSOR)
+                }
+            } else {
+                emptyList()
+            }
+            val regras = if (o["tem_regra"]!!.jsonPrimitive.content.toBoolean()) {
+                listOf(
+                    RegraDeclarada(
+                        id = "espera", tipo = "espera_antes_de_comprar",
+                        acimaDe = Dinheiro.de("300"), dias = 30,
+                        porque = "lista de desejos e 30 dias",
+                    ),
+                )
+            } else {
+                emptyList()
+            }
+
+            val ctx = contextoDeCompra(
+                Vida(missoes = missoes, registros = registros, regras = regras),
+                item = o["item"]!!.jsonPrimitive.content,
+                preco = Dinheiro.de(o["preco"]!!.jsonPrimitive.content),
+                categoria = o["categoria"]!!.jsonPrimitive.content,
+                tags = o["tags"]!!.jsonArray.map { it.jsonPrimitive.content },
+                hoje = dia("2026-10-14"),
+            )
+
+            fun diga(campo: String, py: Any?, kt: Any?) {
+                if (py.toString() != kt.toString()) problemas += "[$nome] $campo: python $py, kotlin $kt"
+            }
+
+            diga(
+                "sem_missoes_cadastradas",
+                o["sem_missoes_cadastradas"]!!.jsonPrimitive.content,
+                ctx.semMissoesCadastradas,
+            )
+            val aplicaPy = o["regra_aplica"]!!.jsonPrimitive.contentOrNull
+            diga("regra_aplica", aplicaPy, ctx.regraDeclarada?.aplica)
+            diga(
+                "regra_liberada_em",
+                o["regra_liberada_em"]!!.jsonPrimitive.contentOrNull,
+                ctx.regraDeclarada?.liberadaEm,
+            )
+            diga(
+                "meses_de_aporte",
+                o["meses_de_aporte"]!!.jsonPrimitive.contentOrNull?.toDouble(),
+                ctx.custoEmAportes?.mesesDeAporte,
+            )
+
+            val emJogoPy = o["missoes_em_jogo"]!!.jsonArray.map { it.jsonObject }
+            diga("quantas_em_jogo", emJogoPy.size, ctx.missoesEmJogo.size)
+            for ((i, m) in emJogoPy.withIndex()) {
+                if (i >= ctx.missoesEmJogo.size) break
+                val k = ctx.missoesEmJogo[i]
+                diga("em_jogo[$i].missao", m["missao"]!!.jsonPrimitive.content, k.missao)
+                diga(
+                    "em_jogo[$i].colisao",
+                    m["colisao_declarada"]!!.jsonPrimitive.contentOrNull,
+                    k.colisaoDeclarada,
+                )
+                diga(
+                    "em_jogo[$i].sequencia",
+                    m["sequencia_em_risco"]!!.jsonPrimitive.contentOrNull?.toInt(),
+                    k.sequenciaEmRisco,
+                )
+            }
+        }
+        if (problemas.isNotEmpty()) {
+            fail("contexto de compra divergiu do motor Python:\n  " + problemas.joinToString("\n  "))
+        }
+    }
+
+    @Test
+    fun o_aporte_contra_os_planos_bate() {
+        val problemas = mutableListOf<String>()
+        for (caso in ouro["planos"]!!.jsonArray) {
+            val o = caso.jsonObject
+            val nome = o["caso"]!!.jsonPrimitive.content
+            val temAporte = o["tem_missao_de_aporte"]!!.jsonPrimitive.content.toBoolean()
+            val missoes = if (temAporte) {
+                listOf(
+                    Missao(
+                        id = "ouro-aporte", titulo = "Aporte do mês",
+                        atributo = Atributo.OURO, cadencia = Cadencia.MENSAL,
+                        valorMensal = Dinheiro.de("4300"),
+                    ),
+                )
+            } else {
+                listOf(missao("foc-tela", "FOC", "diaria", true))
+            }
+            val c = contextoDePlanos(
+                Vida(missoes = missoes),
+                Dinheiro.de(o["exigido"]!!.jsonPrimitive.content),
+            )
+            if (temAporte) {
+                val folgaPy = Dinheiro.de(o["folga_mensal"]!!.jsonPrimitive.content)
+                if (folgaPy != c.folgaMensal) {
+                    problemas += "[$nome] folga: python ${folgaPy.centavos}, kotlin ${c.folgaMensal.centavos}"
+                }
+                val cabePy = o["planos_cabem_no_aporte"]!!.jsonPrimitive.content.toBoolean()
+                if (cabePy != c.planosCabemNoAporte) {
+                    problemas += "[$nome] cabem: python $cabePy, kotlin ${c.planosCabemNoAporte}"
+                }
+            } else if (c.missaoDeAporte != null) {
+                problemas += "[$nome] python não achou missão de aporte e o kotlin achou"
+            }
+        }
+        if (problemas.isNotEmpty()) {
+            fail("aporte contra planos divergiu do motor Python:\n  " + problemas.joinToString("\n  "))
         }
     }
 }

@@ -841,6 +841,120 @@ def ouro_vida() -> dict:
             "pct_medido": c["pct_medido"],
         })
 
+    # A ponte com o dinheiro. O caso que justifica esta seção é o empate de meio
+    # centésimo: o Python divide em `Decimal` exato e o empate acontece; em
+    # `Double` ele nunca existe, e o meio-para-o-par nunca se aplica. Divergia
+    # em metade dos empates, nos dois sentidos.
+    aporte = life.Missao(
+        id="ouro-aporte", titulo="Aporte do mês", atributo="OURO",
+        cadencia="mensal", valor_mensal=Decimal("2.00"),
+    )
+    empates = []
+    # Os dois blocos de preço existem porque **cada implementação de
+    # arredondamento erra num conjunto diferente**, e um ouro que só
+    # exercite um dos dois passa em silêncio no outro.
+    #
+    #   1, 3, 5, 13, …   quebram `BigDecimal(double)` (o arredondar do porte)
+    #   109, 115, 203, … quebram a versão que multiplica por 10 antes
+    #
+    # Descoberto do jeito mais instrutivo possível: sabotei a razão para
+    # `Double` e a suíte **passou**, porque o primeiro bloco não fazia a
+    # pergunta para o arredondar que estava na árvore. O ouro só morderia
+    # depois do merge — o pior momento para descobrir.
+    for preco_cent in (1, 3, 5, 13, 15, 17, 31, 33, 35, 43, 199, 201,
+                       109, 115, 203, 207, 245, 251, 419, 435):
+        ctx = life.contexto_de_compra(
+            life.Vida(missoes=[aporte]),
+            item="x", preco=Decimal(preco_cent) / 100, hoje=hoje,
+        )
+        empates.append({
+            "preco_centavos": preco_cent,
+            "aporte_centavos": 200,
+            "meses_de_aporte": ctx["custo_em_aportes"]["meses_de_aporte"],
+        })
+
+    tela = life.Missao(
+        id="foc-tela", titulo="Tela zero", atributo="FOC", cadencia="diaria",
+        sensor_possivel=True, porque="corte total em vez de moderação",
+        colide_com=["tablet", "assinatura de video"],
+    )
+    aporte_real = life.Missao(
+        id="ouro-aporte", titulo="Aporte do mês", atributo="OURO",
+        cadencia="mensal", valor_mensal=Decimal("4300"),
+    )
+    regra = life.RegraDeclarada(
+        id="espera", tipo="espera_antes_de_comprar",
+        acima_de=Decimal("300"), dias=30, porque="lista de desejos e 30 dias",
+    )
+    registros_tela = [r("foc-tela", d, "sensor") for d in range(10, 15)]
+
+    compras = []
+    for nome, item, preco, cat, tags, missoes, regras, registros in [
+        ("tablet_colide_e_regra_aplica", "Tablet S11", "2500", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("abaixo_do_limite_a_regra_nao_aplica", "Livro", "90", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("exatamente_no_limite_nao_aplica", "Fone", "300", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("um_centavo_acima_do_limite_aplica", "Fone", "300.01", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("sem_colisao_declarada_so_entra_o_ouro", "Cafeteira", "200", "casa", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("colisao_por_tag_e_nao_por_item", "Presente", "500", "compras",
+         ["assinatura de video"], [tela, aporte_real], [regra], registros_tela),
+        ("sem_regra_declarada", "Tablet", "2500", "compras", [],
+         [tela, aporte_real], [], registros_tela),
+        ("catalogo_vazio", "Tablet", "2500", "compras", [], [], [], []),
+    ]:
+        v = life.Vida(missoes=missoes, registros=registros, regras=regras)
+        ctx = life.contexto_de_compra(
+            v, item=item, preco=Decimal(preco), categoria=cat, tags=tags, hoje=hoje,
+        )
+        rd = ctx["regra_declarada"]
+        compras.append({
+            "caso": nome,
+            "item": item,
+            "preco": preco,
+            "categoria": cat,
+            "tags": tags,
+            "missoes": [m.id for m in missoes],
+            "tem_regra": bool(regras),
+            "sem_missoes_cadastradas": ctx["sem_missoes_cadastradas"],
+            "regra_aplica": None if rd is None else rd["aplica"],
+            "regra_liberada_em": None if rd is None else rd["liberada_em"],
+            "missoes_em_jogo": [
+                {
+                    "missao": m["missao"],
+                    "colisao_declarada": m["colisao_declarada"],
+                    "sequencia_em_risco": m["sequencia_em_risco"],
+                    "recorde": m["recorde"],
+                }
+                for m in ctx["missoes_em_jogo"]
+            ],
+            "meses_de_aporte": (ctx["custo_em_aportes"] or {}).get("meses_de_aporte"),
+        })
+
+    planos = []
+    for nome, missoes, exigido in [
+        ("cabe_com_folga", [aporte_real], "700"),
+        ("exatamente_no_limite", [aporte_real], "4300"),
+        ("um_centavo_acima_nao_cabe", [aporte_real], "4300.01"),
+        ("sem_missao_de_aporte", [tela], "700"),
+    ]:
+        c = life.contexto_de_planos(
+            life.Vida(missoes=missoes),
+            [{"nome": "p", "aporte_necessario_mes": exigido, "status": "no_ritmo"}],
+        )
+        planos.append({
+            "caso": nome,
+            "exigido": exigido,
+            "tem_missao_de_aporte": c["missao_de_aporte"] is not None,
+            "aporte_mensal": (c["missao_de_aporte"] or {}).get("aporte_mensal"),
+            "exigido_pelos_planos_mes": c.get("exigido_pelos_planos_mes"),
+            "folga_mensal": c.get("folga_mensal"),
+            "planos_cabem_no_aporte": c.get("planos_cabem_no_aporte"),
+        })
+
     return {
         "fonte": "fintips.life",
         "atributos": list(life.ATRIBUTOS),
@@ -853,6 +967,9 @@ def ouro_vida() -> dict:
         "sequencias": sequencias,
         "barras": barras,
         "coberturas": coberturas,
+        "empates_de_meio_centesimo": empates,
+        "compras": compras,
+        "planos": planos,
     }
 
 

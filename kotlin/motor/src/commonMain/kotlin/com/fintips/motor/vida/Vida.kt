@@ -1,6 +1,8 @@
 package com.fintips.motor.vida
 
+import com.fintips.motor.Dinheiro
 import com.fintips.motor.arredondar
+import com.fintips.motor.norm
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -119,6 +121,18 @@ data class Missao(
     /** De onde a missão veio. O plano da pessoa é dela: origem `usuario`. */
     val porque: String = "",
     val ativa: Boolean = true,
+    /**
+     * Quanto a missão move por mês, quando é de dinheiro. É o que traduz preço
+     * em meses de aporte: "este item custa 0,58 do seu aporte" diz mais que o
+     * valor em reais.
+     */
+    val valorMensal: Dinheiro? = null,
+    /**
+     * O que esta missão considera conflito. **Declarado pela pessoa**, nunca
+     * inferido: é a única porta pela qual uma compra toca uma frente que não é
+     * dinheiro.
+     */
+    val colideCom: List<String> = emptyList(),
 )
 
 /** Um cumprimento, com a data e como se soube. */
@@ -274,5 +288,205 @@ fun coberturaDeEvidencia(
             "quanto do que o app afirma veio de medida. O resto é memória, e " +
             "memória de tempo de tela distorce a favor de quem lembra"
         ),
+    )
+}
+
+// ---------------------------------------------- a ponte com o dinheiro
+
+/**
+ * Uma regra que a pessoa escreveu para si. O motor aplica; não opina.
+ *
+ * É o único tipo deste pacote com direito de mexer num veredito de compra, e
+ * só porque o veredito já é dela: ela decidiu esperar, e pediu ao app para
+ * aplicar. Daí `porque` ser obrigatório na construção — regra que muda
+ * veredito sem dizer de onde veio é opinião do app disfarçada.
+ */
+data class RegraDeclarada(
+    val id: String,
+    val tipo: String,
+    val acimaDe: Dinheiro,
+    val dias: Int,
+    val porque: String,
+) {
+    init {
+        require(porque.isNotBlank()) {
+            "regra '$id' sem porque — regra que mexe em veredito precisa dizer " +
+                "de onde veio, ou vira opinião do app"
+        }
+        require(tipo in TIPOS_DE_REGRA) {
+            "regra '$id': tipo '$tipo' não é suportado. Suportados: $TIPOS_DE_REGRA"
+        }
+    }
+
+    companion object {
+        val TIPOS_DE_REGRA = listOf("espera_antes_de_comprar")
+    }
+}
+
+/** O catálogo da pessoa e os registros dela. */
+data class Vida(
+    val missoes: List<Missao> = emptyList(),
+    val registros: List<RegistroDeMissao> = emptyList(),
+    val regras: List<RegraDeclarada> = emptyList(),
+) {
+    val vazia: Boolean get() = missoes.isEmpty()
+}
+
+data class RegraAplicada(
+    val id: String,
+    val acimaDe: Dinheiro,
+    val dias: Int,
+    val porqueElaEscreveu: String,
+    val aplica: Boolean,
+    val liberadaEm: LocalDate?,
+)
+
+data class MissaoEmJogo(
+    val missao: String,
+    val titulo: String,
+    val atributo: Atributo,
+    val cadencia: Cadencia,
+    val porQueEntraAqui: String,
+    val colisaoDeclarada: String?,
+    val porqueDaMissao: String,
+    val sequenciaEmRisco: Int?,
+    val recorde: Int?,
+)
+
+data class CustoEmAportes(
+    val missao: String,
+    val aporteMensal: Dinheiro,
+    val mesesDeAporte: Double,
+)
+
+data class ContextoDeCompra(
+    val regraDeclarada: RegraAplicada?,
+    val missoesEmJogo: List<MissaoEmJogo>,
+    val custoEmAportes: CustoEmAportes?,
+    val frentesNoMomento: List<ForcaDoAtributo>,
+    val semMissoesCadastradas: Boolean,
+)
+
+/**
+ * O que as seis frentes dizem sobre uma compra.
+ *
+ * O módulo **não infere nada**. A colisão entre uma compra e uma missão existe
+ * só porque a pessoa escreveu a palavra em `colideCom`: o motor não decide que
+ * tablet é vício. É a mesma regra das causas, que não têm nem terão detecção —
+ * e diagnóstico errado sobre vício é pior que silêncio.
+ *
+ * Missão de dinheiro entra sempre, sem precisar de palavra declarada, porque
+ * qualquer compra disputa com ela por definição.
+ */
+fun contextoDeCompra(
+    vida: Vida,
+    item: String,
+    preco: Dinheiro,
+    categoria: String = "",
+    tags: List<String> = emptyList(),
+    hoje: LocalDate,
+): ContextoDeCompra {
+    val texto = norm("$item $categoria ${tags.joinToString(" ")}")
+
+    val regra = vida.regras.firstOrNull { it.tipo == "espera_antes_de_comprar" }?.let { r ->
+        val aplica = preco.centavos > r.acimaDe.centavos
+        RegraAplicada(
+            id = r.id,
+            acimaDe = r.acimaDe,
+            dias = r.dias,
+            porqueElaEscreveu = r.porque,
+            aplica = aplica,
+            liberadaEm = if (aplica) hoje.plus(DatePeriod(days = r.dias)) else null,
+        )
+    }
+
+    val emJogo = vida.missoes.filter { it.ativa }.mapNotNull { m ->
+        val termo = m.colideCom.firstOrNull { it.isNotBlank() && norm(it) in texto }
+        if (termo == null && m.atributo != Atributo.OURO) return@mapNotNull null
+        val estado = if (m.cadencia == Cadencia.DIARIA) estadoDiario(m, vida.registros, hoje) else null
+        MissaoEmJogo(
+            missao = m.id,
+            titulo = m.titulo,
+            atributo = m.atributo,
+            cadencia = m.cadencia,
+            porQueEntraAqui = if (termo != null)
+                "a pessoa declarou que '$termo' colide com esta missão"
+            else "missão de dinheiro — toda compra disputa com ela",
+            colisaoDeclarada = termo,
+            porqueDaMissao = m.porque,
+            sequenciaEmRisco = estado?.sequencia,
+            recorde = estado?.recorde,
+        )
+    }
+
+    val aporte = vida.missoes.firstOrNull {
+        it.ativa && it.atributo == Atributo.OURO && (it.valorMensal?.centavos ?: 0L) > 0L
+    }
+    val custo = aporte?.let { m ->
+        val mensal = m.valorMensal!!
+        CustoEmAportes(
+            missao = m.id,
+            aporteMensal = mensal,
+            mesesDeAporte = mesesDeAporte(preco, mensal),
+        )
+    }
+
+    return ContextoDeCompra(
+        regraDeclarada = regra,
+        missoesEmJogo = emJogo,
+        custoEmAportes = custo,
+        frentesNoMomento = forcaDosAtributos(vida.missoes, vida.registros, hoje),
+        semMissoesCadastradas = vida.vazia,
+    )
+}
+
+/**
+ * Preço em meses de aporte, com duas casas.
+ *
+ * **Em aritmética inteira, e não em `Double`, por um motivo que custou um
+ * harness para aparecer.** O Python divide em `Decimal` exato e arredonda
+ * meio-para-o-par; o empate de meio centésimo (`0.005`) acontece de verdade lá.
+ * Em `Double` esse empate nunca existe — `0.005` não é representável, o valor
+ * cai um fio acima ou abaixo, e o meio-para-o-par nunca se aplica. O resultado
+ * é divergência em metade dos casos de empate, nos dois sentidos:
+ *
+ * ```
+ * preco=3 cent, aporte=200 cent  → python 0.02, kotlin 0.01
+ * preco=5 cent, aporte=200 cent  → python 0.02, kotlin 0.03
+ * ```
+ *
+ * `Dinheiro.dividir(Long)` já faz essa divisão com o empate exato. Multiplicar
+ * por 100 antes põe os centésimos na casa das unidades, e aí a conta inteira é
+ * a mesma que o `Decimal` faz.
+ */
+internal fun mesesDeAporte(preco: Dinheiro, aporteMensal: Dinheiro): Double =
+    Dinheiro(preco.centavos * 100).dividir(aporteMensal.centavos).centavos / 100.0
+
+data class ContextoDePlanos(
+    val missaoDeAporte: Missao?,
+    val aporteMensal: Dinheiro,
+    val exigidoPelosPlanosMes: Dinheiro,
+    val folgaMensal: Dinheiro,
+    val planosCabemNoAporte: Boolean,
+)
+
+/**
+ * O aporte que ela assinou contra o que os planos exigem por mês.
+ *
+ * Compromisso declarado de um lado, necessidade dos planos do outro. Quando não
+ * fecham, o motor mostra a diferença e para: subir o aporte, esticar o prazo ou
+ * cortar plano é escolha dela.
+ */
+fun contextoDePlanos(vida: Vida, exigidoPelosPlanos: Dinheiro): ContextoDePlanos {
+    val aporte = vida.missoes.firstOrNull {
+        it.ativa && it.atributo == Atributo.OURO && (it.valorMensal?.centavos ?: 0L) > 0L
+    }
+    val mensal = aporte?.valorMensal ?: Dinheiro(0)
+    return ContextoDePlanos(
+        missaoDeAporte = aporte,
+        aporteMensal = mensal,
+        exigidoPelosPlanosMes = exigidoPelosPlanos,
+        folgaMensal = Dinheiro(mensal.centavos - exigidoPelosPlanos.centavos),
+        planosCabemNoAporte = mensal.centavos >= exigidoPelosPlanos.centavos,
     )
 }

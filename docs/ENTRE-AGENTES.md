@@ -129,7 +129,7 @@ de pronto volta meio feita.
 | 9c | `Alavancas`, `Triagem`, `Dossie` | porte | livre | com elas fecham o `contexto_pessoal` e os `precedentes` das compras no Kotlin |
 | V3 | App Android: as seis barras e a lista do dia | vida | **assumido pela trilha de vida** | abre, mostra as seis barras, marca missão e a marcação sobrevive a fechar o app |
 | V4 | Sensores (tempo de tela, passos) como registro `sensor` | vida | assumido pela trilha de vida, **depende de V3** | `cobertura_de_evidencia` sai de 0% sem ninguém digitar nada |
-| V5 | Ponte de vida em Kotlin (`contexto_de_compra`, `contexto_de_planos`) | vida | assumido pela trilha de vida, **precisa de costura em `Compras.kt`** — ver pedido 3 | `ouro/vida.json` ganha os casos da ponte e o Kotlin fecha com `fintips/life.py` |
+| V5 | Ponte de vida em Kotlin (`contextoDeCompra`, `contextoDePlanos`) | vida | **pronto o cálculo**; a ligação ainda espera a costura em `Compras.kt` — pedido 3 | feito: `ouro/vida.json` tem 57 casos e o Kotlin fecha com `fintips/life.py` |
 | V6 | Painel: as seis barras ao lado do score | vida | assumido pela trilha de vida | aba lendo `/api/life`, sem número inventado quando o catálogo está vazio |
 | — | **Mesclar as duas branches no `main`** | — | **do usuário** | sete hunks, receita acima; ninguém mescla a branch do outro por conta própria |
 
@@ -191,6 +191,7 @@ O que um lado usa do outro, para ninguém mover em silêncio:
 | Quem usa | O que | Observação |
 |---|---|---|
 | `vida/Vida.kt` | `arredondar()` de `Contratos.kt` | virou `expect`/`actual` no porte, e a implementação nova é **melhor**: `BigDecimal(double)` pega a expansão binária exata, enquanto a minha multiplicava por 10 antes de arredondar e já carregava erro de float. Conferi os 11 casos de `pct` do `ouro/vida.json` contra a nova: **zero divergência**. Mantido como está; se mudar de nome ou de arquivo, uma linha no log evita que eu descubra pelo compilador |
+| `vida/Vida.kt` | `Dinheiro.dividir(Long)` | usado para a razão preço/aporte em aritmética inteira, por causa do achado abaixo. Se a semântica do empate mudar aí, `ouro/vida.json` acusa |
 | ambos | `purchases.evaluate` | depois do merge ela tem quatro parâmetros novos, dois de cada lado, em chaves de saída diferentes (`contexto_de_vida`, `precedentes`). As duas suítes devem passar juntas **sem adaptação** — se uma falhar, o merge comeu um bloco |
 | ambos | `scripts/gerar-ouro.py` | o `GERADORES` é um dicionário: entrada nova no fim, nunca reescrita do bloco |
 
@@ -306,3 +307,48 @@ Em aberto, e é pedido e não tarefa: a ponte de vida precisa de uma costura em
 `Compras.kt`, que é faixa do porte. Até ter resposta, ela fica no pacote `vida/`,
 funcionando isolada, sem deixar o arquivo do outro numa forma que ele não
 escolheu.
+
+**2026-10-14 · V5 pronto no cálculo, e um achado que vale para os dois lados**
+
+Portei a ponte para o Kotlin (`contextoDeCompra`, `contextoDePlanos`, mais
+`valorMensal` e `colideCom` em `Missao`) e estendi `ouro/vida.json` para 57
+casos. A ligação em `Compras.kt` continua esperando resposta do pedido 3; o
+cálculo funciona isolado no pacote `vida/`.
+
+**O achado é sobre harness, não sobre arredondamento, e é o mais útil que
+apareceu até agora neste repositório.**
+
+Portei a razão "preço em meses de aporte" como `Double` dividido e arredondado,
+igual ao resto. Depois fui procurar o empate de meio centésimo — a razão que cai
+exatamente em `0.005` — e ele diverge do Python em **metade dos casos, nos dois
+sentidos**, porque em `Decimal` o empate acontece de verdade e em `Double` ele
+não existe: `0.005` não é representável, o valor cai um fio para um lado, e o
+meio-para-o-par nunca se aplica.
+
+Corrigi usando `Dinheiro.dividir(Long)`, que já faz divisão inteira
+meio-para-o-par: multiplicar por 100 antes põe os centésimos na casa das
+unidades, e a conta inteira é a mesma que o `Decimal` faz. Pus 12 casos de
+empate no ouro, rodei, verde.
+
+**Aí sabotei de propósito — voltei para `Double` — e a suíte passou.**
+
+O motivo é o que interessa. Os 12 casos que eu escolhi quebram
+`BigDecimal(double)`, que é o `arredondar` **da branch do porte**. Na minha
+árvore ainda está a versão que multiplica por 10 antes, e ela erra num conjunto
+**diferente** de casos. Resultado: o ouro passava hoje e só morderia **depois
+do merge** — o pior momento possível para descobrir, porque ali a falha
+pareceria culpa do merge.
+
+Com `109, 115, 203, 207, 245, 251, 419, 435` acrescentados, a mesma sabotagem
+falha nomeando sete linhas. O ouro agora é independente de qual implementação
+de arredondamento está na árvore.
+
+A lição, para quem portar qualquer razão daqui para frente:
+
+- **razão entre dois valores em centavos não vai para `Double`.** Use
+  `Dinheiro.dividir(Long)` e multiplique antes pela escala que você quer. É a
+  única forma de o empate existir no Kotlin como existe no `Decimal`.
+- **caso de empate escolhido contra uma implementação não protege contra outra.**
+  Quando duas implementações da mesma função convivem no repositório — e
+  convivem, porque o `arredondar` mudou de forma numa branch e não na outra —
+  o ouro precisa de casos que quebrem as duas.

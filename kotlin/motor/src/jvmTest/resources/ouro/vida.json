@@ -614,5 +614,349 @@
       "com_medida_registrada": 0,
       "pct_medido": 0.0
     }
+  ],
+  "empates_de_meio_centesimo": [
+    {
+      "preco_centavos": 1,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.0
+    },
+    {
+      "preco_centavos": 3,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.02
+    },
+    {
+      "preco_centavos": 5,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.02
+    },
+    {
+      "preco_centavos": 13,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.06
+    },
+    {
+      "preco_centavos": 15,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.08
+    },
+    {
+      "preco_centavos": 17,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.08
+    },
+    {
+      "preco_centavos": 31,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.16
+    },
+    {
+      "preco_centavos": 33,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.16
+    },
+    {
+      "preco_centavos": 35,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.18
+    },
+    {
+      "preco_centavos": 43,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.22
+    },
+    {
+      "preco_centavos": 199,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.0
+    },
+    {
+      "preco_centavos": 201,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.0
+    },
+    {
+      "preco_centavos": 109,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.54
+    },
+    {
+      "preco_centavos": 115,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.58
+    },
+    {
+      "preco_centavos": 203,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.02
+    },
+    {
+      "preco_centavos": 207,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.04
+    },
+    {
+      "preco_centavos": 245,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.22
+    },
+    {
+      "preco_centavos": 251,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.26
+    },
+    {
+      "preco_centavos": 419,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 2.1
+    },
+    {
+      "preco_centavos": 435,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 2.18
+    }
+  ],
+  "compras": [
+    {
+      "caso": "tablet_colide_e_regra_aplica",
+      "item": "Tablet S11",
+      "preco": "2500",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": true,
+      "regra_liberada_em": "2026-11-13",
+      "missoes_em_jogo": [
+        {
+          "missao": "foc-tela",
+          "colisao_declarada": "tablet",
+          "sequencia_em_risco": 5,
+          "recorde": 5
+        },
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.58
+    },
+    {
+      "caso": "abaixo_do_limite_a_regra_nao_aplica",
+      "item": "Livro",
+      "preco": "90",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": false,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.02
+    },
+    {
+      "caso": "exatamente_no_limite_nao_aplica",
+      "item": "Fone",
+      "preco": "300",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": false,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.07
+    },
+    {
+      "caso": "um_centavo_acima_do_limite_aplica",
+      "item": "Fone",
+      "preco": "300.01",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": true,
+      "regra_liberada_em": "2026-11-13",
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.07
+    },
+    {
+      "caso": "sem_colisao_declarada_so_entra_o_ouro",
+      "item": "Cafeteira",
+      "preco": "200",
+      "categoria": "casa",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": false,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.05
+    },
+    {
+      "caso": "colisao_por_tag_e_nao_por_item",
+      "item": "Presente",
+      "preco": "500",
+      "categoria": "compras",
+      "tags": [
+        "assinatura de video"
+      ],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": true,
+      "regra_liberada_em": "2026-11-13",
+      "missoes_em_jogo": [
+        {
+          "missao": "foc-tela",
+          "colisao_declarada": "assinatura de video",
+          "sequencia_em_risco": 5,
+          "recorde": 5
+        },
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.12
+    },
+    {
+      "caso": "sem_regra_declarada",
+      "item": "Tablet",
+      "preco": "2500",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": false,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": null,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "foc-tela",
+          "colisao_declarada": "tablet",
+          "sequencia_em_risco": 5,
+          "recorde": 5
+        },
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.58
+    },
+    {
+      "caso": "catalogo_vazio",
+      "item": "Tablet",
+      "preco": "2500",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [],
+      "tem_regra": false,
+      "sem_missoes_cadastradas": true,
+      "regra_aplica": null,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [],
+      "meses_de_aporte": null
+    }
+  ],
+  "planos": [
+    {
+      "caso": "cabe_com_folga",
+      "exigido": "700",
+      "tem_missao_de_aporte": true,
+      "aporte_mensal": 4300.0,
+      "exigido_pelos_planos_mes": 700.0,
+      "folga_mensal": 3600.0,
+      "planos_cabem_no_aporte": true
+    },
+    {
+      "caso": "exatamente_no_limite",
+      "exigido": "4300",
+      "tem_missao_de_aporte": true,
+      "aporte_mensal": 4300.0,
+      "exigido_pelos_planos_mes": 4300.0,
+      "folga_mensal": 0.0,
+      "planos_cabem_no_aporte": true
+    },
+    {
+      "caso": "um_centavo_acima_nao_cabe",
+      "exigido": "4300.01",
+      "tem_missao_de_aporte": true,
+      "aporte_mensal": 4300.0,
+      "exigido_pelos_planos_mes": 4300.01,
+      "folga_mensal": -0.01,
+      "planos_cabem_no_aporte": false
+    },
+    {
+      "caso": "sem_missao_de_aporte",
+      "exigido": "700",
+      "tem_missao_de_aporte": false,
+      "aporte_mensal": null,
+      "exigido_pelos_planos_mes": null,
+      "folga_mensal": null,
+      "planos_cabem_no_aporte": null
+    }
   ]
 }
