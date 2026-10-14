@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Sem permissão nenhuma, e isso é o desenho e não um esquecimento.
+
+  O app lê e escreve só o armazenamento privado dele (`filesDir`), que no
+  Android não exige permissão. Não há INTERNET: dado de hábito e de dinheiro
+  não sai do aparelho por este app. Quando os sensores entrarem (tempo de tela,
+  passos), cada um trará a permissão dele, pedida na hora e explicada — não um
+  bloco de permissões adiantadas "para depois".
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:label="FinTips"
+        android:allowBackup="false"
+        android:supportsRtl="true">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

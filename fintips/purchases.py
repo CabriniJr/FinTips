@@ -386,7 +386,7 @@ def evaluate(
         - (15 if any(p["conflito"] for p in impacto_planos) else 0),
     )
 
-    return {
+    saida = {
         "item": intent.item,
         "preco": float(intent.preco),
         "veredito": veredito,
@@ -402,21 +402,32 @@ def evaluate(
         "estrategias": cen,
         "impacto_nos_planos": impacto_planos,
         "melhor_estrategia": _best(cen, fura_reserva, regret["risco_arrependimento"]),
-        "regra_declarada_aplicada": (
-            {
-                "regra": regra["id"],
-                "porque_ela_escreveu": regra["porque_ela_escreveu"],
-                "liberada_em": regra["liberada_em"],
-            }
-            if espera_declarada else None
-        ),
-        "contexto_de_vida": vida_ctx,
         "contexto_pessoal": contexto_pessoal(
             intent, perfil, causas,
             despesa_mes=despesa, saldo_mais_patrimonio=saldo + patr,
         ),
         "precedentes": precedentes_desta_compra(precedentes, aprendizados, intent),
     }
+
+    # As chaves da camada de vida só existem quando há catálogo, e isso é
+    # decisão e não detalhe: quem chama `evaluate` sem `vida` recebe exatamente
+    # a resposta que recebia antes de a camada existir — mesma forma, mesmas
+    # chaves, mesma ordem.
+    #
+    # Nasceu de um teste alheio falhando. O harness do porte confere a LISTA DE
+    # CHAVES de `evaluate`, e devolver `contexto_de_vida: None` mudava a forma
+    # da resposta para todo mundo, inclusive para o Kotlin, que ainda não tem a
+    # ponte ligada em `Compras.kt`. **Chave opcional que aparece como `null` é
+    # mudança de contrato disfarçada de acréscimo.**
+    if vida_ctx is not None:
+        saida["contexto_de_vida"] = vida_ctx
+        if espera_declarada:
+            saida["regra_declarada_aplicada"] = {
+                "regra": regra["id"],
+                "porque_ela_escreveu": regra["porque_ela_escreveu"],
+                "liberada_em": regra["liberada_em"],
+            }
+    return saida
 
 
 def _best(cen: list[dict], fura_reserva: bool, risco: int) -> str:

@@ -188,6 +188,48 @@ O Claude continua sendo um conector sobre o mesmo workspace. O app não embute
 agente: isso exigiria chave de API no aparelho e mandaria dado financeiro para
 fora da máquina, que é o contrário do que sustenta o projeto.
 
+## O celular é outra máquina
+
+Parece obvio escrito assim, e não era: o app Android **não lê o workspace**.
+Ele não tem `~/Documents/FinTips/data/` e nunca vai ter. Isso tem duas
+consequências que mudaram o desenho.
+
+**O aparelho precisa do catálogo em formato próprio.** O workspace guarda
+`missoes.yaml` porque é arquivo que a pessoa edita à mão, e YAML existe para
+isso. O que viaja para o celular é JSON, por `fintips aparelho --saida
+missoes.json`, e o histórico volta por `fintips aparelho --registros`.
+
+**A leitura de YAML em Kotlin deixou de bloquear o app.** Era o item 10b, e
+estava marcado no canal como o maior destravamento do repositório. Continua
+valendo para a heurística e para o catálogo no desktop — mas o Android não
+espera por ele.
+
+A fronteira de plataforma ficou do tamanho de três linhas. `Guarda` recebe
+duas funções, "ler texto" e "acrescentar texto", e **toda** decisão fica em
+`commonMain`: o que recusar, o que conta como cumprido, como a sequência anda,
+o que a tela mostra. O Android entrega as duas funções sobre `filesDir` e não
+tem onde esconder erro.
+
+Isso não é elegância: é que o código em `androidMain` **não roda em teste nenhum
+desta máquina**, porque o alvo exige SDK e emulador. Onde não há teste, não pode
+morar regra.
+
+### A tela, e o que ela não faz
+
+`montarTela(vida, hoje)` é função pura: devolve as seis barras, a lista do dia
+com sequência e recorde, e a cobertura de evidência. A camada Compose só
+desenha — e desenho errado se vê na tela, enquanto número errado, não.
+
+Três coisas a tela não faz, as três por decisão:
+
+- **não elogia e não cobra.** O resumo é "1 de 2 hoje". "Você está indo bem" é
+  o app opinando sobre o dia de alguém com base em caixas marcadas, e é a frase
+  que faz desinstalar no primeiro dia ruim. Existe teste proibindo as palavras.
+- **não esconde frente vazia.** As seis aparecem sempre; a vazia mostra "—",
+  porque frente sem missão é informação.
+- **não marca nada sozinha.** Toque é origem `usuario`. O app nunca grava
+  `presumido`, que existe exatamente para não contar.
+
 ## O que isso muda na ordem de construção
 
 A porta para Kotlin continua, mas a prioridade virou. Antes o Android era o
@@ -199,10 +241,10 @@ módulo 12; agora é o produto.
 | 2 | Persistência: ler e gravar missões e registros | **pronto** (`fintips/life.py`) |
 | 3 | Contexto de compra e de plano, com a regra declarada | **pronto**, 33 testes |
 | 4 | Conector MCP (`frentes`, `registrar_missao`, `aporte_vs_planos`) e API | **pronto** |
-| 5 | App Android: as seis barras e a lista do dia | a fazer |
+| 5 | App Android: as seis barras e a lista do dia | **lógica pronta e testada** (16 casos); a tela Compose **não compilou aqui** |
 | 6 | Sensores: tempo de tela e passos como evidência | a fazer |
 | 7 | Painel: as seis barras ao lado do score | a fazer |
-| 8 | Resto da porta: projeção, planos, compras | adiado |
+| 8 | Resto da porta: projeção, planos, compras | **pronto** — entrou por PR #3 |
 
 O motor financeiro portado — dinheiro, OFX, contratos, regras, análise, score —
 continua valendo e continua testado contra o Python. Ele só deixou de ser a

@@ -1,5 +1,49 @@
 {
   "fonte": "fintips.life",
+  "aparelho": {
+    "catalogo_json": "{\n  \"schema_version\": 1,\n  \"missoes\": [\n    {\n      \"id\": \"foc-tela\",\n      \"titulo\": \"Tela zero\",\n      \"atributo\": \"FOC\",\n      \"cadencia\": \"diaria\",\n      \"como_medir\": \"tempo de tela em zero\",\n      \"sensor_possivel\": true,\n      \"porque\": \"corte total em vez de moderação\",\n      \"ativa\": true,\n      \"valor_mensal\": null,\n      \"colide_com\": [\n        \"tablet\",\n        \"console\"\n      ]\n    },\n    {\n      \"id\": \"int-ler\",\n      \"titulo\": \"Ler um bloco\",\n      \"atributo\": \"INT\",\n      \"cadencia\": \"diaria\",\n      \"como_medir\": \"\",\n      \"sensor_possivel\": false,\n      \"porque\": \"\",\n      \"ativa\": true,\n      \"valor_mensal\": null,\n      \"colide_com\": []\n    },\n    {\n      \"id\": \"ouro-aporte\",\n      \"titulo\": \"Aporte\",\n      \"atributo\": \"OURO\",\n      \"cadencia\": \"mensal\",\n      \"como_medir\": \"\",\n      \"sensor_possivel\": false,\n      \"porque\": \"\",\n      \"ativa\": true,\n      \"valor_mensal\": \"4300.00\",\n      \"colide_com\": []\n    }\n  ],\n  \"regras\": [\n    {\n      \"id\": \"espera\",\n      \"tipo\": \"espera_antes_de_comprar\",\n      \"acima_de\": \"300.00\",\n      \"dias\": 30,\n      \"porque\": \"lista de desejos e 30 dias\"\n    }\n  ]\n}",
+    "esperado": [
+      {
+        "id": "foc-tela",
+        "titulo": "Tela zero",
+        "atributo": "FOC",
+        "cadencia": "diaria",
+        "sensor_possivel": true,
+        "colide_com": [
+          "tablet",
+          "console"
+        ],
+        "valor_mensal_centavos": null
+      },
+      {
+        "id": "int-ler",
+        "titulo": "Ler um bloco",
+        "atributo": "INT",
+        "cadencia": "diaria",
+        "sensor_possivel": false,
+        "colide_com": [],
+        "valor_mensal_centavos": null
+      },
+      {
+        "id": "ouro-aporte",
+        "titulo": "Aporte",
+        "atributo": "OURO",
+        "cadencia": "mensal",
+        "sensor_possivel": false,
+        "colide_com": [],
+        "valor_mensal_centavos": 430000
+      }
+    ],
+    "regras_esperadas": [
+      {
+        "id": "espera",
+        "acima_de_centavos": 30000,
+        "dias": 30,
+        "porque": "lista de desejos e 30 dias"
+      }
+    ],
+    "historico_jsonl": "{\"missao_id\": \"foc-tela\", \"dia\": \"2026-10-13\", \"origem\": \"sensor\", \"medida\": \"0 min\", \"nota\": \"\"}\n{\"missao_id\": \"int-ler\", \"dia\": \"2026-10-14\", \"origem\": \"usuario\", \"medida\": \"\", \"nota\": \"\"}"
+  },
   "atributos": [
     "FOR",
     "AGI",

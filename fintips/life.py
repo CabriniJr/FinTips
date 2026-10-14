@@ -574,3 +574,85 @@ def contexto_de_planos(vida: Vida, resultados_de_planos: list[dict]) -> dict:
             "o prazo ou cortar plano. O motor não escolhe por ela"
         ),
     }
+
+
+# ----------------------------------------- o catálogo viajando para o aparelho
+
+DEVICE_SCHEMA = 1
+
+
+def exportar_para_aparelho(vida: Vida) -> dict:
+    """O catálogo no formato que o app Android lê.
+
+    **Por que existe um segundo formato.** O workspace guarda `missoes.yaml`
+    porque é arquivo que a pessoa edita à mão, e YAML existe para isso. O
+    aparelho não edita nada à mão e, sobretudo, **o celular é outra máquina**:
+    ele não lê `~/Documents/FinTips/data/` e nunca vai ler. O que chega ao
+    aparelho chega por transporte, e formato de transporte não precisa ser
+    formato de edição.
+
+    Isso tem uma consequência que não era óbvia e vale para quem planeja o
+    porte: **a leitura de YAML em Kotlin não bloqueia o app**. O aparelho
+    precisa ler o que ele mesmo grava, e isso é JSON.
+
+    Dinheiro vai como string com duas casas, nunca como float: `4300.00`, não
+    `4300.0`. É a mesma regra que atravessa o projeto — valor que passa por
+    `float` volta diferente, e aqui ele atravessa a fronteira entre dois
+    motores.
+    """
+    def reais(v: Decimal) -> str:
+        return f"{v.quantize(Decimal('0.01'))}"
+
+    return {
+        "schema_version": DEVICE_SCHEMA,
+        "missoes": [
+            {
+                "id": m.id,
+                "titulo": m.titulo,
+                "atributo": m.atributo,
+                "cadencia": m.cadencia,
+                "como_medir": m.como_medir,
+                "sensor_possivel": m.sensor_possivel,
+                "porque": m.porque,
+                "ativa": m.ativa,
+                "valor_mensal": reais(m.valor_mensal) if m.valor_mensal is not None else None,
+                "colide_com": list(m.colide_com),
+            }
+            for m in vida.missoes
+        ],
+        "regras": [
+            {
+                "id": r.id,
+                "tipo": r.tipo,
+                "acima_de": reais(r.acima_de),
+                "dias": r.dias,
+                "porque": r.porque,
+            }
+            for r in vida.regras
+        ],
+    }
+
+
+def importar_do_aparelho(
+    registros_jsonl: str,
+    missoes_conhecidas: set[str] | None = None,
+) -> list[RegistroDeMissao]:
+    """Lê o histórico que voltou do aparelho.
+
+    O mesmo JSONL que o app grava, para o workspace poder absorver o que foi
+    marcado no celular. Registro de missão fora do catálogo é recusado em vez
+    de guardado: ele não enche barra nenhuma e sairia dos relatórios — erro que
+    não aparece é o pior tipo.
+    """
+    saida = []
+    for n, linha in enumerate(registros_jsonl.splitlines(), 1):
+        linha = linha.strip()
+        if not linha:
+            continue
+        r = RegistroDeMissao.from_dict(json.loads(linha))
+        if missoes_conhecidas and r.missao_id not in missoes_conhecidas:
+            raise ValueError(
+                f"linha {n}: registro da missão '{r.missao_id}', que não está no catálogo"
+            )
+        saida.append(r)
+    return saida

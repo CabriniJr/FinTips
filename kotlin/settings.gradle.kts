@@ -25,3 +25,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "fintips"
 include(":motor")
+
+// O app Android é o invólucro: uma Activity que abre a tela do dia. Toda a
+// lógica está em `:motor`, então este módulo é fino de propósito — e só existe
+// quando o alvo está ligado, porque sem SDK o AGP derruba a configuração.
+if ((providers.gradleProperty("fintips.android").orNull?.toBoolean() == true)) {
+    include(":app")
+}

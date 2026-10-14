@@ -7,6 +7,7 @@ import com.fintips.motor.vida.OrigemDoRegistro
 import com.fintips.motor.vida.RegistroDeMissao
 import com.fintips.motor.vida.RegraDeclarada
 import com.fintips.motor.vida.Vida
+import com.fintips.motor.vida.FormatoDeVida
 import com.fintips.motor.vida.coberturaDeEvidencia
 import com.fintips.motor.vida.contextoDeCompra
 import com.fintips.motor.vida.contextoDePlanos
@@ -427,5 +428,77 @@ class OuroVidaTest {
         if (problemas.isNotEmpty()) {
             fail("aporte contra planos divergiu do motor Python:\n  " + problemas.joinToString("\n  "))
         }
+    }
+
+    // ------------------------------------- o formato que vai para o aparelho
+
+    @Test
+    fun o_kotlin_le_o_catalogo_que_o_python_exporta() {
+        // O texto do ouro é exatamente o que `fintips aparelho` escreve. Se uma
+        // chave for renomeada de um lado só, o erro aparece aqui — e não como
+        // "o app não carrega o catálogo" semanas depois, na mão do usuário.
+        val ap = ouro["aparelho"]!!.jsonObject
+        val vida = FormatoDeVida.lerCatalogo(ap["catalogo_json"]!!.jsonPrimitive.content)
+
+        val esperadas = ap["esperado"]!!.jsonArray.map { it.jsonObject }
+        assertEquals(esperadas.size, vida.missoes.size, "número de missões divergiu")
+
+        val problemas = mutableListOf<String>()
+        for ((e, k) in esperadas.zip(vida.missoes)) {
+            fun diga(campo: String, py: Any?, kt: Any?) {
+                if (py.toString() != kt.toString()) {
+                    problemas += "[${k.id}] $campo: python $py, kotlin $kt"
+                }
+            }
+            diga("id", e["id"]!!.jsonPrimitive.content, k.id)
+            diga("titulo", e["titulo"]!!.jsonPrimitive.content, k.titulo)
+            diga("atributo", e["atributo"]!!.jsonPrimitive.content, k.atributo.sigla)
+            diga("cadencia", e["cadencia"]!!.jsonPrimitive.content, k.cadencia.chave)
+            diga(
+                "sensor_possivel",
+                e["sensor_possivel"]!!.jsonPrimitive.content,
+                k.sensorPossivel,
+            )
+            diga(
+                "colide_com",
+                e["colide_com"]!!.jsonArray.map { it.jsonPrimitive.content },
+                k.colideCom,
+            )
+            diga(
+                "valor_mensal_centavos",
+                e["valor_mensal_centavos"]!!.jsonPrimitive.contentOrNull?.toLong(),
+                k.valorMensal?.centavos,
+            )
+        }
+
+        for ((e, k) in ap["regras_esperadas"]!!.jsonArray.map { it.jsonObject }.zip(vida.regras)) {
+            val acima = e["acima_de_centavos"]!!.jsonPrimitive.content.toLong()
+            if (acima != k.acimaDe.centavos) {
+                problemas += "[${k.id}] acima_de: python $acima, kotlin ${k.acimaDe.centavos}"
+            }
+            if (e["porque"]!!.jsonPrimitive.content != k.porque) {
+                problemas += "[${k.id}] porque divergiu"
+            }
+        }
+
+        if (problemas.isNotEmpty()) {
+            fail(
+                "catálogo do aparelho divergiu do que o Python exporta:\n  " +
+                    problemas.joinToString("\n  "),
+            )
+        }
+    }
+
+    @Test
+    fun o_kotlin_le_o_historico_no_formato_que_o_python_grava() {
+        val ap = ouro["aparelho"]!!.jsonObject
+        val registros = FormatoDeVida.lerRegistros(
+            ap["historico_jsonl"]!!.jsonPrimitive.content,
+        )
+        assertEquals(2, registros.size)
+        assertEquals(OrigemDoRegistro.SENSOR, registros[0].origem)
+        assertEquals("0 min", registros[0].medida)
+        assertEquals(LocalDate(2026, 10, 14), registros[1].dia)
+        assertEquals(OrigemDoRegistro.USUARIO, registros[1].origem)
     }
 }
