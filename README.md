@@ -262,8 +262,14 @@ mensagem útil.
 
 ```bash
 bash scripts/check-pii.sh --all
+python3 scripts/gerar-ouro.py --conferir     # o ouro ainda é o do Python?
 cp scripts/check-pii.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
+
+A segunda linha existe por causa de um furo real: depois de um merge, o ouro no
+disco descrevia uma versão **anterior** do motor Python e a suíte Kotlin passava
+verde contra ouro velho. Teste vermelho interrompe; ouro velho deixa os dois
+motores se afastarem em silêncio.
 
 No Windows, um comando só faz tudo (trava, commit, rebase e push):
 

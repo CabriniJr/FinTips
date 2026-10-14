@@ -125,11 +125,11 @@ de pronto volta meio feita.
 
 | # | Tarefa | Faixa | Estado | Pronto quando |
 |---|---|---|---|---|
-| 10b | **Leitura de YAML** | porte | **livre — é o maior destravamento do repositório** | `emitir(ler(x)) == x` sobre o canônico do fixture e sobre `exemplo-missoes.yaml`; `ouro/yaml.json` ganha seção de leitura |
+| 10b | **Leitura de YAML** | porte | **livre.** Já não bloqueia o Android (ver log), mas segue destravando 6b, catálogo, causas e perfil no desktop | `emitir(ler(x)) == x` sobre o canônico do fixture e sobre `exemplo-missoes.yaml`; `ouro/yaml.json` ganha seção de leitura |
 | 6b | `Heuristica` — o piso de categorias | porte | livre, **depende de 10b** | ouro da classificação fecha com o Python sobre o fixture |
 | 7b | gasto invisível | porte | livre, depende de 6b | ouro fecha; o comparador deixa de mostrar renda zerada |
 | 9c | `Alavancas`, `Triagem`, `Dossie` | porte | livre | com elas fecham o `contexto_pessoal` e os `precedentes` das compras no Kotlin |
-| V3 | App Android: as seis barras e a lista do dia | vida | **assumido pela trilha de vida** | abre, mostra as seis barras, marca missão e a marcação sobrevive a fechar o app |
+| V3 | App Android: as seis barras e a lista do dia | vida | **lógica pronta** (16 testes, inclusive "sobrevive a fechar o app"); a tela Compose e o módulo `:app` **não compilaram** — sem SDK nesta máquina | falta: abrir no Android Studio e ver rodar |
 | V4 | Sensores (tempo de tela, passos) como registro `sensor` | vida | assumido pela trilha de vida, **depende de V3** | `cobertura_de_evidencia` sai de 0% sem ninguém digitar nada |
 | V5 | Ponte de vida em Kotlin (`contextoDeCompra`, `contextoDePlanos`) | vida | **pronto o cálculo**; a ligação ainda espera a costura em `Compras.kt` — pedido 3 | feito: `ouro/vida.json` tem 57 casos e o Kotlin fecha com `fintips/life.py` |
 | V6 | Painel: as seis barras ao lado do score | vida | assumido pela trilha de vida | aba lendo `/api/life`, sem número inventado quando o catálogo está vazio |
@@ -386,3 +386,64 @@ tem para a regra "o que entra no motor entra no ouro".
 Em aberto, sem mudança: o pedido 3 (costura em `Compras.kt`) agora é mais fácil,
 porque `Compras.kt` está em `main` e a ponte de vida também. Quem pegar 9c
 encontra as duas coisas no mesmo lugar.
+
+**2026-10-14 · Android: a lógica está pronta e testada; a tela não compilou**
+
+Separo as duas coisas de propósito, porque misturá-las seria dizer que o app
+está pronto.
+
+**Pronto e testado nesta máquina:** o formato de transporte
+(`vida/Formato.kt`), a guarda (`vida/Guarda.kt`), o estado da tela
+(`vida/Tela.kt`) e 16 casos em `AparelhoTest` — entre eles o critério de pronto
+que este quadro exigia, "a marcação sobrevive a fechar o app", que aqui é
+construir uma `Guarda` nova sobre o mesmo armazenamento. Mais `fintips aparelho`
+dos dois lados (exporta catálogo, absorve histórico) e ouro travando o formato
+de transporte: o Kotlin lê o texto **exato** que o Python escreve.
+
+**Não compilou:** a tela Compose e o módulo `:app`. `dl.google.com` responde 403
+nesta máquina e não há SDK — AGP e androidx não puderam ser resolvidos nenhuma
+vez. Está marcado em `app/build.gradle.kts` e no topo de `TelaDoDia.kt`. Quem
+abrir no Android Studio é a primeira pessoa a ver isso rodar.
+
+Três coisas que aprendi tentando, e que poupam tempo de quem for mexer:
+
+- **o alvo Android não cabe em `:motor`.** O bloco `plugins {}` do Gradle não dá
+  acesso a propriedade do projeto (nem `findProperty`, nem `providers`), então
+  "aplicar o AGP só com a flag ligada" não tem forma limpa; e declarar com
+  `apply false` já obriga a resolver no `google()`, derrubando o build puro em
+  máquina sem acesso. A saída ficou melhor que o contorno: o código de Android
+  vive em `:app`, incluído só com a flag, e **`:motor` continua sempre puro**.
+- **o celular é outra máquina**, e isso mudou uma prioridade deste quadro: o
+  aparelho não lê o workspace, precisa de catálogo em JSON, e por isso **a
+  leitura de YAML deixou de bloquear o Android**. O 10b segue valendo para a
+  heurística e para o desktop.
+- **a fronteira de plataforma tem três linhas.** `Guarda` recebe "ler texto" e
+  "acrescentar texto"; toda decisão fica em `commonMain`. Onde não há teste,
+  não pode morar regra — e `androidMain` não roda em teste nenhum daqui.
+
+**2026-10-14 · o furo que o merge deixou: ouro velho passando verde**
+
+Ao regerar o ouro para o formato do aparelho, o `OuroComprasTest` **do lado do
+porte** falhou. A causa não era o Android: o merge do PR #4 acrescentou duas
+chaves à saída de `purchases.evaluate`, e aquele teste confere a **lista de
+chaves**. O ouro no disco havia sido gerado antes do merge, então descrevia uma
+versão anterior do motor Python — e a suíte passava verde contra ouro velho.
+
+Isso é pior que teste vermelho. Teste vermelho interrompe; ouro velho deixa os
+dois motores se afastarem em silêncio, que é exatamente o que o harness existe
+para impedir. **O merge não comeu bloco nenhum — a aritmética 135 = 108 + 27
+estava certa — mas ninguém mandou regerar, e nada cobrava.**
+
+Duas correções, as duas valendo para os dois lados:
+
+1. **As chaves da camada de vida só existem quando há catálogo.** Quem chama
+   `evaluate` sem `vida` recebe exatamente a forma que recebia antes. Chave
+   opcional que aparece como `null` é mudança de contrato disfarçada de
+   acréscimo — e foi o teste alheio que me ensinou isso, não o meu.
+2. **`scripts/gerar-ouro.py --conferir`**, que sai com código 1 se o ouro no
+   disco não for mais o que o Python produz. Entrou no ritual do push no README
+   e serve em CI sem adaptação. Conferido nos dois sentidos: mexi num caso do
+   ouro à mão e a trava acusou nomeando o arquivo.
+
+Quem for mesclar qualquer coisa daqui para frente: **rode `--conferir` depois do
+merge, não antes.** O conflito de texto você vê; o ouro velho, não.

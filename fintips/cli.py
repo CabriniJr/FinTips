@@ -360,6 +360,46 @@ def cmd_decisoes(args) -> None:
           f"{ap['com_desfecho']} com desfecho ({ap['cobertura_de_desfecho_pct']}% das tomadas)")
 
 
+def cmd_aparelho(args) -> None:
+    """Exporta o catálogo de missões para o app Android.
+
+    O celular é outra máquina: ele não lê o workspace. Este comando é a ponte —
+    gera o JSON que o app carrega e, com `--registros`, absorve de volta o que
+    foi marcado no aparelho.
+    """
+    ws = _ws(args)
+    vida = report.load_vida(ws)
+
+    if args.registros:
+        caminho = Path(args.registros).expanduser()
+        if not caminho.exists():
+            raise SystemExit(f"não achei {caminho}")
+        novos = life.importar_do_aparelho(
+            caminho.read_text(encoding="utf-8"),
+            {m.id for m in vida.missoes},
+        )
+        for r in novos:
+            life.registrar(ws.registros_path, r)
+        print(f"{len(novos)} registro(s) do aparelho gravados em {ws.registros_path}")
+        return
+
+    if vida.vazia:
+        raise SystemExit(
+            f"nenhuma missão em {ws.missoes_path}.\n"
+            "Comece do molde: fintips/rules/exemplo-missoes.yaml"
+        )
+
+    payload = life.exportar_para_aparelho(vida)
+    texto = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    if args.saida:
+        destino = Path(args.saida).expanduser()
+        destino.write_text(texto, encoding="utf-8")
+        print(f"{len(payload['missoes'])} missões em {destino}")
+        print("copie para o aparelho como missoes.json")
+    else:
+        print(texto, end="")
+
+
 def cmd_mcp_config(args) -> None:
     """Imprime a config do cliente MCP com os caminhos desta máquina.
 
@@ -455,6 +495,12 @@ def build_parser() -> argparse.ArgumentParser:
     de.add_argument("--abertas", action="store_true", help="só o que ainda não foi decidido")
     de.add_argument("--historico", metavar="ASSUNTO", help="precedentes parecidos com ASSUNTO")
     de.set_defaults(func=cmd_decisoes)
+
+    ap = sub.add_parser("aparelho", help="catálogo de missões para o app Android")
+    ap.add_argument("--saida", metavar="ARQUIVO", help="grava em vez de imprimir")
+    ap.add_argument("--registros", metavar="JSONL",
+                    help="absorve o histórico que voltou do aparelho")
+    ap.set_defaults(func=cmd_aparelho)
 
     mc = sub.add_parser("mcp-config")
     mc.add_argument("--nome", default="fintips", help="nome do servidor no cliente")

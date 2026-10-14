@@ -355,7 +355,7 @@ def test_a_regra_dela_muda_o_veredito_e_vai_nomeada(tmp_path):
 
 def test_abaixo_do_limite_a_regra_nao_interfere(tmp_path):
     r = _cenario_de_compra(tmp_path, com_vida=True, preco=150)
-    assert r["regra_declarada_aplicada"] is None
+    assert "regra_declarada_aplicada" not in r
 
 
 def test_o_resto_do_contexto_de_vida_nao_mexe_em_numero(tmp_path):
@@ -372,14 +372,16 @@ def test_o_resto_do_contexto_de_vida_nao_mexe_em_numero(tmp_path):
     assert com["reserva"] == sem["reserva"]
     assert com["melhor_estrategia"] == sem["melhor_estrategia"]
 
-    assert sem["contexto_de_vida"] is None
+    # Sem catálogo a resposta não ganha chave nenhuma: quem não usa a camada
+    # recebe exatamente a forma que recebia antes dela existir.
+    assert "contexto_de_vida" not in sem
     assert com["contexto_de_vida"]["missoes_em_jogo"]
 
 
 def test_sem_catalogo_o_bloco_de_vida_nem_aparece(tmp_path):
     r = _cenario_de_compra(tmp_path, com_vida=False)
-    assert r["contexto_de_vida"] is None
-    assert r["regra_declarada_aplicada"] is None
+    assert "contexto_de_vida" not in r
+    assert "regra_declarada_aplicada" not in r
 
 
 # ------------------------------------------------- a API que o painel usa

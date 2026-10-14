@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "2.0.21"
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 val comAndroid = (findProperty("fintips.android") as String?)?.toBoolean() ?: false
@@ -28,6 +29,15 @@ kotlin {
             // Python é biblioteca padrão; aqui, não. O resto do motor segue
             // sem dependência — o leitor OFX é escrito à mão, como lá.
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+
+            // A segunda dependência, e ela entrou por uma decisão e não por
+            // comodidade. O motor escreve JSON à mão (ver `MotorCli`) e YAML à
+            // mão (ver `Yaml`), porque **emitir** é fácil. Ler é outra coisa:
+            // escape, unicode e aninhamento são onde o erro se esconde, e o
+            // aparelho precisa LER o catálogo e o histórico que ele mesmo
+            // grava. É o mesmo raciocínio que pôs SHA-256 em `expect`/`actual`
+            // em vez de escrever no braço.
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -65,8 +75,16 @@ tasks.register<JavaExec>("rodar") {
 }
 
 if (comAndroid) {
-    // Placeholder consciente: o alvo Android precisa do plugin AGP e do SDK,
-    // que não existem nesta máquina. Quando for ligar, acrescente aqui
-    // `androidTarget()` e o bloco `android { ... }`, sem tocar em commonMain.
-    logger.lifecycle("alvo Android pedido — configure o AGP e o SDK antes")
+    // O alvo Android **não entra aqui**, e a tentativa de fazê-lo entrar
+    // ensinou por que: o bloco `plugins {}` do Gradle não dá acesso a
+    // propriedade do projeto, então "aplicar o AGP só quando a flag estiver
+    // ligada" não tem forma limpa — e declarar o AGP com `apply false` já
+    // obriga a resolver o artefato no `google()`, derrubando o build puro em
+    // máquina sem acesso.
+    //
+    // A saída foi melhor que o contorno: o código de Android vive no módulo
+    // `:app`, que o `settings.gradle.kts` só inclui quando a flag está ligada.
+    // Isso deixa `:motor` **sempre puro** — jvm e nada mais — e põe Compose
+    // onde ele é, que é código de aplicativo e não de motor.
+    logger.lifecycle("alvo Android: veja o módulo :app (gradle -Pfintips.android=true :app:assembleDebug)")
 }

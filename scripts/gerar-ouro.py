@@ -1993,8 +1993,68 @@ def ouro_vida() -> dict:
             "planos_cabem_no_aporte": c.get("planos_cabem_no_aporte"),
         })
 
+    # O formato de transporte para o aparelho. Vai como TEXTO, de propósito: o
+    # que o Kotlin precisa provar é que lê o que o Python escreve, byte a byte
+    # como ele sai de `fintips aparelho`. Comparar estrutura contra estrutura
+    # não pegaria uma chave renomeada de um lado só — e esse é justamente o
+    # erro que aparece como "app não carrega o catálogo" semanas depois.
+    catalogo_do_aparelho = life.Vida(
+        missoes=[
+            life.Missao(
+                id="foc-tela", titulo="Tela zero", atributo="FOC", cadencia="diaria",
+                como_medir="tempo de tela em zero", sensor_possivel=True,
+                porque="corte total em vez de moderação", colide_com=["tablet", "console"],
+            ),
+            life.Missao(id="int-ler", titulo="Ler um bloco", atributo="INT", cadencia="diaria"),
+            life.Missao(
+                id="ouro-aporte", titulo="Aporte", atributo="OURO", cadencia="mensal",
+                valor_mensal=Decimal("4300"),
+            ),
+        ],
+        regras=[
+            life.RegraDeclarada(
+                id="espera", tipo="espera_antes_de_comprar", acima_de=Decimal("300"),
+                dias=30, porque="lista de desejos e 30 dias",
+            ),
+        ],
+    )
+    aparelho = {
+        "catalogo_json": json.dumps(
+            life.exportar_para_aparelho(catalogo_do_aparelho),
+            ensure_ascii=False, indent=2,
+        ),
+        "esperado": [
+            {
+                "id": m.id,
+                "titulo": m.titulo,
+                "atributo": m.atributo,
+                "cadencia": m.cadencia,
+                "sensor_possivel": m.sensor_possivel,
+                "colide_com": list(m.colide_com),
+                "valor_mensal_centavos": (
+                    centavos(m.valor_mensal) if m.valor_mensal is not None else None
+                ),
+            }
+            for m in catalogo_do_aparelho.missoes
+        ],
+        "regras_esperadas": [
+            {"id": r.id, "acima_de_centavos": centavos(r.acima_de), "dias": r.dias,
+             "porque": r.porque}
+            for r in catalogo_do_aparelho.regras
+        ],
+        # O JSONL que o app grava e o Python precisa absorver de volta.
+        "historico_jsonl": "\n".join(
+            json.dumps(r.to_dict(), ensure_ascii=False)
+            for r in [
+                life.RegistroDeMissao("foc-tela", date(2026, 10, 13), "sensor", "0 min"),
+                life.RegistroDeMissao("int-ler", date(2026, 10, 14), "usuario"),
+            ]
+        ),
+    }
+
     return {
         "fonte": "fintips.life",
+        "aparelho": aparelho,
         "atributos": list(life.ATRIBUTOS),
         "cadencias": life.CADENCIAS,
         "origens": life.ORIGENS_DO_REGISTRO,
@@ -2035,16 +2095,53 @@ GERADORES = {
 
 
 def main() -> int:
+    """Grava o ouro, ou confere se o que está no disco ainda é o do Python.
+
+    `--conferir` existe por causa de um furo real, descoberto num merge: o ouro
+    no disco descrevia uma versão **anterior** do motor Python, e nada obrigava
+    a regerar. A suíte Kotlin passava verde contra ouro velho, e a divergência
+    só apareceu quando alguém rodou o gerador por outro motivo.
+
+    Isso é pior que um teste vermelho. Teste vermelho interrompe; ouro velho
+    deixa os dois motores se afastarem em silêncio, que é exatamente o que o
+    harness existe para impedir.
+
+    Use em CI e antes de dar push:
+
+        python3 scripts/gerar-ouro.py --conferir
+    """
+    conferir = "--conferir" in sys.argv
     DESTINO.mkdir(parents=True, exist_ok=True)
+    desatualizados = []
+
     for nome, gerar in GERADORES.items():
         dados = gerar()
         caminho = DESTINO / nome
-        caminho.write_text(
-            json.dumps(dados, ensure_ascii=False, indent=2, sort_keys=False) + "\n",
-            encoding="utf-8",
-        )
+        texto = json.dumps(dados, ensure_ascii=False, indent=2, sort_keys=False) + "\n"
         n = sum(len(v) for v in dados.values() if isinstance(v, list))
+
+        if conferir:
+            atual = caminho.read_text(encoding="utf-8") if caminho.exists() else ""
+            if atual != texto:
+                motivo = "não existe" if not atual else "difere do motor Python"
+                desatualizados.append((nome, motivo))
+            continue
+
+        caminho.write_text(texto, encoding="utf-8")
         print(f"{caminho.relative_to(RAIZ)}  ({n} casos)")
+
+    if conferir:
+        if desatualizados:
+            print("OURO DESATUALIZADO:")
+            for nome, motivo in desatualizados:
+                print(f"  {nome}: {motivo}")
+            print()
+            print("O ouro no disco não é mais o que o Python produz. Rode:")
+            print("  python3 scripts/gerar-ouro.py")
+            print("e confira o diff antes de commitar — se algum caso mudou de")
+            print("valor, alguém mudou comportamento sem perceber.")
+            return 1
+        print(f"ok: os {len(GERADORES)} arquivos de ouro batem com o motor Python")
     return 0
 
 
