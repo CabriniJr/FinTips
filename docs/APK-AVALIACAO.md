@@ -5,6 +5,12 @@ A variante **debug** agora abre a UI Evangelion com os cinco destinos: Hoje,
 Vida, Finanças, Planos e Contexto. O nome de instalação é **FinTips UI** e o
 application ID é `com.fintips.app.ui`, separado do futuro app de produção.
 
+A segunda versão (`versionCode=2`) acrescenta [movimento e respostas de interação](MOVIMENTO-UI.md).
+O armazenamento mantém o mesmo schema e application ID. Atualizar sobre a
+primeira versão exige a mesma assinatura. Na entrega v2, a assinatura foi
+comparada com o primeiro APK e coincide; instale sobre ele para preservar os
+registros, sem desinstalar ou limpar dados.
+
 ## O que testar
 
 - Criar e concluir tarefas diárias, mudar o dia e reabrir o app.

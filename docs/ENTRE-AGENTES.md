@@ -697,3 +697,22 @@ produto final para web: o recorte e os limites estão em `docs/APK-AVALIACAO.md`
 O seletor de arquivos Android atende importação Librera e a cópia fica em
 Downloads local no Android 10+. Não houve teste em dispositivo; isso é pedido
 de feedback do usuário, não evidência presumida de funcionamento nativo.
+
+**2026-10-14 · automação para reduzir manutenção diária**
+
+O usuário definiu automação e integração natural à rotina como foco. Registro
+manual é alternativa/correção, não a base de retenção. A-01 Librera, A-02
+UsageStats e A-03 Health Connect foram priorizados em `AUTOMACAO-SEM-TOIL.md`,
+com coleta no aparelho e contratos de frescor/cobertura/deduplicação. Codex
+assume UI-03 (conexão única); adaptadores são pedidos ao Claude com aceite
+pendente. O motor já aceita `sensor`; a UI web exige ponte/migração explícita.
+O APK atual não ganhou coleta automática por essa decisão de prioridade.
+
+**2026-10-14 · movimento pedido após aprovação da UI**
+
+O usuário aprovou o desenho do primeiro APK e pediu mais transições/hover/toque
+com alto contraste. Codex acrescentou navegação com último destino prevalecendo,
+indicador deslizante, pressão/ondas, módulos, barras, linha de leitura e
+formulários com entrada/saída. `MOVIMENTO-UI.md` descreve tempos e acessibilidade;
+não mudam regras nem origens de registros. Movimento reduzido inclui hover e
+interrupção de animações em execução. APK de avaliação passa a versionCode 2.

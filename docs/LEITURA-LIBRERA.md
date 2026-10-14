@@ -4,6 +4,9 @@ O tracker está em **Vida → Estudos**. Aceita livro/posição manual ou import
 de uma cópia local de `app-Progress.json`. A seleção é lida em memória no
 client, sem upload. A sincronização automática com a nuvem ainda não existe.
 
+A prioridade agora é conexão única com fonte persistente e atualização local,
+para dispensar reimportações diárias. [Plano e contrato de automação](AUTOMACAO-SEM-TOIL.md).
+
 ## Discovery realizado
 
 Verificação no código público [LibreraReader](https://github.com/foobnix/LibreraReader),

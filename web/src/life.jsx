@@ -3,6 +3,7 @@ import { AREAS, STORAGE_KEY, dailyProgress, emptyLife, isDone, localDay, newId,
   readLife, removeTask, shiftDay, tasksForDay, toggleTask, validateLife } from "./life-store.js";
 import { Icon } from "./icons.jsx";
 import { ReadingTracker } from "./reading.jsx";
+import { reducedMotion } from "./motion.js";
 
 export function useLocalLife() {
   const [initial] = useState(() => {
@@ -52,16 +53,33 @@ function Empty({ icon = "life", title, children, action }) {
     <h3>{title}</h3><p>{children}</p>{action}</div>;
 }
 
+export function closeSheet(close) {
+  const dialog = document.querySelector(".life-sheet[open]");
+  const event = new Event("fintips:request-close", { cancelable: true });
+  if (!dialog || dialog.dispatchEvent(event)) close();
+}
+
 export function Sheet({ title, close, children }) {
   const ref = useRef(null);
+  const closing = useRef(false);
+  const timer = useRef(null);
+  const [leaving, setLeaving] = useState(false);
+  const dismiss = () => {
+    if (closing.current) return;
+    if (reducedMotion()) { close(); return; }
+    closing.current = true; setLeaving(true);
+    timer.current = setTimeout(close, 160);
+  };
   useEffect(() => {
     const dialog = ref.current;
     dialog.showModal();
-    return () => dialog.close();
+    const requested = (e) => { e.preventDefault(); dismiss(); };
+    dialog.addEventListener("fintips:request-close", requested);
+    return () => { clearTimeout(timer.current); dialog.removeEventListener("fintips:request-close", requested); dialog.close(); };
   }, []);
-  return <dialog ref={ref} className="life-sheet" aria-label={title} onCancel={close}
-    onClick={(e) => { if (e.target === ref.current) close(); }}>
-    <div className="sheet-head"><h2>{title}</h2><button className="icon-button" aria-label="Fechar" onClick={close}><Icon name="close"/></button></div>
+  return <dialog ref={ref} className={`life-sheet${leaving ? " is-closing" : ""}`} inert={leaving ? "" : undefined} aria-label={title} onCancel={(e) => { e.preventDefault(); dismiss(); }}
+    onClick={(e) => { if (e.target === ref.current) dismiss(); }}>
+    <div className="sheet-head"><h2>{title}</h2><button className="icon-button" aria-label="Fechar" onClick={dismiss}><Icon name="close"/></button></div>
     {children}
   </dialog>;
 }
@@ -77,7 +95,7 @@ export function TaskForm({ life, selectedDay, area = "FOC", close, toast }) {
       const trimmed = title.trim();
       if (!trimmed) return;
       if (life.update((s) => ({ ...s, tarefas: [...s.tarefas, { id: newId(), titulo: trimmed,
-        atributo: attribute, inicio: selectedDay, repetir: repeat }] }))) { toast("Tarefa salva no aparelho"); close(); }
+        atributo: attribute, inicio: selectedDay, repetir: repeat }] }))) { toast("Tarefa salva no aparelho"); closeSheet(close); }
     }}>
       <label className="life-field">O que você quer fazer?<input autoFocus required maxLength={180} value={title}
         onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: ler por 20 minutos"/></label>
@@ -157,7 +175,7 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
       {!isToday && <button className="text-button" onClick={() => setDay(localDay())}>Hoje</button>}</div>
     <section className="day-summary"><div><div className="eyebrow">Progresso registrado</div><h2>{progress.total ? `${progress.done} de ${progress.total} tarefas feitas` : "Pronto para começar"}</h2>
       {!progress.total && <p>Adicione uma tarefa para acompanhar o dia.</p>}</div>
-      <div className="daily-gauge"><div className="daily-value" aria-label={`${progress.pct}% das tarefas concluídas`}>{progress.total ? <>{progress.pct}<small>%</small></> : "—"}</div><div className="daily-track" aria-hidden="true"><i style={{ width: `${progress.pct}%` }}/></div><small>{progress.total ? "tarefas concluídas" : "sem tarefas ainda"}</small></div>
+      <div className="daily-gauge"><div key={`${selectedDay}/${progress.done}/${progress.total}`} className="daily-value" aria-label={`${progress.pct}% das tarefas concluídas`}>{progress.total ? <>{progress.pct}<small>%</small></> : "—"}</div><div className="daily-track" aria-hidden="true"><i style={{ width: `${progress.pct}%` }}/></div><small>{progress.total ? "tarefas concluídas" : "sem tarefas ainda"}</small></div>
     </section>
     <Tasks life={life} selectedDay={selectedDay} add={() => setForm(true)} toast={toast}/>
     <div className="section-head outside"><h2>Suas áreas de vida</h2><button className="text-button" onClick={() => ir("vida")}>Explorar <Icon name="arrow" size={16}/></button></div>
@@ -179,7 +197,7 @@ export function LifeAreas({ life, selectedDay, areaId, setArea, toast, ir }) {
   return <>
     <PageHeading code="02" overline="Seis áreas · uma vida" title="Vida" description="Você escolhe o que cultivar em cada uma."/>
     <div ref={tabs} className="area-tabs" aria-label="Áreas da vida">{AREAS.map((a) => <button key={a.id} aria-pressed={area.id === a.id} onClick={() => setArea(a.id)}><Icon name={a.icone} size={18}/>{a.nome}</button>)}</div>
-    <section className="area-feature" style={{ "--area": area.cor }}><AreaBadge id={area.id}/><h2>{area.detalhe}</h2><p>{area.id === "OURO" ? "Suas escolhas financeiras também fazem parte da vida que você está construindo." : "Defina a sua intenção. Transforme-a em um passo possível para hoje."}</p>
+    <section key={area.id} className="area-feature" style={{ "--area": area.cor }}><AreaBadge id={area.id}/><h2>{area.detalhe}</h2><p>{area.id === "OURO" ? "Suas escolhas financeiras também fazem parte da vida que você está construindo." : "Defina a sua intenção. Transforme-a em um passo possível para hoje."}</p>
       <div className="area-feature-stats"><span><b>{dailyProgress(life.state, selectedDay, area.id).total}</b> tarefas neste dia</span><span><b>{plans.length}</b> planos em andamento</span></div>
       {area.id === "OURO" && <button className="life-button" onClick={() => ir("visao")}>Abrir finanças <Icon name="arrow" size={17}/></button>}
     </section>
@@ -200,7 +218,7 @@ function PlanForm({ life, plan, close, toast }) {
       e.preventDefault();
       if (!draft.titulo.trim() || !draft.porque.trim()) return;
       const value = { ...draft, titulo: draft.titulo.trim(), porque: draft.porque.trim(), proximoPasso: draft.proximoPasso.trim() };
-      if (life.update((s) => ({ ...s, planos: plan ? s.planos.map((p) => p.id === plan.id ? value : p) : [...s.planos, value] }))) { toast("Plano salvo no aparelho"); close(); }
+      if (life.update((s) => ({ ...s, planos: plan ? s.planos.map((p) => p.id === plan.id ? value : p) : [...s.planos, value] }))) { toast("Plano salvo no aparelho"); closeSheet(close); }
     }}>
       <label className="life-field">O que você quer realizar?<input required maxLength={180} autoFocus placeholder="Ex.: aprender um novo idioma" {...field("titulo")}/></label>
       <label className="life-field">Área<select {...field("atributo")}>{AREAS.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}</select></label>
@@ -254,7 +272,7 @@ function UsageForm({ life, close, toast }) {
       if (!app.trim() || !date || minutes === "" || !Number.isInteger(number) || number < 0 || number > 1440) return;
       // Um app por dia: corrigir o valor substitui a anotação anterior.
       if (life.update((s) => ({ ...s, medidas: [...s.medidas.filter((m) => !(m.dia === date && m.app.toLocaleLowerCase() === app.trim().toLocaleLowerCase())),
-        { id: newId(), dia: date, app: app.trim(), minutos: number, origem: "usuario" }] }))) { toast("Tempo registrado no aparelho"); close(); }
+        { id: newId(), dia: date, app: app.trim(), minutos: number, origem: "usuario" }] }))) { toast("Tempo registrado no aparelho"); closeSheet(close); }
     }}>
       <label className="life-field">Aplicativo<input required autoFocus maxLength={100} placeholder="Nome do app" value={app} onChange={(e) => setApp(e.target.value)}/></label>
       <label className="life-field">Minutos de uso<input type="number" inputMode="numeric" min="0" max="1440" step="1" required value={minutes} onChange={(e) => setMinutes(e.target.value)}/></label>

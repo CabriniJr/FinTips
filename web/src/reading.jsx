@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Icon } from "./icons.jsx";
-import { Sheet } from "./life.jsx";
+import { Sheet, closeSheet } from "./life.jsx";
 import { localDay, newId, shiftDay } from "./life-store.js";
 import { READING_KEY, emptyReading, libreraPositions, mergeLibrera, pacing, readReading, validateReading } from "./reading-model.js";
 import "./reading.css";
@@ -46,7 +46,7 @@ function BookForm({ store, close, toast }) {
     const n = Number(progress); if (!title.trim() || progress === "" || !Number.isFinite(n) || n < 0 || n > 100) return;
     const book = { id: newId(), titulo: title.trim(), fonte: "usuario", chave: null, perfil: "",
       prazo: deadline, dias_semana: Number(days), observacoes: [{ dia: localDay(), progresso_bp: Math.round(n * 100), tempo_ms: Date.now(), origem: "usuario" }] };
-    if (store.update((s) => ({ ...s, livros: [...s.livros, book] }))) { toast("Livro salvo no aparelho"); close(); }
+    if (store.update((s) => ({ ...s, livros: [...s.livros, book] }))) { toast("Livro salvo no aparelho"); closeSheet(close); }
   }}>
     <label className="life-field">Título do livro<input autoFocus required maxLength={180} placeholder="O livro que você quer acompanhar" value={title} onChange={(e) => setTitle(e.target.value)}/></label>
     <label className="life-field">Porcentagem atual<input required type="number" inputMode="decimal" min="0" max="100" step="0.01" value={progress} onChange={(e) => setProgress(e.target.value)}/></label>
@@ -73,7 +73,7 @@ function ImportForm({ store, close, toast }) {
         if (!parsed.posicoes.length) { setIssue("Não há posições com porcentagem e data válidas neste arquivo. Use app-Progress.json; formatos antigos podem precisar de atualização no Librera."); return; }
         let result;
         const saved = store.update((s) => { result = mergeLibrera(s, parsed.posicoes, profile.trim()); return result.state; });
-        if (saved) { toast(`${result.updated} posições atualizadas · ${parsed.ignorados + result.ignored} ignoradas`); close(); }
+        if (saved) { toast(`${result.updated} posições atualizadas · ${parsed.ignorados + result.ignored} ignoradas`); closeSheet(close); }
       } catch { setIssue("Não foi possível ler esse arquivo de progresso. Nenhum dado foi enviado ou alterado."); }
       finally { setBusy(false); }
     }}>
@@ -96,7 +96,7 @@ function ProgressForm({ book, store, close, toast }) {
       e.preventDefault(); const n = Number(progress);
       if (progress === "" || !Number.isFinite(n) || n < 0 || n > 100 || !day || day > localDay()) return;
       if (store.update((s) => ({ ...s, livros: s.livros.map((b) => b.id !== book.id ? b : { ...b, observacoes: [...b.observacoes.filter((p) => p.dia !== day),
-        { dia: day, progresso_bp: Math.round(n * 100), tempo_ms: Date.now(), origem: "usuario" }].sort((a, b) => a.dia.localeCompare(b.dia)) }) }))) { toast("Posição registrada no aparelho"); close(); }
+        { dia: day, progresso_bp: Math.round(n * 100), tempo_ms: Date.now(), origem: "usuario" }].sort((a, b) => a.dia.localeCompare(b.dia)) }) }))) { toast("Posição registrada no aparelho"); closeSheet(close); }
     }}>
       <label className="life-field">Porcentagem de leitura<input autoFocus required type="number" inputMode="decimal" min="0" max="100" step="0.01" value={progress} onChange={(e) => setProgress(e.target.value)}/></label>
       <label className="life-field">Dia da posição<input type="date" required max={localDay()} value={day} onChange={(e) => setDay(e.target.value)}/></label>
@@ -113,7 +113,7 @@ function PaceForm({ book, store, close, toast }) {
     <form onSubmit={(e) => {
       e.preventDefault();
       if (!title.trim()) return;
-      if (store.update((s) => ({ ...s, livros: s.livros.map((b) => b.id === book.id ? { ...b, titulo: title.trim(), dias_semana: Number(days), prazo: deadline } : b) }))) { toast("Plano de leitura atualizado"); close(); }
+      if (store.update((s) => ({ ...s, livros: s.livros.map((b) => b.id === book.id ? { ...b, titulo: title.trim(), dias_semana: Number(days), prazo: deadline } : b) }))) { toast("Plano de leitura atualizado"); closeSheet(close); }
     }}>
       <label className="life-field">Título no FinTips<input required maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)}/></label>
       <label className="life-field">Dias de leitura por semana<select value={days} onChange={(e) => setDays(e.target.value)}>{[1, 2, 3, 4, 5, 6, 7].map((d) => <option key={d} value={d}>{d} {d === 1 ? "dia" : "dias"}</option>)}</select></label>
@@ -134,7 +134,7 @@ function PositionChart({ observations }) {
   return <figure className="reading-chart"><figcaption>Posições observadas · últimas {points.length}</figcaption>
     <svg viewBox="0 0 286 118" role="img" aria-label="Evolução da posição de leitura. Consulte os valores em Ver posições registradas.">
       {[0, 50, 100].map((n) => <g key={n}><line className="chart-grid" x1="34" x2="272" y1={92 - n * .76} y2={92 - n * .76}/><text x="1" y={95 - n * .76}>{n}%</text></g>)}
-      <polyline className="chart-path" points={points.map((p) => `${x(p)},${y(p)}`).join(" ")}/>
+      <polyline key={points.map((p) => `${p.dia}/${p.progresso_bp}`).join(";")} pathLength="1" className="chart-path" points={points.map((p) => `${x(p)},${y(p)}`).join(" ")}/>
       {points.map((p) => <circle key={p.dia} className="chart-point" cx={x(p)} cy={y(p)} r="3"/>)}
       <text x="34" y="112">{dateLabel(points[0].dia).slice(0, 5)}</text><text x="272" y="112" textAnchor="end">{dateLabel(points.at(-1).dia).slice(0, 5)}</text>
     </svg>

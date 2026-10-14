@@ -13,6 +13,10 @@ para ligar as duas coisas: PII vive exclusivamente no client.
 
 ## Pedidos, por prioridade
 
+Prioridade atual do usuário: **automação para reduzir trabalho manual**.
+Fonte conectada uma vez deve abastecer registros no aparelho; formulário é
+alternativa/correção. [Ordem, contratos e aceite](AUTOMACAO-SEM-TOIL.md).
+
 As tarefas abaixo têm responsável solicitado e aceite separado. O usuário
 autorizou delegação via docs; outro agente deve registrar a resposta aqui ou
 no log antes de marcar o pedido como assumido.
@@ -21,8 +25,10 @@ no log antes de marcar o pedido como assumido.
 |---|---|---|---|
 | UI-01 | Codex | implementado no protótipo; ver evidências no log | cinco destinos mobile, visual Evangelion, leitura e pacing locais |
 | UI-02 | Codex | APK compilado; execução no aparelho pendente | tema e tipografia Compose, imports e recomposição corrigidos; APK debug com UI web local para feedback, release Compose do dia; sem afirmar app completo |
-| M-01 | Claude | solicitado, aceite pendente | adaptador Librera local e snapshots seguindo o contrato abaixo |
+| M-01 / A-01 | Claude | solicitado, aceite pendente; prioridade alta | Librera com acesso persistente escolhido uma vez, atualização ao retomar e snapshots locais; dispensar reimportação diária |
 | M-02 | Claude | solicitado, aceite pendente | gravação atômica e reversão de cumprimento no contrato da guarda |
+| A-02 / A-03 | Claude | solicitado, aceite pendente | UsageStats e Health Connect locais, com período/cobertura; critérios objetivos escolhidos pela pessoa |
+| UI-03 | Codex | assumido para próxima implementação | conectar fontes uma vez, apresentar frescor/erro/pausa e permitir correção; manual como alternativa |
 | REV-01 | Claude | solicitado, resposta pendente | avaliar contrato e privacidade da UI/reading; citar cenário e arquivo, sem substituir a direção visual do usuário |
 | REV-02 | Codex | avaliação registrada | entrega do Claude até `78c71f7`, guarda/formato mantidos e problemas de Activity/estado corrigidos |
 
@@ -44,8 +50,9 @@ Kotlin e réplica JS, com ouro. O adaptador Android não precisa recriar a regra
 Precisa entregar os pontos locais `{dia, progresso_bp}` ao `ritmoDeLeitura`,
 preservando em armazenamento a proveniência e o timestamp da fonte.
 
-Não marcar missão como concluída ao chegar a 100% de posição. Só a pessoa
-confirma conclusão; abrir uma página não prova tempo de estudo ou compreensão.
+Posição em 100% não declara leitura/compreensão concluída. Critério objetivo
+escolhido pela pessoa pode ser atendido por evidência `sensor`, sem confirmação
+diária, no motor; abrir uma página não prova tempo de estudo ou compreensão.
 Não transformar títulos de livros, rotinas, metas ou nomes de apps em labels
 de analytics. Percentuais/contexto derivados também precisam de revisão de
 privacidade antes de sair do aparelho: remover nome não garante anonimato.
@@ -55,8 +62,8 @@ privacidade antes de sair do aparelho: remover nome não garante anonimato.
 A separação `Guarda`/`Formato`/`montarTela` é útil para manter números e
 proveniência fora do desenho. O commit novo também resolveu a divergência
 de ouro de compras encontrada na base anterior. A UI não vai reconstruir
-essa guarda. Falta compilar a tela Android e verificar recomposição, estados
-de erro e marcação no aparelho: a versão anterior de `TelaDoDia.kt` usava estados sem `remember` e
+essa guarda. A compilação foi validada; falta verificar recomposição, estados
+de erro e marcação no aparelho. A versão anterior de `TelaDoDia.kt` usava estados sem `remember` e
 imports de Activity apontavam para o pacote do motor. Codex corrigiu ambos,
 alinhou a tela à paleta Evangelion, removeu comandos de CLI do fluxo de produto
 e acrescentou erro de leitura com tentativa de reabrir. A entrada de catálogo

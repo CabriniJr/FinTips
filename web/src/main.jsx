@@ -7,9 +7,11 @@ import { Data, Fixed, Overview, Plans, Spending } from "./views.jsx";
 import { LifeAreas, LifePlans, PageHeading, PhoneContext, Today, useLocalLife } from "./life.jsx";
 import { AREAS, localDay } from "./life-store.js";
 import { Icon } from "./icons.jsx";
+import { useRouteMotion, useTouchFeedback } from "./motion.js";
 import "./styles.css";
 import "./mobile.css";
 import "./instrument.css";
+import "./motion.css";
 
 const FINANCE = [["visao", "Panorama"], ["perfil", "Perfil"], ["triagem", "Triagem"],
   ["gastos", "Gastos"], ["fixos", "Compromissos"], ["planos", "Metas"],
@@ -21,6 +23,7 @@ function route() {
   const known = [...NAV, ...FINANCE].some(([id]) => id === page);
   return { page: known ? page : "hoje", area: AREAS.some((a) => a.id === area) ? area : "FOR" };
 }
+const pageGroup = (page) => FINANCE.some(([id]) => id === page) ? "visao" : page;
 
 function FinanceEmpty({ erro, reload, toast }) {
   const [file, setFile] = useState(null);
@@ -49,23 +52,21 @@ function FinanceEmpty({ erro, reload, toast }) {
 
 function App() {
   const life = useLocalLife();
-  const [current, setCurrent] = useState(route);
+  const { current, target, phase } = useRouteMotion(route, pageGroup);
+  useTouchFeedback();
   const [day, setDay] = useState(localDay);
   const [ctx, setCtx] = useState(null);
   const [financeError, setFinanceError] = useState("");
   const [loading, setLoading] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
   const timer = useRef(null);
+  const toastSequence = useRef(0);
+  const navIndex = NAV.findIndex(([id]) => id === pageGroup(target.page));
   const financeiro = FINANCE.some(([id]) => id === current.page);
   const carregar = useCallback(() => {
     setLoading(true); setFinanceError("");
     api.context().then((data) => setCtx(data)).catch((e) => setFinanceError(e.message))
       .finally(() => setLoading(false));
-  }, []);
-  useEffect(() => {
-    const change = () => { setCurrent(route()); window.scrollTo({ top: 0, behavior: "instant" }); };
-    addEventListener("hashchange", change);
-    return () => removeEventListener("hashchange", change);
   }, []);
   useEffect(() => { if (financeiro && !ctx && !loading && !financeError) carregar(); }, [financeiro, ctx, loading, financeError, carregar]);
   useEffect(() => {
@@ -76,11 +77,11 @@ function App() {
     return () => { clearInterval(id); removeEventListener("focus", refreshDay); };
   }, []);
   const toast = useCallback((msg) => {
-    clearTimeout(timer.current); setToastMsg(msg);
+    clearTimeout(timer.current); setToastMsg({ id: ++toastSequence.current, text: msg });
     timer.current = setTimeout(() => setToastMsg(null), 3600);
   }, []);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const ir = useCallback((id) => { location.hash = id; setCurrent(route()); }, []);
+  const ir = useCallback((id) => { location.hash = id; }, []);
   const openArea = (id) => ir(`vida/${id}`);
   const financialProps = { ctx, reload: carregar, toast, ir };
   const views = { visao: Overview, perfil: ProfileView, triagem: TriageView, gastos: Spending,
@@ -93,6 +94,7 @@ function App() {
     </div></header>
     <main id="conteudo" tabIndex={-1} className="life-main">
       {life.issue && <div className="storage-alert" role="alert"><Icon name="lock" size={19}/><div>{life.issue}<button className="text-button" onClick={() => ir("contexto")}>Abrir cópia local</button></div></div>}
+      <div key={pageGroup(current.page)} className={`route-view is-${phase}`} inert={phase === "leave" ? "" : undefined}>
       {current.page === "hoje" && <Today life={life} selectedDay={day} setDay={setDay} ir={ir} openArea={openArea} toast={toast}/>}
       {current.page === "vida" && <LifeAreas life={life} selectedDay={day} areaId={current.area} setArea={openArea} toast={toast} ir={ir}/>}
       {current.page === "projetos" && <LifePlans life={life} toast={toast} ir={ir}/>}
@@ -103,13 +105,14 @@ function App() {
         {!loading && financeError && <FinanceEmpty erro={financeError} reload={carregar} toast={toast}/>}
         {!loading && !financeError && ctx && FinancialView && <FinancialView {...financialProps}/>}
       </div>}
+      </div>
       <footer className="life-footer"><Icon name="lock" size={13}/><span>Seu contexto começa com você.</span></footer>
     </main>
-    <nav className="bottom-nav" aria-label="Navegação principal"><div>{NAV.map(([id, label, icon]) => {
-      const active = id === "visao" ? financeiro : current.page === id;
+    <nav className="bottom-nav" aria-label="Navegação principal"><div style={{ "--nav-index": navIndex }}>{NAV.map(([id, label, icon]) => {
+      const active = id === pageGroup(target.page);
       return <a key={id} href={`#${id}`} aria-current={active ? "page" : undefined}><Icon name={icon} size={23}/><span>{label}</span></a>;
     })}</div></nav>
-    {toastMsg && <div className="life-toast" role="status">{toastMsg}</div>}
+    {toastMsg && <div key={toastMsg.id} className="life-toast" role="status">{toastMsg.text}</div>}
   </div>;
 }
 

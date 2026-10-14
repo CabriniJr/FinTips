@@ -37,6 +37,10 @@ layout e `styles.css` mantém os componentes financeiros. Barlow Condensed
 SemiBold e Black são distribuídas localmente sob SIL OFL; corpo usa fonte do sistema.
 Não há requisição a serviços de fontes nem imagens remotas na interface.
 
+Após aprovação visual do primeiro APK, o usuário pediu movimento mais presente.
+[Transições e respostas de toque/hover](MOVIMENTO-UI.md) complementam este
+sistema, preservando a paleta, legibilidade e opção de movimento reduzido.
+
 ## Requisitos ao portar para Compose
 
 - Cinco destinos persistentes: Hoje, Vida, Finanças, Planos, Contexto.
