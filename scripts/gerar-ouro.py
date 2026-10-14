@@ -2071,6 +2071,9 @@ def ouro_vida() -> dict:
     }
 
 
+from ouro_leitura import ouro_leitura
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
@@ -2091,6 +2094,7 @@ GERADORES = {
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
     "vida.json": ouro_vida,
+    "leitura.json": ouro_leitura,
 }
 
 

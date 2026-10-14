@@ -1,4 +1,4 @@
-/* A interface de vida mantém o papel e a tinta do FinTips, com ritmo de celular. */
+/* Composição mobile. A direção visual final está em instrument.css. */
 :root { --ink-3: #65645e; --hero: #e9ece4; --radius: 18px; }
 body { -webkit-tap-highlight-color: transparent; }
 button, a, input { touch-action: manipulation; }

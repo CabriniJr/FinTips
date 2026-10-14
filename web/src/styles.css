@@ -1,19 +1,4 @@
-/* FinTips — sistema visual.
- *
- * A linguagem é emprestada do delineax: preto e branco, canto vivo, borda de
- * 1px sólida e sombra dura deslocada, sem desfoque. Tipografia monoespaçada
- * em caixa alta para tudo que é interface (rótulo, botão, cabeçalho de
- * tabela) e sem serifa para o que é leitura corrida.
- *
- * O movimento é o que dá vida a isso: cada elemento clicável fica sobre uma
- * sombra sólida, e no hover ele anda na direção dela. É o gesto de apertar
- * um adesivo contra o papel. Rápido (120ms), curto (2px) e igual em toda a
- * aplicação — animação que varia de lugar para lugar vira ruído.
- *
- * A cor sobrevive em um lugar só: dado. Gráfico precisa distinguir séries, e
- * padrão de hachura é pior que matiz para isso. Interface é monocromática;
- * o que tem cor é número.
- */
+/* Componentes financeiros base. Tokens e direção visual: instrument.css. */
 
 :root {
   color-scheme: light;

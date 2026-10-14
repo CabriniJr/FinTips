@@ -9,6 +9,7 @@ import { AREAS, localDay } from "./life-store.js";
 import { Icon } from "./icons.jsx";
 import "./styles.css";
 import "./mobile.css";
+import "./instrument.css";
 
 const FINANCE = [["visao", "Panorama"], ["perfil", "Perfil"], ["triagem", "Triagem"],
   ["gastos", "Gastos"], ["fixos", "Compromissos"], ["planos", "Metas"],
@@ -82,7 +83,7 @@ function App() {
   const FinancialView = views[current.page];
   return <div className="app mobile-app">
     <a className="skip-link" href="#conteudo" onClick={(e) => { e.preventDefault(); document.getElementById("conteudo").focus(); }}>Ir para o conteúdo</a>
-    <header className="life-topbar"><div className="life-topbar-in"><a className="life-brand" href="#hoje" aria-label="FinTips, início"><span className="brand-mark">f<span>.</span></span><span>fintips<small>uma vida em perspectiva</small></span></a>
+    <header className="life-topbar"><div className="life-topbar-in"><a className="life-brand" href="#hoje" aria-label="FinTips, início"><span className="brand-mark" aria-hidden="true">FT</span><span>fintips<small>uma vida em perspectiva</small></span></a>
       <span className="local-indicator"><Icon name="lock" size={14}/><span>No seu aparelho</span></span>
     </div></header>
     <main id="conteudo" tabIndex={-1} className="life-main">
@@ -91,7 +92,7 @@ function App() {
       {current.page === "vida" && <LifeAreas life={life} selectedDay={day} areaId={current.area} setArea={openArea} toast={toast} ir={ir}/>}
       {current.page === "projetos" && <LifePlans life={life} toast={toast} ir={ir}/>}
       {current.page === "contexto" && <PhoneContext life={life} toast={toast}/>}
-      {financeiro && <div className="finance-content"><PageHeading overline="Uma parte da sua vida" title="Dinheiro com direção." description="Entenda o presente. Abra espaço para seus planos."/>
+      {financeiro && <div className="finance-content"><PageHeading code="03" overline="Reserva, escolhas e metas" title="Finanças" description="Entenda o presente. Abra espaço para seus planos."/>
         <div className="finance-tabs" aria-label="Seções financeiras">{FINANCE.map(([id, label]) => <button key={id} aria-pressed={current.page === id} onClick={() => ir(id)}>{label}{id === "triagem" && ctx?.triagem?.resumo?.abertos > 0 && <span className="finance-count">{ctx.triagem.resumo.abertos}</span>}</button>)}</div>
         {loading && <div className="loading-card" role="status">Organizando suas finanças…</div>}
         {!loading && financeError && <FinanceEmpty erro={financeError} reload={carregar} toast={toast}/>}

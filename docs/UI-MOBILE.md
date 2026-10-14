@@ -8,7 +8,7 @@ os fluxos no navegador, antes de ligar os adaptadores nativos.
 
 - **Hoje:** tarefas do dia, progresso registrado e acesso às seis áreas.
 - **Vida:** abas Força, Movimento, Saúde, Estudos, Foco e Finanças, alinhadas a
-  FOR/AGI/VIT/INT/FOC/OURO do domínio de vida em desenvolvimento pelo Claude.
+  FOR/AGI/VIT/INT/FOC/OURO; Estudos inclui tracker de leitura e pacing local.
 - **Finanças:** as nove seções anteriores, agora dentro da área financeira.
 - **Planos:** planos de vida com motivo, próximo passo, prazo opcional e
   conclusão; metas financeiras continuam no motor e não são duplicadas aqui.
@@ -16,8 +16,11 @@ os fluxos no navegador, antes de ligar os adaptadores nativos.
   em estudo e download de cópia local.
 
 O desenho usa navegação inferior, controles de toque, safe areas, formulários
-em bottom sheets no celular, foco por teclado e tema escuro. A tipografia usa
-fontes do sistema; não há requisição a Google Fonts.
+em bottom sheets no celular, foco por teclado e tema escuro. A linguagem segue
+as interfaces de Neon Genesis Evangelion indicadas pelo usuário:
+[tokens e regras visuais](LINGUAGEM-VISUAL.md). Títulos usam Barlow Condensed
+distribuída localmente; texto usa fontes do sistema. Não há requisição a
+Google Fonts. [Contratos para o motor e app nativo](NECESSIDADES-UI.md).
 
 ## Tarefas e registros
 
@@ -61,6 +64,8 @@ precisa do motor no próprio aparelho para usar essa parte.
 - Compartilhamento do novo contexto com ChatGPT.
 - APK, app iOS ou interface Compose nativa.
 - Migração e sincronização entre navegadores, dispositivos e motor Kotlin.
+- Sincronização direta com a nuvem do Librera; a importação de arquivo local
+  já funciona. [Discovery do formato e limites do pacing](LEITURA-LIBRERA.md).
 
 As capacidades de coleta aparecem como “Em estudo / Ainda não conectado”.
 Minutos digitados pela pessoa são marcados como registro manual, sem fingir

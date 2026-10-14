@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AREAS, STORAGE_KEY, dailyProgress, emptyLife, isDone, localDay, newId,
   readLife, removeTask, shiftDay, tasksForDay, toggleTask, validateLife } from "./life-store.js";
 import { Icon } from "./icons.jsx";
+import { ReadingTracker } from "./reading.jsx";
 
 export function useLocalLife() {
   const [initial] = useState(() => {
@@ -35,8 +36,8 @@ export function useLocalLife() {
   return { state, update, blocked, issue };
 }
 
-export function PageHeading({ overline, title, description, action }) {
-  return <div className="life-heading"><div><div className="eyebrow">{overline}</div><h1>{title}</h1>
+export function PageHeading({ code = "01", overline, title, description, action }) {
+  return <div className="life-heading"><div><div className="heading-code" aria-hidden="true"><span>FIN / {code}</span><span className="heading-ruler"/></div><div className="eyebrow">{overline}</div><h1>{title}</h1>
     {description && <p>{description}</p>}</div>{action}</div>;
 }
 
@@ -127,8 +128,8 @@ function AreaCards({ life, selectedDay, openArea }) {
   return <div className="area-grid">{AREAS.map((a) => {
     const progress = dailyProgress(life.state, selectedDay, a.id);
     return <button className="area-card" key={a.id} onClick={() => openArea(a.id)} style={{ "--area": a.cor }}>
-      <span className="area-card-top"><span className="area-icon"><Icon name={a.icone}/></span><Icon name="arrow" size={16}/></span>
-      <strong>{a.nome}</strong><small>{progress.total ? `${progress.done} de ${progress.total} tarefas` : "Seu espaço para começar"}</small>
+      <span className="area-card-top"><span className="area-icon"><Icon name={a.icone}/></span><span className="area-code" aria-hidden="true">{a.id}</span></span>
+      <strong>{a.nome}</strong><span className="area-reading" aria-hidden="true">{progress.total ? `${progress.done}/${progress.total}` : "—"}</span><small>{progress.total ? `${progress.done} de ${progress.total} tarefas` : "Sem tarefas ainda"}</small>
       <span className="area-progress"><i style={{ width: `${progress.pct}%` }}/></span>
     </button>;
   })}</div>;
@@ -141,7 +142,7 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
   const start = shiftDay(selectedDay, -((weekday + 6) % 7));
   const isToday = selectedDay === localDay();
   return <>
-    <PageHeading overline="Um pouco, todos os dias" title={isToday ? "O que importa hoje." : "Cada dia conta."}
+    <PageHeading overline={isToday ? "Rotina diária" : "Histórico da rotina"} title={isToday ? "Hoje" : "Seu dia"}
       description="Sua vida tem mais de uma dimensão. Dê espaço a cada uma."/>
     <div className="week-strip" aria-label="Selecionar dia da semana">{Array.from({ length: 7 }, (_, i) => {
       const d = shiftDay(start, i), date = new Date(`${d}T12:00:00`);
@@ -154,9 +155,9 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
       <label>Dia <input type="date" aria-label="Data das tarefas" value={selectedDay} onChange={(e) => e.target.value && setDay(e.target.value)}/></label>
       <button className="icon-button" aria-label="Próxima semana" onClick={() => setDay(shiftDay(selectedDay, 7))}><Icon name="arrow" size={18}/></button>
       {!isToday && <button className="text-button" onClick={() => setDay(localDay())}>Hoje</button>}</div>
-    <section className="day-summary"><div><div className="eyebrow">Seu ritmo, sem pressa</div><h2>{progress.total ? `${progress.done} de ${progress.total} passos dados` : "Um dia cheio de possibilidades"}</h2>
+    <section className="day-summary"><div><div className="eyebrow">Progresso registrado</div><h2>{progress.total ? `${progress.done} de ${progress.total} tarefas feitas` : "Pronto para começar"}</h2>
       <p>{progress.total ? "O progresso vem do que você registra, uma tarefa de cada vez." : "Comece pelo que faz sentido para você."}</p></div>
-      <div className="progress-circle" style={{ "--progress": `${progress.pct}%` }} aria-label={`${progress.pct}% das tarefas concluídas`}><span>{progress.total ? `${progress.pct}%` : "—"}</span></div>
+      <div className="daily-gauge"><div className="daily-value" aria-label={`${progress.pct}% das tarefas concluídas`}>{progress.total ? <>{progress.pct}<small>%</small></> : "—"}</div><div className="daily-track" aria-hidden="true"><i style={{ width: `${progress.pct}%` }}/></div><small>{progress.total ? "tarefas concluídas" : "sem tarefas ainda"}</small></div>
     </section>
     <Tasks life={life} selectedDay={selectedDay} add={() => setForm(true)} toast={toast}/>
     <div className="section-head outside"><h2>Suas áreas de vida</h2><button className="text-button" onClick={() => ir("vida")}>Explorar <Icon name="arrow" size={16}/></button></div>
@@ -171,12 +172,13 @@ export function LifeAreas({ life, selectedDay, areaId, setArea, toast, ir }) {
   const area = AREAS.find((a) => a.id === areaId) || AREAS[0];
   const plans = life.state.planos.filter((p) => p.atributo === area.id && !p.concluido);
   return <>
-    <PageHeading overline="Uma vida com espaço para tudo" title="Cuide do que te move." description="Seis áreas. Você escolhe o que cultivar em cada uma."/>
+    <PageHeading code="02" overline="Seis áreas · uma vida" title="Vida" description="Você escolhe o que cultivar em cada uma."/>
     <div className="area-tabs" aria-label="Áreas da vida">{AREAS.map((a) => <button key={a.id} aria-pressed={area.id === a.id} onClick={() => setArea(a.id)}><Icon name={a.icone} size={18}/>{a.nome}</button>)}</div>
     <section className="area-feature" style={{ "--area": area.cor }}><AreaBadge id={area.id}/><h2>{area.detalhe}</h2><p>{area.id === "OURO" ? "Suas escolhas financeiras também fazem parte da vida que você está construindo." : "Defina a sua intenção. Transforme-a em um passo possível para hoje."}</p>
       <div className="area-feature-stats"><span><b>{dailyProgress(life.state, selectedDay, area.id).total}</b> tarefas neste dia</span><span><b>{plans.length}</b> planos em andamento</span></div>
       {area.id === "OURO" && <button className="life-button" onClick={() => ir("visao")}>Abrir finanças <Icon name="arrow" size={17}/></button>}
     </section>
+    {area.id === "INT" && <ReadingTracker toast={toast}/>}
     <Tasks key={area.id} life={life} area={area.id} selectedDay={selectedDay} add={() => setForm(true)} toast={toast}/>
     <section className="life-card"><div className="section-head"><h2>Para onde você quer ir</h2><button className="text-button" onClick={() => ir("projetos")}>Planos <Icon name="arrow" size={16}/></button></div>
       {plans.length ? plans.map((p) => <div className="area-plan" key={p.id}><strong>{p.titulo}</strong><small>{p.proximoPasso || "Escolha seu próximo passo na aba Planos."}</small></div>) : <p className="quiet-state">Um plano dá direção às pequenas escolhas. Crie o seu na aba Planos.</p>}
@@ -212,7 +214,7 @@ export function LifePlans({ life, toast, ir }) {
   const active = life.state.planos.filter((p) => !p.concluido);
   const shown = life.state.planos.filter((p) => filter === "todos" || !p.concluido);
   return <>
-    <PageHeading overline="O horizonte também é seu" title="Planos para a vida." description="Um motivo para começar. Um próximo passo para continuar."
+    <PageHeading code="04" overline="Direção e próximos passos" title="Planos" description="Um motivo para começar. Um próximo passo para continuar."
       action={<button className="life-button primary" onClick={() => setEditing("novo")} disabled={life.blocked}><Icon name="plus" size={18}/> Novo plano</button>}/>
     <div className="plan-summary"><Icon name="plans" size={24}/><span><b>{active.length}</b> {active.length === 1 ? "plano em andamento" : "planos em andamento"}</span><small>Sem precisar transformar tudo em dinheiro.</small></div>
     <div className="segmented plan-filter">{[["ativos", "Em andamento"], ["todos", "Todos os planos"]].map(([id, label]) => <button key={id} aria-pressed={filter === id} onClick={() => setFilter(id)}>{label}</button>)}</div>
@@ -273,7 +275,7 @@ export function PhoneContext({ life, toast }) {
     } catch { toast("Não foi possível criar a cópia local."); }
   };
   return <>
-    <PageHeading overline="Contexto para escolhas melhores" title="O que o celular sabe." description="Sinais da rotina, com permissão e sob seu controle."/>
+    <PageHeading code="05" overline="Sinais da rotina" title="Contexto" description="O que seu celular pode contar, sob seu controle."/>
     <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros desta tela ficam neste navegador. A coleta automática e a conexão com ChatGPT ainda não estão ativas.</p></div></section>
     <section className="life-card"><div className="section-head"><h2>Seu tempo de tela</h2><span className="manual-tag">Registro manual</span></div>
       <label className="usage-date">Dia do registro<input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)}/></label>

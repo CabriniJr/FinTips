@@ -1,12 +1,12 @@
 // Estado exclusivamente no client. Não é enviado à API financeira ou ao MCP.
 export const STORAGE_KEY = "fintips.vida.v1";
 export const AREAS = [
-  { id: "FOR", nome: "Força", detalhe: "Treino e resistência", cor: "#b85b41", icone: "strength" },
-  { id: "AGI", nome: "Movimento", detalhe: "Caminhada e cardio", cor: "#467b68", icone: "movement" },
-  { id: "VIT", nome: "Saúde", detalhe: "Sono e cuidado", cor: "#8b5886", icone: "heart" },
-  { id: "INT", nome: "Estudos", detalhe: "Aprendizado e carreira", cor: "#5075aa", icone: "book" },
-  { id: "FOC", nome: "Foco", detalhe: "Atenção e tempo", cor: "#8b7328", icone: "focus" },
-  { id: "OURO", nome: "Finanças", detalhe: "Reserva e escolhas", cor: "#367c7a", icone: "wallet" },
+  { id: "FOR", nome: "Força", detalhe: "Treino e resistência", cor: "#f38b59", icone: "strength" },
+  { id: "AGI", nome: "Movimento", detalhe: "Caminhada e cardio", cor: "#89d8af", icone: "movement" },
+  { id: "VIT", nome: "Saúde", detalhe: "Sono e cuidado", cor: "#c5ace2", icone: "heart" },
+  { id: "INT", nome: "Estudos", detalhe: "Aprendizado e carreira", cor: "#9ebee9", icone: "book" },
+  { id: "FOC", nome: "Foco", detalhe: "Atenção e tempo", cor: "#e9c56e", icone: "focus" },
+  { id: "OURO", nome: "Finanças", detalhe: "Reserva e escolhas", cor: "#90d8d3", icone: "wallet" },
 ];
 
 export const emptyLife = () => ({ schema_version: 1, tarefas: [], registros: [], planos: [], medidas: [] });

@@ -79,7 +79,7 @@ resolver.
 |---|---|---|
 | **Porte financeiro** | `kotlin/motor/src/*/com/fintips/motor/*.kt` (raiz), `ouro/{projecao,planos,compras,causas,perfil,yaml,contratos}.json`, `docs/PORTE-KOTLIN.md` (tabela da fila) | quem está portando a fila |
 | **Vida e motor do aparelho** | `fintips/life.py`, `kotlin/.../motor/vida/`, `ouro/vida.json`, `docs/APP-DE-VIDA.md`, `fintips/rules/exemplo-missoes.yaml` | quem está no app de vida |
-| **Visual** | `kotlin/app/` (tela Compose, `:app`), `web/src/*.css`, `web/src/*.jsx`, `docs/VISUAL.md` | **a trilha visual** — ver a entrega no log |
+| **Visual** | `kotlin/app/` (tela Compose, `:app`), `web/src/*.css`, `web/src/*.jsx`, `docs/VISUAL.md` | **Codex / trilha visual**, por pedido do usuário — ver `docs/NECESSIDADES-UI.md` |
 | **Compartilhado** | `fintips/report.py`, `mcp_server.py`, `api.py`, `purchases.py`, `contracts.py`, `workspace.py`, `scripts/gerar-ouro.py`, `README.md`, `pyproject.toml` | **os dois — avise no log** |
 
 Na faixa compartilhada, duas regras que evitam quase todo conflito:
@@ -164,10 +164,10 @@ de pronto volta meio feita.
 | 7b | gasto invisível | porte | livre, depende de 6b | ouro fecha; o comparador deixa de mostrar renda zerada |
 | 9c | `Alavancas`, `Triagem`, `Dossie` | porte | livre | com elas fecham o `contexto_pessoal` e os `precedentes` das compras no Kotlin |
 | V3 | Motor do aparelho: formato, guarda, estado da tela | vida | **pronto**, 16 testes, inclusive "sobrevive a fechar o app" | feito |
-| V3-tela | A tela do dia em Compose, dentro do sistema visual | **visual** | **entregue à trilha visual** — ver a entrega no log | compila, roda no aparelho, usa os tokens de `docs/VISUAL.md`, tem o gesto e tem tema escuro |
+| V3-tela | A tela do dia em Compose, dentro do sistema visual | **visual** | **entregue à trilha visual** — ver a entrega no log | compila, roda no aparelho, usa a direção Evangelion de `docs/VISUAL.md` e tem acessibilidade mobile |
 | V4 | Sensores (tempo de tela, passos) como registro `sensor` | vida | assumido pela trilha de vida, **depende de V3** | `cobertura_de_evidencia` sai de 0% sem ninguém digitar nada |
 | V5 | Ponte de vida em Kotlin (`contextoDeCompra`, `contextoDePlanos`) | vida | **pronto o cálculo**; a ligação ainda espera a costura em `Compras.kt` — pedido 3 | feito: `ouro/vida.json` tem 57 casos e o Kotlin fecha com `fintips/life.py` |
-| V6 | Painel: as seis barras ao lado do score | **visual** | **entregue à trilha visual** | aba lendo `/api/life`, sem número inventado quando o catálogo está vazio |
+| V6 | Painel: as seis barras ao lado do score | **visual** | **entregue à trilha visual** | UI ligada ao motor no aparelho, sem número inventado quando o catálogo está vazio; PII exclusivamente no client |
 | — | **Mesclar as duas branches no `main`** | — | **do usuário** | sete hunks, receita acima; ninguém mescla a branch do outro por conta própria |
 
 ## Pedidos diretos à trilha do porte
@@ -633,3 +633,24 @@ errando, e as três já viraram teste ou trava:
   duas.
 - **chave opcional que aparece como `null` é mudança de contrato disfarçada de
   acréscimo.** Quem me ensinou isso foi um teste alheio, não o meu.
+
+
+**2026-10-14 · Codex assume UI e registra a primeira avaliação da entrega visual**
+
+O usuário atribuiu UI ao Codex, escolheu referências de Neon Genesis Evangelion
+e pediu comunicação, delegação e avaliação via docs. O sistema monocromático
+da entrega anterior foi superado por essa escolha; a nova direção está em
+`docs/LINGUAGEM-VISUAL.md`. `docs/NECESSIDADES-UI.md` registra pedidos com
+critério de pronto para motor/sensores/integração e a fronteira client-only.
+
+Li a entrega de Claude até `78c71f7`: `Guarda`, `Formato` e `Tela` oferecem uma
+fronteira útil e não precisam ser reescritos pela UI. A tela Compose continua
+sem evidência de compilação. O protótipo web permite revisar os cinco destinos
+e o tracker Librera; não constitui APK nem substitui a guarda nativa.
+
+Pedido ao Claude/motor: avaliar o contrato de snapshots em
+`docs/LEITURA-LIBRERA.md` e implementar o adaptador nativo mínimo, conservando
+a projeção local e sem inferir sessão/conclusão. Para avaliação da UI, apontar
+contrato quebrado, dado calculado sem referência ou estado ausente; citar
+arquivo e cenário reproduzível. A evidência visual e os testes ficam registrados
+no fecho desta entrega. Nenhum pedido está marcado como aceito sem resposta.
