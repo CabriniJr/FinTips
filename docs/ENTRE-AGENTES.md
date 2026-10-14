@@ -1214,3 +1214,88 @@ correspondentes aos packages release/UI/CI; qualquer outra permissão continua
 reprovando. Acrescentei um teste com manifesto compilado que inclui INTERNET
 para demonstrar que o leitor não oculta a permissão de rede. O contrato de
 configuração não mudou. 234 testes Python, JVM em dia (136), 19 ouros em paridade.
+
+**14/10/2026 · Codex — kit público de identidade, após o handoff visual**
+
+Pedido do usuário: ícone, logos, banners e assets fora do aplicativo.
+Faixa desta entrega: `docs/identidade/`, os geradores em `scripts/` e somente
+cabeçalho/texto de identidade do README. Base: `c682891`. Motor, telas,
+permissões e APK não foram alterados.
+
+O FT conserva os contornos do launcher Android, agora com contraformas
+transparentes. Ícone externo com margem para avatar circular (64 a 1024 px),
+favicon com margem menor, logos claros/escuros e de uma tinta, banners para
+README, GitHub social preview, Open Graph e releases. Troquei a palavra
+geométrica por Barlow Condensed Black, a família do app. **Todas as letras,
+inclusive frases e rótulos, continuam em paths**: nenhum SVG depende de uma
+fonte instalada no leitor. Aviso OFL e origem no guia do kit.
+
+`python3 scripts/gerar-identidade.py` exporta SVG, PNG e ICO usando as
+ferramentas fixadas em `docs/identidade/requirements.txt`. `campanha.png` é uma
+ilustração complementar gerada com a ferramenta de imagem do ChatGPT; não é a
+fonte do logo e não é reescrita pelo gerador. Os instrumentos são decorativos,
+sem registros pessoais ou scores inventados.
+
+**Para Claude reutilizar:** escolha os arquivos pelo guia
+`docs/identidade/README.md`; não recopie os paths nem crie outra palavra-marca.
+Use `banner-release.png` com URL fixada à tag nas próximas notas de release.
+O social preview está pronto como arquivo, mas não foi configurado nas
+Settings do GitHub. O launcher do aplicativo segue como estava.
+
+Conferência: inspeção das peças renderizadas, exportação idêntica em duas
+execuções (inclusive fora da raiz), transparência dos logos, tamanhos PNG/ICO,
+SVGs sem fontes, scripts ou recursos externos; 233 testes Python, 136 JVM e
+19 arquivos de ouro conferidos. Varredura de PII antes do push.
+
+**CI da trilha paralela:** PR #10 (`codex/ci-android-watch`) passou no Actions
+em `2a24593`. Compilação debug/release, verificador offline e upload do artefato
+concluídos em https://github.com/CabriniJr/FinTips/actions/runs/38646830962 .
+O APK isolado `com.fintips.app.ci` está no artefato
+https://github.com/CabriniJr/FinTips/actions/runs/38646830962/artifacts/11932832911 .
+O download local do artefato foi bloqueado pelo proxy no domínio de armazenamento;
+a conferência desse APK foi executada no runner, não repetida localmente.
+O usuário decidiu configurar `ANDROID_KEYSTORE_BASE64` depois: não gerar uma
+nova assinatura para uma atualização de `com.fintips.app.ui`. PR #10 mantém a
+publicação compatível bloqueada até receber a chave das alphas.
+
+**14/10/2026 · Codex — README como entrada de produto, com demonstrações**
+
+O usuário pediu uma apresentação de projeto maior, citando o README do
+OpenClaw, com GIFs e assets reais. Continuei no PR #11 de identidade para
+entregar uma apresentação coerente com o kit já criado. Faixa: README,
+CONTRIBUTING, `docs/GUIA-TECNICO.md`, `docs/media/` e o gravador de demonstrações.
+
+O README agora abre com a campanha da marca, badges, navegação, dois GIFs,
+download direto da alpha 3, início rápido, contexto para o agente, privacidade,
+roadmap e índice de documentação. O conteúdo técnico anterior foi preservado
+no guia, com links relativos ajustados. As regras detalhadas de identidade
+continuam no kit. A apresentação separa recursos do APK e do motor desktop;
+ChatGPT nativo, sensores, TotalPass e Librera cloud aparecem como planejados.
+Não recomenda a release rolante de assinatura temporária como atualização.
+
+Os GIFs de Hoje e Leitura são capturas da interface embarcada, com os seis
+assets de `fintips/web` identificados por SHA-256 em `capture-info.json`.
+Chromium, viewport 390×844, origem local do APK, perfil temporário, cenário
+inventado de 14/01/2026. Não é captura de aparelho. O vídeo mostra os checks,
+transições, uma posição manual e ajuste de pacing; não simula sincronização.
+PNGs e `prefers-reduced-motion` oferecem alternativas sem animação.
+
+**Para quem continuar:** preserve essa distinção de disponibilidade e a
+proveniência das demonstrações. O script `scripts/gravar-demos-readme.py` lê
+somente o bundle público; nunca substitua o cenário por um workspace pessoal.
+Atualize os GIFs ao mudar esses fluxos. A receita está em `docs/media/README.md`.
+
+Validação: ações executadas na UI sem erros JavaScript; GIFs inspecionados,
+ambos com cerca de 10 s a 12 fps; tamanhos e frames conferidos; hashes do bundle,
+links locais e âncoras conferidos; renderização do Markdown pela API do GitHub
+preservou os elementos picture e os fallbacks. Portão local: 233 testes Python,
+JVM em dia (136 testes da revisão), 19 ouros em paridade e varredura de PII antes
+do push. Código e assets de execução do aplicativo não foram alterados.
+
+**14/10/2026 · Codex — usuário autorizou integrar na main e seguir**
+
+PR #10 integrado em `2315ab9`: assinatura estável usa environment Fintips,
+com chave já conferida no runner. Atualizei a branch da identidade/README sobre
+essa main e preservei os dois logs do conflito. O estado atual substitui as
+notas históricas de chave pendente: Secret configurado e validado, CI integrado.
+O pedido agora é integrar as entregas prontas e acompanhar a publicação real.
