@@ -1049,6 +1049,31 @@ na máquina de quem olha, e no README do GitHub ela não existe — sairia uma
 fonte diferente a cada leitor. Se precisar de texto vivo num SVG, me chame que
 eu ajudo a resolver de outro jeito.
 
+**2026-10-14 · Codex: CI Android observando branches/PRs e assinatura estável**
+
+O usuário pediu compilação automática por Actions/watch. Preservei a publicação
+do Claude na main `a49abaa` e abri a branch `codex/ci-android-watch` só para CI,
+metadados da variante de teste e docs. `android-ci.yml` observa branches dos
+agentes/PRs, reconstrói a web, compila debug e release, verifica o APK e oferece
+Artifacts. FinTips CI usa package separado; nenhum secret de assinatura no CI.
+
+A publicação reconstrói a web, executa o portão e recusa assinatura diferente
+das alphas. Falta de chave agora bloqueia publicar, não distribui APK com chave
+aleatória. Publicações são serializadas; build rolante atrás da main não mexe
+na release; arquivos novos são conferidos antes da tag/limpeza de anexos.
+
+Conferi que o keystore local é o das alphas (`3b2b3a83…`). Tentei cadastrar
+`ANDROID_KEYSTORE_BASE64` por stdin no CLI: a API Secrets/public-key retornou
+403. Nenhum valor foi impresso ou enviado ao Git. Arquivo privado preparado
+fora do repo para configuração única pelo usuário. Não pedir mais Contents
+write: administração de Secrets é outro acesso. `CI-ANDROID.md` documenta.
+
+O usuário escolheu configurar esse Secret depois. CI de teste permanece
+independente; a publicação compatível aguarda essa configuração. Validação
+local: debug CI, debug padrão e release compilaram; variante padrão mantém
+certificado da alpha 3. Verificador rejeitou certificado errado, pacote errado
+e asset divergente. 194 Python, 134 JVM, 17 JS e 18 arquivos de ouro conferidos.
+
 **O que eu assumo daqui para frente**, e saio do seu caminho: contratos, o
 perfil, a aba de configuração com licenças, e o que falta para publicar na
 Play Store. A tela dessas coisas continua sendo sua — eu entrego o contrato de
@@ -1152,3 +1177,40 @@ custo o deixaria no fim da lista para sempre.
 Ouro novo: `perfil-tempo.json`, com a aritmética de meses de calendário. As
 sabotagens mostraram que `dias / 30` erra exatamente na virada de mês, que é
 quando o app começa a perguntar.
+
+**14/10/2026 · Codex — assinatura no GitHub environment Fintips**
+
+O usuário informou que cadastrou a chave no environment `fintips`. A API de
+Environments confirmou o nome canônico `Fintips`, sem restrições de branch ou
+aprovações nesta conferência. A listagem de secrets segue retornando 403;
+a disponibilidade será conferida pelo runner, sem leitura/saída do valor.
+
+O job de publicação agora declara `environment: Fintips`. Acrescentei a opção
+manual `check_signing_only`: um job isolado, de leitura, exporta somente o
+certificado público do keystore temporário e exige o digest das alphas. Essa
+opção não compila, publica, move tags ou altera assets; permite conferir a
+configuração na branch antes do merge do PR #10. A publicação manual continua
+restrita à main e exige a conferência do APK. CI de PRs sem environment/secret.
+
+Ajustei `docs/CI-ANDROID.md` para a configuração realmente escolhida pelo
+usuário. Nenhum segredo foi adicionado a arquivos, logs ou artifacts.
+Actionlint conferiu os dois workflows antes do push.
+
+Conferência no runner concluída com sucesso:
+https://github.com/CabriniJr/FinTips/actions/runs/38649836779 .
+Secret disponível no environment e certificado idêntico ao das alphas. Só o
+job de assinatura executou; o job de APK/publicação foi pulado. Configuração
+não está mais pendente. A ativação na main depende da integração do PR #10.
+
+Integração do PR #10 com `main c682891`: preservados os contratos/registro de
+perfil e os dois logs do conflito de documentação. O portão de publicação
+passa também a conferir as licenças entregues pelo Claude.
+
+Encontrei uma falha da suíte após compilação Android:
+`test_as_permissoes_vem_do_manifesto_compilado` exigia lista vazia, mas AndroidX
+Core inclui `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, de proteção signature,
+no manifesto final. Ajustei **só o teste** para permitir os três nomes internos
+correspondentes aos packages release/UI/CI; qualquer outra permissão continua
+reprovando. Acrescentei um teste com manifesto compilado que inclui INTERNET
+para demonstrar que o leitor não oculta a permissão de rede. O contrato de
+configuração não mudou. 234 testes Python, JVM em dia (136), 19 ouros em paridade.
