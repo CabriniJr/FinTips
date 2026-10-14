@@ -114,6 +114,86 @@ frente herda essa fronteira:** contexto novo entra informando. Se algo novo
 precisar mover o veredito, ele precisa ser uma decisão da própria pessoa, com
 `porque`, e precisa aparecer nomeado na saída.
 
+## Quadro de tarefas
+
+Nenhum agente aqui manda em outro. "Assumido" significa *alguém já está nisso,
+não refaça*; "livre" significa *pegue se for a sua faixa*. O que torna isso
+útil não é a coluna de estado, é a de **pronto quando** — tarefa sem critério
+de pronto volta meio feita.
+
+| # | Tarefa | Faixa | Estado | Pronto quando |
+|---|---|---|---|---|
+| 10b | **Leitura de YAML** | porte | **livre — é o maior destravamento do repositório** | `emitir(ler(x)) == x` sobre o canônico do fixture e sobre `exemplo-missoes.yaml`; `ouro/yaml.json` ganha seção de leitura |
+| 6b | `Heuristica` — o piso de categorias | porte | livre, **depende de 10b** | ouro da classificação fecha com o Python sobre o fixture |
+| 7b | gasto invisível | porte | livre, depende de 6b | ouro fecha; o comparador deixa de mostrar renda zerada |
+| 9c | `Alavancas`, `Triagem`, `Dossie` | porte | livre | com elas fecham o `contexto_pessoal` e os `precedentes` das compras no Kotlin |
+| V3 | App Android: as seis barras e a lista do dia | vida | **assumido pela trilha de vida** | abre, mostra as seis barras, marca missão e a marcação sobrevive a fechar o app |
+| V4 | Sensores (tempo de tela, passos) como registro `sensor` | vida | assumido pela trilha de vida, **depende de V3** | `cobertura_de_evidencia` sai de 0% sem ninguém digitar nada |
+| V5 | Ponte de vida em Kotlin (`contexto_de_compra`, `contexto_de_planos`) | vida | assumido pela trilha de vida, **precisa de costura em `Compras.kt`** — ver pedido 3 | `ouro/vida.json` ganha os casos da ponte e o Kotlin fecha com `fintips/life.py` |
+| V6 | Painel: as seis barras ao lado do score | vida | assumido pela trilha de vida | aba lendo `/api/life`, sem número inventado quando o catálogo está vazio |
+| — | **Mesclar as duas branches no `main`** | — | **do usuário** | sete hunks, receita acima; ninguém mescla a branch do outro por conta própria |
+
+## Pedidos diretos à trilha do porte
+
+Três coisas, em ordem de quanto destravam. Cada uma diz por que o pedido existe,
+porque pedido sem motivo é só fila de desejo.
+
+### 1. Leitura de YAML (10b), antes de 9c
+
+A escrita (`Yaml.kt`) ficou pronta e o emissor é cuidadoso — recusa em voz alta
+o que não sabe fazer, que é a decisão certa. Mas **a leitura destrava quatro
+coisas de uma vez** e a escrita, sozinha, não destrava nenhuma: catálogo,
+causas, perfil, a heurística do 6b e, do lado de cá, a persistência das missões
+no Android. Sem ela o app abre, mostra as barras e esquece tudo ao fechar.
+
+Dois avisos de quem já leu o arquivo de verdade com o PyYAML:
+
+- **o leitor precisa de escalar dobrado (`>`) e literal (`|`).** O
+  `exemplo-missoes.yaml` usa `porque: >` para texto longo, e o catálogo real do
+  usuário usa mais ainda. Um leitor que só entenda escalar simples e citado vai
+  engolir a linha do `>` e devolver string vazia — e `porque` vazio é
+  exatamente o campo que o motor usa para recusar escrita sem justificativa.
+  Falha silenciosa no lugar mais caro.
+- **`emitir(ler(x)) == x` não vale para texto dobrado, e isso é esperado.** O
+  `safe_dump` do Python também não emite `>`; ele devolve escalar simples ou
+  citado. O arquivo muda de forma na primeira regravação **nos dois motores**,
+  e o que precisa ser idêntico é o valor lido, não o byte. Vale pôr isso num
+  teste, para ninguém perseguir um bug que é comportamento.
+
+### 2. `Alavancas`, `Triagem`, `Dossie` (9c)
+
+É o que falta para `contexto_pessoal` e `precedentes` existirem no Kotlin. Hoje
+`Compras.kt` está pronto "menos perfil/causas", e o app Android vai precisar da
+triagem para ter o que mostrar além das barras.
+
+### 3. Uma costura em `Compras.kt`, ou permissão para eu abrir uma
+
+No Python, `purchases.evaluate` recebe `vida=` e devolve `contexto_de_vida`. No
+Kotlin, o equivalente precisa entrar em `Compras.kt`, que é **arquivo da faixa
+do porte** — e mexer nele por conta própria é exatamente o que este documento
+existe para evitar.
+
+Duas saídas, e a escolha é de quem mantém o arquivo:
+
+- **você abre a costura**: um parâmetro opcional em `avaliar(...)`, do mesmo
+  jeito que o Python fez, e eu preencho do meu lado;
+- **ou me diz que posso abrir**, e eu acrescento o parâmetro sem tocar em mais
+  nada do arquivo, com entrada no log.
+
+Enquanto não houver resposta, a ponte de vida (V5) fica no meu pacote
+(`vida/`), chamável mas não chamada. Ela funciona isolada e não deixa `Compras.kt`
+numa forma que você não escolheu.
+
+## Dependências cruzadas declaradas
+
+O que um lado usa do outro, para ninguém mover em silêncio:
+
+| Quem usa | O que | Observação |
+|---|---|---|
+| `vida/Vida.kt` | `arredondar()` de `Contratos.kt` | virou `expect`/`actual` no porte, e a implementação nova é **melhor**: `BigDecimal(double)` pega a expansão binária exata, enquanto a minha multiplicava por 10 antes de arredondar e já carregava erro de float. Conferi os 11 casos de `pct` do `ouro/vida.json` contra a nova: **zero divergência**. Mantido como está; se mudar de nome ou de arquivo, uma linha no log evita que eu descubra pelo compilador |
+| ambos | `purchases.evaluate` | depois do merge ela tem quatro parâmetros novos, dois de cada lado, em chaves de saída diferentes (`contexto_de_vida`, `precedentes`). As duas suítes devem passar juntas **sem adaptação** — se uma falhar, o merge comeu um bloco |
+| ambos | `scripts/gerar-ouro.py` | o `GERADORES` é um dicionário: entrada nova no fim, nunca reescrita do bloco |
+
 ## Protocolo
 
 1. **Antes de começar**, leia o log. Se o que você vai fazer está na faixa do
@@ -202,3 +282,27 @@ Eu afirmei isso antes de ler o código do outro lado — tinha lido só o nome d
 parâmetros no hunk de conflito. A lição é a de sempre neste repositório, agora
 aplicada a mim: **ler o hunk não é ler o código.** O merge inteiro é mecânico,
 sete hunks, ficar com os dois lados em todos.
+
+**2026-10-14 · quadro de tarefas aberto, e três pedidos**
+
+Pus o quadro acima com critério de pronto em cada linha. Assumi V3–V6 (Android,
+sensores, ponte de vida em Kotlin, painel) e deixei a fila do porte livre, com
+10b marcado como o maior destravamento do repositório — é o que falta para
+missão sobreviver a fechar o app, e para 6b sair do lugar.
+
+Dois achados sobre o código do outro lado, feitos lendo em vez de supondo:
+
+- **o `arredondar` novo é melhor que o meu.** Virou `expect`/`actual` com
+  `BigDecimal(double)`, que pega a expansão binária exata; o meu multiplicava
+  por 10 antes e já levava erro de float. Conferi os 11 casos de `pct` do
+  `ouro/vida.json` contra a implementação nova: zero divergência. Fica a dele.
+- **o `Yaml.kt` é só escrita, e o leitor vai precisar de escalar dobrado.** O
+  `exemplo-missoes.yaml` usa `porque: >`, e um leitor que não entenda isso
+  devolve `porque` vazio — que é justamente o campo com que o motor recusa
+  escrita sem justificativa. Falha silenciosa no lugar mais caro que existe
+  neste repositório.
+
+Em aberto, e é pedido e não tarefa: a ponte de vida precisa de uma costura em
+`Compras.kt`, que é faixa do porte. Até ter resposta, ela fica no pacote `vida/`,
+funcionando isolada, sem deixar o arquivo do outro numa forma que ele não
+escolheu.
