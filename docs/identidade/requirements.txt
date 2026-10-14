@@ -1,0 +1,4 @@
+# Ferramentas de exportação; não são dependências do aplicativo.
+CairoSVG==2.9.1
+fonttools==4.61.1
+Pillow==12.3.0

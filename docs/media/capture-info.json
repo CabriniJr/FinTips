@@ -1,0 +1,18 @@
+{
+  "interface": "WebView embarcada; captura no Chromium, não em aparelho Android",
+  "dados": "fictícios; cenário exclusivo em perfil temporário",
+  "data_do_cenario": "2026-01-14",
+  "viewport": [
+    390,
+    844
+  ],
+  "fps_gif": 12,
+  "assets_embarcados_sha256": {
+    "fintips/web/assets/BarlowCondensed-Black-CRk7EgUb.ttf": "e74b750df582c608f35db467b711b2b60d2217618e85e60b72b42dfd00446cab",
+    "fintips/web/assets/BarlowCondensed-OFL.txt": "10b0e6bb43166a50fbe7cde2895bd7f703738a5da843acb5c97c95dc9ea26817",
+    "fintips/web/assets/BarlowCondensed-SemiBold-B7YG4rBL.ttf": "7b619d14bc2327509a9ef32b0890f709626f7ecc9ff61191c2a4314c5499d2d9",
+    "fintips/web/assets/index-BzLhx3gm.css": "5f88593caecc647d6946f8b330ea2343c8b39f36fdf4a044708bdb4e97c9df2d",
+    "fintips/web/assets/index-DffCbiCl.js": "1ca2f849ddc1d9e3c531c09fcec1b71fd1c028fdafe6ed25558553fc7fd93363",
+    "fintips/web/index.html": "60ef1e5278414dc8a8ed060a7bdb7fd1f0bd486798f6d6c221f3153dc35121c6"
+  }
+}
