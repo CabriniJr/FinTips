@@ -739,6 +739,123 @@ def ouro_score() -> dict:
     }
 
 
+def ouro_vida() -> dict:
+    """Sequência, recorde, as seis barras e a cobertura de evidência.
+
+    Este é o único ouro em que o Kotlin veio primeiro: o domínio de vida nasceu
+    lá, porque não existia no Python. Agora que existe nos dois, o ouro trava a
+    paridade na direção de sempre — o Python é a referência.
+
+    Os casos foram escolhidos onde os dois podem divergir sem ninguém notar:
+
+    - **terço exato** (1 de 3 cumpridas) — `round(x, 1)` do Python contra
+      divisão de `Double` crua do Kotlin. 33.3 contra 33.33333333333333.
+    - **recaída** — a sequência recomeça e o recorde sobrevive.
+    - **hoje vazio** — o dia não acabou; a sequência de ontem continua.
+    - **presumido no meio** — abre buraco, porque suposição não conta.
+    """
+    from datetime import date
+
+    from fintips import life
+
+    def m(mid, atributo, cadencia="diaria", sensor=False):
+        return life.Missao(id=mid, titulo=mid, atributo=atributo,
+                           cadencia=cadencia, sensor_possivel=sensor)
+
+    def r(mid, dia, origem, medida=""):
+        return life.RegistroDeMissao(mid, date(2026, 10, dia), origem, medida)
+
+    hoje = date(2026, 10, 14)
+
+    sequencias = []
+    for nome, dias_e_origens, ate in [
+        ("cinco_dias_seguidos", [(d, "sensor") for d in range(10, 15)], hoje),
+        ("hoje_ainda_vazio", [(d, "sensor") for d in (11, 12, 13)], hoje),
+        ("recaida_no_meio",
+         [(d, "sensor") for d in (1, 2, 3, 4, 5, 6, 7, 9, 10)], date(2026, 10, 10)),
+        ("presumido_abre_buraco",
+         [(11, "usuario"), (12, "presumido"), (13, "usuario"), (14, "usuario")], hoje),
+        ("nenhum_registro", [], hoje),
+        ("so_presumido", [(13, "presumido"), (14, "presumido")], hoje),
+        ("buraco_de_um_dia", [(10, "agente"), (12, "agente"), (13, "agente"), (14, "agente")], hoje),
+    ]:
+        missao = m("x", "FOC")
+        registros = [r("x", d, o) for d, o in dias_e_origens]
+        e = life.estado_diario(missao, registros, ate)
+        sequencias.append({
+            "caso": nome,
+            "ate": ate.isoformat(),
+            "dias": [[d, o] for d, o in dias_e_origens],
+            "cumprida_na_janela": e["cumprida_na_janela"],
+            "sequencia": e["sequencia"],
+            "recorde": e["recorde"],
+        })
+
+    # Um terço exato é o caso que separa arredondamento de divisão crua.
+    tres_de_foc = [m("a", "FOC", sensor=True), m("b", "FOC"), m("c", "FOC")]
+    barras = []
+    for nome, missoes, registros, cadencia in [
+        ("um_de_tres_e_um_terco", tres_de_foc, [r("a", 14, "sensor", "0 min")], "diaria"),
+        ("dois_de_tres", tres_de_foc, [r("a", 14, "sensor"), r("b", 14, "usuario")], "diaria"),
+        ("tudo_vazio", tres_de_foc, [], "diaria"),
+        ("presumido_nao_enche_barra", tres_de_foc, [r("a", 14, "presumido")], "diaria"),
+        ("fora_da_janela_diaria", tres_de_foc, [r("a", 1, "usuario")], "diaria"),
+        ("janela_semanal_pega_sete_dias",
+         [m("s", "AGI", "semanal", sensor=True)], [r("s", 8, "sensor", "22 km")], "semanal"),
+        ("janela_semanal_nao_pega_o_oitavo",
+         [m("s", "AGI", "semanal", sensor=True)], [r("s", 7, "sensor")], "semanal"),
+        ("janela_mensal", [m("o", "OURO", "mensal")], [r("o", 1, "usuario")], "mensal"),
+    ]:
+        f = life.forca_dos_atributos(missoes, registros, hoje, cadencia)
+        barras.append({
+            "caso": nome,
+            "cadencia": cadencia,
+            "frentes": [
+                {
+                    "atributo": x["atributo"],
+                    "missoes": x["missoes"],
+                    "cumpridas": x["cumpridas"],
+                    "pct": x["pct"],
+                    "com_evidencia_de_maquina": x["com_evidencia_de_maquina"],
+                }
+                for x in f
+            ],
+        })
+
+    coberturas = []
+    for nome, missoes, registros in [
+        ("uma_de_duas_medida", [m("a", "FOC", sensor=True), m("b", "INT")],
+         [r("a", 14, "sensor", "0 min")]),
+        ("uma_de_tres_e_um_terco",
+         [m("a", "FOC", sensor=True), m("b", "INT"), m("c", "VIT", sensor=True)],
+         [r("a", 14, "sensor")]),
+        ("sensor_possivel_mas_sem_medida", [m("a", "FOC", sensor=True)], [r("a", 14, "usuario")]),
+        ("catalogo_vazio", [], []),
+    ]:
+        c = life.cobertura_de_evidencia(missoes, registros)
+        coberturas.append({
+            "caso": nome,
+            "missoes_ativas": c["missoes_ativas"],
+            "mensuraveis_por_aparelho": c["mensuraveis_por_aparelho"],
+            "com_medida_registrada": c["com_medida_registrada"],
+            "pct_medido": c["pct_medido"],
+        })
+
+    return {
+        "fonte": "fintips.life",
+        "atributos": list(life.ATRIBUTOS),
+        "cadencias": life.CADENCIAS,
+        "origens": life.ORIGENS_DO_REGISTRO,
+        "conta_como_cumprido": {
+            k: v >= life.AUTORIDADE_MINIMA_PARA_CUMPRIR
+            for k, v in life.ORIGENS_DO_REGISTRO.items()
+        },
+        "sequencias": sequencias,
+        "barras": barras,
+        "coberturas": coberturas,
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
@@ -752,6 +869,7 @@ GERADORES = {
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
+    "vida.json": ouro_vida,
 }
 
 

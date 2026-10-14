@@ -172,13 +172,27 @@ linha da tabela; agora é o produto. O que isso muda na prática:
   continua testado contra o Python e vira o pilar OURO. Ele só deixou de ser a
   frente de ataque.
 
-O domínio de vida não tem ouro, e não é esquecimento: não existe motor Python
-para comparar com. O que os 14 testes dele cobram é outra coisa — propriedade
-de produto, cada uma com uma frase do plano atrás. Registro `presumido` não
-conta como cumprido; o recorde não zera na recaída; hoje ainda não cumprido não
-quebra a sequência; as seis barras aparecem mesmo vazias. Quando uma delas
-quebrar, o app terá deixado de fazer o que foi desenhado para fazer, mesmo com
-todos os números certos.
+O domínio de vida nasceu sem ouro, porque não existia motor Python para
+comparar com. Os 14 testes dele cobram outra coisa — propriedade de produto,
+cada uma com uma frase do plano atrás: `presumido` não conta como cumprido, o
+recorde não zera na recaída, hoje ainda não cumprido não quebra a sequência, as
+seis barras aparecem mesmo vazias.
+
+Depois o Python ganhou `fintips/life.py`, porque é o Python que serve o agente
+e o painel hoje. Isso cria o risco que o resto da porta não tem: **dois motores
+sem nada obrigando a concordar**, e o Kotlin dessa vez chegou primeiro. Por
+isso nasceu `ouro/vida.json`, cobrado na direção de sempre, com o Python como
+referência. Ele achou divergência na primeira execução:
+
+```
+barras divergiram do motor Python:
+  [um_de_tres_e_um_terco/FOC] pct: python 33.3, kotlin 33.33333333333333
+```
+
+Uma missão de três. O Python arredonda em uma casa, o Kotlin dividia cru.
+Nenhum teste de propriedade pegaria — as duas respostas parecem certas, e a
+diferença só apareceria quando alguém comparasse a barra do app com o número
+do painel.
 
 Do que não depende de nada para o que depende de tudo. Cada linha só começa
 quando a anterior tem ouro fechando — ou, no caso do domínio de vida, os
@@ -198,6 +212,7 @@ testes de propriedade.
 | 8 | `Score` — cinco dimensões, pesos, alavanca de maior ganho | **pronto** |
 | 8b | `Projecao`, `Planos`, `Compras` | adiado |
 | 9 | `Vida` — atributos, missões, registro, sequência, cobertura | **pronto** |
+| 9b | `ouro/vida.json` — paridade com `fintips/life.py` | **pronto** |
 | 10 | Persistência YAML (`expect`/`actual` por alvo) — missões primeiro | a fazer |
 | 11 | App Android: as seis barras e a lista do dia | a fazer |
 | 12 | Sensores (tempo de tela, passos) como registro `sensor` | a fazer |

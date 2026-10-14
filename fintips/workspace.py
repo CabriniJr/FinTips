@@ -10,7 +10,12 @@ Layout (tudo na sua máquina, nada sincronizado por padrão):
         planos.yaml        seus planos financeiros
         patrimonio.yaml    saldos e posições que o extrato não vê
         compras.yaml       intenções de compra em avaliação
+        missoes.yaml       as seis frentes: missões e regras declaradas
+        registros.jsonl    cumprimento das missões, em append
       relatorios/          saídas geradas (dashboard, análises)
+
+Nada de `data/` entra no Git, e `missoes.yaml` é o caso mais sensível: plano
+de vida tem salário, empregador, nome de gente e hora de dormir.
 """
 
 from __future__ import annotations
@@ -93,6 +98,14 @@ class Workspace:
     def triagem_path(self) -> Path: return self.data / "triagem.yaml"
     @property
     def contrapartes_path(self) -> Path: return self.data / "contrapartes.yaml"
+    @property
+    def missoes_path(self) -> Path:
+        """Catálogo de missões da pessoa. Fica em data/ — fora do Git."""
+        return self.data / "missoes.yaml"
+    @property
+    def registros_path(self) -> Path:
+        """Histórico de cumprimento, em append. Fica em data/ — fora do Git."""
+        return self.data / "registros.jsonl"
     @property
     def regras_locais_path(self) -> Path:
         """Estabelecimentos do seu dia a dia. Fica em data/ — fora do Git."""

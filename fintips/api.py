@@ -12,6 +12,7 @@ proveniência do que se faz conversando.
 from __future__ import annotations
 
 import os
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -22,13 +23,13 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import levers, mapping, plans as plans_mod, projection, purchases, report
+from . import levers, life, mapping, plans as plans_mod, projection, purchases, report
 from .analysis import baseline
 from .categorize import norm
 from .contracts import Proveniencia
 from .workspace import Workspace
 
-API_VERSION = "0.5.0"
+API_VERSION = "0.6.0"
 WEB_DIR = Path(__file__).parent / "web"
 
 
@@ -174,6 +175,21 @@ class ProfileIn(BaseModel):
     evidencia: list[str] = Field(default_factory=list)
 
 
+class MissionLogIn(BaseModel):
+    """Registro de missão cumprida.
+
+    `origem` é a escada da vida, não a financeira: presumido < agente <
+    sensor < usuario. O painel marca como `usuario`, porque quem clica é a
+    pessoa; `sensor` entra pelo aparelho e `presumido` nunca conta.
+    """
+
+    missao_id: str
+    origem: str = "usuario"
+    medida: str = ""
+    nota: str = ""
+    dia: str = ""
+
+
 class HoldingsIn(BaseModel):
     posicoes: list[dict]
 
@@ -248,6 +264,40 @@ def perfil() -> dict:
 def alavancas() -> dict:
     ws = _ws()
     return levers.calcular(cache.get(ws))
+
+
+@app.get("/api/life")
+def vida() -> dict:
+    """As seis frentes de hoje, as missões diárias e a cobertura de evidência.
+
+    Devolve sempre as seis barras, mesmo vazias: frente sem missão mostra o que
+    a pessoa não está treinando, e esconder a barra esconderia a lacuna.
+    """
+    ws = _ws()
+    v = report.load_vida(ws)
+    if v.vazia:
+        return {
+            "sem_missoes_cadastradas": True,
+            "arquivo": str(ws.missoes_path),
+            "molde": "fintips/rules/exemplo-missoes.yaml",
+        }
+    hoje = date.today()
+    return {
+        "hoje": hoje.isoformat(),
+        "frentes": life.forca_dos_atributos(v.missoes, v.registros, hoje),
+        "missoes_do_dia": [
+            life.estado_diario(m, v.registros, hoje)
+            for m in v.missoes if m.ativa and m.cadencia == "diaria"
+        ],
+        "cobertura_de_evidencia": life.cobertura_de_evidencia(v.missoes, v.registros),
+    }
+
+
+@app.get("/api/life/plans")
+def vida_e_planos() -> dict:
+    """O aporte declarado contra o que os planos exigem por mês."""
+    ws = _ws()
+    return life.contexto_de_planos(report.load_vida(ws), cache.get(ws)["planos"])
 
 
 # --------------------------------------------------------------------------
@@ -434,7 +484,33 @@ def avaliar_compra(body: PurchaseIn) -> dict:
         reserva_alvo_meses=float(ctx["baseline"].get("reserva_alvo_meses", 6)),
         perfil=ctx.get("perfil"),
         causas=(ctx.get("causas") or {}).get("itens"),
+        vida=report.load_vida(ws),
     )
+
+
+@app.post("/api/life/log")
+def registrar_missao(body: MissionLogIn) -> dict:
+    ws = _ws()
+    v = report.load_vida(ws)
+    if v.missoes and body.missao_id not in {m.id for m in v.missoes}:
+        raise HTTPException(404, f"missão '{body.missao_id}' não está no catálogo")
+    try:
+        registro = life.RegistroDeMissao.from_dict({
+            "missao_id": body.missao_id,
+            "dia": body.dia or date.today().isoformat(),
+            "origem": body.origem,
+            "medida": body.medida,
+            "nota": body.nota,
+        })
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+    life.registrar(ws.registros_path, registro)
+    missao = next(m for m in v.missoes if m.id == body.missao_id)
+    return {
+        "gravado": registro.to_dict(),
+        "conta_como_cumprido": registro.conta_como_cumprido,
+        "estado": life.estado_diario(missao, report.load_vida(ws).registros, date.today()),
+    }
 
 
 @app.post("/api/holdings")

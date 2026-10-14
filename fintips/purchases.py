@@ -16,6 +16,7 @@ from decimal import Decimal
 from typing import Iterable
 
 from .categorize import norm
+from .life import Vida, contexto_de_compra
 from .models import Statement, Transaction
 
 Z = Decimal("0")
@@ -326,6 +327,8 @@ def evaluate(
     patrimonio: Decimal | float = 0,
     perfil: dict | None = None,
     causas: list[dict] | None = None,
+    vida: Vida | None = None,
+    hoje: date | None = None,
 ) -> dict:
     saldo = Decimal(str(saldo_conta))
     patr = Decimal(str(patrimonio))
@@ -335,6 +338,14 @@ def evaluate(
     reserva_alvo = despesa * Decimal(str(reserva_alvo_meses))
     excedente = patr + saldo - reserva_alvo  # o que dá pra gastar sem furar a reserva
 
+    vida_ctx = (
+        contexto_de_compra(
+            vida, item=intent.item, preco=intent.preco,
+            categoria=intent.categoria, tags=intent.tags, hoje=hoje,
+        )
+        if vida and not vida.vazia else None
+    )
+
     regret = regret_signals(intent, stmt, base)
     cen = scenarios(intent, base, saldo + patr)
     impacto_planos = plan_impact(intent, plan_results, base)
@@ -342,8 +353,18 @@ def evaluate(
     custo_em_meses = float(intent.preco / sobra) if sobra > 0 else None
     fura_reserva = intent.preco > excedente
 
+    # A regra que a pessoa assinou vem antes dos sinais calculados: ela não é
+    # leitura do motor sobre o histórico dela, é decisão que ela já tomou. Por
+    # isso é a única coisa do contexto de vida que mexe no veredito — e vai
+    # nomeada em `regra_declarada_aplicada`, para que a conversa cite a regra
+    # dela e não um conselho do app.
+    regra = (vida_ctx or {}).get("regra_declarada") or {}
+    espera_declarada = bool(regra.get("aplica"))
+
     if fura_reserva and (custo_em_meses or 0) > 3:
         veredito = "nao_agora"
+    elif espera_declarada:
+        veredito = "espere_30_dias" if regra.get("dias") == 30 else "espere_o_prazo_que_voce_definiu"
     elif regret["risco_arrependimento"] >= 60:
         veredito = "espere_30_dias"
     elif fura_reserva:
@@ -379,6 +400,15 @@ def evaluate(
         "estrategias": cen,
         "impacto_nos_planos": impacto_planos,
         "melhor_estrategia": _best(cen, fura_reserva, regret["risco_arrependimento"]),
+        "regra_declarada_aplicada": (
+            {
+                "regra": regra["id"],
+                "porque_ela_escreveu": regra["porque_ela_escreveu"],
+                "liberada_em": regra["liberada_em"],
+            }
+            if espera_declarada else None
+        ),
+        "contexto_de_vida": vida_ctx,
         "contexto_pessoal": contexto_pessoal(
             intent, perfil, causas,
             despesa_mes=despesa, saldo_mais_patrimonio=saldo + patr,

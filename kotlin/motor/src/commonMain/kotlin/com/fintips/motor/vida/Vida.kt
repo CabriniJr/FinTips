@@ -1,5 +1,6 @@
 package com.fintips.motor.vida
 
+import com.fintips.motor.arredondar
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -236,7 +237,11 @@ fun forcaDosAtributos(
             atributo = atributo,
             missoes = dele.size,
             cumpridas = cumpridas,
-            pct = if (dele.isEmpty()) 0.0 else cumpridas.toDouble() / dele.size * 100,
+            // Arredondado em uma casa porque o motor Python arredonda — uma
+            // missão de três dá 33.3 lá e 33.33333333333333 aqui se a divisão
+            // for crua. As duas "parecem certas", e a diferença só apareceria
+            // quando alguém comparasse a barra do app com o número do painel.
+            pct = if (dele.isEmpty()) 0.0 else arredondar(cumpridas.toDouble() / dele.size * 100, 1),
             comEvidenciaDeMaquina = porMaquina,
         )
     }
@@ -264,7 +269,7 @@ fun coberturaDeEvidencia(
         "mensuraveis_por_aparelho" to mensuraveis,
         "com_medida_registrada" to comRegistroDeSensor,
         "pct_medido" to if (ativas.isEmpty()) 0.0
-                        else comRegistroDeSensor.toDouble() / ativas.size * 100,
+                        else arredondar(comRegistroDeSensor.toDouble() / ativas.size * 100, 1),
         "explicacao" to (
             "quanto do que o app afirma veio de medida. O resto é memória, e " +
             "memória de tempo de tela distorce a favor de quem lembra"

@@ -23,6 +23,23 @@
 # `sensor_possivel: true` diz que **existe aparelho capaz de responder** — não
 # que ele esteja ligado. Missão sem sensor fica na palavra da pessoa, e o app
 # mostra isso na tela em vez de fingir um rigor que não tem.
+#
+# TRÊS CAMPOS QUE LIGAM ISTO À DECISÃO FINANCEIRA
+#
+# `valor_mensal`   quanto a missão move por mês. É o que permite traduzir preço
+#                  em meses de aporte: "este item custa 7 meses do que você
+#                  guarda" diz mais que "R$ 2.500".
+#
+# `colide_com`     o que esta missão considera conflito. **Só o que você
+#                  escrever aqui cria colisão.** O motor não decide que tablet
+#                  é vício: se a palavra não está na lista, não há colisão. É a
+#                  única porta pela qual uma compra toca uma frente que não é
+#                  dinheiro.
+#
+# `regras`         (no fim do arquivo) regras que você assina para si. Esta é a
+#                  única parte deste arquivo que mexe no veredito de uma
+#                  compra, e por isso exige `porque`: a conversa precisa poder
+#                  dizer "a sua regra diz", nunca "o app acha".
 
 schema_version: 1
 
@@ -38,9 +55,13 @@ missoes:
     como_medir: tempo de tela em apps de vídeo curto igual a zero
     sensor_possivel: true
     porque: corte total em vez de moderação
+    # Aparelho de tela é a porta de entrada do que esta missão corta. Escrever
+    # isso aqui é o que faz uma compra de tablet aparecer nesta frente — e o
+    # que impede o motor de inventar a ligação sozinho.
+    colide_com: [tablet, celular, smartphone, streaming, assinatura de video]
 
   - id: for-movimento-do-dia
-    titulo: Movimento do dia
+    titulo: Treino ou caminhada
     atributo: FOR
     cadencia: diaria
     como_medir: treino nos dias marcados; nos outros, caminhada curta
@@ -61,7 +82,7 @@ missoes:
     sensor_possivel: true
 
   - id: ouro-sem-compra-fora-do-orcamento
-    titulo: Nenhuma compra fora do orçamento
+    titulo: Gasto dentro do envelope
     atributo: OURO
     cadencia: diaria
     # Esta é a única missão que o motor financeiro consegue conferir sozinho:
@@ -88,7 +109,7 @@ missoes:
     titulo: Lab da semana
     atributo: INT
     cadencia: semanal
-    como_medir: um lab completo, do começo ao fim
+    como_medir: um exercício prático inteiro, do começo ao fim
     sensor_possivel: false
 
   - id: foc-revisao-semanal
@@ -105,6 +126,7 @@ missoes:
     cadencia: mensal
     como_medir: valor combinado transferido nas datas combinadas
     sensor_possivel: true
+    valor_mensal: 1000        # reescreva com o seu — é o que traduz preço em meses
 
   - id: agi-trilha-do-mes
     titulo: Trilha do mês
@@ -121,14 +143,34 @@ missoes:
 
   # --------------------------------------------------- trimestrais e anuais
   - id: ouro-revisao-trimestral
-    titulo: Revisão do trimestre
+    titulo: Revisão trimestral do dinheiro
     atributo: OURO
     cadencia: trimestral
     como_medir: metas revistas, projeção atualizada com o saldo real, assinaturas auditadas
     sensor_possivel: false
 
   - id: vit-check-up
-    titulo: Check-up anual
+    titulo: Exames do ano
     atributo: VIT
     cadencia: anual
     sensor_possivel: false
+
+# ------------------------------------------------- regras que você assina
+#
+# A única parte deste arquivo que muda o veredito de uma compra. Por isso cada
+# regra exige `porque`: o app aplica a SUA regra, e a conversa precisa poder
+# citá-la. Sem `porque`, o carregamento falha de propósito.
+#
+# Tipo suportado hoje: `espera_antes_de_comprar`. Tipo desconhecido não é
+# ignorado em silêncio — ele quebra o carregamento, porque regra ignorada em
+# silêncio é pior que regra inexistente.
+
+regras:
+  - id: espera-antes-de-comprar
+    tipo: espera_antes_de_comprar
+    acima_de: 300
+    dias: 30
+    porque: >
+      tudo que der vontade entra na lista de desejos com data; acima do limite,
+      espera o prazo. Se ainda quiser depois e couber no envelope do mês,
+      compra. Compra por impulso é o padrão a quebrar.

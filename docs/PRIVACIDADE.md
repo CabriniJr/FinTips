@@ -35,10 +35,38 @@ hora de classificar. O motivo é direto: uma lista com a sua padaria, o seu bar 
 loja de trilha onde você compra é um perfil de localização e hábito — o mesmo tipo
 de dado que o resto do projeto se dá ao trabalho de pseudonimizar.
 
+## O arquivo mais sensível do workspace não é o extrato
+
+É `data/missoes.yaml`.
+
+O extrato diz onde o dinheiro foi. O catálogo de missões diz a que horas você
+deita, quantas vezes por semana você treina, quanto do salário você aporta, que
+vício você está cortando e há quantos dias. Plano de vida tem salário,
+empregador, nome de gente e valor de patrimônio no mesmo arquivo.
+
+Por isso ele mora em `data/`, com `data/registros.jsonl` ao lado, e o pacote
+carrega só o molde em `fintips/rules/exemplo-missoes.yaml` — a mesma divisão de
+`regras-locais.yaml`, por uma razão mais forte.
+
+A trava de PII colhe os termos desses dois arquivos e procura cada um nos
+arquivos que vão para o commit. Como ela colhe, e por quê:
+
+| Decisão | Motivo |
+|---|---|
+| lê o YAML de verdade, não com `grep` | as frases mais sensíveis estão em bloco dobrado (`porque: >`), e `grep` de linha pega só o `>` |
+| texto só entra como frase (espaço + 8 caracteres) | "Leitura" sozinha acusaria metade da documentação, e varredura que grita por tudo se aprende a ignorar |
+| número entra sozinho | o valor do seu aporte não é palavra genérica |
+| `colide_com` fica fora | são categorias de produto ("tablet", "console"); o que é pessoal é a ligação, não a palavra |
+
+Na primeira execução com dados reais ela acusou dois vazamentos já commitados:
+o fixture de teste Kotlin e o molde do pacote carregavam frases copiadas
+literalmente do plano. **O repositório foi corrigido, não o arquivo pessoal** —
+em caso de colisão, o Git cede.
+
 ## O que nunca deve entrar no repositório
 
 ```gitignore
-data/
+data/              # inclui missoes.yaml e registros.jsonl
 relatorios/
 .fintips-salt
 config.yaml        # contém apelidos = nomes reais

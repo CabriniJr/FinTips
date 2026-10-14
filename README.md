@@ -70,6 +70,17 @@ decisão e quanto ainda é palpite**. Começa em 0%.
   A frase que interpreta o número é do agente, que conversou com você.
 - **Avalia intenção de compra** contra reserva, planos e o seu histórico de
   arrependimento.
+- **Lê a compra à luz das seis frentes.** Dinheiro (OURO) é uma de seis
+  — força, agilidade, vitalidade, intelecto, foco e ouro —, e as outras cinco
+  existem para dar contexto a decisão financeira. Duas pessoas olham o mesmo
+  tablet de R$ 2.500 com a mesma sobra: numa é o aparelho de estudo que falta,
+  na outra é a porta de entrada do vídeo curto que ela corta há 40 dias. Nenhum
+  extrato distingue; a missão declarada, sim. O motor devolve qual sequência a
+  compra põe em risco, o preço em meses de aporte e as seis barras de hoje —
+  **e não decide que tablet é vício**: a colisão só existe porque a pessoa
+  escreveu `colide_com` na missão dela. A única coisa dessa camada que mexe no
+  veredito é a regra de espera que ela mesma assinou, e ela vai nomeada na
+  resposta, com o `porque` dela ao lado.
 
 ## A jornada, em três passos
 
@@ -182,7 +193,7 @@ pessoa, causas ativas, o que está aberto) e `fintips://spec` (a regra de
 proveniência e os vocabulários) o cliente lê sozinho, sem gastar um turno. Os
 prompts `conversa_de_compra` e `entender_um_gasto` trazem roteiro pronto.
 
-As 33 ferramentas se dividem em ler (`analise_completa`, `triagem`, `investigar`,
+As 36 ferramentas se dividem em ler (`analise_completa`, `triagem`, `investigar`,
 `listar_taxonomia`, `listar_regras`, `contexto_do_usuario`, `custos_fixos`,
 `buscar_transacoes`, `projecao`, `perfil`, `alavancas`, `briefing`,
 `listar_causas`), simular
@@ -245,9 +256,16 @@ No Windows, um comando só faz tudo (trava, commit, rebase e push):
 .\scripts\publicar.ps1 "mensagem do commit"
 ```
 
-O script lê o seu `config.yaml`, `data/patrimonio.yaml` e `data/regras-locais.yaml`
-— todos fora do Git — e procura qualquer pedaço deles nos arquivos do commit. Ele
-próprio não guarda nada: só sabe onde os seus dados ficam.
+O script lê o seu `config.yaml`, `data/patrimonio.yaml`, `data/regras-locais.yaml`,
+`data/missoes.yaml` e `data/registros.jsonl` — todos fora do Git — e procura
+qualquer pedaço deles nos arquivos do commit. Ele próprio não guarda nada: só
+sabe onde os seus dados ficam.
+
+O catálogo de missões é o arquivo mais sensível do workspace, mais que o
+extrato: ele diz a que horas você deita, quanto do salário você aporta e que
+vício você está cortando. Na primeira execução com dados reais, a trava acusou
+dois vazamentos já commitados — fixture de teste e molde do pacote com frases
+copiadas do plano. Em colisão, o Git cede.
 
 ## Testes
 
@@ -257,6 +275,7 @@ for t in tests/test_*.py; do python "$t" || break; done
 
 ## Documentos
 
+- `docs/APP-DE-VIDA.md` — as seis frentes e por que elas servem ao dinheiro
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
 - `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
 - `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem

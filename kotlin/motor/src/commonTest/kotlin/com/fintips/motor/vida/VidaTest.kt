@@ -18,21 +18,21 @@ class VidaTest {
     private val hoje = LocalDate(2026, 10, 14)
 
     private val semTela = Missao(
-        id = "foc-sem-video-curto",
-        titulo = "Zero Instagram, Reels e Shorts",
+        id = "foc-tela-zero",
+        titulo = "Tela zero",
         atributo = Atributo.FOC,
         cadencia = Cadencia.DIARIA,
-        comoMedir = "tempo de tela em redes sociais igual a zero",
+        comoMedir = "tempo de tela em zero",
         sensorPossivel = true,
-        porque = "corte total, sem moderação — força de vontade sozinha já falhou",
+        porque = "corte total em vez de moderação",
     )
 
     private val leitura = Missao(
-        id = "int-leitura-30min",
-        titulo = "30 min de leitura",
+        id = "int-ler-um-bloco",
+        titulo = "Ler um bloco",
         atributo = Atributo.INT,
         cadencia = Cadencia.DIARIA,
-        comoMedir = "no trajeto ou na mesa",
+        comoMedir = "um bloco de leitura",
         sensorPossivel = false,
     )
 
@@ -43,7 +43,7 @@ class VidaTest {
 
     @Test
     fun medida_do_aparelho_vence_conclusao_do_agente() {
-        // "Você ficou sem Reels?" é pergunta factual. Se o celular mediu, a
+        // "Você treinou hoje?" é pergunta factual. Se o celular mediu, a
         // medida vale mais que a interpretação de quem conversou.
         assertTrue(OrigemDoRegistro.SENSOR.autoridade > OrigemDoRegistro.AGENTE.autoridade)
     }
@@ -51,7 +51,7 @@ class VidaTest {
     @Test
     fun a_pessoa_continua_acima_do_aparelho() {
         // O sensor erra de um jeito que a pessoa sabe explicar: celular em
-        // casa, vídeo visto no computador, treino na rua.
+        // casa, tela usada em outro aparelho, treino na rua.
         assertTrue(OrigemDoRegistro.USUARIO.autoridade > OrigemDoRegistro.SENSOR.autoridade)
     }
 
