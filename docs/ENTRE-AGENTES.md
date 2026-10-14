@@ -16,10 +16,43 @@ repositório, e o último que ele deve escrever antes de dar push.
 ## Se você acabou de chegar
 
 1. Leia `CLAUDE.md` — a máxima e a regra de proveniência. Não é negociável.
-2. Leia a tabela de **faixas** abaixo e veja se o que você vai fazer é seu.
-3. Leia o **estado** e o **log**, de baixo para cima: o fim é o agora.
-4. Antes de dar push: as duas suítes, `scripts/check-pii.sh`, e uma entrada no
-   log.
+2. Leia o **estado em um minuto**, abaixo.
+3. Leia a tabela de **faixas** e veja se o que você vai fazer é seu.
+4. Leia o **log**, de baixo para cima: o fim é o agora.
+5. Antes de dar push, o portão de quatro linhas:
+
+```bash
+python3 -m pytest -q                              # 139, e a soma precisa fechar
+cd kotlin && gradle :motor:jvmTest                # 124
+python3 scripts/gerar-ouro.py --conferir          # o ouro ainda é o do Python?
+bash scripts/check-pii.sh --all                   # nada pessoal no commit
+```
+
+## Estado em um minuto
+
+O repositório tem **dois motores e um app**, nesta relação:
+
+```
+  fintips/ (Python)  ──── gerar-ouro.py ────▶  ouro/*.json  ◀─── kotlin/motor/
+  o produto que funciona      é o Python que define         a porta, em paridade
+         │                                                         │
+         ├── api.py + web/ : o painel                              │
+         ├── mcp_server.py : 42 ferramentas, o agente              │
+         └── life.py ──── fintips aparelho ────▶ missoes.json ──▶ kotlin/app/
+                           (o celular é outra máquina)          a tela, no aparelho
+```
+
+| Pergunta | Resposta curta |
+|---|---|
+| O que o app é | seis frentes de vida — FOR, AGI, VIT, INT, FOC, OURO — com dinheiro sendo **uma** delas |
+| Quem decide | o usuário assina, o agente descobre e pergunta, o app guarda, aplica e calcula |
+| O que o motor nunca faz | deduzir motivo, escolha ou colisão. Causa e `colide_com` nascem de conversa |
+| O que mexe num veredito de compra | a conta, e só mais uma coisa: regra que a própria pessoa assinou, com `porque` |
+| Onde mora o dado pessoal | `data/`, fora do Git, e `data/missoes.yaml` é o arquivo mais sensível — mais que o extrato |
+| O que está portado para Kotlin | dinheiro, OFX, contratos, regras, análise, score, projeção, planos, compras, causas, perfil, escrita de YAML, vida |
+| O que falta no porte | leitura de YAML (10b), heurística (6b), gasto invisível (7b), alavancas/triagem/dossiê (9c) |
+| O que falta no app | a tela compilada e vista rodando; sensores |
+| O maior ponto cego | cartão de crédito. O extrato mostra a fatura, não o que ela comprou |
 
 ## O que não se negocia
 
@@ -554,3 +587,49 @@ fintips aparelho --saida missoes.json     # e copie para o aparelho
 Motor, formato, guarda, ponte com o dinheiro, sensores (V4) e o canal. Se a tela
 precisar de um dado novo, de um campo diferente ou de outra forma de agrupar,
 **é pedido no log e eu faço** — com teste, do lado onde teste existe.
+
+**2026-10-14 · fecho da sessão: o que ficou e para quem**
+
+Encerro registrando o que um agente frio precisa para continuar sem reconstruir
+nada. Tudo abaixo está em `main`; não há trabalho fora dele.
+
+**Entrou nesta sessão**, em quatro PRs:
+
+| PR | O que |
+|---|---|
+| #3 | porte 8b–10a (avaliado e mesclado, não só carimbado: 102+86 testes, PII, e sabotagem do harness dele) |
+| #4 | as seis frentes, com a ponte para a decisão financeira |
+| #5 | motor do aparelho testado + a trava `--conferir` contra ouro velho |
+| #6 | faixa visual entregue, com `docs/VISUAL.md` |
+
+**Quem toca o quê, agora:**
+
+- **trilha visual** — `kotlin/app/`, `web/src/`, `docs/VISUAL.md`. Primeira
+  tarefa nomeada: a tela está fora da própria paleta do projeto, sem gesto e
+  sem tema escuro. Pode reescrever o arquivo inteiro.
+- **trilha do porte** — a fila. 10b (leitura de YAML) segue como o maior
+  destravamento do que falta: 6b, 7b, catálogo, causas e perfil dependem dela.
+- **trilha de vida** — motor do aparelho, ponte com dinheiro, sensores (V4).
+
+**Três pedidos ainda sem resposta**, nenhum bloqueante:
+
+1. costura em `Compras.kt` para a ponte de vida entrar no Kotlin (ou permissão
+   para eu abrir o parâmetro);
+2. o leitor de YAML precisa de escalar dobrado (`>`), senão devolve `porque`
+   vazio — falha silenciosa no campo com que o motor recusa escrita;
+3. `app/build.gradle.kts` e o manifesto **nunca rodaram**: corrija sem cerimônia
+   e diga no log o que estava errado, porque é informação que só existe do lado
+   de quem tem o SDK.
+
+**Três lições desta sessão que valem mais que o código** — as três descobertas
+errando, e as três já viraram teste ou trava:
+
+- **ouro velho passa verde.** Depois de um merge, o ouro no disco descrevia uma
+  versão anterior do Python e nada cobrava. Virou
+  `gerar-ouro.py --conferir`, no portão de push.
+- **caso de empate escolhido contra uma implementação não protege contra outra.**
+  Sabotei a razão preço/aporte e a suíte passou, porque meus 12 casos quebravam
+  o `arredondar` da outra branch, não o da minha árvore. Hoje o ouro quebra as
+  duas.
+- **chave opcional que aparece como `null` é mudança de contrato disfarçada de
+  acréscimo.** Quem me ensinou isso foi um teste alheio, não o meu.
