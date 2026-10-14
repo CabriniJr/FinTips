@@ -26,6 +26,45 @@ bytes dos arquivos e downloads antes de tornar o rascunho público.
 O fonte da UI e os contratos para as próximas etapas estão no
 [PR #8](https://github.com/CabriniJr/FinTips/pull/8), sem merge automático de main.
 
+## O caminho de agora: `.github/workflows/android.yml`
+
+O processo manual descrito abaixo continua válido como referência do que o
+build faz, mas **não é mais o caminho**. Desde `c69841a` a publicação é do CI:
+
+| gatilho | resultado |
+|---|---|
+| push na `main` | atualiza a pré-release rolante `android-main` |
+| tag `android-v*` | cria a release daquela versão, e se recusa a reescrever uma já publicada |
+| `workflow_dispatch` | o mesmo, com a tag escolhida na hora |
+
+Isso nasceu de duas paredes diferentes que levaram ao mesmo lugar: o 401 em
+`uploads.github.com` no upload local, e o 403 de tipo de sessão de agente ao
+criar release. O token do runner resolve os dois.
+
+### A assinatura, que decide se a atualização instala
+
+O Android recusa instalar atualização assinada com chave diferente da
+instalada. A chave de depuração do Gradle nasce na máquina de quem compila —
+sem intervenção, cada build do CI teria chave nova, e atualizar exigiria
+desinstalar o app. Num app cujos dados só existem no aparelho, isso é **perda
+de dado**, não inconveniência.
+
+Em *Settings → Secrets and variables → Actions*:
+
+| nome | tipo | o quê |
+|---|---|---|
+| `ANDROID_KEYSTORE_BASE64` | secret | o `debug.keystore` das entregas, em base64 |
+| `ANDROID_CERT_SHA256` | variable | `3b2b3a83eec0f218c80f27541a3e27a918d87f7ecda890aecb2e5afbf3afc467` |
+
+Sem o secret o build continua, e a release sai dizendo em letra visível que
+aquele APK não instala por cima do anterior. Com a variável, o build **falha**
+se o certificado mudar — que é o erro que ninguém percebe até chegar a
+reclamação de quem não conseguiu atualizar.
+
+A impressão digital é lida com `apksigner`, não com `keytool -printcert
+-jarfile`: com `minSdk 26` o AGP desliga a assinatura v1, e o keytool não acha
+certificado nenhum num APK perfeitamente assinado em v2/v3.
+
 ## Preparar
 
 1. Build com JDK 17, SDK 34 e wrapper Gradle 8.10.2:

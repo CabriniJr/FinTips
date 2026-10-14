@@ -310,6 +310,10 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         meses=12,
     )
 
+    # O retrato entra DEPOIS de perfil e objetivos porque compõe os dois. É o
+    # bloco que o agente lê antes de aconselhar qualquer coisa.
+    ctx["retrato"] = profile_mod.retrato(ctx)
+
     itens = triage.construir(
         stmt, cps,
         base=base,
@@ -319,6 +323,7 @@ def analyze(ws: Workspace, stmt: Statement | None = None, st: dict | None = None
         store=st["triagem"],
         causas=st["causas"],
         decisoes=st["decisoes"],
+        perfil_a_reconfirmar=ctx["perfil"].get("a_reconfirmar"),
         fallback=tax_mod.FALLBACK,
     )
     ctx["triagem"] = {

@@ -23,6 +23,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from . import profile as profile_mod
+from . import configuracao as cfg_mod
+from . import licencas as lic_mod
 from . import objetivos as objetivos_mod
 from . import levers, life, mapping, plans as plans_mod, projection, purchases, report
 from .analysis import baseline
@@ -31,6 +34,10 @@ from .contracts import Proveniencia
 from .workspace import Workspace
 
 API_VERSION = "0.7.0"
+
+# A raiz do repositório: é de lá que saem os manifestos que a aba de
+# configuração lê. Não é o workspace da pessoa — são coisas diferentes.
+_RAIZ = Path(__file__).resolve().parent.parent
 WEB_DIR = Path(__file__).parent / "web"
 
 
@@ -344,6 +351,40 @@ def propor_reajuste(objetivo_id: str) -> dict:
     if obj is None:
         raise HTTPException(404, f"objetivo '{objetivo_id}' não existe")
     return objetivos_mod.reajuste_proposto(obj, checks, date.today())
+
+
+@app.get("/api/portrait")
+def retrato() -> dict:
+    """Quem é a pessoa: dinheiro, vida e compromissos, numa leitura só."""
+    return cache.get(_ws()).get("retrato") or {}
+
+
+@app.get("/api/profile/history")
+def historico_de_perfil(eixo: str = "", so_travessias: bool = True) -> dict:
+    """Como o perfil mudou, com o `porque` dos dois lados de cada travessia."""
+    loja = profile_mod.PerfilStore(_ws().perfil_path)
+    dados = loja.travessias(eixo) if so_travessias else loja.historico(eixo)
+    return {"eixo": eixo or "todos", "itens": dados, "quantas": len(dados)}
+
+
+@app.get("/api/settings")
+def configuracao() -> dict:
+    """O que o app declara sobre si: privacidade, dados, IA e licenças."""
+    return cfg_mod.montar(_ws(), _RAIZ)
+
+
+@app.get("/api/settings/licenses")
+def licencas_de(superficie: str = "apk") -> dict:
+    """As atribuições de uma superfície, com a conferência junto."""
+    try:
+        itens = lic_mod.inventario(_RAIZ, superficie)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+    return {
+        "superficie": superficie,
+        "componentes": itens,
+        "conferencia": lic_mod.conferir(_RAIZ),
+    }
 
 
 # --------------------------------------------------------------------------

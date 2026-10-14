@@ -19,12 +19,21 @@
 # `o_que_muda` é texto do APP: descreve qual cálculo ou qual dúvida esse
 # arquétipo levanta. Nunca é conselho, e nunca é uma pergunta pronta — a
 # pergunta é do agente, que sabe com quem está falando.
+#
+# `validade_em_meses` é por quanto tempo a assinatura daquele eixo continua
+# dizendo algo sobre a pessoa. Não é prazo de validade de dado: o traço não
+# some nem deixa de valer sozinho. É o momento em que o app passa a PERGUNTAR
+# se ainda é assim, e em que a cobertura para de contar aquele eixo como
+# decidido. Sem isso, um perfil assinado há três anos devolve 100% de cobertura
+# para uma decisão tomada em outra vida — e cobertura que mente é pior que
+# cobertura baixa, porque ninguém vai conferir.
 
 schema_version: 1
 
 eixos:
   # ------------------------------------------------------------------ fase
   - id: fase
+    validade_em_meses: 36   # fase de vida muda devagar: emprego novo, filho, mudança de cidade
     nome: Fase financeira
     o_que_e: onde a pessoa está entre não fechar o mês e acumular com folga
     minimo: 0.55
@@ -101,6 +110,7 @@ eixos:
 
   # ----------------------------------------------------------------- renda
   - id: renda
+    validade_em_meses: 12   # contrato, promoção e troca de PJ para CLT cabem num ano
     nome: Natureza da renda
     o_que_e: se o que entra todo mês é previsível
     minimo: 0.55
@@ -150,6 +160,7 @@ eixos:
 
   # ----------------------------------------------------------------- custo
   - id: custo
+    validade_em_meses: 12   # aluguel reajusta, plano de saúde sobe, carro sai ou entra
     nome: Estrutura de custo
     o_que_e: quanto da renda já está comprometido antes de qualquer escolha do mês
     minimo: 0.6
@@ -190,6 +201,7 @@ eixos:
 
   # --------------------------------------------------------------- consumo
   - id: consumo
+    validade_em_meses: 6   # hábito de consumo é o que mais depressa deixa de valer
     nome: Padrão de consumo
     o_que_e: se o gasto variável se concentra em poucas decisões ou se espalha em muitas
     minimo: 0.6
@@ -224,6 +236,7 @@ eixos:
 
   # ------------------------------------------------------------ constância
   - id: constancia
+    validade_em_meses: 6   # constância é sobre o comportamento recente, não sobre quem a pessoa é
     nome: Constância do gasto
     o_que_e: se o gasto mensal se repete ou salta de um mês para o outro
     minimo: 0.6

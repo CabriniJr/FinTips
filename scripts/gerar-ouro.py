@@ -2399,6 +2399,64 @@ def ouro_objetivos() -> dict:
 from ouro_leitura import ouro_leitura
 
 
+def ouro_perfil_tempo() -> dict:
+    """O envelhecimento do perfil: idade em meses e o que conta como válido.
+
+    Aritmética de calendário é onde dois motores divergem sem ninguém notar. A
+    conta é `(ano - ano) * 12 + (mês - mês)`, **em meses de calendário e não em
+    dias**: de 31/01 para 01/02 é um mês, mesmo sendo um dia. Uma porta que
+    usasse `dias // 30` acertaria a maioria dos casos e erraria exatamente nas
+    viradas de mês, que é quando o app passa a perguntar se o traço ainda vale.
+
+    Os casos cobrem as três bordas que importam: a virada de ano, o dia
+    seguinte que já é outro mês, e a data futura — que devolve 0 em vez de
+    negativo, porque "assinado daqui a dois meses" não é idade negativa, é
+    relógio errado.
+    """
+    from datetime import date
+
+    from fintips.contracts import Proveniencia
+    from fintips.profile import TracoDePerfil, carregar_catalogo
+
+    def traco(quando: str) -> TracoDePerfil:
+        return TracoDePerfil(
+            eixo="renda", arquetipo="variavel", nome="Variável",
+            proveniencia=Proveniencia(origem="usuario", porque="ouro", quando=quando),
+        )
+
+    hoje = date(2026, 10, 14)
+    casos = []
+    for nome, quando in [
+        ("mesmo mês", "2026-10-01T09:00:00"),
+        ("mês anterior, dia maior", "2026-09-30T09:00:00"),
+        ("virada de ano", "2025-12-31T23:59:59"),
+        ("doze meses exatos", "2025-10-14T10:00:00"),
+        ("um dia antes de doze meses", "2025-10-15T10:00:00"),
+        ("trinta e seis meses", "2023-10-14T10:00:00"),
+        ("data no futuro", "2027-01-01T00:00:00"),
+        ("só a data, sem hora", "2024-04-14"),
+        ("sem data", ""),
+        ("data ilegível", "ontem de manhã"),
+    ]:
+        t = traco(quando)
+        casos.append({
+            "nome": nome,
+            "quando": quando,
+            "hoje": hoje.isoformat(),
+            "idade_em_meses": t.idade_em_meses(hoje),
+            "envelhecido_em_6": t.envelhecido(6, hoje),
+            "envelhecido_em_12": t.envelhecido(12, hoje),
+            "envelhecido_em_36": t.envelhecido(36, hoje),
+        })
+
+    return {
+        "fonte": "fintips.profile",
+        "o_que_e": "idade da assinatura em meses de calendário, e a validade por eixo",
+        "validade_por_eixo": {e.id: e.validade_em_meses for e in carregar_catalogo()},
+        "casos": casos,
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
@@ -2420,6 +2478,7 @@ GERADORES = {
     #   "analise.json"       — baseline, meses, recorrências
     "vida.json": ouro_vida,
     "objetivos.json": ouro_objetivos,
+    "perfil-tempo.json": ouro_perfil_tempo,
     "leitura.json": ouro_leitura,
 }
 

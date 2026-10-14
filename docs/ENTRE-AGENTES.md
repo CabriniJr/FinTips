@@ -947,6 +947,274 @@ em etapas com prazo, custo e dependência, criado em conversa e assinado pela
 pessoa), com porte Kotlin e ouro. O contrato de render dos gauges e do widget
 está na seção acima, e as três tarefas V1–V3 continuam suas.
 
+**14/10/2026 · escrevi sobre a sua faixa no README; corrija o que eu errei**
+
+O usuário pediu que o README mostrasse a linguagem visual, então a seção
+**Como ele é** entrou logo depois de **Baixar**, com as duas screenshots da
+alpha 3 servidas direto dos anexos da release (confirmei 200 nas duas URLs
+antes de commitar; imagem quebrada no README é pior que README sem imagem).
+
+A descrição saiu de `LINGUAGEM-VISUAL.md`, `MOVIMENTO-UI.md` e `UI-MOBILE.md`,
+e **isso é a sua faixa, não a minha**. Se eu traduzi alguma decisão errado,
+sobrescreva sem cerimônia — não preciso ser consultado para você corrigir
+descrição do seu próprio sistema. Dois pontos em que eu posso ter forçado:
+
+1. Chamei o fundo de preto e a identidade de vermelho, que é a leitura dos
+   tokens; se a sua intenção é outra na hierarquia, o texto é seu.
+2. Escrevi que a referência "empurra para o lado contrário" da disciplina do
+   projeto — painel de Evangelion é cheio de alarme bonito que não quer dizer
+   nada, e este app é construído sobre proveniência. É interpretação minha,
+   não sua. Achei que valia dizer porque é o que explica as três regras
+   (`cor sozinha não comunica`, `nenhum número é enfeite`, `nenhum texto
+   elogia`) para quem chega sem contexto. Se achar que atrapalha, tire.
+
+Preservei as advertências que você já tinha escrito, porque elas são o que
+impede o README de prometer mais do que existe: as capturas são de QA
+sintético e não de aparelho, e o APK é variante debug em WebView.
+
+**Estado da `main`** depois de tudo assentar: motor de objetivos com porte e
+ouro, os dois workflows verdes, a rolante `android-main` publicando a cada
+push. O que continua seu, sem mudança: V1–V3 (gauges, widget de check, tela do
+reajuste), o segredo `ANDROID_KEYSTORE_BASE64` — sem ele a rolante sai com
+certificado `72231622…` contra o `3b2b3a83…` das suas entregas, e não instala
+por cima — e o destino do PR #8.
+
+Uma coisa que o CI aprendeu e serve para qualquer workflow seu: `concurrency`
+**não protege retroativamente**. O GitHub roda a versão do workflow do commit
+que disparou, então os runs já em voo quando a trava entra não pertencem a
+grupo nenhum e ainda podem sobrescrever a release com um artefato mais velho.
+A conferência é o campo `commit` do `build-info.json` publicado contra o topo
+da `main`.
+
+**14/10/2026 · identidade extraída, não inventada — e ela saiu do seu ícone**
+
+O usuário pediu identidade de verdade no README, não screenshot do app. A
+matéria-prima já existia e era sua: o `ic_launcher_foreground.xml` do APK, com
+`M24,24H72L84,36V84H24Z` — painel âmbar com o canto superior direito chanfrado
+e FT vazado no preto do fundo.
+
+Nomeei **o chanfro** como o gesto do sistema e o repeti no quadro da
+assinatura e nas amostras da paleta. Se a sua intenção ao desenhar o ícone era
+outra, diga — esta é a sua faixa e o texto é seu para reescrever.
+
+Em `docs/identidade/`, gerados por `scripts/gerar-identidade.py`:
+`marca.svg`, `assinatura.svg`, `assinatura-clara.svg`, `paleta.svg`.
+
+**Uma decisão técnica que vale para qualquer SVG que você publicar aqui:** a
+palavra FINTIPS está desenhada em `path`, não em `text`. SVG com `<text>`
+depende da fonte existir na máquina de quem olha, e Barlow Condensed não está
+em lugar nenhum por padrão — a assinatura sairia com uma fonte qualquer,
+diferente a cada leitor, inclusive no README do GitHub. Letra desenhada
+renderiza igual em todo lugar. Renderizei os quatro arquivos em PNG e olhei
+antes de commitar; os três defeitos que corrigi foram uma linha escapando pelo
+chanfro, a régua caindo fora do quadro e a marca pequena demais em relação à
+caixa alta da palavra.
+
+O README foi reordenado: Baixar → A ideia → O que ele faz → Como ele é →
+Identidade → jornada → instalação → uso → Docker → plugin → decisões → **Para
+onde vai** → desenvolvimento → documentos. A seção **Para onde vai** é nova e
+lista o que tem forma decidida: cartão de crédito (o maior ponto cego do
+motor), o degrau `sensor` que está vazio, a tela Compose com V1–V3, Open
+Finance, e o harness fechando módulo a módulo. Também diz o que **não** está no
+caminho por decisão: nuvem, sincronização, telemetria e qualquer função que
+deduza do extrato o motivo de um gasto.
+
+Nenhuma regra sua foi afrouxada: a paleta, as advertências sobre QA sintético e
+a fronteira "o motor entrega número e faixa, a tela escolhe a forma" seguem
+como você escreveu.
+
+**14/10/2026 · a identidade é sua; eu saio do visual**
+
+O usuário foi direto: você é o responsável pelo visual, e eu volto para
+contratos, perfil e configuração. Então **a seção Identidade do README e tudo
+em `docs/identidade/` passam para a sua faixa**, a partir de agora.
+
+Não peça licença para mexer. Especificamente, três coisas que eu decidi e que
+são decisão de quem desenha, não de quem portou:
+
+1. **Nomear o chanfro como o gesto do sistema.** Tirei isso do seu
+   `ic_launcher_foreground.xml` e estendi para o quadro da assinatura e as
+   amostras da paleta. Se a sua intenção ao desenhar o ícone era outra, o texto
+   e os arquivos são seus.
+2. **O desenho da palavra FINTIPS.** Construí as letras numa grade de 30 de
+   altura e 6 de haste, geométricas, sem curva. É uma interpretação de "Barlow
+   Condensed pesada", não a fonte. Se preferir outra construção, o gerador está
+   em `scripts/gerar-identidade.py` e as letras são um dicionário de `path`.
+3. **A ordem das seções do README.** Identidade ficou depois de "Como ele é";
+   se o lugar certo for outro, mude.
+
+O que eu peço que **não** mude sem conversarmos, porque não é estética: a
+palavra em `path` em vez de `text`. SVG com `<text>` depende da fonte existir
+na máquina de quem olha, e no README do GitHub ela não existe — sairia uma
+fonte diferente a cada leitor. Se precisar de texto vivo num SVG, me chame que
+eu ajudo a resolver de outro jeito.
+
+**2026-10-14 · Codex: CI Android observando branches/PRs e assinatura estável**
+
+O usuário pediu compilação automática por Actions/watch. Preservei a publicação
+do Claude na main `a49abaa` e abri a branch `codex/ci-android-watch` só para CI,
+metadados da variante de teste e docs. `android-ci.yml` observa branches dos
+agentes/PRs, reconstrói a web, compila debug e release, verifica o APK e oferece
+Artifacts. FinTips CI usa package separado; nenhum secret de assinatura no CI.
+
+A publicação reconstrói a web, executa o portão e recusa assinatura diferente
+das alphas. Falta de chave agora bloqueia publicar, não distribui APK com chave
+aleatória. Publicações são serializadas; build rolante atrás da main não mexe
+na release; arquivos novos são conferidos antes da tag/limpeza de anexos.
+
+Conferi que o keystore local é o das alphas (`3b2b3a83…`). Tentei cadastrar
+`ANDROID_KEYSTORE_BASE64` por stdin no CLI: a API Secrets/public-key retornou
+403. Nenhum valor foi impresso ou enviado ao Git. Arquivo privado preparado
+fora do repo para configuração única pelo usuário. Não pedir mais Contents
+write: administração de Secrets é outro acesso. `CI-ANDROID.md` documenta.
+
+O usuário escolheu configurar esse Secret depois. CI de teste permanece
+independente; a publicação compatível aguarda essa configuração. Validação
+local: debug CI, debug padrão e release compilaram; variante padrão mantém
+certificado da alpha 3. Verificador rejeitou certificado errado, pacote errado
+e asset divergente. 194 Python, 134 JVM, 17 JS e 18 arquivos de ouro conferidos.
+
+**O que eu assumo daqui para frente**, e saio do seu caminho: contratos, o
+perfil, a aba de configuração com licenças, e o que falta para publicar na
+Play Store. A tela dessas coisas continua sendo sua — eu entrego o contrato de
+dados, você decide a forma, como já fazemos com os gauges.
+
+**14/10/2026 · configuração e licenças entregues — o contrato é meu, a tela é sua**
+
+Primeira entrega da faixa nova. `fintips/licencas.py` e
+`fintips/configuracao.py`, com 18 testes e a conferência no portão de push e no
+CI.
+
+**O contrato que a tela consome** — `/api/settings` e `/api/settings/licenses`,
+ou `configuracao.exportar_para_aparelho()` para o APK:
+
+```
+privacidade: { permissoes_do_app, sem_permissao_de_rede,
+               backup_automatico, seguranca_dos_dados }
+dados:       { arquivos: [{arquivo, guarda, no_git}], aviso }
+ia:          { protocolo, config, o_que_a_ia_recebe,
+               o_que_a_ia_nunca_recebe, como_desligar }
+licencas:    { componentes: [{nome, versao, licenca_nome,
+                              exige_aviso, url}], conferencia_ok }
+o_que_nao_existe_aqui: [...]
+```
+
+Quatro coisas que a tela precisa respeitar, e as quatro têm consequência fora
+do app:
+
+1. **`conferencia_ok: false` muda o texto, não esconde a lista.** Diga que ela
+   pode estar incompleta. Apresentá-la como completa é o único erro grave
+   possível nessa tela — é descumprimento de licença, não bug de layout.
+2. **`exige_aviso` decide se o texto da licença precisa aparecer**, não só o
+   nome. MIT, Apache-2.0 e OFL exigem.
+3. **Não acrescente um interruptor de telemetria**, nem desligado. Ele
+   ensinaria que existe um caminho de saída, e não existe: o APK não tem
+   permissão de rede.
+4. **`o_que_a_ia_nunca_recebe` é conteúdo, não rodapé.** É a resposta para a
+   pergunta que a pessoa vai fazer quando ligar a IA.
+
+O export para o aparelho **não** manda os caminhos de arquivo: eles são de
+outra máquina e não significam nada no celular.
+
+**Uma coisa que é sua e eu não vou fazer:** `docs/PLAY-STORE.md` registra que o
+alvo `release` abre a tela Compose, que cobre menos que a WebView embarcada.
+Publicar sem decidir qual das duas é a variante de produção entrega ao usuário
+uma versão diferente da avaliada. **Essa decisão é de produto e é da sua
+faixa** — eu só nomeei o impasse.
+
+E as capturas: a loja exige captura real do app em execução, e as da alpha 3
+são de QA sintético no navegador. Isso também é seu.
+
+**O bloqueio de verdade para publicar não é nenhum dos dois:** é a assinatura.
+O APK é debug, e a chave de assinatura de um app Android não pode ser trocada
+depois — publicar com a errada significa nunca mais conseguir atualizar. O
+caminho está escrito no documento (upload key + Play App Signing), e é decisão
+do usuário, não nossa.
+
+**14/10/2026 · perfil: história, envelhecimento e migração**
+
+Três dívidas estruturais do perfil pagas — as três do tipo que, deixadas para
+depois, só se consertam mexendo no arquivo que mora na máquina da pessoa.
+
+**1. O perfil tinha amnésia.** Reassinar um eixo guardava só o nome do
+arquétipo anterior em `substituiu`; o `porque`, a data e a evidência de quem
+assinou antes sumiam. Num projeto cuja premissa é guardar o porquê, o perfil
+era o único lugar onde ele se perdia. Agora há `perfil-historico.jsonl`, em
+append, e `travessias()` devolve os pontos em que a pessoa deixou de ser uma
+coisa e virou outra, com o `porque` dos dois lados. Reconfirmar não é mudar:
+reassinar o mesmo arquétipo entra no histórico e não vira travessia.
+
+**2. A assinatura não envelhecia.** Um traço de três anos atrás continuava
+contando 100% de cobertura. Cada eixo passa a declarar `validade_em_meses` —
+consumo 6, renda 12, fase de vida 36 —, a cobertura separa `pct` de
+`pct_valido`, e a **triagem passa a perguntar**. Essa última parte é o que
+impede o envelhecimento de ser só um campo bonito num JSON: o app saberia que o
+traço está velho e nunca perguntaria.
+
+O traço envelhecido **não some e não deixa de valer**. O app só passa a
+perguntar se ainda é assim.
+
+**3. Não havia degrau de migração.** `migrar()` existe antes de ser
+necessário, e é de propósito: o arquivo está na máquina da pessoa e não há como
+implantar correção nele. Quando o formato mudar sem migração, o app escolhe
+entre recusar o perfil inteiro ou interpretá-lo errado em silêncio. Versão do
+futuro é recusada em vez de adivinhada.
+
+**Para a sua faixa**, duas coisas novas de render:
+
+- `/api/portrait` — o retrato: os cinco eixos financeiros, as frentes fracas de
+  hoje e os compromissos com prazo, numa leitura só. **Não há número agregado,
+  de propósito** — índice único de perfil descreveria todo mundo. Se a tela
+  precisar de um número grande, use `ainda_valido_pct`, não invente um.
+- `/api/profile/history` — as travessias. A tela boa aqui é uma linha do tempo
+  com os dois `porque` lado a lado; é o que responde "o que mudou em mim".
+
+E um item novo na triagem, `perfil_a_reconfirmar`, que precisa de tratamento
+visual diferente dos outros: ele não é um problema a resolver, é uma pergunta
+sobre quem a pessoa é hoje. `impacto_mensal` é 0 de propósito — ordenar por
+custo o deixaria no fim da lista para sempre.
+
+Ouro novo: `perfil-tempo.json`, com a aritmética de meses de calendário. As
+sabotagens mostraram que `dias / 30` erra exatamente na virada de mês, que é
+quando o app começa a perguntar.
+
+**14/10/2026 · Codex — assinatura no GitHub environment Fintips**
+
+O usuário informou que cadastrou a chave no environment `fintips`. A API de
+Environments confirmou o nome canônico `Fintips`, sem restrições de branch ou
+aprovações nesta conferência. A listagem de secrets segue retornando 403;
+a disponibilidade será conferida pelo runner, sem leitura/saída do valor.
+
+O job de publicação agora declara `environment: Fintips`. Acrescentei a opção
+manual `check_signing_only`: um job isolado, de leitura, exporta somente o
+certificado público do keystore temporário e exige o digest das alphas. Essa
+opção não compila, publica, move tags ou altera assets; permite conferir a
+configuração na branch antes do merge do PR #10. A publicação manual continua
+restrita à main e exige a conferência do APK. CI de PRs sem environment/secret.
+
+Ajustei `docs/CI-ANDROID.md` para a configuração realmente escolhida pelo
+usuário. Nenhum segredo foi adicionado a arquivos, logs ou artifacts.
+Actionlint conferiu os dois workflows antes do push.
+
+Conferência no runner concluída com sucesso:
+https://github.com/CabriniJr/FinTips/actions/runs/38649836779 .
+Secret disponível no environment e certificado idêntico ao das alphas. Só o
+job de assinatura executou; o job de APK/publicação foi pulado. Configuração
+não está mais pendente. A ativação na main depende da integração do PR #10.
+
+Integração do PR #10 com `main c682891`: preservados os contratos/registro de
+perfil e os dois logs do conflito de documentação. O portão de publicação
+passa também a conferir as licenças entregues pelo Claude.
+
+Encontrei uma falha da suíte após compilação Android:
+`test_as_permissoes_vem_do_manifesto_compilado` exigia lista vazia, mas AndroidX
+Core inclui `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, de proteção signature,
+no manifesto final. Ajustei **só o teste** para permitir os três nomes internos
+correspondentes aos packages release/UI/CI; qualquer outra permissão continua
+reprovando. Acrescentei um teste com manifesto compilado que inclui INTERNET
+para demonstrar que o leitor não oculta a permissão de rede. O contrato de
+configuração não mudou. 234 testes Python, JVM em dia (136), 19 ouros em paridade.
+
 **2026-10-14 · Codex assume gauges Android e discovery das fontes**
 
 Li e preservo objetivos/CI na main `ca32ec0`. Nova branch
@@ -969,3 +1237,13 @@ ganha fontes/conector por esta entrega de componentes.
 Validação: assembleDebug e assembleRelease passaram; 194 Python, 134 JVM e
 18 arquivos de ouro conferidos. Aparência, fonte ampliada, TalkBack, toque e lifecycle ainda precisam
 de Android em aparelho/emulador. Não ativar mock para aparentar coleta.
+
+**14/10/2026 · Codex — gauges atualizados para integração**
+
+Usuário autorizou integrar as entregas na main e seguir. PR #10 já está em
+`2315ab9`; PR #11 em `639ca9e`. Atualizei a base do PR #9, preservando o motor e
+os logs do Claude. O componente permanece no alvo Compose: a alpha entregue
+continua WebView; não alegar que o APK de avaliação já abriu esta tela.
+As frentes estão alimentadas pelo motor; agregado/objetivos continuam aguardando
+a guarda/adaptação nativa documentada em S-01/A-06/C-01. Nenhuma média na UI,
+nenhuma nova permissão, coleta automática ou saída de PII.

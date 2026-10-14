@@ -1,11 +1,20 @@
-# FinTips
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/identidade/assinatura.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/identidade/assinatura-clara.svg">
+    <img src="docs/identidade/assinatura.svg" alt="FinTips — uma vida em perspectiva" width="760">
+  </picture>
+</p>
 
-[![portão](../../actions/workflows/portao.yml/badge.svg)](../../actions/workflows/portao.yml)
-[![android](../../actions/workflows/android.yml/badge.svg)](../../actions/workflows/android.yml)
+<p align="center">
+  <a href="../../actions/workflows/portao.yml"><img src="../../actions/workflows/portao.yml/badge.svg" alt="portão"></a>
+  <a href="../../actions/workflows/android.yml"><img src="../../actions/workflows/android.yml/badge.svg" alt="android"></a>
+  <a href="../../releases"><img src="https://img.shields.io/github/v/release/CabriniJr/FinTips?include_prereleases&label=release&color=ffa342" alt="release"></a>
+</p>
 
 Centraliza extrato e perfil financeiro na sua máquina, e deixa a inteligência
-por conta do seu agente. O app guarda, aplica e calcula; o agente investiga,
-pergunta e registra; você assina. Um painel local mostra tudo.
+por conta do seu agente. **O app guarda, aplica e calcula; o agente investiga,
+pergunta e registra; você assina.**
 
 ```
                        ┌─ painel local (React, 127.0.0.1)
@@ -17,6 +26,10 @@ Open Finance ┘         ├─ agente (MCP: 47 primitivas + 2 recursos)
 
 Nada sai da máquina: sem conta, sem servidor, sem telemetria. O agente recebe
 agregados, nunca o extrato bruto.
+
+**Índice** · [Baixar](#baixar) · [A ideia](#a-ideia) · [O que ele faz](#o-que-ele-faz)
+· [Como ele é](#como-ele-é) · [Identidade](#identidade) · [Instalação](#instalação)
+· [Uso](#uso) · [Para onde vai](#para-onde-vai) · [Documentos](#documentos)
 
 ## Baixar
 
@@ -121,6 +134,149 @@ decisão e quanto ainda é palpite**. Começa em 0%.
   dimensões do score, senão bastaria empurrar a data para estar sempre em dia.
   Ver `docs/APP-DE-VIDA.md`.
 
+## Como ele é
+
+<p align="center">
+  <img src="https://github.com/CabriniJr/FinTips/releases/download/android-v0.6.0-alpha.3/hoje.png" width="46%" alt="Tela Hoje: cabeçalho FINTIPS, seletor de semana, 2 de 4 tarefas feitas e a lista do dia">
+  &nbsp;&nbsp;
+  <img src="https://github.com/CabriniJr/FinTips/releases/download/android-v0.6.0-alpha.3/leitura.png" width="46%" alt="Tela Vida: as seis áreas, o livro em andamento com porcentagem e o gráfico de posições observadas">
+</p>
+
+<p align="center"><sub>
+Dados sintéticos de QA, capturados no navegador com a origem local do APK —
+não é captura de aparelho.
+</sub></p>
+
+A direção visual é **Neon Genesis Evangelion** — painéis chanfrados, réguas,
+marcações de posição, tipografia condensada pesada. O sistema inteiro está em
+[Identidade](#identidade).
+
+Mas a escolha estética não afrouxa nenhuma regra do projeto — e é aí que o
+desenho fica interessante, porque a referência empurra para o lado contrário.
+Painel de Evangelion é cheio de alarme bonito que não quer dizer nada, e este
+app é construído sobre a premissa de que **nada é verdade sem proveniência**.
+Então:
+
+- **Cor sozinha não comunica nada.** Nem conclusão, nem erro, nem de onde veio
+  um registro. A hierarquia vem de tamanho, espaçamento e borda antes de cor,
+  as seis áreas sempre exibem o nome junto do ícone, e erro tem texto e estado
+  explícitos. Quem não distingue vermelho de âmbar continua lendo o app.
+- **Nenhum número é enfeite.** Sem radar aleatório, sem contador inventado, sem
+  alerta falso, sem estática sobre texto, sem luz piscando. As barras do dia
+  mostram tarefas registradas; as linhas do gráfico de leitura ligam posições
+  que você marcou, e não representam sessões. Na captura acima, o rótulo
+  `Informado por você` e o `Primeira estimativa` estão ali por isso.
+- **Nenhum texto elogia nem cobra.** "2 de 4 tarefas feitas" é informação;
+  "quase lá!" é opinião do app sobre o seu dia, e é o que faz um app ser
+  fechado.
+- **O motor entrega número, a tela escolhe a forma.** `gauges()` devolve
+  `valor` de 0 a 100, a `faixa` que nomeia a zona e a `legenda`. Ele não sabe o
+  que é ponteiro, arco ou barra — trocar a forma não muda o motor, e mudar a
+  fórmula não muda a tela. E o que ainda não tem como ser medido vem marcado
+  `sem_base`: a tela desenha vazio, porque zero ali afirmaria um fracasso que
+  não aconteceu.
+
+O movimento foi pedido depois do primeiro APK e segue a mesma disciplina:
+transição de 130 ms na saída e 280 ms na entrada, onda no ponto do toque,
+encaixe do check — e `prefers-reduced-motion` respeitado. As fontes (Barlow
+Condensed, sob SIL OFL) são distribuídas localmente: **a interface não faz
+requisição a serviço de fonte nem carrega imagem remota**, o que é consequência
+direta de não haver permissão de rede no APK.
+
+Detalhe em [`docs/LINGUAGEM-VISUAL.md`](docs/LINGUAGEM-VISUAL.md), movimento em
+[`docs/MOVIMENTO-UI.md`](docs/MOVIMENTO-UI.md), e os limites do protótipo em
+[`docs/UI-MOBILE.md`](docs/UI-MOBILE.md). O tema escuro é a direção atual,
+inclusive com o sistema no claro; um tema claro exigiria paleta e validação
+próprias.
+
+## Identidade
+
+<p align="center">
+  <img src="docs/identidade/marca.svg" alt="A marca do FinTips: painel âmbar com o canto superior direito chanfrado, carregando FT" width="104">
+</p>
+
+A marca não é um logo desenhado por fora e colado no produto: ela é **um
+painel da própria interface**. Um retângulo âmbar com o canto superior direito
+cortado, carregando as iniciais vazadas na cor do fundo. É literalmente o
+mesmo desenho que o Android usa como ícone do app.
+
+### O gesto
+
+O **chanfro** é a única coisa que precisa ser lembrada. Ele aparece na marca,
+no quadro da assinatura, nos cartões da interface e nas amostras da paleta
+abaixo. Um retângulo com um canto cortado comunica *instrumento* — mostrador de
+painel, não cartão de banco — e essa é a diferença que o app quer marcar.
+
+Ele é sempre o **superior direito**, sempre em 45°, e nunca aparece duas vezes
+na mesma forma. Chanfro em todos os cantos vira losango e perde o sentido.
+
+### A palavra
+
+`FINTIPS` em caixa alta, condensada e pesada, com as contraformas retangulares
+— sem curva em lugar nenhum. A assinatura alinha a altura do painel da marca
+com a altura da caixa alta da palavra, e é isso que faz as duas lerem como uma
+peça só em vez de um ícone encostado num texto.
+
+A linha `UMA VIDA EM PERSPECTIVA` vem em monoespaçada, espaçada, em texto
+secundário. Ela é posicionamento, não slogan: o app não é sobre dinheiro, é
+sobre uma vida da qual o dinheiro é uma das seis frentes.
+
+Nos arquivos da identidade a palavra está **desenhada em `path`, não em
+`text`**. SVG com texto depende da fonte existir na máquina de quem olha, e
+Barlow Condensed não está em lugar nenhum por padrão — a assinatura sairia com
+uma fonte qualquer, diferente a cada leitor. Dentro do produto, a fonte é
+distribuída localmente sob SIL OFL, e **a interface não faz requisição a
+serviço de fonte**: consequência direta de não haver permissão de rede no APK.
+
+### A paleta
+
+<p align="center">
+  <img src="docs/identidade/paleta.svg" alt="Paleta: paper, card, ink, ink-3, accent, signal, registrado, atenção, erro" width="840">
+</p>
+
+| Papel | Token | |
+|---|---|---|
+| Fundo | `--paper` | `#080808` |
+| Painel | `--card` | `#0d0c0b` |
+| Texto | `--ink` | `#f1efe6` |
+| Texto secundário | `--ink-3` | `#bdad99` |
+| Ação, seção ativa | `--accent` | `#ffa342` |
+| Identidade, títulos | `--signal` | `#ff4b35` |
+| Progresso registrado | `--s3` | `#a4ec8c` |
+| Atenção | `--warn` | `#e9c56e` |
+| Erro real | `--crit` | `#ff9c8c` |
+
+Vermelho é **estrutura** — identifica a tela, não acusa problema. Âmbar é
+**ação**. Verde é **registro que existe**, nunca elogio. Quem usar vermelho
+para erro e âmbar para alerta quebra o sistema, porque o vermelho já está
+ocupado identificando a própria tela.
+
+### A voz
+
+Esta é a parte da identidade que não se vê e é a que mais define o produto.
+
+| | |
+|---|---|
+| **Nunca elogia, nunca cobra** | "2 de 4 feitas" é informação. "Quase lá!" é opinião do app sobre o seu dia. |
+| **Nunca conclui sem proveniência** | Todo número diz de onde veio: `Informado por você`, `Primeira estimativa`. |
+| **Ausência não vira zero** | O que não tem como ser medido aparece vazio, não em 0% — zero afirmaria um fracasso que não aconteceu. |
+| **Nome antes de cor** | As seis áreas sempre exibem o nome junto do ícone. Quem não distingue âmbar de vermelho continua lendo o app. |
+| **Número antes de adjetivo** | "R$ 87,50 contra R$ 69,44 por mês de uso", não "a troca compensa". |
+
+### Usando
+
+Os arquivos estão em [`docs/identidade/`](docs/identidade/) e são gerados, não
+desenhados à mão — `marca.svg`, `assinatura.svg`, `assinatura-clara.svg` e
+`paleta.svg`.
+
+Não estique a marca fora de proporção, não gire o chanfro, não troque o âmbar
+por outra cor para "combinar" com um fundo, e não ponha a assinatura sobre
+fotografia. Sobre fundo claro, use `assinatura-clara.svg` em vez de inverter a
+escura.
+
+O sistema completo da interface, com movimento e requisitos de porte, está em
+[`docs/LINGUAGEM-VISUAL.md`](docs/LINGUAGEM-VISUAL.md).
+
 ## A jornada, em três passos
 
 ```
@@ -137,40 +293,6 @@ com `porque`. Daí em diante o painel centraliza o que foi acumulando, e as
 perguntas do dia a dia passam a ter contra o que ser respondidas.
 
 Detalhe de cada etapa, com os buracos que ainda existem, em `docs/JORNADA.md`.
-
-## Rodar com Docker (Linux)
-
-Três comandos, do zero ao painel:
-
-```bash
-./scripts/fintips-docker.sh setup          # .env com o seu UID, workspace e imagem
-./scripts/fintips-docker.sh importar extrato.ofx
-./scripts/fintips-docker.sh up             # http://127.0.0.1:8420
-```
-
-O `setup` resolve as três coisas que dão errado ao rodar isto em Linux: o
-volume sair com dono root (ele passa o seu UID/GID para o build), o `~` do
-caminho não ser expandido pelo compose (ele grava o caminho absoluto) e o
-painel acabar publicado na rede (o mapeamento é `127.0.0.1:8420:8420`, e
-trocar aquilo por `8420:8420` serve o seu extrato para a rede inteira).
-
-Qualquer comando do CLI passa pelo mesmo script:
-
-```bash
-./scripts/fintips-docker.sh triagem
-./scripts/fintips-docker.sh perfil
-./scripts/fintips-docker.sh alavancas
-./scripts/fintips-docker.sh down
-```
-
-Para conectar o agente ao mesmo workspace:
-
-```bash
-./scripts/fintips-docker.sh mcp-config     # imprime o JSON do cliente MCP
-```
-
-Seus dados ficam no workspace montado (`~/Documents/FinTips` por padrão), nunca
-dentro da imagem: o container é descartável, o workspace não.
 
 ## Instalação
 
@@ -192,9 +314,13 @@ fintips triagem                                # o que está em aberto
 fintips categorias --criar transporte-trabalho --nome "Transporte — trabalho"
 fintips contexto --gravar moradia.situacao --valor com_familia
 fintips perfil                                 # sugestões, assinaturas, cobertura
+fintips perfil --retrato                       # dinheiro, vida e compromissos juntos
+fintips perfil --historico                     # como o perfil mudou, e por quê
 fintips perfil --assinar renda --arquetipo variavel --porque "sou PJ"
 fintips alavancas                              # o que muda o número, e quanto
 fintips decisoes --historico "celular"         # precedentes de um assunto
+fintips config                                 # privacidade, dados, IA e licenças
+fintips config --licencas                      # só as atribuições do APK
 fintips objetivos                              # agenda, score e atrasos
 fintips objetivos --reajustar cert-nuvem       # calcula o atraso; não aplica
 fintips aparelho --saida missoes.json          # catálogo para o celular
@@ -230,6 +356,40 @@ FinTips/
     dossie.json        briefing do agente + correlações (derivado)
     observacoes.jsonl  uma linha por observação, vira dataframe (derivado)
 ```
+
+## Rodar com Docker (Linux)
+
+Três comandos, do zero ao painel:
+
+```bash
+./scripts/fintips-docker.sh setup          # .env com o seu UID, workspace e imagem
+./scripts/fintips-docker.sh importar extrato.ofx
+./scripts/fintips-docker.sh up             # http://127.0.0.1:8420
+```
+
+O `setup` resolve as três coisas que dão errado ao rodar isto em Linux: o
+volume sair com dono root (ele passa o seu UID/GID para o build), o `~` do
+caminho não ser expandido pelo compose (ele grava o caminho absoluto) e o
+painel acabar publicado na rede (o mapeamento é `127.0.0.1:8420:8420`, e
+trocar aquilo por `8420:8420` serve o seu extrato para a rede inteira).
+
+Qualquer comando do CLI passa pelo mesmo script:
+
+```bash
+./scripts/fintips-docker.sh triagem
+./scripts/fintips-docker.sh perfil
+./scripts/fintips-docker.sh alavancas
+./scripts/fintips-docker.sh down
+```
+
+Para conectar o agente ao mesmo workspace:
+
+```bash
+./scripts/fintips-docker.sh mcp-config     # imprime o JSON do cliente MCP
+```
+
+Seus dados ficam no workspace montado (`~/Documents/FinTips` por padrão), nunca
+dentro da imagem: o container é descartável, o workspace não.
 
 ## Como plugin do Claude
 
@@ -297,11 +457,51 @@ mensagem útil.
   sua esquina vai em `data/regras-locais.yaml`, fora do Git, porque a lista de
   onde você compra identifica onde você mora. Ver `docs/PRIVACIDADE.md`.
 
+## Para onde vai
+
+O que está escrito aqui é o que já tem forma decidida — não é lista de desejo.
+
+**O cartão de crédito é o maior ponto cego do motor.** Hoje ele enxerga a
+fatura saindo da conta, como um custo fixo que varia. Ele não enxerga a compra
+parcelada que comprometeu os próximos doze meses antes de aparecer em qualquer
+extrato. Enquanto isso não entrar, a projeção subestima compromisso — e o
+lugar certo para resolver é a mesma disciplina do resto: a parcela é afirmação
+de quem comprou, não dedução do extrato.
+
+**Sensores como evidência de máquina.** A escada de proveniência da vida já
+tem o degrau `sensor`, acima de `agente` e abaixo de `usuario`, e ele está
+vazio. Tempo de tela e passos são as duas primeiras entradas: o aparelho sabe
+sem precisar perguntar, e isso é mais forte que memória — memória de tempo de
+tela distorce a favor de quem lembra. O degrau existe desde o começo
+justamente para isso não virar palpite promovido a fato.
+
+**A tela nativa em Compose.** O APK de hoje embarca a interface web numa
+WebView. A lógica do aparelho já está portada e testada contra o ouro; falta a
+tela. As três primeiras são os gauges da tela inicial, o widget de check e a
+tela do reajuste — contratos escritos em
+[`docs/ENTRE-AGENTES.md`](docs/ENTRE-AGENTES.md).
+
+**Open Finance via agregador**, para o extrato parar de ser um arquivo que
+alguém baixa à mão. O desenho está em
+[`docs/OPEN-FINANCE.md`](docs/OPEN-FINANCE.md), e a regra não muda: o que entra
+vira `importacao`, que **não** conclui nada sozinho.
+
+**O harness fechando módulo a módulo.** Enquanto o Kotlin não reproduzir o
+Python inteiro, o Python é o produto. A conta de quanto falta é visível: cada
+módulo portado tem um arquivo em
+`kotlin/motor/src/jvmTest/resources/ouro/`, e são 18 hoje.
+
+O que **não** está no caminho, e é decisão e não esquecimento: conta na nuvem,
+sincronização entre aparelhos, telemetria, e qualquer função que deduza do
+extrato o *motivo* de um gasto. O extrato mostra o dinheiro saindo; ele nunca
+diz por quê.
+
 ## Antes de dar push
 
 ```bash
 bash scripts/check-pii.sh --all
 python3 scripts/gerar-ouro.py --conferir     # o ouro ainda é o do Python?
+fintips config --conferir                    # as licenças ainda batem?
 cp scripts/check-pii.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
@@ -346,20 +546,6 @@ um arquivo de `kotlin/motor/src/jvmTest/resources/ouro/`, gravado por
 pode estar certa nos dois lados e divergir na terceira casa — isso aparece ali
 ou não aparece em lugar nenhum.
 
-## Documentos
-
-- `docs/ENTRE-AGENTES.md` — **leia primeiro se você é um agente**: faixas, estado e log
-- `docs/VISUAL.md` — a linguagem visual, e o que a tela não decide
-- `docs/APP-DE-VIDA.md` — as seis frentes e **objetivos**: etapas, score e reajuste
-- `docs/RELEASES-ANDROID.md` — build, evidências e como a release é publicada
-- `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
-- `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
-- `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem
-- `docs/UI-MOBILE.md` — UI para celular: áreas de vida, tarefas diárias, planos e contexto com persistência no client
-- `docs/PRIVACIDADE.md` — modelo de ameaça e o que nunca sai da máquina
-- `docs/DECISOES.md` — o ADR financeiro: alternativas, números da época, desfecho
-- `docs/OPEN-FINANCE.md` — por que via agregador e como plugar
-
 ## Integração contínua
 
 Dois workflows, e os dois existem por um motivo que já custou caro:
@@ -394,3 +580,20 @@ Para resolver, em *Settings → Secrets and variables → Actions*:
 Sem o secret o build continua, mas a release sai dizendo, em letra visível, que
 aquele APK não instala por cima do anterior. O workflow não finge que está tudo
 bem.
+
+## Documentos
+
+- `docs/ENTRE-AGENTES.md` — **leia primeiro se você é um agente**: faixas, estado e log
+- `docs/VISUAL.md` — índice do sistema visual, e o que a tela não decide
+- `docs/LINGUAGEM-VISUAL.md` — a direção Evangelion: tokens, paleta e o que cor **não** comunica
+- `docs/MOVIMENTO-UI.md` — transições, resposta ao toque e movimento reduzido
+- `docs/APP-DE-VIDA.md` — as seis frentes e **objetivos**: etapas, score e reajuste
+- `docs/RELEASES-ANDROID.md` — build, evidências e como a release é publicada
+- `docs/PLAY-STORE.md` — o que está pronto para publicar e o que bloqueia
+- `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
+- `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
+- `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem
+- `docs/UI-MOBILE.md` — UI para celular: áreas de vida, tarefas diárias, planos e contexto com persistência no client
+- `docs/PRIVACIDADE.md` — modelo de ameaça e o que nunca sai da máquina
+- `docs/DECISOES.md` — o ADR financeiro: alternativas, números da época, desfecho
+- `docs/OPEN-FINANCE.md` — por que via agregador e como plugar
