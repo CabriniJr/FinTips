@@ -317,6 +317,8 @@ fintips perfil                                 # sugestões, assinaturas, cobert
 fintips perfil --assinar renda --arquetipo variavel --porque "sou PJ"
 fintips alavancas                              # o que muda o número, e quanto
 fintips decisoes --historico "celular"         # precedentes de um assunto
+fintips config                                 # privacidade, dados, IA e licenças
+fintips config --licencas                      # só as atribuições do APK
 fintips objetivos                              # agenda, score e atrasos
 fintips objetivos --reajustar cert-nuvem       # calcula o atraso; não aplica
 fintips aparelho --saida missoes.json          # catálogo para o celular
@@ -497,6 +499,7 @@ diz por quê.
 ```bash
 bash scripts/check-pii.sh --all
 python3 scripts/gerar-ouro.py --conferir     # o ouro ainda é o do Python?
+fintips config --conferir                    # as licenças ainda batem?
 cp scripts/check-pii.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
@@ -584,6 +587,7 @@ bem.
 - `docs/MOVIMENTO-UI.md` — transições, resposta ao toque e movimento reduzido
 - `docs/APP-DE-VIDA.md` — as seis frentes e **objetivos**: etapas, score e reajuste
 - `docs/RELEASES-ANDROID.md` — build, evidências e como a release é publicada
+- `docs/PLAY-STORE.md` — o que está pronto para publicar e o que bloqueia
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
 - `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
 - `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem

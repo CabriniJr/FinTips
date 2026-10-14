@@ -27,6 +27,8 @@ from mcp.server.fastmcp import FastMCP
 from . import causes as causes_mod
 from . import decisions
 from . import dossier, levers, life, mapping, plans as plans_mod
+from . import configuracao as cfg_mod
+from . import licencas as lic_mod
 from . import objetivos as objetivos_mod
 from . import projection as proj_mod
 from . import purchases, report
@@ -218,6 +220,7 @@ _SPEC = {
         "uma_contraparte": "investigar",
         "seis_frentes": "frentes",
         "aporte_contra_planos": "aporte_vs_planos",
+        "privacidade_e_licencas": "configuracao",
         "objetivos_e_prazos": "objetivos",
     },
     "erros_que_o_motor_recusa": [
@@ -1178,6 +1181,39 @@ def reajustar(objetivo_id: str, aplicar: bool = False, porque: str = "") -> str:
     loja.save()
     return _json({"aplicado": proposta["movimentos"],
                   "objetivo": loja.objetivos[objetivo_id].to_dict()})
+
+
+@mcp.tool()
+def configuracao(licencas_de: str = "") -> str:
+    """O que o app declara sobre si mesmo: privacidade, dados, IA e licenças.
+
+    Use quando a pessoa perguntar onde os dados dela estão, o que o app envia
+    para fora, o que acontece se ela desinstalar, ou que código de terceiros
+    viaja junto.
+
+    Duas coisas aqui não são opinião e você pode afirmar sem ressalva, porque
+    saem do manifesto compilado e dos manifestos de dependência, não de um
+    texto que alguém escreveu:
+
+      `permissoes_do_app`   o que o APK realmente pede — hoje, nada
+      `licencas`            derivadas dos manifestos, com conferência cruzada
+
+    Se `conferencia_ok` for falso, **diga que a lista pode estar incompleta**.
+    Apresentá-la como completa é o único erro grave possível nesta tela.
+
+    `licencas_de` filtra a superfície: apk, painel_web, pacote_python."""
+    ws = _ws()
+    raiz = Path(__file__).resolve().parent.parent
+    if licencas_de:
+        try:
+            return _json({
+                "superficie": licencas_de,
+                "componentes": lic_mod.inventario(raiz, licencas_de),
+                "conferencia": lic_mod.conferir(raiz),
+            })
+        except ValueError as e:
+            return _json({"erro": str(e)})
+    return _json(cfg_mod.montar(ws, raiz))
 
 
 @mcp.tool()

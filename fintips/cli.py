@@ -30,6 +30,8 @@ import yaml
 
 from . import levers
 from . import life
+from . import configuracao as cfg_mod
+from . import licencas as lic_mod
 from . import objetivos as objetivos_mod
 from . import plans as plans_mod
 from . import purchases, report
@@ -484,6 +486,63 @@ def cmd_objetivos(args) -> None:
                   f"({len(o.etapas)} etapas)")
 
 
+def cmd_config(args) -> None:
+    """A aba de configuração: privacidade, dados, ligação com a IA e licenças.
+
+    Com `--conferir`, só cruza os manifestos com a declaração de licenças e
+    devolve código de saída 1 se divergirem — é o formato que serve ao portão
+    de push e ao CI.
+    """
+    ws = _ws(args)
+    raiz = Path(__file__).resolve().parent.parent
+
+    if args.conferir:
+        r = lic_mod.conferir(raiz)
+        if r["ok"]:
+            c = r["conferidos"]
+            print(f"ok: licenças conferem ({c['declarados']} declarados, "
+                  f"{c['gradle']} do Gradle, {c['python']} do Python, "
+                  f"{c['npm_que_embarca']} do npm que embarcam)")
+            return
+        print("LICENÇAS DESATUALIZADAS:")
+        for chave, rotulo in (
+            ("nao_declarados", "sem declaração de licença"),
+            ("declarados_sem_uso", "declarados e já fora do projeto"),
+            ("sem_licenca_conhecida", "licença que não sabemos tratar"),
+            ("licenca_que_bloqueia", "copyleft forte — decisão de produto"),
+        ):
+            for item in r[chave]:
+                print(f"  {item}: {rotulo}")
+        print()
+        print(r["como_corrigir"])
+        raise SystemExit(1)
+
+    if args.licencas:
+        for c in lic_mod.inventario(raiz, args.superficie):
+            v = f" {c['versao']}" if c["versao"] else ""
+            print(f"{c['nome']}{v}  —  {c['licenca_nome']}")
+            if c["url"]:
+                print(f"    {c['url']}")
+        return
+
+    d = cfg_mod.montar(ws, raiz)
+    priv = d["privacidade"]
+    print(f"workspace: {d['app']['workspace']}")
+    print(f"permissões do app: {', '.join(priv['permissoes_do_app']) or 'nenhuma'}")
+    print(f"backup automático: {priv['backup_automatico']}")
+    print()
+    print(priv["resumo"])
+    print()
+    print("onde os seus dados moram:")
+    for a in d["dados"]["arquivos"]:
+        print(f"  {a['arquivo']}")
+        print(f"      {a['guarda']}")
+    print()
+    print(f"licenças que embarcam no app: {len(d['licencas']['componentes'])}"
+          f" (confere: {'sim' if d['licencas']['conferencia_ok'] else 'NÃO'})")
+    print("o que não existe aqui: " + "; ".join(d["o_que_nao_existe_aqui"]))
+
+
 def cmd_mcp_config(args) -> None:
     """Imprime a config do cliente MCP com os caminhos desta máquina.
 
@@ -597,6 +656,14 @@ def build_parser() -> argparse.ArgumentParser:
                     help="grava o reajuste calculado; exige --porque")
     ob.add_argument("--porque", default="", help="o motivo do reajuste")
     ob.set_defaults(func=cmd_objetivos)
+
+    cf = sub.add_parser("config", help="privacidade, dados, IA e licenças")
+    cf.add_argument("--conferir", action="store_true",
+                    help="cruza os manifestos com a declaração de licenças; sai 1 se divergir")
+    cf.add_argument("--licencas", action="store_true", help="só as atribuições")
+    cf.add_argument("--superficie", default="apk",
+                    choices=list(lic_mod.SUPERFICIES), help="de que superfície")
+    cf.set_defaults(func=cmd_config)
 
     mc = sub.add_parser("mcp-config")
     mc.add_argument("--nome", default="fintips", help="nome do servidor no cliente")

@@ -1053,3 +1053,55 @@ eu ajudo a resolver de outro jeito.
 perfil, a aba de configuração com licenças, e o que falta para publicar na
 Play Store. A tela dessas coisas continua sendo sua — eu entrego o contrato de
 dados, você decide a forma, como já fazemos com os gauges.
+
+**14/10/2026 · configuração e licenças entregues — o contrato é meu, a tela é sua**
+
+Primeira entrega da faixa nova. `fintips/licencas.py` e
+`fintips/configuracao.py`, com 18 testes e a conferência no portão de push e no
+CI.
+
+**O contrato que a tela consome** — `/api/settings` e `/api/settings/licenses`,
+ou `configuracao.exportar_para_aparelho()` para o APK:
+
+```
+privacidade: { permissoes_do_app, sem_permissao_de_rede,
+               backup_automatico, seguranca_dos_dados }
+dados:       { arquivos: [{arquivo, guarda, no_git}], aviso }
+ia:          { protocolo, config, o_que_a_ia_recebe,
+               o_que_a_ia_nunca_recebe, como_desligar }
+licencas:    { componentes: [{nome, versao, licenca_nome,
+                              exige_aviso, url}], conferencia_ok }
+o_que_nao_existe_aqui: [...]
+```
+
+Quatro coisas que a tela precisa respeitar, e as quatro têm consequência fora
+do app:
+
+1. **`conferencia_ok: false` muda o texto, não esconde a lista.** Diga que ela
+   pode estar incompleta. Apresentá-la como completa é o único erro grave
+   possível nessa tela — é descumprimento de licença, não bug de layout.
+2. **`exige_aviso` decide se o texto da licença precisa aparecer**, não só o
+   nome. MIT, Apache-2.0 e OFL exigem.
+3. **Não acrescente um interruptor de telemetria**, nem desligado. Ele
+   ensinaria que existe um caminho de saída, e não existe: o APK não tem
+   permissão de rede.
+4. **`o_que_a_ia_nunca_recebe` é conteúdo, não rodapé.** É a resposta para a
+   pergunta que a pessoa vai fazer quando ligar a IA.
+
+O export para o aparelho **não** manda os caminhos de arquivo: eles são de
+outra máquina e não significam nada no celular.
+
+**Uma coisa que é sua e eu não vou fazer:** `docs/PLAY-STORE.md` registra que o
+alvo `release` abre a tela Compose, que cobre menos que a WebView embarcada.
+Publicar sem decidir qual das duas é a variante de produção entrega ao usuário
+uma versão diferente da avaliada. **Essa decisão é de produto e é da sua
+faixa** — eu só nomeei o impasse.
+
+E as capturas: a loja exige captura real do app em execução, e as da alpha 3
+são de QA sintético no navegador. Isso também é seu.
+
+**O bloqueio de verdade para publicar não é nenhum dos dois:** é a assinatura.
+O APK é debug, e a chave de assinatura de um app Android não pode ser trocada
+depois — publicar com a errada significa nunca mais conseguir atualizar. O
+caminho está escrito no documento (upload key + Play App Signing), e é decisão
+do usuário, não nossa.
