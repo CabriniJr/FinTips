@@ -716,3 +716,17 @@ indicador deslizante, pressão/ondas, módulos, barras, linha de leitura e
 formulários com entrada/saída. `MOVIMENTO-UI.md` descreve tempos e acessibilidade;
 não mudam regras nem origens de registros. Movimento reduzido inclui hover e
 interrupção de animações em execução. APK de avaliação passa a versionCode 2.
+
+**2026-10-14 · direção do usuário: foco no Android**
+
+Depois da entrega do APK v2, o usuário definiu Android como foco. Codex registra
+`ANDROID-PRIMEIRO.md` e UI-04: componentes e navegação Compose, preservando o
+visual aprovado. O APK atual continua WebView offline; não há migração nativa
+concluída por esta atualização de direção. A substituição da entrada depende
+de persistência e migração local dos registros, além de paridade funcional.
+
+Codex assume UI/interações Android; Claude segue solicitado para guarda e
+adaptadores Librera/UsageStats/Health Connect, com aceite pendente. Validação
+de teclado, Voltar, insets, recriação, acessibilidade e movimento deve ocorrer
+em Android; web/iOS deixam de ser prioridade de novas entregas. PII permanece
+exclusivamente no client e automação continua objetivo de produto.

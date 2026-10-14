@@ -1,6 +1,9 @@
 # APK para avaliar a UI
 
 O usuário pediu um APK para instalar no próprio celular e devolver feedback.
+Após a entrega v2, definiu Android como foco. A próxima evolução segue
+[ANDROID-PRIMEIRO.md](ANDROID-PRIMEIRO.md); este APK continua sendo a avaliação
+em WebView descrita abaixo.
 A variante **debug** agora abre a UI Evangelion com os cinco destinos: Hoje,
 Vida, Finanças, Planos e Contexto. O nome de instalação é **FinTips UI** e o
 application ID é `com.fintips.app.ui`, separado do futuro app de produção.

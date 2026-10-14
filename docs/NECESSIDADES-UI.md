@@ -13,7 +13,11 @@ para ligar as duas coisas: PII vive exclusivamente no client.
 
 ## Pedidos, por prioridade
 
-Prioridade atual do usuário: **automação para reduzir trabalho manual**.
+Plataforma prioritária do usuário: **Android**. Implementação e validação devem
+seguir [ANDROID-PRIMEIRO.md](ANDROID-PRIMEIRO.md), incluindo Compose, lifecycle,
+permissões e preservação dos registros do APK de avaliação.
+
+Prioridade de produto: **automação para reduzir trabalho manual**.
 Fonte conectada uma vez deve abastecer registros no aparelho; formulário é
 alternativa/correção. [Ordem, contratos e aceite](AUTOMACAO-SEM-TOIL.md).
 
@@ -25,6 +29,7 @@ no log antes de marcar o pedido como assumido.
 |---|---|---|---|
 | UI-01 | Codex | implementado no protótipo; ver evidências no log | cinco destinos mobile, visual Evangelion, leitura e pacing locais |
 | UI-02 | Codex | APK compilado; execução no aparelho pendente | tema e tipografia Compose, imports e recomposição corrigidos; APK debug com UI web local para feedback, release Compose do dia; sem afirmar app completo |
+| UI-04 | Codex | próximo escopo Android, registrado | estrutura e componentes Compose dos cinco destinos, seguindo ANDROID-PRIMEIRO; migração local antes de substituir a entrada de avaliação |
 | M-01 / A-01 | Claude | solicitado, aceite pendente; prioridade alta | Librera com acesso persistente escolhido uma vez, atualização ao retomar e snapshots locais; dispensar reimportação diária |
 | M-02 | Claude | solicitado, aceite pendente | gravação atômica e reversão de cumprimento no contrato da guarda |
 | A-02 / A-03 | Claude | solicitado, aceite pendente | UsageStats e Health Connect locais, com período/cobertura; critérios objetivos escolhidos pela pessoa |
@@ -41,7 +46,7 @@ comprova sensor, regra numérica nem preservação de PII.
 | Extensões de `Guarda`/`Formato` para tarefas e planos | A guarda de missões já entrou em `main`; o protótipo também inclui planos e tarefa pontual | conservar a guarda existente, definir migração/versionamento e reversão de cumprimento; sem duplicar catálogo nem telemetria com conteúdo |
 | Contrato de leitura das seis áreas | Separar tarefa cumprida de inferência e score | valor, origem, período, amostra/cobertura e estado ausente; vazio não vira zero medido |
 | Adaptador Librera via seletor de documentos | Alimentar porcentagem sem compartilhar títulos ou arquivos | arquivo escolhido no aparelho, projeção mínima, perfil explícito, deduplicação e snapshots locais; [formato verificado](LEITURA-LIBRERA.md) |
-| Capacidades de sensores | Evitar botão que promete acesso indisponível | estado `disponivel`, `nao_suportado`, `precisa_permissao`, `negado`, `sem_fonte`, `erro`, mais origem e atualização; Android UsageStats/Health Connect, iOS conforme entitlement |
+| Capacidades de sensores | Evitar botão que promete acesso indisponível | estado `disponivel`, `nao_suportado`, `precisa_permissao`, `negado`, `sem_fonte`, `erro`, mais origem e atualização; prioridade Android UsageStats/Health Connect; iOS fora do escopo atual |
 | Exportação segura para ChatGPT | Dar contexto sem tirar PII do client | projeção local com allowlist, revisão do payload exato, exclusão de texto livre/IDs/nome de livro/app e bloqueio de saída fora do contrato |
 | Backup e restauração locais | Recuperar registros sem servidor | versão de schema, validação, prévia de conflito, escrita atômica, preservação do arquivo inválido; protótipo atual apenas baixa a cópia |
 
@@ -78,7 +83,9 @@ em silêncio nem inventar uma operação de armazenamento paralela.
 
 ## Integração e propriedade dos arquivos
 
-Codex mantém `web/`, `fintips/web/`, docs de UI e componentes visuais. Para a
+Codex mantém componentes visuais Compose em `kotlin/app/`, `web/`,
+`fintips/web/` e docs de UI, priorizando Android. Persistência/adaptadores no
+módulo Android continuam na faixa Claude/motor. Para a
 primeira entrega do tracker, acrescentou isoladamente `fintips/reading.py`,
 `vida/Leitura.kt`, gerador e ouro de leitura; não alterou o cálculo de missões
 nem `Compras.kt`. Claude pode continuar o motor e os adaptadores nativos.
