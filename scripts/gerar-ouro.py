@@ -2396,6 +2396,7 @@ def ouro_objetivos() -> dict:
         "empates_de_arredondamento": empates,
         "reajustes": reajustes,
     }
+from ouro_leitura import ouro_leitura
 
 
 GERADORES = {
@@ -2419,6 +2420,7 @@ GERADORES = {
     #   "analise.json"       — baseline, meses, recorrências
     "vida.json": ouro_vida,
     "objetivos.json": ouro_objetivos,
+    "leitura.json": ouro_leitura,
 }
 
 

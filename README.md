@@ -302,6 +302,7 @@ for t in tests/test_*.py; do python "$t" || break; done
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
 - `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
 - `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem
+- `docs/UI-MOBILE.md` — UI para celular: áreas de vida, tarefas diárias, planos e contexto com persistência no client
 - `docs/PRIVACIDADE.md` — modelo de ameaça e o que nunca sai da máquina
 - `docs/DECISOES.md` — o ADR financeiro: alternativas, números da época, desfecho
 - `docs/PORTE-KOTLIN.md` — a porta para Kotlin, que é o destino do projeto

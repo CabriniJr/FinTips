@@ -3,8 +3,6 @@ package com.fintips.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.fintips.motor.vida.TelaDoDia
-import com.fintips.motor.vida.guardaDoAparelho
 
 /**
  * A Activity, e ela não faz nada além de abrir a tela.

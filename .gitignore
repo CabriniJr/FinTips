@@ -23,6 +23,7 @@ build/
 
 # build do Kotlin (kotlin/motor/src É versionado; o resto é artefato)
 kotlin/.gradle/
+kotlin/.kotlin/
 kotlin/build/
 kotlin/*/build/
 .gradle/
