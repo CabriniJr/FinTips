@@ -17,8 +17,9 @@ proveniência; a UI apresenta sem elogiar, cobrar ou concluir sozinha.
 `kotlin/app/` pertence à trilha visual. A tela do dia recebeu os tokens,
 fonte local e correção de estado/imports, preservando `Guarda`/`Formato`.
 `assembleDebug` passou com JDK 17, SDK 34 e Gradle 8.10.2 em 14/10/2026.
-O desenho e o ciclo de vida precisam de revisão no aparelho: não foram executados. Os cinco destinos e o tracker completo são revisáveis no web;
-a navegação correspondente ainda precisa de implementação Compose.
+O desenho e o ciclo de vida precisam de revisão no aparelho: não foram executados. Os cinco destinos e o tracker completo são revisáveis no web e no APK
+debug local de avaliação; a navegação correspondente ainda precisa de
+implementação Compose. [Recorte do APK](APK-AVALIACAO.md).
 A compilação JVM do motor não comprova compilação nem funcionamento do APK.
 
 ## Compilação Android verificada

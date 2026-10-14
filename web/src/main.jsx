@@ -26,6 +26,11 @@ function FinanceEmpty({ erro, reload, toast }) {
   const [file, setFile] = useState(null);
   const [busy, setBusy] = useState(false);
   const [issue, setIssue] = useState("");
+  if (location.hostname === "appassets.androidplatform.net") {
+    return <section className="life-card finance-empty"><span className="empty-icon"><Icon name="wallet" size={30}/></span>
+      <h2>Finanças em preparação</h2><p>As finanças ainda não estão disponíveis neste APK de avaliação. Você já pode registrar tarefas, planos de vida e o progresso dos livros.</p>
+    </section>;
+  }
   return <section className="life-card finance-empty"><span className="empty-icon"><Icon name="wallet" size={30}/></span>
     <h2>Vamos conhecer suas finanças?</h2><p>Importe um extrato para ver seus gastos, sua reserva e o efeito das escolhas. Suas outras áreas já podem ser usadas.</p>
     <form onSubmit={async (e) => {

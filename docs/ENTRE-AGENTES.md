@@ -684,3 +684,16 @@ Pedidos M-01/M-02 e avaliação REV-01 continuam aguardando resposta do Claude
 em `docs/NECESSIDADES-UI.md`. APK compilado não é interface vista funcionando:
 não houve emulador/aparelho, nem sensor ou nuvem real. A seleção de catálogo e
 os cinco destinos nativos seguem na faixa Codex/UI, sem delegar desenho ao motor.
+
+**2026-10-14 · APK de avaliação pedido pelo usuário**
+
+Para permitir feedback no celular sobre a UI completa, a variante debug usa
+WebView com assets empacotados, origem HTTPS virtual e rede bloqueada. O alvo
+release preserva Compose. Nome FinTips UI / `com.fintips.app.ui`, sem dados
+pré-preenchidos. Tarefas, planos, leitura e contexto manual são locais; finanças,
+sensores e ChatGPT aparecem/continuam pendentes. Não é migração silenciosa do
+produto final para web: o recorte e os limites estão em `docs/APK-AVALIACAO.md`.
+
+O seletor de arquivos Android atende importação Librera e a cópia fica em
+Downloads local no Android 10+. Não houve teste em dispositivo; isso é pedido
+de feedback do usuário, não evidência presumida de funcionamento nativo.

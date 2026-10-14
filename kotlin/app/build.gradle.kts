@@ -16,6 +16,15 @@ android {
         versionName = "0.6.0"
     }
     buildFeatures { compose = true }
+    buildTypes {
+        getByName("debug") {
+            applicationIdSuffix = ".ui"
+            versionNameSuffix = "-ui-preview"
+        }
+    }
+    // APK de avaliação: a UI revisada roda sem servidor no próprio aparelho.
+    // O alvo release continua usando a tela Compose e o motor local.
+    sourceSets.getByName("debug").assets.srcDir("../../fintips/web")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -29,6 +38,7 @@ kotlin {
 }
 
 dependencies {
+    debugImplementation("androidx.webkit:webkit:1.11.0")
     implementation(project(":motor"))
     // Esta tela importa Clock/LocalDate diretamente; não depender da
     // dependência implementation interna do motor para compilá-los.

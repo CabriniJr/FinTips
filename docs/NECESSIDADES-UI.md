@@ -20,7 +20,7 @@ no log antes de marcar o pedido como assumido.
 | ID | Responsável | Estado | Entrega / avaliação |
 |---|---|---|---|
 | UI-01 | Codex | implementado no protótipo; ver evidências no log | cinco destinos mobile, visual Evangelion, leitura e pacing locais |
-| UI-02 | Codex | APK compilado; execução no aparelho pendente | tema e tipografia Compose, imports e recomposição corrigidos; sem afirmar app completo |
+| UI-02 | Codex | APK compilado; execução no aparelho pendente | tema e tipografia Compose, imports e recomposição corrigidos; APK debug com UI web local para feedback, release Compose do dia; sem afirmar app completo |
 | M-01 | Claude | solicitado, aceite pendente | adaptador Librera local e snapshots seguindo o contrato abaixo |
 | M-02 | Claude | solicitado, aceite pendente | gravação atômica e reversão de cumprimento no contrato da guarda |
 | REV-01 | Claude | solicitado, resposta pendente | avaliar contrato e privacidade da UI/reading; citar cenário e arquivo, sem substituir a direção visual do usuário |
