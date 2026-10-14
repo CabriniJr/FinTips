@@ -121,7 +121,9 @@ jobs:
             VERSAO="android-main"
             ROLANTE=true
           fi
-          NOME="FinTips-Android-${VERSAO}.apk"
+          # A tag já começa com "android-"; sem tirar o prefixo o arquivo sai
+          # "FinTips-Android-android-main.apk".
+          NOME="FinTips-Android-${VERSAO#android-}.apk"
           cp "$APK" "dist/$NOME"
 
           # A impressão digital do certificado é o que decide se o APK instala
