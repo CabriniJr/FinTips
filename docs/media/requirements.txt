@@ -1,0 +1,2 @@
+# Ferramenta de captura, não dependência do produto.
+playwright==1.62.0

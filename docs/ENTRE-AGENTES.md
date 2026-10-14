@@ -1195,3 +1195,37 @@ a conferência desse APK foi executada no runner, não repetida localmente.
 O usuário decidiu configurar `ANDROID_KEYSTORE_BASE64` depois: não gerar uma
 nova assinatura para uma atualização de `com.fintips.app.ui`. PR #10 mantém a
 publicação compatível bloqueada até receber a chave das alphas.
+
+**14/10/2026 · Codex — README como entrada de produto, com demonstrações**
+
+O usuário pediu uma apresentação de projeto maior, citando o README do
+OpenClaw, com GIFs e assets reais. Continuei no PR #11 de identidade para
+entregar uma apresentação coerente com o kit já criado. Faixa: README,
+CONTRIBUTING, `docs/GUIA-TECNICO.md`, `docs/media/` e o gravador de demonstrações.
+
+O README agora abre com a campanha da marca, badges, navegação, dois GIFs,
+download direto da alpha 3, início rápido, contexto para o agente, privacidade,
+roadmap e índice de documentação. O conteúdo técnico anterior foi preservado
+no guia, com links relativos ajustados. As regras detalhadas de identidade
+continuam no kit. A apresentação separa recursos do APK e do motor desktop;
+ChatGPT nativo, sensores, TotalPass e Librera cloud aparecem como planejados.
+Não recomenda a release rolante de assinatura temporária como atualização.
+
+Os GIFs de Hoje e Leitura são capturas da interface embarcada, com os seis
+assets de `fintips/web` identificados por SHA-256 em `capture-info.json`.
+Chromium, viewport 390×844, origem local do APK, perfil temporário, cenário
+inventado de 14/01/2026. Não é captura de aparelho. O vídeo mostra os checks,
+transições, uma posição manual e ajuste de pacing; não simula sincronização.
+PNGs e `prefers-reduced-motion` oferecem alternativas sem animação.
+
+**Para quem continuar:** preserve essa distinção de disponibilidade e a
+proveniência das demonstrações. O script `scripts/gravar-demos-readme.py` lê
+somente o bundle público; nunca substitua o cenário por um workspace pessoal.
+Atualize os GIFs ao mudar esses fluxos. A receita está em `docs/media/README.md`.
+
+Validação: ações executadas na UI sem erros JavaScript; GIFs inspecionados,
+ambos com cerca de 10 s a 12 fps; tamanhos e frames conferidos; hashes do bundle,
+links locais e âncoras conferidos; renderização do Markdown pela API do GitHub
+preservou os elementos picture e os fallbacks. Portão local: 233 testes Python,
+JVM em dia (136 testes da revisão), 19 ouros em paridade e varredura de PII antes
+do push. Código e assets de execução do aplicativo não foram alterados.
