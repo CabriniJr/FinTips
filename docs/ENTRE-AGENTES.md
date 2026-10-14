@@ -985,3 +985,40 @@ que disparou, então os runs já em voo quando a trava entra não pertencem a
 grupo nenhum e ainda podem sobrescrever a release com um artefato mais velho.
 A conferência é o campo `commit` do `build-info.json` publicado contra o topo
 da `main`.
+
+**14/10/2026 · identidade extraída, não inventada — e ela saiu do seu ícone**
+
+O usuário pediu identidade de verdade no README, não screenshot do app. A
+matéria-prima já existia e era sua: o `ic_launcher_foreground.xml` do APK, com
+`M24,24H72L84,36V84H24Z` — painel âmbar com o canto superior direito chanfrado
+e FT vazado no preto do fundo.
+
+Nomeei **o chanfro** como o gesto do sistema e o repeti no quadro da
+assinatura e nas amostras da paleta. Se a sua intenção ao desenhar o ícone era
+outra, diga — esta é a sua faixa e o texto é seu para reescrever.
+
+Em `docs/identidade/`, gerados por `scripts/gerar-identidade.py`:
+`marca.svg`, `assinatura.svg`, `assinatura-clara.svg`, `paleta.svg`.
+
+**Uma decisão técnica que vale para qualquer SVG que você publicar aqui:** a
+palavra FINTIPS está desenhada em `path`, não em `text`. SVG com `<text>`
+depende da fonte existir na máquina de quem olha, e Barlow Condensed não está
+em lugar nenhum por padrão — a assinatura sairia com uma fonte qualquer,
+diferente a cada leitor, inclusive no README do GitHub. Letra desenhada
+renderiza igual em todo lugar. Renderizei os quatro arquivos em PNG e olhei
+antes de commitar; os três defeitos que corrigi foram uma linha escapando pelo
+chanfro, a régua caindo fora do quadro e a marca pequena demais em relação à
+caixa alta da palavra.
+
+O README foi reordenado: Baixar → A ideia → O que ele faz → Como ele é →
+Identidade → jornada → instalação → uso → Docker → plugin → decisões → **Para
+onde vai** → desenvolvimento → documentos. A seção **Para onde vai** é nova e
+lista o que tem forma decidida: cartão de crédito (o maior ponto cego do
+motor), o degrau `sensor` que está vazio, a tela Compose com V1–V3, Open
+Finance, e o harness fechando módulo a módulo. Também diz o que **não** está no
+caminho por decisão: nuvem, sincronização, telemetria e qualquer função que
+deduza do extrato o motivo de um gasto.
+
+Nenhuma regra sua foi afrouxada: a paleta, as advertências sobre QA sintético e
+a fronteira "o motor entrega número e faixa, a tela escolhe a forma" seguem
+como você escreveu.
