@@ -1,6 +1,13 @@
 const BASE = "";
 
+function requireLocalMotor() {
+  if (!["localhost", "127.0.0.1", "[::1]", "::1"].includes(location.hostname)) {
+    throw new Error("O motor financeiro precisa rodar no próprio aparelho. Tarefas e planos de vida continuam disponíveis aqui.");
+  }
+}
+
 async function req(path, opts = {}) {
+  requireLocalMotor();
   const r = await fetch(BASE + path, {
     headers: { "content-type": "application/json" },
     ...opts,
@@ -45,6 +52,7 @@ export const api = {
   purchase: (body) => post("/api/purchase", body),
   holdings: (posicoes) => post("/api/holdings", { posicoes }),
   import: (file) => {
+    requireLocalMotor();
     const fd = new FormData();
     fd.append("arquivo", file);
     return fetch("/api/import", { method: "POST", body: fd }).then((r) => {
