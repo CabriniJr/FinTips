@@ -1,0 +1,962 @@
+{
+  "fonte": "fintips.life",
+  "atributos": [
+    "FOR",
+    "AGI",
+    "VIT",
+    "INT",
+    "FOC",
+    "OURO"
+  ],
+  "cadencias": {
+    "diaria": 1,
+    "semanal": 7,
+    "mensal": 30,
+    "trimestral": 90,
+    "anual": 365
+  },
+  "origens": {
+    "presumido": 0,
+    "agente": 1,
+    "sensor": 2,
+    "usuario": 3
+  },
+  "conta_como_cumprido": {
+    "presumido": false,
+    "agente": true,
+    "sensor": true,
+    "usuario": true
+  },
+  "sequencias": [
+    {
+      "caso": "cinco_dias_seguidos",
+      "ate": "2026-10-14",
+      "dias": [
+        [
+          10,
+          "sensor"
+        ],
+        [
+          11,
+          "sensor"
+        ],
+        [
+          12,
+          "sensor"
+        ],
+        [
+          13,
+          "sensor"
+        ],
+        [
+          14,
+          "sensor"
+        ]
+      ],
+      "cumprida_na_janela": true,
+      "sequencia": 5,
+      "recorde": 5
+    },
+    {
+      "caso": "hoje_ainda_vazio",
+      "ate": "2026-10-14",
+      "dias": [
+        [
+          11,
+          "sensor"
+        ],
+        [
+          12,
+          "sensor"
+        ],
+        [
+          13,
+          "sensor"
+        ]
+      ],
+      "cumprida_na_janela": false,
+      "sequencia": 3,
+      "recorde": 3
+    },
+    {
+      "caso": "recaida_no_meio",
+      "ate": "2026-10-10",
+      "dias": [
+        [
+          1,
+          "sensor"
+        ],
+        [
+          2,
+          "sensor"
+        ],
+        [
+          3,
+          "sensor"
+        ],
+        [
+          4,
+          "sensor"
+        ],
+        [
+          5,
+          "sensor"
+        ],
+        [
+          6,
+          "sensor"
+        ],
+        [
+          7,
+          "sensor"
+        ],
+        [
+          9,
+          "sensor"
+        ],
+        [
+          10,
+          "sensor"
+        ]
+      ],
+      "cumprida_na_janela": true,
+      "sequencia": 2,
+      "recorde": 7
+    },
+    {
+      "caso": "presumido_abre_buraco",
+      "ate": "2026-10-14",
+      "dias": [
+        [
+          11,
+          "usuario"
+        ],
+        [
+          12,
+          "presumido"
+        ],
+        [
+          13,
+          "usuario"
+        ],
+        [
+          14,
+          "usuario"
+        ]
+      ],
+      "cumprida_na_janela": true,
+      "sequencia": 2,
+      "recorde": 2
+    },
+    {
+      "caso": "nenhum_registro",
+      "ate": "2026-10-14",
+      "dias": [],
+      "cumprida_na_janela": false,
+      "sequencia": 0,
+      "recorde": 0
+    },
+    {
+      "caso": "so_presumido",
+      "ate": "2026-10-14",
+      "dias": [
+        [
+          13,
+          "presumido"
+        ],
+        [
+          14,
+          "presumido"
+        ]
+      ],
+      "cumprida_na_janela": false,
+      "sequencia": 0,
+      "recorde": 0
+    },
+    {
+      "caso": "buraco_de_um_dia",
+      "ate": "2026-10-14",
+      "dias": [
+        [
+          10,
+          "agente"
+        ],
+        [
+          12,
+          "agente"
+        ],
+        [
+          13,
+          "agente"
+        ],
+        [
+          14,
+          "agente"
+        ]
+      ],
+      "cumprida_na_janela": true,
+      "sequencia": 3,
+      "recorde": 3
+    }
+  ],
+  "barras": [
+    {
+      "caso": "um_de_tres_e_um_terco",
+      "cadencia": "diaria",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 3,
+          "cumpridas": 1,
+          "pct": 33.3,
+          "com_evidencia_de_maquina": 1
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    },
+    {
+      "caso": "dois_de_tres",
+      "cadencia": "diaria",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 3,
+          "cumpridas": 2,
+          "pct": 66.7,
+          "com_evidencia_de_maquina": 1
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    },
+    {
+      "caso": "tudo_vazio",
+      "cadencia": "diaria",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 3,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    },
+    {
+      "caso": "presumido_nao_enche_barra",
+      "cadencia": "diaria",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 3,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    },
+    {
+      "caso": "fora_da_janela_diaria",
+      "cadencia": "diaria",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 3,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    },
+    {
+      "caso": "janela_semanal_pega_sete_dias",
+      "cadencia": "semanal",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 1,
+          "cumpridas": 1,
+          "pct": 100.0,
+          "com_evidencia_de_maquina": 1
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    },
+    {
+      "caso": "janela_semanal_nao_pega_o_oitavo",
+      "cadencia": "semanal",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 1,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    },
+    {
+      "caso": "janela_mensal",
+      "cadencia": "mensal",
+      "frentes": [
+        {
+          "atributo": "FOR",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "AGI",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "VIT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "INT",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "FOC",
+          "missoes": 0,
+          "cumpridas": 0,
+          "pct": 0.0,
+          "com_evidencia_de_maquina": 0
+        },
+        {
+          "atributo": "OURO",
+          "missoes": 1,
+          "cumpridas": 1,
+          "pct": 100.0,
+          "com_evidencia_de_maquina": 0
+        }
+      ]
+    }
+  ],
+  "coberturas": [
+    {
+      "caso": "uma_de_duas_medida",
+      "missoes_ativas": 2,
+      "mensuraveis_por_aparelho": 1,
+      "com_medida_registrada": 1,
+      "pct_medido": 50.0
+    },
+    {
+      "caso": "uma_de_tres_e_um_terco",
+      "missoes_ativas": 3,
+      "mensuraveis_por_aparelho": 2,
+      "com_medida_registrada": 1,
+      "pct_medido": 33.3
+    },
+    {
+      "caso": "sensor_possivel_mas_sem_medida",
+      "missoes_ativas": 1,
+      "mensuraveis_por_aparelho": 1,
+      "com_medida_registrada": 0,
+      "pct_medido": 0.0
+    },
+    {
+      "caso": "catalogo_vazio",
+      "missoes_ativas": 0,
+      "mensuraveis_por_aparelho": 0,
+      "com_medida_registrada": 0,
+      "pct_medido": 0.0
+    }
+  ],
+  "empates_de_meio_centesimo": [
+    {
+      "preco_centavos": 1,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.0
+    },
+    {
+      "preco_centavos": 3,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.02
+    },
+    {
+      "preco_centavos": 5,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.02
+    },
+    {
+      "preco_centavos": 13,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.06
+    },
+    {
+      "preco_centavos": 15,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.08
+    },
+    {
+      "preco_centavos": 17,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.08
+    },
+    {
+      "preco_centavos": 31,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.16
+    },
+    {
+      "preco_centavos": 33,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.16
+    },
+    {
+      "preco_centavos": 35,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.18
+    },
+    {
+      "preco_centavos": 43,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.22
+    },
+    {
+      "preco_centavos": 199,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.0
+    },
+    {
+      "preco_centavos": 201,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.0
+    },
+    {
+      "preco_centavos": 109,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.54
+    },
+    {
+      "preco_centavos": 115,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 0.58
+    },
+    {
+      "preco_centavos": 203,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.02
+    },
+    {
+      "preco_centavos": 207,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.04
+    },
+    {
+      "preco_centavos": 245,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.22
+    },
+    {
+      "preco_centavos": 251,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 1.26
+    },
+    {
+      "preco_centavos": 419,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 2.1
+    },
+    {
+      "preco_centavos": 435,
+      "aporte_centavos": 200,
+      "meses_de_aporte": 2.18
+    }
+  ],
+  "compras": [
+    {
+      "caso": "tablet_colide_e_regra_aplica",
+      "item": "Tablet S11",
+      "preco": "2500",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": true,
+      "regra_liberada_em": "2026-11-13",
+      "missoes_em_jogo": [
+        {
+          "missao": "foc-tela",
+          "colisao_declarada": "tablet",
+          "sequencia_em_risco": 5,
+          "recorde": 5
+        },
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.58
+    },
+    {
+      "caso": "abaixo_do_limite_a_regra_nao_aplica",
+      "item": "Livro",
+      "preco": "90",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": false,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.02
+    },
+    {
+      "caso": "exatamente_no_limite_nao_aplica",
+      "item": "Fone",
+      "preco": "300",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": false,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.07
+    },
+    {
+      "caso": "um_centavo_acima_do_limite_aplica",
+      "item": "Fone",
+      "preco": "300.01",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": true,
+      "regra_liberada_em": "2026-11-13",
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.07
+    },
+    {
+      "caso": "sem_colisao_declarada_so_entra_o_ouro",
+      "item": "Cafeteira",
+      "preco": "200",
+      "categoria": "casa",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": false,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.05
+    },
+    {
+      "caso": "colisao_por_tag_e_nao_por_item",
+      "item": "Presente",
+      "preco": "500",
+      "categoria": "compras",
+      "tags": [
+        "assinatura de video"
+      ],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": true,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": true,
+      "regra_liberada_em": "2026-11-13",
+      "missoes_em_jogo": [
+        {
+          "missao": "foc-tela",
+          "colisao_declarada": "assinatura de video",
+          "sequencia_em_risco": 5,
+          "recorde": 5
+        },
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.12
+    },
+    {
+      "caso": "sem_regra_declarada",
+      "item": "Tablet",
+      "preco": "2500",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [
+        "foc-tela",
+        "ouro-aporte"
+      ],
+      "tem_regra": false,
+      "sem_missoes_cadastradas": false,
+      "regra_aplica": null,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [
+        {
+          "missao": "foc-tela",
+          "colisao_declarada": "tablet",
+          "sequencia_em_risco": 5,
+          "recorde": 5
+        },
+        {
+          "missao": "ouro-aporte",
+          "colisao_declarada": null,
+          "sequencia_em_risco": null,
+          "recorde": null
+        }
+      ],
+      "meses_de_aporte": 0.58
+    },
+    {
+      "caso": "catalogo_vazio",
+      "item": "Tablet",
+      "preco": "2500",
+      "categoria": "compras",
+      "tags": [],
+      "missoes": [],
+      "tem_regra": false,
+      "sem_missoes_cadastradas": true,
+      "regra_aplica": null,
+      "regra_liberada_em": null,
+      "missoes_em_jogo": [],
+      "meses_de_aporte": null
+    }
+  ],
+  "planos": [
+    {
+      "caso": "cabe_com_folga",
+      "exigido": "700",
+      "tem_missao_de_aporte": true,
+      "aporte_mensal": 4300.0,
+      "exigido_pelos_planos_mes": 700.0,
+      "folga_mensal": 3600.0,
+      "planos_cabem_no_aporte": true
+    },
+    {
+      "caso": "exatamente_no_limite",
+      "exigido": "4300",
+      "tem_missao_de_aporte": true,
+      "aporte_mensal": 4300.0,
+      "exigido_pelos_planos_mes": 4300.0,
+      "folga_mensal": 0.0,
+      "planos_cabem_no_aporte": true
+    },
+    {
+      "caso": "um_centavo_acima_nao_cabe",
+      "exigido": "4300.01",
+      "tem_missao_de_aporte": true,
+      "aporte_mensal": 4300.0,
+      "exigido_pelos_planos_mes": 4300.01,
+      "folga_mensal": -0.01,
+      "planos_cabem_no_aporte": false
+    },
+    {
+      "caso": "sem_missao_de_aporte",
+      "exigido": "700",
+      "tem_missao_de_aporte": false,
+      "aporte_mensal": null,
+      "exigido_pelos_planos_mes": null,
+      "folga_mensal": null,
+      "planos_cabem_no_aporte": null
+    }
+  ]
+}

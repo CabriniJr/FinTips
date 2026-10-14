@@ -155,6 +155,29 @@ baseline divergiu do motor Python:
   [mes_no_vermelho]     volatilidade: python 0.229, kotlin 0.281
 ```
 
+## O ouro que nasceu depois do Kotlin
+
+O domínio de vida (as seis frentes) é o único módulo em que o **Kotlin veio
+primeiro** — ele não existia no Python, então não havia o que replicar. Depois
+o Python ganhou `fintips/life.py`, porque é o Python que serve o agente e o
+painel hoje, e isso criou o risco que o resto da porta não tem: dois motores
+sem nada obrigando a concordar.
+
+A saída foi a de sempre, só com a ordem de nascimento invertida: gerar
+`ouro/vida.json` e cobrar o Kotlin contra ele, **com o Python como
+referência**. Achou divergência na primeira execução:
+
+```
+barras divergiram do motor Python:
+  [um_de_tres_e_um_terco/FOC] pct: python 33.3, kotlin 33.33333333333333
+```
+
+Uma missão cumprida de três. O Python arredonda em uma casa, o Kotlin dividia
+cru. Nenhum teste de propriedade pegaria — as duas respostas parecem certas, e
+a diferença só apareceria quando alguém comparasse a barra do app com o número
+do painel. A regra vale também quando o Kotlin chega antes: **quem define é o
+Python.**
+
 ## Ordem dos módulos
 
 Do que não depende de nada para o que depende de tudo. Cada linha só começa
@@ -182,6 +205,25 @@ quando a anterior tem ouro fechando.
 | 10b | YAML — **leitura** (destrava catálogo, causas, perfil e o item 6b) | a fazer |
 | 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
 | 12 | Compose Multiplatform no lugar do painel React | a fazer |
+
+### Fora da fila: o domínio de vida e o Android
+
+Esta trilha corre **em paralelo** à de cima, e numerá-la junto seria mentir
+sobre a dependência: ela não espera módulo nenhum da fila, porque não porta
+nada — o domínio de vida nasceu em Kotlin. Ela também muda a prioridade do
+Android, que na tabela acima é o último item e na prática virou o produto
+([`APP-DE-VIDA.md`](APP-DE-VIDA.md)).
+
+| # | O que | Estado |
+|---|---|---|
+| V1 | `vida/Vida.kt` — atributos, missões, registro, sequência, cobertura | **pronto** |
+| V2 | `ouro/vida.json` — paridade travada contra `fintips/life.py` | **pronto** |
+| V3 | App Android: as seis barras e a lista do dia | a fazer |
+| V4 | Sensores (tempo de tela, passos) como registro `sensor` | a fazer |
+
+As duas trilhas se encontram num ponto só: a persistência YAML (módulo 10), de
+que as missões também precisam. Quem chegar primeiro resolve para os dois —
+ver [`ENTRE-AGENTES.md`](ENTRE-AGENTES.md).
 
 O painel React continua funcionando durante tudo isso, porque fala JSON e não
 sabe quem serve.
@@ -214,11 +256,46 @@ nomeando o mês. A lição repete a do leitor OFX: **o harness não estava cego;
 ouro é que não fazia a pergunta.** E quando a pergunta é sobre um caso raro,
 procurar não basta — às vezes é preciso derivá-lo.
 
+## Os dois motores lado a lado
+
+O harness de ouro prova paridade, mas prova em arquivo de teste e fala por
+`assert`. Para ver com os próprios olhos, sobre o **seu** extrato:
+
+```bash
+python3 scripts/comparar-motores.py ~/Documents/FinTips/data/extratos/seu.ofx
+```
+
+Ele roda os dois motores, imprime duas colunas e marca cada linha com ✓ ou ✗:
+leitura do OFX (hash da conta, período, saldo, conciliação, cada transação em
+id, data, hora, valor e memo), baseline e score dimensão por dimensão. Sai com
+código 1 se algo divergir, então serve em CI sem adaptação.
+
+Duas honestidades embutidas na saída:
+
+- **Cobre só o que foi portado.** Nenhum dos dois lados roda a heurística de
+  classificação, porque ela ainda não existe no Kotlin. Por isso toda transação
+  fica no fluxo padrão, a renda aparece zerada e o score sai baixo. Não é erro:
+  é a pergunta exata que os dois conseguem responder hoje, feita igual para os
+  dois.
+- **A saída da JVM é forçada para UTF-8.** Sem isso "Aplicação" sai como
+  "Aplica??o" e o comparador acusaria divergência falsa, mandando alguém caçar
+  um bug que não existe.
+
+Confirmado quebrando de propósito: mudar a pena por mês no vermelho de 25% para
+20% no Kotlin derruba duas linhas e o código de saída.
+
+```
+SCORE
+✗ score                34.3                       35.1
+✗   estabilidade       11.2                       12.0
+```
+
 ## Rodar
 
 ```bash
 cd kotlin && gradle :motor:jvmTest        # motor + harness diferencial
 python3 scripts/gerar-ouro.py             # regrava o ouro a partir do Python
+python3 scripts/comparar-motores.py X.ofx # os dois motores lado a lado
 ```
 
 O alvo Android está desligado por propriedade (`fintips.android=false`) porque

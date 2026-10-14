@@ -17,6 +17,7 @@ import json
 import os
 import statistics
 from collections import Counter
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -25,7 +26,7 @@ from mcp.server.fastmcp import FastMCP
 
 from . import causes as causes_mod
 from . import decisions
-from . import dossier, levers, mapping, plans as plans_mod
+from . import dossier, levers, life, mapping, plans as plans_mod
 from . import projection as proj_mod
 from . import purchases, report
 from .analysis import baseline
@@ -112,6 +113,11 @@ _SPEC = {
         "O usuário assina. Nada é verdade sem proveniência."
     ),
     "proveniencia": {
+        "nota": (
+            "existem DUAS escadas, porque são duas perguntas diferentes. A do "
+            "dinheiro responde 'quem classificou esta transação'; a da vida "
+            "responde 'como sabemos que isso foi feito'"
+        ),
         "ordem_de_autoridade": ["heuristica", "importacao", "agente", "usuario"],
         "vale_como_verdade": ["agente", "usuario"],
         "nunca_vale": {
@@ -119,6 +125,21 @@ _SPEC = {
             "importacao": "derivado dos dados (cadência, arquétipo casado, alavanca)",
         },
         "regra": "origem menor nunca sobrescreve origem maior, por mais confiante que esteja",
+    },
+    "proveniencia_da_vida": {
+        "ordem_de_autoridade": list(life.ORIGENS_DO_REGISTRO),
+        "vale_como_cumprido": ["agente", "sensor", "usuario"],
+        "nunca_vale": {
+            "presumido": "o app supôs pela rotina — supor que ela treinou não é ela ter treinado",
+        },
+        "por_que_sensor_acima_de_agente": (
+            "'você treinou hoje?' é pergunta factual. Se o aparelho mediu, a "
+            "medida vale mais que a sua interpretação da conversa"
+        ),
+        "por_que_usuario_acima_de_sensor": (
+            "o aparelho erra de um jeito que a pessoa sabe explicar: celular em "
+            "casa, tela em outro aparelho, treino na rua"
+        ),
     },
     "contratos": {
         "Categoria": "uma categoria existe porque alguém a criou",
@@ -128,6 +149,13 @@ _SPEC = {
         "Causa": "por que o dinheiro sai + a atitude tomada; nunca derivável",
         "TracoDePerfil": "um eixo do perfil, assinado por quem tem autoridade",
         "ItemDeTriagem": "algo em aberto, com o custo mensal de não decidir",
+        "Missao": "o que a pessoa combinou consigo; nasce dela, nunca do app",
+        "RegistroDeMissao": "um cumprimento + como se soube dele",
+        "RegraDeclarada": (
+            "regra que ela assina para si (ex.: esperar N dias acima de X). É a "
+            "ÚNICA coisa do lado da vida que mexe em veredito de compra, e por "
+            "isso exige `porque`: a conversa cita a regra dela, não um conselho seu"
+        ),
     },
     "vocabularios": {
         "causa.efeito_tipo": list(causes_mod.EFEITOS),
@@ -142,6 +170,18 @@ _SPEC = {
             "nota": "o dossiê e as alavancas calculam em cima disso",
         },
         "perfil.eixos": ["fase", "renda", "custo", "consumo", "constancia"],
+        "vida.atributos": {
+            "valores": {k: v for k, v in life.ATRIBUTOS.items()},
+            "nota": (
+                "as seis frentes. Dinheiro (OURO) é uma delas, não o centro — o "
+                "motor financeiro inteiro vive dentro dessa barra"
+            ),
+        },
+        "vida.cadencias": list(life.CADENCIAS),
+        "vida.sem_xp_e_sem_nivel": (
+            "de propósito. Nível só sobe e não consegue dizer 'esta semana foi "
+            "pior que a passada', que é a única informação que muda comportamento"
+        ),
     },
     "toda_escrita_exige": ["porque"],
     "como_expandir": {
@@ -152,12 +192,17 @@ _SPEC = {
         "pendencias": "triagem",
         "alavancas": "alavancas",
         "uma_contraparte": "investigar",
+        "seis_frentes": "frentes",
+        "aporte_contra_planos": "aporte_vs_planos",
     },
     "erros_que_o_motor_recusa": [
         "assinar perfil ou gravar causa com origem heuristica/importacao",
         "gravar qualquer decisão sem `porque`",
         "causa sem enunciado (rótulo não é causa)",
         "atitude fora do vocabulário fechado",
+        "registrar missão com origem fora da escada da vida",
+        "registrar missão que não está no catálogo da pessoa",
+        "regra declarada sem `porque` (ela mexe em veredito; precisa de origem)",
     ],
 }
 
@@ -773,7 +818,17 @@ def avaliar_compra(item: str, preco: float, categoria: str = "compras",
                    palavras_chave: list[str] | None = None) -> str:
     """Avalia uma intenção de compra: impacto no caixa, custo em meses de sobra,
     conflito com planos, sinais de arrependimento tirados do histórico e as
-    estratégias possíveis com o trade-off de cada uma."""
+    estratégias possíveis com o trade-off de cada uma.
+
+    Quando existe catálogo de missões, a resposta traz `contexto_de_vida`: qual
+    sequência esta compra põe em risco, o preço traduzido em meses de aporte e
+    como estão as seis frentes hoje. Leia o bloco antes de escrever: ele diz o
+    que trazer para a conversa.
+
+    Uma coisa só de lá mexe no veredito — `regra_declarada_aplicada`, a regra
+    de espera que a própria pessoa escreveu. Quando ela aparecer, **cite a
+    regra dela, com o `porque` que vem junto**. Não é conselho seu: é decisão
+    que ela já tomou e pediu para o app aplicar."""
     ws = _ws()
     st = report.stores(ws)
     ctx = report.analyze(ws, st=st)
@@ -796,7 +851,102 @@ def avaliar_compra(item: str, preco: float, categoria: str = "compras",
             ligacoes=[f"categoria:{intent.categoria}"],
         ),
         aprendizados=(ctx.get("decisoes") or {}).get("aprendizados"),
+        vida=report.load_vida(ws),
     ))
+
+
+@mcp.tool()
+def frentes(cadencia: str = "diaria") -> str:
+    """As seis frentes de hoje: FOR, AGI, VIT, INT, FOC e OURO.
+
+    Devolve sempre as seis, mesmo vazias — frente sem missão mostra o que a
+    pessoa não está treinando, e esconder a barra esconderia a lacuna.
+
+    Não existe XP e não existe nível, de propósito: nível é número que só sobe
+    e não consegue dizer "esta semana foi pior que a passada". O que existe é
+    a janela atual, a sequência e o recorde.
+
+    `cobertura_de_evidencia` diz quanto do que o app afirma veio de medida de
+    aparelho e quanto é memória. Use isso antes de afirmar qualquer coisa sobre
+    hábito: memória de tempo de tela distorce a favor de quem lembra."""
+    ws = _ws()
+    vida = report.load_vida(ws)
+    if vida.vazia:
+        return _json({
+            "sem_missoes_cadastradas": True,
+            "como_cadastrar": (
+                f"escreva {ws.missoes_path} a partir do molde em "
+                "fintips/rules/exemplo-missoes.yaml. Missão nasce da pessoa: o "
+                "app não sabe quantas vezes alguém deve treinar"
+            ),
+        })
+    hoje = date.today()
+    return _json({
+        "hoje": hoje.isoformat(),
+        "frentes": life.forca_dos_atributos(vida.missoes, vida.registros, hoje, cadencia),
+        "missoes_do_dia": [
+            life.estado_diario(m, vida.registros, hoje)
+            for m in vida.missoes if m.ativa and m.cadencia == "diaria"
+        ],
+        "cobertura_de_evidencia": life.cobertura_de_evidencia(vida.missoes, vida.registros),
+    })
+
+
+@mcp.tool()
+def registrar_missao(missao_id: str, origem: str = "agente", medida: str = "",
+                     nota: str = "", dia: str = "") -> str:
+    """Grava que uma missão foi cumprida, dizendo **como se soube**.
+
+    `origem` é a escada de proveniência do lado da vida, e ela não é a mesma
+    do lado financeiro:
+
+      presumido  o app supôs pela rotina — NUNCA conta como cumprido
+      agente     você concluiu a partir da conversa
+      sensor     o aparelho mediu (tempo de tela, passos, horário)
+      usuario    a pessoa marcou; vence tudo
+
+    Use `agente` só quando ela te disse, nesta conversa, que fez. "Deve ter
+    treinado, é terça" é `presumido`, e `presumido` existe para não contar: o
+    app supor que ela treinou não é ela ter treinado.
+
+    Quando houver número, mande em `medida` ("0 min de tela", "12 km"). É o
+    que separa medida de memória na cobertura de evidência."""
+    ws = _ws()
+    vida = report.load_vida(ws)
+    if vida.missoes and missao_id not in {m.id for m in vida.missoes}:
+        return _json({
+            "erro": f"missão '{missao_id}' não está no catálogo",
+            "catalogo": [m.id for m in vida.missoes],
+        })
+    try:
+        registro = life.RegistroDeMissao.from_dict({
+            "missao_id": missao_id,
+            "dia": dia or date.today().isoformat(),
+            "origem": origem,
+            "medida": medida,
+            "nota": nota,
+        })
+    except ValueError as e:
+        return _json({"erro": str(e)})
+    life.registrar(ws.registros_path, registro)
+    missao = next(m for m in vida.missoes if m.id == missao_id)
+    return _json({
+        "gravado": registro.to_dict(),
+        "conta_como_cumprido": registro.conta_como_cumprido,
+        "estado": life.estado_diario(missao, report.load_vida(ws).registros, date.today()),
+    })
+
+
+@mcp.tool()
+def aporte_vs_planos() -> str:
+    """O aporte que ela assinou contra o que os planos exigem por mês.
+
+    Compromisso declarado de um lado, necessidade dos planos do outro. Quando
+    não fecham, o motor mostra a diferença e para aí: subir o aporte, esticar
+    o prazo ou cortar plano é escolha dela, não cálculo."""
+    ws = _ws()
+    ctx = report.analyze(ws)
+    return _json(life.contexto_de_planos(report.load_vida(ws), ctx["planos"]))
 
 
 @mcp.tool()

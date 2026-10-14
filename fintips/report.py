@@ -23,6 +23,7 @@ from typing import Any
 import yaml
 
 from . import analysis, causes as causes_mod, commitments, decisions, discovery, mapping
+from . import life
 from . import plans as plans_mod
 from . import profile as profile_mod, projection
 from . import score as score_mod, taxonomy as tax_mod, triage
@@ -40,6 +41,15 @@ CONTEXT_SCHEMA = 3
 # --------------------------------------------------------------------------
 # lojas
 # --------------------------------------------------------------------------
+
+def load_vida(ws: Workspace) -> life.Vida:
+    """Abre o catálogo de missões e os registros, se existirem.
+
+    Ausência não é erro: quem nunca cadastrou missão tem o motor financeiro
+    inteiro funcionando, só sem a camada de contexto das seis frentes.
+    """
+    return life.carregar(ws.missoes_path, ws.registros_path)
+
 
 def stores(ws: Workspace) -> dict[str, Any]:
     """Abre todas as lojas do workspace de uma vez."""

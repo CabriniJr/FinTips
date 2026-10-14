@@ -1777,6 +1777,240 @@ def ouro_score() -> dict:
     }
 
 
+def ouro_vida() -> dict:
+    """Sequência, recorde, as seis barras e a cobertura de evidência.
+
+    Este é o único ouro em que o Kotlin veio primeiro: o domínio de vida nasceu
+    lá, porque não existia no Python. Agora que existe nos dois, o ouro trava a
+    paridade na direção de sempre — o Python é a referência.
+
+    Os casos foram escolhidos onde os dois podem divergir sem ninguém notar:
+
+    - **terço exato** (1 de 3 cumpridas) — `round(x, 1)` do Python contra
+      divisão de `Double` crua do Kotlin. 33.3 contra 33.33333333333333.
+    - **recaída** — a sequência recomeça e o recorde sobrevive.
+    - **hoje vazio** — o dia não acabou; a sequência de ontem continua.
+    - **presumido no meio** — abre buraco, porque suposição não conta.
+    """
+    from datetime import date
+
+    from fintips import life
+
+    def m(mid, atributo, cadencia="diaria", sensor=False):
+        return life.Missao(id=mid, titulo=mid, atributo=atributo,
+                           cadencia=cadencia, sensor_possivel=sensor)
+
+    def r(mid, dia, origem, medida=""):
+        return life.RegistroDeMissao(mid, date(2026, 10, dia), origem, medida)
+
+    hoje = date(2026, 10, 14)
+
+    sequencias = []
+    for nome, dias_e_origens, ate in [
+        ("cinco_dias_seguidos", [(d, "sensor") for d in range(10, 15)], hoje),
+        ("hoje_ainda_vazio", [(d, "sensor") for d in (11, 12, 13)], hoje),
+        ("recaida_no_meio",
+         [(d, "sensor") for d in (1, 2, 3, 4, 5, 6, 7, 9, 10)], date(2026, 10, 10)),
+        ("presumido_abre_buraco",
+         [(11, "usuario"), (12, "presumido"), (13, "usuario"), (14, "usuario")], hoje),
+        ("nenhum_registro", [], hoje),
+        ("so_presumido", [(13, "presumido"), (14, "presumido")], hoje),
+        ("buraco_de_um_dia", [(10, "agente"), (12, "agente"), (13, "agente"), (14, "agente")], hoje),
+    ]:
+        missao = m("x", "FOC")
+        registros = [r("x", d, o) for d, o in dias_e_origens]
+        e = life.estado_diario(missao, registros, ate)
+        sequencias.append({
+            "caso": nome,
+            "ate": ate.isoformat(),
+            "dias": [[d, o] for d, o in dias_e_origens],
+            "cumprida_na_janela": e["cumprida_na_janela"],
+            "sequencia": e["sequencia"],
+            "recorde": e["recorde"],
+        })
+
+    # Um terço exato é o caso que separa arredondamento de divisão crua.
+    tres_de_foc = [m("a", "FOC", sensor=True), m("b", "FOC"), m("c", "FOC")]
+    barras = []
+    for nome, missoes, registros, cadencia in [
+        ("um_de_tres_e_um_terco", tres_de_foc, [r("a", 14, "sensor", "0 min")], "diaria"),
+        ("dois_de_tres", tres_de_foc, [r("a", 14, "sensor"), r("b", 14, "usuario")], "diaria"),
+        ("tudo_vazio", tres_de_foc, [], "diaria"),
+        ("presumido_nao_enche_barra", tres_de_foc, [r("a", 14, "presumido")], "diaria"),
+        ("fora_da_janela_diaria", tres_de_foc, [r("a", 1, "usuario")], "diaria"),
+        ("janela_semanal_pega_sete_dias",
+         [m("s", "AGI", "semanal", sensor=True)], [r("s", 8, "sensor", "22 km")], "semanal"),
+        ("janela_semanal_nao_pega_o_oitavo",
+         [m("s", "AGI", "semanal", sensor=True)], [r("s", 7, "sensor")], "semanal"),
+        ("janela_mensal", [m("o", "OURO", "mensal")], [r("o", 1, "usuario")], "mensal"),
+    ]:
+        f = life.forca_dos_atributos(missoes, registros, hoje, cadencia)
+        barras.append({
+            "caso": nome,
+            "cadencia": cadencia,
+            "frentes": [
+                {
+                    "atributo": x["atributo"],
+                    "missoes": x["missoes"],
+                    "cumpridas": x["cumpridas"],
+                    "pct": x["pct"],
+                    "com_evidencia_de_maquina": x["com_evidencia_de_maquina"],
+                }
+                for x in f
+            ],
+        })
+
+    coberturas = []
+    for nome, missoes, registros in [
+        ("uma_de_duas_medida", [m("a", "FOC", sensor=True), m("b", "INT")],
+         [r("a", 14, "sensor", "0 min")]),
+        ("uma_de_tres_e_um_terco",
+         [m("a", "FOC", sensor=True), m("b", "INT"), m("c", "VIT", sensor=True)],
+         [r("a", 14, "sensor")]),
+        ("sensor_possivel_mas_sem_medida", [m("a", "FOC", sensor=True)], [r("a", 14, "usuario")]),
+        ("catalogo_vazio", [], []),
+    ]:
+        c = life.cobertura_de_evidencia(missoes, registros)
+        coberturas.append({
+            "caso": nome,
+            "missoes_ativas": c["missoes_ativas"],
+            "mensuraveis_por_aparelho": c["mensuraveis_por_aparelho"],
+            "com_medida_registrada": c["com_medida_registrada"],
+            "pct_medido": c["pct_medido"],
+        })
+
+    # A ponte com o dinheiro. O caso que justifica esta seção é o empate de meio
+    # centésimo: o Python divide em `Decimal` exato e o empate acontece; em
+    # `Double` ele nunca existe, e o meio-para-o-par nunca se aplica. Divergia
+    # em metade dos empates, nos dois sentidos.
+    aporte = life.Missao(
+        id="ouro-aporte", titulo="Aporte do mês", atributo="OURO",
+        cadencia="mensal", valor_mensal=Decimal("2.00"),
+    )
+    empates = []
+    # Os dois blocos de preço existem porque **cada implementação de
+    # arredondamento erra num conjunto diferente**, e um ouro que só
+    # exercite um dos dois passa em silêncio no outro.
+    #
+    #   1, 3, 5, 13, …   quebram `BigDecimal(double)` (o arredondar do porte)
+    #   109, 115, 203, … quebram a versão que multiplica por 10 antes
+    #
+    # Descoberto do jeito mais instrutivo possível: sabotei a razão para
+    # `Double` e a suíte **passou**, porque o primeiro bloco não fazia a
+    # pergunta para o arredondar que estava na árvore. O ouro só morderia
+    # depois do merge — o pior momento para descobrir.
+    for preco_cent in (1, 3, 5, 13, 15, 17, 31, 33, 35, 43, 199, 201,
+                       109, 115, 203, 207, 245, 251, 419, 435):
+        ctx = life.contexto_de_compra(
+            life.Vida(missoes=[aporte]),
+            item="x", preco=Decimal(preco_cent) / 100, hoje=hoje,
+        )
+        empates.append({
+            "preco_centavos": preco_cent,
+            "aporte_centavos": 200,
+            "meses_de_aporte": ctx["custo_em_aportes"]["meses_de_aporte"],
+        })
+
+    tela = life.Missao(
+        id="foc-tela", titulo="Tela zero", atributo="FOC", cadencia="diaria",
+        sensor_possivel=True, porque="corte total em vez de moderação",
+        colide_com=["tablet", "assinatura de video"],
+    )
+    aporte_real = life.Missao(
+        id="ouro-aporte", titulo="Aporte do mês", atributo="OURO",
+        cadencia="mensal", valor_mensal=Decimal("4300"),
+    )
+    regra = life.RegraDeclarada(
+        id="espera", tipo="espera_antes_de_comprar",
+        acima_de=Decimal("300"), dias=30, porque="lista de desejos e 30 dias",
+    )
+    registros_tela = [r("foc-tela", d, "sensor") for d in range(10, 15)]
+
+    compras = []
+    for nome, item, preco, cat, tags, missoes, regras, registros in [
+        ("tablet_colide_e_regra_aplica", "Tablet S11", "2500", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("abaixo_do_limite_a_regra_nao_aplica", "Livro", "90", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("exatamente_no_limite_nao_aplica", "Fone", "300", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("um_centavo_acima_do_limite_aplica", "Fone", "300.01", "compras", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("sem_colisao_declarada_so_entra_o_ouro", "Cafeteira", "200", "casa", [],
+         [tela, aporte_real], [regra], registros_tela),
+        ("colisao_por_tag_e_nao_por_item", "Presente", "500", "compras",
+         ["assinatura de video"], [tela, aporte_real], [regra], registros_tela),
+        ("sem_regra_declarada", "Tablet", "2500", "compras", [],
+         [tela, aporte_real], [], registros_tela),
+        ("catalogo_vazio", "Tablet", "2500", "compras", [], [], [], []),
+    ]:
+        v = life.Vida(missoes=missoes, registros=registros, regras=regras)
+        ctx = life.contexto_de_compra(
+            v, item=item, preco=Decimal(preco), categoria=cat, tags=tags, hoje=hoje,
+        )
+        rd = ctx["regra_declarada"]
+        compras.append({
+            "caso": nome,
+            "item": item,
+            "preco": preco,
+            "categoria": cat,
+            "tags": tags,
+            "missoes": [m.id for m in missoes],
+            "tem_regra": bool(regras),
+            "sem_missoes_cadastradas": ctx["sem_missoes_cadastradas"],
+            "regra_aplica": None if rd is None else rd["aplica"],
+            "regra_liberada_em": None if rd is None else rd["liberada_em"],
+            "missoes_em_jogo": [
+                {
+                    "missao": m["missao"],
+                    "colisao_declarada": m["colisao_declarada"],
+                    "sequencia_em_risco": m["sequencia_em_risco"],
+                    "recorde": m["recorde"],
+                }
+                for m in ctx["missoes_em_jogo"]
+            ],
+            "meses_de_aporte": (ctx["custo_em_aportes"] or {}).get("meses_de_aporte"),
+        })
+
+    planos = []
+    for nome, missoes, exigido in [
+        ("cabe_com_folga", [aporte_real], "700"),
+        ("exatamente_no_limite", [aporte_real], "4300"),
+        ("um_centavo_acima_nao_cabe", [aporte_real], "4300.01"),
+        ("sem_missao_de_aporte", [tela], "700"),
+    ]:
+        c = life.contexto_de_planos(
+            life.Vida(missoes=missoes),
+            [{"nome": "p", "aporte_necessario_mes": exigido, "status": "no_ritmo"}],
+        )
+        planos.append({
+            "caso": nome,
+            "exigido": exigido,
+            "tem_missao_de_aporte": c["missao_de_aporte"] is not None,
+            "aporte_mensal": (c["missao_de_aporte"] or {}).get("aporte_mensal"),
+            "exigido_pelos_planos_mes": c.get("exigido_pelos_planos_mes"),
+            "folga_mensal": c.get("folga_mensal"),
+            "planos_cabem_no_aporte": c.get("planos_cabem_no_aporte"),
+        })
+
+    return {
+        "fonte": "fintips.life",
+        "atributos": list(life.ATRIBUTOS),
+        "cadencias": life.CADENCIAS,
+        "origens": life.ORIGENS_DO_REGISTRO,
+        "conta_como_cumprido": {
+            k: v >= life.AUTORIDADE_MINIMA_PARA_CUMPRIR
+            for k, v in life.ORIGENS_DO_REGISTRO.items()
+        },
+        "sequencias": sequencias,
+        "barras": barras,
+        "coberturas": coberturas,
+        "empates_de_meio_centesimo": empates,
+        "compras": compras,
+        "planos": planos,
+    }
+
+
 GERADORES = {
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
@@ -1796,6 +2030,7 @@ GERADORES = {
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
+    "vida.json": ouro_vida,
 }
 
 
