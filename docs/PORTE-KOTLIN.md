@@ -157,8 +157,32 @@ baseline divergiu do motor Python:
 
 ## Ordem dos módulos
 
+**A ordem virou no meio do caminho.** O escopo do app deixou de ser finança e
+passou a ser vida em seis frentes, com dinheiro como uma delas
+([`APP-DE-VIDA.md`](APP-DE-VIDA.md)). O Android era o módulo 12, a última
+linha da tabela; agora é o produto. O que isso muda na prática:
+
+- o **domínio de vida** entrou na frente de tudo que faltava portar — ele não
+  depende de nada do Python, porque não existe no Python;
+- a **persistência** (módulo 10) subiu, porque sem ela missão não sobrevive a
+  fechar o app;
+- **projeção, planos, compras e dossiê** (8b e 9) desceram. Continuam valendo
+  no Python, que continua sendo o produto que funciona;
+- o motor já portado — dinheiro, OFX, contratos, regras, análise, score —
+  continua testado contra o Python e vira o pilar OURO. Ele só deixou de ser a
+  frente de ataque.
+
+O domínio de vida não tem ouro, e não é esquecimento: não existe motor Python
+para comparar com. O que os 14 testes dele cobram é outra coisa — propriedade
+de produto, cada uma com uma frase do plano atrás. Registro `presumido` não
+conta como cumprido; o recorde não zera na recaída; hoje ainda não cumprido não
+quebra a sequência; as seis barras aparecem mesmo vazias. Quando uma delas
+quebrar, o app terá deixado de fazer o que foi desenhado para fazer, mesmo com
+todos os números certos.
+
 Do que não depende de nada para o que depende de tudo. Cada linha só começa
-quando a anterior tem ouro fechando.
+quando a anterior tem ouro fechando — ou, no caso do domínio de vida, os
+testes de propriedade.
 
 | # | Módulo | Estado |
 |---|---|---|
@@ -172,11 +196,14 @@ quando a anterior tem ouro fechando.
 | 7 | `Analise` — baseline, meses, recorrências, atípicos | **pronto** |
 | 7b | `gasto invisível` — depende das etiquetas da heurística | a fazer |
 | 8 | `Score` — cinco dimensões, pesos, alavanca de maior ganho | **pronto** |
-| 8b | `Projecao`, `Planos`, `Compras` | a fazer |
-| 9 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | a fazer |
-| 10 | Persistência YAML (`expect`/`actual` por alvo) | a fazer |
-| 11 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
-| 12 | Compose Multiplatform no lugar do painel React | a fazer |
+| 8b | `Projecao`, `Planos`, `Compras` | adiado |
+| 9 | `Vida` — atributos, missões, registro, sequência, cobertura | **pronto** |
+| 10 | Persistência YAML (`expect`/`actual` por alvo) — missões primeiro | a fazer |
+| 11 | App Android: as seis barras e a lista do dia | a fazer |
+| 12 | Sensores (tempo de tela, passos) como registro `sensor` | a fazer |
+| 13 | Servidor MCP (SDK Kotlin) e HTTP (Ktor) | a fazer |
+| 14 | `Perfil`, `Causas`, `Alavancas`, `Triagem`, `Dossie` | adiado |
+| 15 | Compose Multiplatform no lugar do painel React | adiado |
 
 O painel React continua funcionando durante tudo isso, porque fala JSON e não
 sabe quem serve.

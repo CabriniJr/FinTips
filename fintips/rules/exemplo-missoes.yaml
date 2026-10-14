@@ -1,0 +1,134 @@
+# Exemplo de catálogo de missões — copie para data/missoes.yaml e reescreva.
+#
+# ATENÇÃO AO QUE ESTE ARQUIVO É E AO QUE ELE NÃO É.
+#
+# Ele é um **molde**. As missões de verdade saem do plano de quem usa o app, e
+# plano de vida é documento pessoal: tem salário, empregador, nome de gente,
+# valor de patrimônio, hora de dormir. Por isso `data/missoes.yaml` fica fora
+# do Git, junto com `regras-locais.yaml` e pelo mesmo motivo — a lista do que
+# você treina e quanto você aporta diz mais sobre você do que o extrato.
+#
+# Ele **não** é sugestão de rotina. O app não sabe quantas vezes alguém deve ir
+# à academia; quem sabe é a pessoa, com o corpo que tem e a semana que tem.
+# Missão aqui nasce com origem `usuario`, porque o plano é dela.
+#
+# Os seis atributos:
+#   FOR  força      musculação, carga, resistência
+#   AGI  agilidade  cardio, pedal, trilha, caminhada
+#   VIT  vitalidade sono, alimentação, exames
+#   INT  intelecto  estudo, leitura, lab, carreira
+#   FOC  foco       atenção, tempo de tela, revisão
+#   OURO ouro       dinheiro: aporte, orçamento, decisão de compra
+#
+# `sensor_possivel: true` diz que **existe aparelho capaz de responder** — não
+# que ele esteja ligado. Missão sem sensor fica na palavra da pessoa, e o app
+# mostra isso na tela em vez de fingir um rigor que não tem.
+
+schema_version: 1
+
+missoes:
+  # ------------------------------------------------------------- diárias
+  # A diária é o mínimo que cabe no dia ruim. Uma diária que só se cumpre no
+  # dia bom não é missão, é aspiração — e falhar nela todo dia ensina a
+  # ignorar o app.
+  - id: foc-sem-video-curto
+    titulo: Sem vídeo curto
+    atributo: FOC
+    cadencia: diaria
+    como_medir: tempo de tela em apps de vídeo curto igual a zero
+    sensor_possivel: true
+    porque: corte total em vez de moderação
+
+  - id: for-movimento-do-dia
+    titulo: Movimento do dia
+    atributo: FOR
+    cadencia: diaria
+    como_medir: treino nos dias marcados; nos outros, caminhada curta
+    sensor_possivel: true
+
+  - id: int-leitura
+    titulo: Leitura
+    atributo: INT
+    cadencia: diaria
+    como_medir: um bloco de leitura, no trajeto ou na mesa
+    sensor_possivel: false
+
+  - id: vit-sono
+    titulo: Dormir no horário
+    atributo: VIT
+    cadencia: diaria
+    como_medir: celular fora do quarto e hora fixa de deitar
+    sensor_possivel: true
+
+  - id: ouro-sem-compra-fora-do-orcamento
+    titulo: Nenhuma compra fora do orçamento
+    atributo: OURO
+    cadencia: diaria
+    # Esta é a única missão que o motor financeiro consegue conferir sozinho:
+    # o extrato mostra o que saiu, e o orçamento diz o que estava previsto.
+    como_medir: nenhuma transação fora das categorias previstas no mês
+    sensor_possivel: true
+
+  # ------------------------------------------------------------ semanais
+  - id: for-treinos-da-semana
+    titulo: Treinos da semana
+    atributo: FOR
+    cadencia: semanal
+    como_medir: número de treinos combinados, em dias fixos
+    sensor_possivel: false
+
+  - id: agi-cardio-longo
+    titulo: Cardio longo
+    atributo: AGI
+    cadencia: semanal
+    como_medir: distância e tempo
+    sensor_possivel: true
+
+  - id: int-lab-da-semana
+    titulo: Lab da semana
+    atributo: INT
+    cadencia: semanal
+    como_medir: um lab completo, do começo ao fim
+    sensor_possivel: false
+
+  - id: foc-revisao-semanal
+    titulo: Revisão semanal
+    atributo: FOC
+    cadencia: semanal
+    como_medir: revisão curta no fim de semana, com o tempo de tela conferido
+    sensor_possivel: false
+
+  # -------------------------------------------------------------- mensais
+  - id: ouro-aporte-do-mes
+    titulo: Aporte do mês
+    atributo: OURO
+    cadencia: mensal
+    como_medir: valor combinado transferido nas datas combinadas
+    sensor_possivel: true
+
+  - id: agi-trilha-do-mes
+    titulo: Trilha do mês
+    atributo: AGI
+    cadencia: mensal
+    sensor_possivel: false
+
+  - id: int-conversa-de-carreira
+    titulo: Conversa de carreira
+    atributo: INT
+    cadencia: mensal
+    como_medir: a pergunta sobre o próximo passo foi feita, e a resposta anotada
+    sensor_possivel: false
+
+  # --------------------------------------------------- trimestrais e anuais
+  - id: ouro-revisao-trimestral
+    titulo: Revisão do trimestre
+    atributo: OURO
+    cadencia: trimestral
+    como_medir: metas revistas, projeção atualizada com o saldo real, assinaturas auditadas
+    sensor_possivel: false
+
+  - id: vit-check-up
+    titulo: Check-up anual
+    atributo: VIT
+    cadencia: anual
+    sensor_possivel: false
