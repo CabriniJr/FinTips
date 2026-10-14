@@ -29,6 +29,9 @@ if package.group(1) != expected_package:
     raise SystemExit("Pacote inesperado")
 if "android.permission.INTERNET" in badging or badging.count("launchable-activity:") != 1:
     raise SystemExit("Permissões/launcher não respeitam o contrato offline")
+label = "FinTips CI" if expected_package == "com.fintips.app.ci" else "FinTips UI"
+if f"application-label:'{label}'" not in badging or f"label='{label}'" not in badging:
+    raise SystemExit("Nome do app/launcher não identifica a variante esperada")
 manifest = subprocess.check_output([str(tools / "aapt"), "dump", "xmltree", str(apk), "AndroidManifest.xml"], text=True)
 if not re.search(r"android:allowBackup[^\n]*=\s*\(type 0x12\)0x0\s*$", manifest, re.M):
     raise SystemExit("Backup automático não está desabilitado")
