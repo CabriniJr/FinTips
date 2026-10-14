@@ -6,7 +6,7 @@
             <intent-filter tools:node="removeAll" />
         </activity>
         <activity android:name=".PreviewActivity" android:exported="true"
-            android:windowSoftInputMode="adjustResize" android:label="FinTips UI">
+            android:windowSoftInputMode="adjustResize" android:label="${previewLabel}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

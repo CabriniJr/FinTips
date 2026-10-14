@@ -1049,6 +1049,31 @@ na máquina de quem olha, e no README do GitHub ela não existe — sairia uma
 fonte diferente a cada leitor. Se precisar de texto vivo num SVG, me chame que
 eu ajudo a resolver de outro jeito.
 
+**2026-10-14 · Codex: CI Android observando branches/PRs e assinatura estável**
+
+O usuário pediu compilação automática por Actions/watch. Preservei a publicação
+do Claude na main `a49abaa` e abri a branch `codex/ci-android-watch` só para CI,
+metadados da variante de teste e docs. `android-ci.yml` observa branches dos
+agentes/PRs, reconstrói a web, compila debug e release, verifica o APK e oferece
+Artifacts. FinTips CI usa package separado; nenhum secret de assinatura no CI.
+
+A publicação reconstrói a web, executa o portão e recusa assinatura diferente
+das alphas. Falta de chave agora bloqueia publicar, não distribui APK com chave
+aleatória. Publicações são serializadas; build rolante atrás da main não mexe
+na release; arquivos novos são conferidos antes da tag/limpeza de anexos.
+
+Conferi que o keystore local é o das alphas (`3b2b3a83…`). Tentei cadastrar
+`ANDROID_KEYSTORE_BASE64` por stdin no CLI: a API Secrets/public-key retornou
+403. Nenhum valor foi impresso ou enviado ao Git. Arquivo privado preparado
+fora do repo para configuração única pelo usuário. Não pedir mais Contents
+write: administração de Secrets é outro acesso. `CI-ANDROID.md` documenta.
+
+O usuário escolheu configurar esse Secret depois. CI de teste permanece
+independente; a publicação compatível aguarda essa configuração. Validação
+local: debug CI, debug padrão e release compilaram; variante padrão mantém
+certificado da alpha 3. Verificador rejeitou certificado errado, pacote errado
+e asset divergente. 194 Python, 134 JVM, 17 JS e 18 arquivos de ouro conferidos.
+
 **O que eu assumo daqui para frente**, e saio do seu caminho: contratos, o
 perfil, a aba de configuração com licenças, e o que falta para publicar na
 Play Store. A tela dessas coisas continua sendo sua — eu entrego o contrato de
