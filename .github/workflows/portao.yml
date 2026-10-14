@@ -1,0 +1,76 @@
+# O portão de push, automatizado.
+#
+# É exatamente a sequência que se roda à mão antes de commitar, e ela está aqui
+# por um motivo concreto, descoberto errando: depois de um merge, o ouro no
+# disco descrevia uma versão anterior do motor Python e **nada cobrava**. A
+# suíte passava verde contra um ouro velho, e os dois motores se afastavam em
+# silêncio — que é precisamente o que o harness diferencial existe para
+# impedir. `gerar-ouro.py --conferir` é a trava, e trava que só roda quando
+# alguém lembra não é trava.
+#
+# O `check-pii.sh` está aqui pelo motivo mais forte do projeto: `data/` guarda
+# salário, empregador, nome de gente e hora de dormir, e já houve duas frases
+# do plano pessoal vazando para dentro de fixture de teste. Em colisão entre o
+# repositório e o arquivo pessoal, **o Git cede**.
+name: portão
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  motor:
+    name: motor Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: instalar
+        run: pip install -e ".[tudo]" pytest
+      - name: testes
+        run: python -m pytest tests/ -q
+      - name: ouro em paridade com o Python
+        run: python scripts/gerar-ouro.py --conferir
+      - name: nenhum dado pessoal nos arquivos versionados
+        run: bash scripts/check-pii.sh --all
+
+  kotlin:
+    name: motor Kotlin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      # Sem a flag Android: o motor tem de continuar puro, e é esta linha que
+      # prova. Se um dia ela precisar do SDK para passar, a separação quebrou.
+      - name: jvmTest sem o alvo Android
+        working-directory: kotlin
+        run: ./gradlew :motor:jvmTest --no-daemon
+
+  painel:
+    name: painel web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm test
+        working-directory: web
+      - run: npm run build
+        working-directory: web
