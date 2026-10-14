@@ -454,3 +454,58 @@ def test_api_registro_presumido_grava_mas_nao_conta(tmp_path):
     }).json()
     assert d["conta_como_cumprido"] is False
     assert d["estado"]["sequencia"] == 0
+
+
+# --------------------------------- o catálogo viajando para o aparelho
+
+
+def test_exportar_para_aparelho_manda_dinheiro_como_texto():
+    # Valor que passa por float volta diferente, e aqui ele atravessa a
+    # fronteira entre dois motores.
+    from fintips.life import exportar_para_aparelho
+
+    d = exportar_para_aparelho(Vida(missoes=[APORTE, SEM_TELA]))
+    aporte = next(m for m in d["missoes"] if m["id"] == APORTE.id)
+    assert aporte["valor_mensal"] == "1000.00"
+    assert isinstance(aporte["valor_mensal"], str)
+    tela = next(m for m in d["missoes"] if m["id"] == SEM_TELA.id)
+    assert tela["valor_mensal"] is None
+    assert tela["colide_com"] == ["tablet", "celular", "streaming"]
+
+
+def test_o_historico_do_aparelho_volta_para_o_workspace():
+    from fintips.life import importar_do_aparelho
+
+    linhas = "\n".join([
+        json.dumps({"missao_id": "int-leitura", "dia": "2026-10-13", "origem": "usuario"}),
+        json.dumps({"missao_id": "foc-sem-video-curto", "dia": "2026-10-14",
+                    "origem": "sensor", "medida": "0 min"}),
+    ])
+    vindos = importar_do_aparelho(linhas, {"int-leitura", "foc-sem-video-curto"})
+    assert len(vindos) == 2
+    assert vindos[1].origem == "sensor"
+    assert vindos[1].medida == "0 min"
+
+
+def test_historico_do_aparelho_com_missao_desconhecida_e_recusado():
+    from fintips.life import importar_do_aparelho
+
+    with pytest.raises(ValueError, match="não está no catálogo"):
+        importar_do_aparelho(
+            json.dumps({"missao_id": "fantasma", "dia": "2026-10-14", "origem": "usuario"}),
+            {"int-leitura"},
+        )
+
+
+def test_o_exemplo_do_pacote_exporta_sem_dado_pessoal():
+    """Quem trabalha na tela precisa de dado, e não do workspace de ninguém."""
+    from fintips.life import carregar, exportar_para_aparelho
+
+    vida = carregar(Path("fintips/rules/exemplo-missoes.yaml"))
+    d = exportar_para_aparelho(vida)
+    assert len(d["missoes"]) >= 10
+    assert d["schema_version"] == 1
+    # tem o que a tela precisa exercitar: as duas pontas e a regra
+    assert any(m["valor_mensal"] for m in d["missoes"])
+    assert any(m["colide_com"] for m in d["missoes"])
+    assert len(d["regras"]) == 1
