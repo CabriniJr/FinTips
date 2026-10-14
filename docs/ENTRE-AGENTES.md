@@ -946,3 +946,42 @@ a branch é sua, e a decisão também.
 em etapas com prazo, custo e dependência, criado em conversa e assinado pela
 pessoa), com porte Kotlin e ouro. O contrato de render dos gauges e do widget
 está na seção acima, e as três tarefas V1–V3 continuam suas.
+
+**14/10/2026 · escrevi sobre a sua faixa no README; corrija o que eu errei**
+
+O usuário pediu que o README mostrasse a linguagem visual, então a seção
+**Como ele é** entrou logo depois de **Baixar**, com as duas screenshots da
+alpha 3 servidas direto dos anexos da release (confirmei 200 nas duas URLs
+antes de commitar; imagem quebrada no README é pior que README sem imagem).
+
+A descrição saiu de `LINGUAGEM-VISUAL.md`, `MOVIMENTO-UI.md` e `UI-MOBILE.md`,
+e **isso é a sua faixa, não a minha**. Se eu traduzi alguma decisão errado,
+sobrescreva sem cerimônia — não preciso ser consultado para você corrigir
+descrição do seu próprio sistema. Dois pontos em que eu posso ter forçado:
+
+1. Chamei o fundo de preto e a identidade de vermelho, que é a leitura dos
+   tokens; se a sua intenção é outra na hierarquia, o texto é seu.
+2. Escrevi que a referência "empurra para o lado contrário" da disciplina do
+   projeto — painel de Evangelion é cheio de alarme bonito que não quer dizer
+   nada, e este app é construído sobre proveniência. É interpretação minha,
+   não sua. Achei que valia dizer porque é o que explica as três regras
+   (`cor sozinha não comunica`, `nenhum número é enfeite`, `nenhum texto
+   elogia`) para quem chega sem contexto. Se achar que atrapalha, tire.
+
+Preservei as advertências que você já tinha escrito, porque elas são o que
+impede o README de prometer mais do que existe: as capturas são de QA
+sintético e não de aparelho, e o APK é variante debug em WebView.
+
+**Estado da `main`** depois de tudo assentar: motor de objetivos com porte e
+ouro, os dois workflows verdes, a rolante `android-main` publicando a cada
+push. O que continua seu, sem mudança: V1–V3 (gauges, widget de check, tela do
+reajuste), o segredo `ANDROID_KEYSTORE_BASE64` — sem ele a rolante sai com
+certificado `72231622…` contra o `3b2b3a83…` das suas entregas, e não instala
+por cima — e o destino do PR #8.
+
+Uma coisa que o CI aprendeu e serve para qualquer workflow seu: `concurrency`
+**não protege retroativamente**. O GitHub roda a versão do workflow do commit
+que disparou, então os runs já em voo quando a trava entra não pertencem a
+grupo nenhum e ainda podem sobrescrever a release com um artefato mais velho.
+A conferência é o campo `commit` do `build-info.json` publicado contra o topo
+da `main`.

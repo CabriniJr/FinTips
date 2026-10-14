@@ -35,6 +35,71 @@ O motor Python é o produto que funciona hoje; o app é a porta em andamento.
 Enquanto o harness diferencial não fechar módulo a módulo, não se troca um
 motor testado por um que ninguém conferiu.
 
+## Como ele é
+
+<p align="center">
+  <img src="https://github.com/CabriniJr/FinTips/releases/download/android-v0.6.0-alpha.3/hoje.png" width="46%" alt="Tela Hoje: cabeçalho FINTIPS, seletor de semana, 2 de 4 tarefas feitas e a lista do dia">
+  &nbsp;&nbsp;
+  <img src="https://github.com/CabriniJr/FinTips/releases/download/android-v0.6.0-alpha.3/leitura.png" width="46%" alt="Tela Vida: as seis áreas, o livro em andamento com porcentagem e o gráfico de posições observadas">
+</p>
+
+<p align="center"><sub>
+Dados sintéticos de QA, capturados no navegador com a origem local do APK —
+não é captura de aparelho.
+</sub></p>
+
+A direção visual é **Neon Genesis Evangelion**: painéis retangulares com áreas
+chanfradas, réguas e marcações de posição, tipografia condensada pesada em
+caixa alta nos títulos, valores monoespaçados e barras segmentadas. Preto de
+fundo, vermelho de identidade, âmbar de ação.
+
+| Papel | Token | |
+|---|---|---|
+| Fundo | `--paper` | `#080808` |
+| Painel | `--card` | `#0d0c0b` |
+| Texto | `--ink` | `#f1efe6` |
+| Ação, seção ativa | `--accent` | `#ffa342` |
+| Identidade, títulos | `--signal` | `#ff4b35` |
+| Progresso registrado | `--s3` | `#a4ec8c` |
+
+Mas a escolha estética não afrouxa nenhuma regra do projeto — e é aí que o
+desenho fica interessante, porque a referência empurra para o lado contrário.
+Painel de Evangelion é cheio de alarme bonito que não quer dizer nada, e este
+app é construído sobre a premissa de que **nada é verdade sem proveniência**.
+Então:
+
+- **Cor sozinha não comunica nada.** Nem conclusão, nem erro, nem de onde veio
+  um registro. A hierarquia vem de tamanho, espaçamento e borda antes de cor,
+  as seis áreas sempre exibem o nome junto do ícone, e erro tem texto e estado
+  explícitos. Quem não distingue vermelho de âmbar continua lendo o app.
+- **Nenhum número é enfeite.** Sem radar aleatório, sem contador inventado, sem
+  alerta falso, sem estática sobre texto, sem luz piscando. As barras do dia
+  mostram tarefas registradas; as linhas do gráfico de leitura ligam posições
+  que você marcou, e não representam sessões. Na captura acima, o rótulo
+  `Informado por você` e o `Primeira estimativa` estão ali por isso.
+- **Nenhum texto elogia nem cobra.** "2 de 4 tarefas feitas" é informação;
+  "quase lá!" é opinião do app sobre o seu dia, e é o que faz um app ser
+  fechado.
+- **O motor entrega número, a tela escolhe a forma.** `gauges()` devolve
+  `valor` de 0 a 100, a `faixa` que nomeia a zona e a `legenda`. Ele não sabe o
+  que é ponteiro, arco ou barra — trocar a forma não muda o motor, e mudar a
+  fórmula não muda a tela. E o que ainda não tem como ser medido vem marcado
+  `sem_base`: a tela desenha vazio, porque zero ali afirmaria um fracasso que
+  não aconteceu.
+
+O movimento foi pedido depois do primeiro APK e segue a mesma disciplina:
+transição de 130 ms na saída e 280 ms na entrada, onda no ponto do toque,
+encaixe do check — e `prefers-reduced-motion` respeitado. As fontes (Barlow
+Condensed, sob SIL OFL) são distribuídas localmente: **a interface não faz
+requisição a serviço de fonte nem carrega imagem remota**, o que é consequência
+direta de não haver permissão de rede no APK.
+
+Detalhe em [`docs/LINGUAGEM-VISUAL.md`](docs/LINGUAGEM-VISUAL.md), movimento em
+[`docs/MOVIMENTO-UI.md`](docs/MOVIMENTO-UI.md), e os limites do protótipo em
+[`docs/UI-MOBILE.md`](docs/UI-MOBILE.md). O tema escuro é a direção atual,
+inclusive com o sistema no claro; um tema claro exigiria paleta e validação
+próprias.
+
 ## A ideia
 
 Um app de finanças que decide por você erra de um jeito específico: ele acha que
@@ -349,7 +414,9 @@ ou não aparece em lugar nenhum.
 ## Documentos
 
 - `docs/ENTRE-AGENTES.md` — **leia primeiro se você é um agente**: faixas, estado e log
-- `docs/VISUAL.md` — a linguagem visual, e o que a tela não decide
+- `docs/VISUAL.md` — índice do sistema visual, e o que a tela não decide
+- `docs/LINGUAGEM-VISUAL.md` — a direção Evangelion: tokens, paleta e o que cor **não** comunica
+- `docs/MOVIMENTO-UI.md` — transições, resposta ao toque e movimento reduzido
 - `docs/APP-DE-VIDA.md` — as seis frentes e **objetivos**: etapas, score e reajuste
 - `docs/RELEASES-ANDROID.md` — build, evidências e como a release é publicada
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
