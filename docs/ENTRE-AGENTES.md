@@ -1299,3 +1299,56 @@ com chave já conferida no runner. Atualizei a branch da identidade/README sobre
 essa main e preservei os dois logs do conflito. O estado atual substitui as
 notas históricas de chave pendente: Secret configurado e validado, CI integrado.
 O pedido agora é integrar as entregas prontas e acompanhar a publicação real.
+
+**2026-10-14 · Codex assume gauges Android e discovery das fontes**
+
+Li e preservo objetivos/CI na main `ca32ec0`. Nova branch
+`codex/android-gauges-fontes` nasce dessa main; não reaplicar a alpha 3 nem
+voltar sobre o motor. O PR #8 antigo está incorporado na main e será encerrado;
+a trilha nova usa diff incremental dessa base.
+
+O usuário confirmou comprometimento como cumprimento de metas escolhidas,
+com pesos ajustáveis e ausência de dados separada de meta não cumprida.
+`SCORES-FONTES-CONECTORES.md` registra as fontes oficiais e os aceites
+S-01/A-06/C-01/UI-05/UI-06. Os pedidos aguardam resposta do Claude.
+
+Codex altera só Compose e docs: arco segmentado, ponteiro animado, detalhe
+ao toque, base parcial e sem base distinto de zero. Frentes vêm de
+`montarTela`; não há fórmula, faixa ou média na UI. Renderer de agregado e
+objetivos recebe números prontos; a guarda/adaptação nativa desses dados ainda
+falta. V1 não está completo; V2/V3 continuam na fila. A alpha 3 publicada não
+ganha fontes/conector por esta entrega de componentes.
+
+Validação: assembleDebug e assembleRelease passaram; 194 Python, 134 JVM e
+18 arquivos de ouro conferidos. Aparência, fonte ampliada, TalkBack, toque e lifecycle ainda precisam
+de Android em aparelho/emulador. Não ativar mock para aparentar coleta.
+
+**14/10/2026 · Codex — gauges atualizados para integração**
+
+Usuário autorizou integrar as entregas na main e seguir. PR #10 já está em
+`2315ab9`; PR #11 em `639ca9e`. Atualizei a base do PR #9, preservando o motor e
+os logs do Claude. O componente permanece no alvo Compose: a alpha entregue
+continua WebView; não alegar que o APK de avaliação já abriu esta tela.
+As frentes estão alimentadas pelo motor; agregado/objetivos continuam aguardando
+a guarda/adaptação nativa documentada em S-01/A-06/C-01. Nenhuma média na UI,
+nenhuma nova permissão, coleta automática ou saída de PII.
+
+**14/10/2026 · Codex — publicação bloqueada corretamente; keystore explícito**
+
+A primeira execução da main após integrar CI compilou e leu o Secret, mas o
+verificador recusou o certificado do APK. A conferência isolada do Secret tinha
+passado. Não houve publicação incompatível. A seleção implícita do keystore do
+Gradle não é suficiente no runner.
+
+Ajustei o job para fornecer `FINTIPS_SIGNING_KEYSTORE` com o caminho do arquivo
+privado instalado; o signingConfig debug usa esse caminho explicitamente.
+Nenhum valor privado entra no código ou em argumentos de linha de comando.
+Build local foi repetido com Android user home diferente: debug e release
+compilaram, e o APK default manteve o certificado das alphas, package .ui,
+launcher e seis assets offline corretos. O verificador passou. Notas de release
+passam a usar o banner da identidade com URL fixada ao commit.
+
+Validação da integração: 234 Python, 136 JVM, 19 ouros, licenças, PII, Actionlint,
+assembleDebug/assembleRelease e verificador do APK. Próxima faixa visual:
+concluir guarda/adaptação do agregado e levar telas existentes para Compose,
+sem substituir o launcher antes de preservar armazenamento e fluxos da alpha.

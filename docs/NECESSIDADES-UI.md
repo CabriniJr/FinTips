@@ -13,6 +13,12 @@ para ligar as duas coisas: PII vive exclusivamente no client.
 
 ## Pedidos, por prioridade
 
+Novo recorte confirmado: [scores, fontes e conectores](SCORES-FONTES-CONECTORES.md).
+Comprometimento refere-se a metas escolhidas pela pessoa e pesos ajustáveis.
+UI-05 entrega o renderer Compose; S-01 pede agregado ao motor; A-06 pede
+histórico pessoal TotalPass; C-01/UI-06 pede MCP dentro do chat. Essas fontes
+automáticas e o conector ainda não estão ligados no APK.
+
 Plataforma prioritária do usuário: **Android**. Implementação e validação devem
 seguir [ANDROID-PRIMEIRO.md](ANDROID-PRIMEIRO.md), incluindo Compose, lifecycle,
 permissões e preservação dos registros do APK de avaliação.

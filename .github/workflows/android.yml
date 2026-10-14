@@ -140,7 +140,8 @@ jobs:
           if [ -n "$KEYSTORE_B64" ]; then
             umask 077
             mkdir -p "$HOME/.android"
-            echo "$KEYSTORE_B64" | base64 -d > "$HOME/.android/debug.keystore"
+            printf '%s' "$KEYSTORE_B64" | base64 -d > "$HOME/.android/debug.keystore"
+            echo "FINTIPS_SIGNING_KEYSTORE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
             echo "propria=true" >> "$GITHUB_OUTPUT"
             echo "Chave do environment instalada; a compatibilidade será conferida no APK."
           else
@@ -243,6 +244,8 @@ jobs:
         run: |
           set -euo pipefail
           {
+            echo "![FinTips Android](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/docs/identidade/banner-release.png)"
+            echo
             if [ "${{ steps.pacote.outputs.rolante }}" = "true" ]; then
               echo "Build automático do último commit da \`main\`."
               echo "Esta pré-release é **rolante**: ela é substituída a cada push."

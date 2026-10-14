@@ -1,6 +1,5 @@
 package com.fintips.app
 
-import com.fintips.motor.vida.ForcaDoAtributo
 import com.fintips.motor.vida.Guarda
 import com.fintips.motor.vida.LinhaDoDia
 import com.fintips.motor.vida.OrigemDoRegistro
@@ -33,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Clock
@@ -41,7 +39,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 
 /**
- * As seis barras e a lista do dia.
+ * Os seis gauges e a lista do dia.
  *
  * ## A linguagem visual
  *
@@ -106,80 +104,44 @@ fun TelaDoDia(guarda: Guarda, hojeFixo: kotlinx.datetime.LocalDate? = null) {
         }
     }
 
-    Column(
+    LazyColumn(
         Modifier.fillMaxSize().background(PAPEL).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("FINTIPS / 01", fontFamily = FontFamily.Monospace,
-            fontSize = 11.sp, color = LINHA)
-        Text("HOJE", fontFamily = TITULO, fontSize = 64.sp, color = SINAL)
-        Text(
-            estado.resumo.uppercase(),
-            fontFamily = FontFamily.Monospace,
-            fontSize = 12.sp,
-            letterSpacing = 1.sp,
-            color = DADO,
-        )
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("FINTIPS / 01", fontFamily = FontFamily.Monospace,
+                    fontSize = 11.sp, color = LINHA)
+                Text("HOJE", fontFamily = TITULO, fontSize = 64.sp, color = SINAL)
+                Text(estado.resumo.uppercase(), fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp, letterSpacing = 1.sp, color = DADO)
+            }
+        }
+        if (erro.isNotEmpty()) item { Text(erro, fontSize = 14.sp, color = TINTA) }
 
-        if (erro.isNotEmpty()) Text(erro, fontSize = 14.sp, color = TINTA)
-
-        SeisBarras(estado.frentes)
+        item { PainelDeGauges(estado.frentes) }
 
         if (estado.semCatalogo) {
-            Cartao {
-                Text(
+            item {
+                Cartao {
+                    Text(
                     "Nenhuma missão neste aparelho.\n\n" +
                         "Adicione um catálogo local para começar. " +
                         "A seleção de arquivo ainda não está disponível nesta tela.",
                     fontSize = 14.sp, color = TINTA,
-                )
+                    )
+                }
             }
         } else {
-            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(estado.doDia, key = { it.missaoId }) { linha ->
-                    LinhaDeMissao(linha) { marcar(linha.missaoId) }
-                }
+            items(estado.doDia, key = { "missao-${it.missaoId}" }) { linha ->
+                LinhaDeMissao(linha) { marcar(linha.missaoId) }
             }
         }
 
-        Spacer(Modifier.height(8.dp))
-        val pct = estado.cobertura["pct_medido"]
-        Text(
-            "evidência de aparelho: $pct%".uppercase(),
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp, color = SECUNDARIO,
-        )
-    }
-}
-
-/** As seis, sempre as seis. */
-@Composable
-private fun SeisBarras(frentes: List<ForcaDoAtributo>) {
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        frentes.forEach { f ->
-            Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    Modifier.fillMaxWidth().height(72.dp).background(CARTAO).border(1.dp, LINHA),
-                    contentAlignment = Alignment.BottomCenter,
-                ) {
-                    val altura = (72 * (f.pct / 100.0)).dp
-                    Box(Modifier.fillMaxWidth().height(altura).background(DADO))
-                }
-                Text(
-                    f.atributo.sigla,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold, color = LINHA,
-                    textAlign = TextAlign.Center,
-                )
-                // Frente sem missão não fica vazia em silêncio: ela diz que
-                // está vazia, porque isso é informação.
-                Text(
-                    if (f.missoes == 0) "—" else "${f.cumpridas}/${f.missoes}",
-                    fontFamily = FontFamily.Monospace, fontSize = 9.sp, color = DADO,
-                )
-            }
+        item {
+            val pct = estado.cobertura["pct_medido"]
+            Text("evidência de aparelho: $pct%".uppercase(),
+                fontFamily = FontFamily.Monospace, fontSize = 10.sp, color = SECUNDARIO)
         }
     }
 }
