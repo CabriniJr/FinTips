@@ -1,7 +1,7 @@
 {
   "name": "fintips",
   "displayName": "FinTips",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Motor financeiro pessoal local: o app guarda, aplica e calcula; o agente investiga, pergunta e registra com proveniência. Extrato -> objetos -> causas -> perfil -> triagem, score, projeção e alavancas.",
   "author": {
     "name": "CabriniJr"

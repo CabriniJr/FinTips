@@ -434,6 +434,11 @@ def avaliar_compra(body: PurchaseIn) -> dict:
         reserva_alvo_meses=float(ctx["baseline"].get("reserva_alvo_meses", 6)),
         perfil=ctx.get("perfil"),
         causas=(ctx.get("causas") or {}).get("itens"),
+        precedentes=st["decisoes"].semelhantes(
+            f"{intent.item} {intent.categoria}", tipo="compra",
+            ligacoes=[f"categoria:{intent.categoria}"],
+        ),
+        aprendizados=(ctx.get("decisoes") or {}).get("aprendizados"),
     )
 
 

@@ -1,0 +1,1370 @@
+{
+  "o_que_e": "projeção de caixa: cenários, consumo da sobra pelos planos e mês da reserva",
+  "gerado_por": "fintips.projection",
+  "inicio_fixo": "2026-06-15",
+  "cenarios": {
+    "base": {
+      "renda": 1.0,
+      "variavel": 1.0
+    },
+    "conservador": {
+      "renda": 0.9,
+      "variavel": 1.15
+    },
+    "otimista": {
+      "renda": 1.05,
+      "variavel": 0.9
+    }
+  },
+  "casos": [
+    {
+      "nome": "sem_planos",
+      "entrada": {
+        "nome": "sem_planos",
+        "cenario": "base",
+        "meses": 6,
+        "baseline": {
+          "renda_media_mes": 5000.0,
+          "despesa_media_mes": 3000.0,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 1200.0,
+        "saldo_conta": 2000.0,
+        "patrimonio": 5000.0,
+        "planos": []
+      },
+      "saida": {
+        "cenario": "base",
+        "premissas": {
+          "renda_mensal": 5000.0,
+          "custo_fixo": 1200.0,
+          "custo_variavel": 1800.0,
+          "sobra_mensal": 2000.0,
+          "fixo_pct_da_renda": 24.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 5000.0,
+            "custo_fixo": 1200.0,
+            "custo_variavel": 1800.0,
+            "sobra": 2000.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 7000.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 5000.0,
+            "custo_fixo": 1200.0,
+            "custo_variavel": 1800.0,
+            "sobra": 2000.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 9000.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 5000.0,
+            "custo_fixo": 1200.0,
+            "custo_variavel": 1800.0,
+            "sobra": 2000.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 11000.0
+          },
+          {
+            "mes": "2026-09",
+            "renda": 5000.0,
+            "custo_fixo": 1200.0,
+            "custo_variavel": 1800.0,
+            "sobra": 2000.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 13000.0
+          },
+          {
+            "mes": "2026-10",
+            "renda": 5000.0,
+            "custo_fixo": 1200.0,
+            "custo_variavel": 1800.0,
+            "sobra": 2000.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 15000.0
+          },
+          {
+            "mes": "2026-11",
+            "renda": 5000.0,
+            "custo_fixo": 1200.0,
+            "custo_variavel": 1800.0,
+            "sobra": 2000.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 17000.0
+          }
+        ],
+        "planos": [],
+        "reserva": {
+          "alvo": 18000.0,
+          "atingida_em": null
+        }
+      }
+    },
+    {
+      "nome": "fator_nao_fecha_em_centavo",
+      "entrada": {
+        "nome": "fator_nao_fecha_em_centavo",
+        "cenario": "conservador",
+        "meses": 12,
+        "baseline": {
+          "renda_media_mes": 3333.33,
+          "despesa_media_mes": 2222.22,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 1111.11,
+        "saldo_conta": 500.0,
+        "patrimonio": 1500.0,
+        "planos": []
+      },
+      "saida": {
+        "cenario": "conservador",
+        "premissas": {
+          "renda_mensal": 3000.0,
+          "custo_fixo": 1111.11,
+          "custo_variavel": 1277.78,
+          "sobra_mensal": 611.11,
+          "fixo_pct_da_renda": 37.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 2111.11
+          },
+          {
+            "mes": "2026-07",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 2722.22
+          },
+          {
+            "mes": "2026-08",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 3333.33
+          },
+          {
+            "mes": "2026-09",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 3944.44
+          },
+          {
+            "mes": "2026-10",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 4555.55
+          },
+          {
+            "mes": "2026-11",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 5166.66
+          },
+          {
+            "mes": "2026-12",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 5777.77
+          },
+          {
+            "mes": "2027-01",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 6388.88
+          },
+          {
+            "mes": "2027-02",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 6999.99
+          },
+          {
+            "mes": "2027-03",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 7611.1
+          },
+          {
+            "mes": "2027-04",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 8222.22
+          },
+          {
+            "mes": "2027-05",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 8833.33
+          }
+        ],
+        "planos": [],
+        "reserva": {
+          "alvo": 14333.32,
+          "atingida_em": null
+        }
+      }
+    },
+    {
+      "nome": "conservador_com_planos",
+      "entrada": {
+        "nome": "conservador_com_planos",
+        "cenario": "conservador",
+        "meses": 12,
+        "baseline": {
+          "renda_media_mes": 6000.0,
+          "despesa_media_mes": 4000.0,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 1500.0,
+        "saldo_conta": 3000.0,
+        "patrimonio": 10000.0,
+        "planos": [
+          {
+            "id": "viagem",
+            "nome": "Viagem",
+            "falta": 8000.0,
+            "prioridade": "alta",
+            "status": "em_andamento",
+            "aporte_planejado_mes": 500.0
+          },
+          {
+            "id": "notebook",
+            "nome": "Notebook",
+            "falta": 4000.0,
+            "prioridade": "baixa",
+            "status": "em_andamento"
+          },
+          {
+            "id": "curso",
+            "nome": "Curso",
+            "falta": 2000.0,
+            "prioridade": "media",
+            "status": "em_andamento",
+            "aporte_planejado_mes": 300.0
+          }
+        ]
+      },
+      "saida": {
+        "cenario": "conservador",
+        "premissas": {
+          "renda_mensal": 5400.0,
+          "custo_fixo": 1500.0,
+          "custo_variavel": 2875.0,
+          "sobra_mensal": 1025.0,
+          "fixo_pct_da_renda": 27.8
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 11025.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 12050.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 13075.0
+          },
+          {
+            "mes": "2026-09",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 14100.0
+          },
+          {
+            "mes": "2026-10",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 15125.0
+          },
+          {
+            "mes": "2026-11",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 16150.0
+          },
+          {
+            "mes": "2026-12",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 17175.0
+          },
+          {
+            "mes": "2027-01",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 18200.0
+          },
+          {
+            "mes": "2027-02",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 19225.0
+          },
+          {
+            "mes": "2027-03",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 20250.0
+          },
+          {
+            "mes": "2027-04",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 1025.0,
+            "patrimonio_projetado": 21275.0
+          },
+          {
+            "mes": "2027-05",
+            "renda": 5400.0,
+            "custo_fixo": 1500.0,
+            "custo_variavel": 2875.0,
+            "sobra": 1025.0,
+            "aportes_em_planos": 725.0,
+            "patrimonio_projetado": 22300.0
+          }
+        ],
+        "planos": [
+          {
+            "id": "viagem",
+            "nome": "Viagem",
+            "falta_ao_fim": 2000.0,
+            "conclui_em": null
+          },
+          {
+            "id": "curso",
+            "nome": "Curso",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2026-12"
+          },
+          {
+            "id": "notebook",
+            "nome": "Notebook",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2027-05"
+          }
+        ],
+        "reserva": {
+          "alvo": 26250.0,
+          "atingida_em": null
+        }
+      }
+    },
+    {
+      "nome": "otimista",
+      "entrada": {
+        "nome": "otimista",
+        "cenario": "otimista",
+        "meses": 12,
+        "baseline": {
+          "renda_media_mes": 4500.0,
+          "despesa_media_mes": 3100.0,
+          "reserva_alvo_meses": 3
+        },
+        "fixed_monthly": 900.0,
+        "saldo_conta": 1000.0,
+        "patrimonio": 4000.0,
+        "planos": [
+          {
+            "id": "reforma",
+            "nome": "Reforma",
+            "falta": 15000.0,
+            "prioridade": "alta",
+            "status": "em_andamento"
+          }
+        ]
+      },
+      "saida": {
+        "cenario": "otimista",
+        "premissas": {
+          "renda_mensal": 4725.0,
+          "custo_fixo": 900.0,
+          "custo_variavel": 1980.0,
+          "sobra_mensal": 1845.0,
+          "fixo_pct_da_renda": 19.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 5845.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 7690.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 9535.0
+          },
+          {
+            "mes": "2026-09",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 11380.0
+          },
+          {
+            "mes": "2026-10",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 13225.0
+          },
+          {
+            "mes": "2026-11",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 15070.0
+          },
+          {
+            "mes": "2026-12",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 16915.0
+          },
+          {
+            "mes": "2027-01",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 1845.0,
+            "patrimonio_projetado": 18760.0
+          },
+          {
+            "mes": "2027-02",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 240.0,
+            "patrimonio_projetado": 20605.0
+          },
+          {
+            "mes": "2027-03",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 22450.0
+          },
+          {
+            "mes": "2027-04",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 24295.0
+          },
+          {
+            "mes": "2027-05",
+            "renda": 4725.0,
+            "custo_fixo": 900.0,
+            "custo_variavel": 1980.0,
+            "sobra": 1845.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 26140.0
+          }
+        ],
+        "planos": [
+          {
+            "id": "reforma",
+            "nome": "Reforma",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2027-02"
+          }
+        ],
+        "reserva": {
+          "alvo": 8640.0,
+          "atingida_em": "2026-08"
+        }
+      }
+    },
+    {
+      "nome": "sobra_negativa",
+      "entrada": {
+        "nome": "sobra_negativa",
+        "cenario": "base",
+        "meses": 12,
+        "baseline": {
+          "renda_media_mes": 2500.0,
+          "despesa_media_mes": 3200.0,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 2000.0,
+        "saldo_conta": 4000.0,
+        "patrimonio": 6000.0,
+        "planos": [
+          {
+            "id": "divida",
+            "nome": "Quitar dívida",
+            "falta": 3000.0,
+            "prioridade": "alta",
+            "status": "em_andamento"
+          }
+        ]
+      },
+      "saida": {
+        "cenario": "base",
+        "premissas": {
+          "renda_mensal": 2500.0,
+          "custo_fixo": 2000.0,
+          "custo_variavel": 1200.0,
+          "sobra_mensal": -700.0,
+          "fixo_pct_da_renda": 80.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 5300.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 4600.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 3900.0
+          },
+          {
+            "mes": "2026-09",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 3200.0
+          },
+          {
+            "mes": "2026-10",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 2500.0
+          },
+          {
+            "mes": "2026-11",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 1800.0
+          },
+          {
+            "mes": "2026-12",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 1100.0
+          },
+          {
+            "mes": "2027-01",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 400.0
+          },
+          {
+            "mes": "2027-02",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": -300.0
+          },
+          {
+            "mes": "2027-03",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": -1000.0
+          },
+          {
+            "mes": "2027-04",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": -1700.0
+          },
+          {
+            "mes": "2027-05",
+            "renda": 2500.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1200.0,
+            "sobra": -700.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": -2400.0
+          }
+        ],
+        "planos": [
+          {
+            "id": "divida",
+            "nome": "Quitar dívida",
+            "falta_ao_fim": 3000.0,
+            "conclui_em": null
+          }
+        ],
+        "reserva": {
+          "alvo": 19200.0,
+          "atingida_em": null
+        }
+      }
+    },
+    {
+      "nome": "fixo_maior_que_despesa",
+      "entrada": {
+        "nome": "fixo_maior_que_despesa",
+        "cenario": "base",
+        "meses": 4,
+        "baseline": {
+          "renda_media_mes": 5000.0,
+          "despesa_media_mes": 1000.0,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 1800.0,
+        "saldo_conta": 1000.0,
+        "patrimonio": 2000.0,
+        "planos": [
+          {
+            "id": "feito",
+            "nome": "Já concluído",
+            "falta": 0.0,
+            "prioridade": "alta",
+            "status": "concluido"
+          },
+          {
+            "id": "aberto",
+            "nome": "Em aberto",
+            "falta": 1200.0,
+            "prioridade": "media",
+            "status": "em_andamento"
+          }
+        ]
+      },
+      "saida": {
+        "cenario": "base",
+        "premissas": {
+          "renda_mensal": 5000.0,
+          "custo_fixo": 1800.0,
+          "custo_variavel": 0.0,
+          "sobra_mensal": 3200.0,
+          "fixo_pct_da_renda": 36.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 5000.0,
+            "custo_fixo": 1800.0,
+            "custo_variavel": 0.0,
+            "sobra": 3200.0,
+            "aportes_em_planos": 1200.0,
+            "patrimonio_projetado": 5200.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 5000.0,
+            "custo_fixo": 1800.0,
+            "custo_variavel": 0.0,
+            "sobra": 3200.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 8400.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 5000.0,
+            "custo_fixo": 1800.0,
+            "custo_variavel": 0.0,
+            "sobra": 3200.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 11600.0
+          },
+          {
+            "mes": "2026-09",
+            "renda": 5000.0,
+            "custo_fixo": 1800.0,
+            "custo_variavel": 0.0,
+            "sobra": 3200.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 14800.0
+          }
+        ],
+        "planos": [
+          {
+            "id": "aberto",
+            "nome": "Em aberto",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2026-06"
+          }
+        ],
+        "reserva": {
+          "alvo": 10800.0,
+          "atingida_em": "2026-08"
+        }
+      }
+    },
+    {
+      "nome": "renda_zero",
+      "entrada": {
+        "nome": "renda_zero",
+        "cenario": "base",
+        "meses": 3,
+        "baseline": {
+          "renda_media_mes": 0.0,
+          "despesa_media_mes": 800.0,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 500.0,
+        "saldo_conta": 900.0,
+        "patrimonio": 900.0,
+        "planos": []
+      },
+      "saida": {
+        "cenario": "base",
+        "premissas": {
+          "renda_mensal": 0.0,
+          "custo_fixo": 500.0,
+          "custo_variavel": 300.0,
+          "sobra_mensal": -800.0,
+          "fixo_pct_da_renda": 0.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 0.0,
+            "custo_fixo": 500.0,
+            "custo_variavel": 300.0,
+            "sobra": -800.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 100.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 0.0,
+            "custo_fixo": 500.0,
+            "custo_variavel": 300.0,
+            "sobra": -800.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": -700.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 0.0,
+            "custo_fixo": 500.0,
+            "custo_variavel": 300.0,
+            "sobra": -800.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": -1500.0
+          }
+        ],
+        "planos": [],
+        "reserva": {
+          "alvo": 4800.0,
+          "atingida_em": null
+        }
+      }
+    },
+    {
+      "nome": "resto_de_plano_com_mais_de_duas_casas",
+      "entrada": {
+        "nome": "resto_de_plano_com_mais_de_duas_casas",
+        "cenario": "conservador",
+        "meses": 12,
+        "baseline": {
+          "renda_media_mes": 3333.33,
+          "despesa_media_mes": 2222.22,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 1111.11,
+        "saldo_conta": 0.0,
+        "patrimonio": 0.0,
+        "planos": [
+          {
+            "id": "longo",
+            "nome": "Plano longo",
+            "falta": 10000.0,
+            "prioridade": "alta",
+            "status": "em_andamento"
+          }
+        ]
+      },
+      "saida": {
+        "cenario": "conservador",
+        "premissas": {
+          "renda_mensal": 3000.0,
+          "custo_fixo": 1111.11,
+          "custo_variavel": 1277.78,
+          "sobra_mensal": 611.11,
+          "fixo_pct_da_renda": 37.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 611.11
+          },
+          {
+            "mes": "2026-07",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 1222.22
+          },
+          {
+            "mes": "2026-08",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 1833.33
+          },
+          {
+            "mes": "2026-09",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 2444.44
+          },
+          {
+            "mes": "2026-10",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 3055.55
+          },
+          {
+            "mes": "2026-11",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 3666.66
+          },
+          {
+            "mes": "2026-12",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 4277.77
+          },
+          {
+            "mes": "2027-01",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 4888.88
+          },
+          {
+            "mes": "2027-02",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 5499.99
+          },
+          {
+            "mes": "2027-03",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 6111.1
+          },
+          {
+            "mes": "2027-04",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 6722.22
+          },
+          {
+            "mes": "2027-05",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.78,
+            "sobra": 611.11,
+            "aportes_em_planos": 611.11,
+            "patrimonio_projetado": 7333.33
+          }
+        ],
+        "planos": [
+          {
+            "id": "longo",
+            "nome": "Plano longo",
+            "falta_ao_fim": 2666.674,
+            "conclui_em": null
+          }
+        ],
+        "reserva": {
+          "alvo": 14333.32,
+          "atingida_em": null
+        }
+      }
+    },
+    {
+      "nome": "reserva_no_fio_do_sub_centavo",
+      "entrada": {
+        "nome": "reserva_no_fio_do_sub_centavo",
+        "cenario": "conservador",
+        "meses": 4,
+        "baseline": {
+          "renda_media_mes": 3333.33,
+          "despesa_media_mes": 2222.27,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 1111.11,
+        "saldo_conta": 0.0,
+        "patrimonio": 13722.61,
+        "planos": []
+      },
+      "saida": {
+        "cenario": "conservador",
+        "premissas": {
+          "renda_mensal": 3000.0,
+          "custo_fixo": 1111.11,
+          "custo_variavel": 1277.83,
+          "sobra_mensal": 611.05,
+          "fixo_pct_da_renda": 37.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.83,
+            "sobra": 611.05,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 14333.66
+          },
+          {
+            "mes": "2026-07",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.83,
+            "sobra": 611.05,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 14944.72
+          },
+          {
+            "mes": "2026-08",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.83,
+            "sobra": 611.05,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 15555.77
+          },
+          {
+            "mes": "2026-09",
+            "renda": 3000.0,
+            "custo_fixo": 1111.11,
+            "custo_variavel": 1277.83,
+            "sobra": 611.05,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 16166.82
+          }
+        ],
+        "planos": [],
+        "reserva": {
+          "alvo": 14333.66,
+          "atingida_em": "2026-07"
+        }
+      }
+    },
+    {
+      "nome": "cenario_desconhecido",
+      "entrada": {
+        "nome": "cenario_desconhecido",
+        "cenario": "inventado",
+        "meses": 3,
+        "baseline": {
+          "renda_media_mes": 4000.0,
+          "despesa_media_mes": 2500.0,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 1000.0,
+        "saldo_conta": 1000.0,
+        "patrimonio": 1000.0,
+        "planos": []
+      },
+      "saida": {
+        "cenario": "inventado",
+        "premissas": {
+          "renda_mensal": 4000.0,
+          "custo_fixo": 1000.0,
+          "custo_variavel": 1500.0,
+          "sobra_mensal": 1500.0,
+          "fixo_pct_da_renda": 25.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 4000.0,
+            "custo_fixo": 1000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 2500.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 4000.0,
+            "custo_fixo": 1000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 4000.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 4000.0,
+            "custo_fixo": 1000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 5500.0
+          }
+        ],
+        "planos": [],
+        "reserva": {
+          "alvo": 15000.0,
+          "atingida_em": null
+        }
+      }
+    },
+    {
+      "nome": "prioridade_ordena_e_empate_mantem_ordem",
+      "entrada": {
+        "nome": "prioridade_ordena_e_empate_mantem_ordem",
+        "cenario": "base",
+        "meses": 8,
+        "baseline": {
+          "renda_media_mes": 5000.0,
+          "despesa_media_mes": 3500.0,
+          "reserva_alvo_meses": 6
+        },
+        "fixed_monthly": 2000.0,
+        "saldo_conta": 0.0,
+        "patrimonio": 0.0,
+        "planos": [
+          {
+            "id": "b_baixa",
+            "nome": "Baixa",
+            "falta": 2000.0,
+            "prioridade": "baixa",
+            "status": "em_andamento"
+          },
+          {
+            "id": "m1",
+            "nome": "Média primeira",
+            "falta": 1000.0,
+            "prioridade": "media",
+            "status": "em_andamento"
+          },
+          {
+            "id": "m2",
+            "nome": "Média segunda",
+            "falta": 1000.0,
+            "prioridade": "media",
+            "status": "em_andamento"
+          },
+          {
+            "id": "a_alta",
+            "nome": "Alta",
+            "falta": 3000.0,
+            "prioridade": "alta",
+            "status": "em_andamento"
+          }
+        ]
+      },
+      "saida": {
+        "cenario": "base",
+        "premissas": {
+          "renda_mensal": 5000.0,
+          "custo_fixo": 2000.0,
+          "custo_variavel": 1500.0,
+          "sobra_mensal": 1500.0,
+          "fixo_pct_da_renda": 40.0
+        },
+        "linhas": [
+          {
+            "mes": "2026-06",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 1500.0,
+            "patrimonio_projetado": 1500.0
+          },
+          {
+            "mes": "2026-07",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 1500.0,
+            "patrimonio_projetado": 3000.0
+          },
+          {
+            "mes": "2026-08",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 1500.0,
+            "patrimonio_projetado": 4500.0
+          },
+          {
+            "mes": "2026-09",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 1500.0,
+            "patrimonio_projetado": 6000.0
+          },
+          {
+            "mes": "2026-10",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 1000.0,
+            "patrimonio_projetado": 7500.0
+          },
+          {
+            "mes": "2026-11",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 9000.0
+          },
+          {
+            "mes": "2026-12",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 10500.0
+          },
+          {
+            "mes": "2027-01",
+            "renda": 5000.0,
+            "custo_fixo": 2000.0,
+            "custo_variavel": 1500.0,
+            "sobra": 1500.0,
+            "aportes_em_planos": 0.0,
+            "patrimonio_projetado": 12000.0
+          }
+        ],
+        "planos": [
+          {
+            "id": "a_alta",
+            "nome": "Alta",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2026-07"
+          },
+          {
+            "id": "m1",
+            "nome": "Média primeira",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2026-08"
+          },
+          {
+            "id": "m2",
+            "nome": "Média segunda",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2026-09"
+          },
+          {
+            "id": "b_baixa",
+            "nome": "Baixa",
+            "falta_ao_fim": 0.0,
+            "conclui_em": "2026-10"
+          }
+        ],
+        "reserva": {
+          "alvo": 21000.0,
+          "atingida_em": null
+        }
+      }
+    }
+  ],
+  "virada_de_ano": {
+    "inicio": "2026-11-30",
+    "meses": [
+      "2026-11",
+      "2026-12",
+      "2027-01",
+      "2027-02",
+      "2027-03",
+      "2027-04",
+      "2027-05",
+      "2027-06",
+      "2027-07",
+      "2027-08",
+      "2027-09",
+      "2027-10",
+      "2027-11",
+      "2027-12"
+    ]
+  }
+}

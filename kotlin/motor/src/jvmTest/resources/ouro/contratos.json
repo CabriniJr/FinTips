@@ -33,6 +33,86 @@
     "automatizar",
     "observar"
   ],
+  "status_decisao": [
+    "aberta",
+    "decidida",
+    "revisada",
+    "substituida"
+  ],
+  "tipos_decisao": [
+    "troca",
+    "compra",
+    "contrato",
+    "divida",
+    "investimento",
+    "renda",
+    "moradia",
+    "outro"
+  ],
+  "vereditos": [
+    "funcionou",
+    "arrependi",
+    "indiferente",
+    "cedo_para_saber"
+  ],
+  "custo_de_alternativa": [
+    {
+      "nome": "consertar",
+      "custo": 700.0,
+      "custo_mensal": 0.0,
+      "horizonte_meses": 8,
+      "custo_no_horizonte": 700.0,
+      "custo_por_mes_de_uso": 87.5
+    },
+    {
+      "nome": "comprar novo",
+      "custo": 2500.0,
+      "custo_mensal": 0.0,
+      "horizonte_meses": 36,
+      "custo_no_horizonte": 2500.0,
+      "custo_por_mes_de_uso": 69.44
+    },
+    {
+      "nome": "com plano",
+      "custo": 0.0,
+      "custo_mensal": 90.0,
+      "horizonte_meses": 36,
+      "custo_no_horizonte": 3240.0,
+      "custo_por_mes_de_uso": 90.0
+    },
+    {
+      "nome": "sem horizonte",
+      "custo": 700.0,
+      "custo_mensal": 0.0,
+      "horizonte_meses": null,
+      "custo_no_horizonte": null,
+      "custo_por_mes_de_uso": null
+    },
+    {
+      "nome": "horizonte zero",
+      "custo": 700.0,
+      "custo_mensal": 0.0,
+      "horizonte_meses": 0,
+      "custo_no_horizonte": 700.0,
+      "custo_por_mes_de_uso": null
+    },
+    {
+      "nome": "empate de arredondamento",
+      "custo": 100.0,
+      "custo_mensal": 0.0,
+      "horizonte_meses": 3,
+      "custo_no_horizonte": 100.0,
+      "custo_por_mes_de_uso": 33.33
+    },
+    {
+      "nome": "centavo",
+      "custo": 0.01,
+      "custo_mensal": 0.0,
+      "horizonte_meses": 3,
+      "custo_no_horizonte": 0.01,
+      "custo_por_mes_de_uso": 0.0
+    }
+  ],
   "ids": [
     {
       "prefixo": "causa",
@@ -441,6 +521,66 @@
       "prioridade": 45.0
     },
     {
+      "tipo": "decisao_aberta",
+      "impacto_mensal": 100.0,
+      "prioridade": 150.0
+    },
+    {
+      "tipo": "decisao_aberta",
+      "impacto_mensal": 33.33,
+      "prioridade": 49.99
+    },
+    {
+      "tipo": "decisao_aberta",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "decisao_aberta",
+      "impacto_mensal": -50.0,
+      "prioridade": 75.0
+    },
+    {
+      "tipo": "decisao_a_revisar",
+      "impacto_mensal": 100.0,
+      "prioridade": 100.0
+    },
+    {
+      "tipo": "decisao_a_revisar",
+      "impacto_mensal": 33.33,
+      "prioridade": 33.33
+    },
+    {
+      "tipo": "decisao_a_revisar",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "decisao_a_revisar",
+      "impacto_mensal": -50.0,
+      "prioridade": 50.0
+    },
+    {
+      "tipo": "decisao_sem_desfecho",
+      "impacto_mensal": 100.0,
+      "prioridade": 70.0
+    },
+    {
+      "tipo": "decisao_sem_desfecho",
+      "impacto_mensal": 33.33,
+      "prioridade": 23.33
+    },
+    {
+      "tipo": "decisao_sem_desfecho",
+      "impacto_mensal": 0.0,
+      "prioridade": 0.0
+    },
+    {
+      "tipo": "decisao_sem_desfecho",
+      "impacto_mensal": -50.0,
+      "prioridade": 35.0
+    },
+    {
       "tipo": "tipo_que_nao_existe",
       "impacto_mensal": 100.0,
       "prioridade": 100.0
@@ -490,6 +630,72 @@
       "revisar_em": "2027-01-01",
       "vencida": false,
       "criado_em": "2026-06-15T10:30:00",
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa afirmou",
+        "evidencia": [
+          "tx-1",
+          "tx-2"
+        ],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    },
+    "decisao": {
+      "id": "dec-abc",
+      "titulo": "Celular quebrou",
+      "situacao": "caiu na terça, tela e carregamento",
+      "pergunta": "consertar, trocar ou aguentar?",
+      "tipo": "troca",
+      "alternativas": [
+        {
+          "nome": "consertar",
+          "custo": 700.0,
+          "custo_mensal": 0.0,
+          "horizonte_meses": 8,
+          "custo_no_horizonte": 700.0,
+          "custo_por_mes_de_uso": 87.5,
+          "consequencia": "volta a funcionar, sem garantia de placa",
+          "risco": "",
+          "descartada_porque": "assistência não cobre a placa"
+        },
+        {
+          "nome": "comprar novo",
+          "custo": 2500.0,
+          "custo_mensal": 0.0,
+          "horizonte_meses": 36,
+          "custo_no_horizonte": 2500.0,
+          "custo_por_mes_de_uso": 69.44,
+          "consequencia": "resolve por três anos",
+          "risco": "",
+          "descartada_porque": ""
+        }
+      ],
+      "escolhida": "comprar novo",
+      "porque": "o conserto não cobria o que quebrou",
+      "status": "revisada",
+      "ligacoes": [
+        "categoria:eletronicos"
+      ],
+      "instantaneo": {
+        "em": "2026-06-15",
+        "sobra_media_mes": 4963.1,
+        "score": 55.0
+      },
+      "desfecho": {
+        "veredito": "funcionou",
+        "nota": "durou",
+        "custo_real": 2480.0,
+        "em": "2026-06-15T10:30:00"
+      },
+      "substitui": null,
+      "substituida_por": null,
+      "revisar_em": "2027-01-01",
+      "vencida": false,
+      "custo_da_escolha": 2500.0,
+      "criado_em": "2026-06-15T10:30:00",
+      "decidido_em": "2026-06-15T10:30:00",
       "proveniencia": {
         "origem": "usuario",
         "confianca": 1.0,

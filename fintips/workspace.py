@@ -88,6 +88,8 @@ class Workspace:
     @property
     def causas_path(self) -> Path: return self.data / "causas.yaml"
     @property
+    def decisoes_path(self) -> Path: return self.data / "decisoes.yaml"
+    @property
     def custos_fixos_path(self) -> Path: return self.data / "custos-fixos.yaml"
     @property
     def triagem_path(self) -> Path: return self.data / "triagem.yaml"

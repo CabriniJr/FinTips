@@ -20,7 +20,7 @@ import kotlinx.datetime.LocalDate
  * proveniência**.
  */
 
-const val VERSAO_CONTRATOS = 2   // 2: entra o contrato Causa
+const val VERSAO_CONTRATOS = 3   // 3: entram Decisao e Alternativa
 
 /**
  * Quem decidiu, em ordem de autoridade crescente.
@@ -385,29 +385,218 @@ data class ItemDeTriagem(
             "causa_ausente" to 1.1,
             "causa_a_revisar" to 1.0,
             "causa_sem_atitude" to 0.9,
+            "decisao_aberta" to 1.5,
+            "decisao_a_revisar" to 1.0,
+            "decisao_sem_desfecho" to 0.7,
         )
     }
 }
 
-/**
- * Arredondamento meio-para-o-par sobre Double, como o `round()` do Python.
- *
- * O `Math.round` da JVM arredonda meio-para-cima e divergiria: o Python 3 usa
- * meio-para-o-par em `round()`, e o valor aparece no arquivo gravado.
- */
-internal fun arredondar(valor: Double, casas: Int): Double {
-    if (valor.isNaN() || valor.isInfinite()) return valor
-    var fator = 1.0
-    repeat(casas) { fator *= 10 }
-    val escalado = valor * fator
-    val inteiro = kotlin.math.floor(escalado)
-    val resto = escalado - inteiro
-    val arredondado = when {
-        resto > 0.5 -> inteiro + 1
-        resto < 0.5 -> inteiro
-        // empate exato: vai para o par
-        inteiro.toLong() % 2L == 0L -> inteiro
-        else -> inteiro + 1
+/** Em que pé está uma decisão. */
+enum class StatusDecisao(val chave: String) {
+    /** A pergunta existe, a resposta ainda não. */
+    ABERTA("aberta"),
+    /** Escolheu-se uma alternativa, e está valendo. */
+    DECIDIDA("decidida"),
+    /** O desfecho foi registrado: sabe-se no que deu. */
+    REVISADA("revisada"),
+    /** Outra decisão tomou o lugar desta — mas ela continua no histórico. */
+    SUBSTITUIDA("substituida");
+
+    companion object {
+        fun de(chave: String): StatusDecisao? = entries.firstOrNull { it.chave == chave }
     }
-    return arredondado / fator
 }
+
+/**
+ * O que se aprendeu depois.
+ *
+ * `CEDO_PARA_SABER` existe para a pessoa não ser forçada a inventar um veredito
+ * antes da hora: a decisão volta para a fila em vez de virar aprendizado falso.
+ */
+enum class Veredito(val chave: String) {
+    FUNCIONOU("funcionou"),
+    ARREPENDI("arrependi"),
+    INDIFERENTE("indiferente"),
+    CEDO_PARA_SABER("cedo_para_saber");
+
+    companion object {
+        fun de(chave: String): Veredito? = entries.firstOrNull { it.chave == chave }
+    }
+}
+
+/**
+ * Que pergunta a decisão responde. Fechada, ao contrário das naturezas de
+ * causa, porque o histórico agrupa por ela: "como eu costumo decidir troca de
+ * equipamento" é respondível; "como eu costumo decidir coisas" não é.
+ */
+enum class TipoDecisao(val chave: String) {
+    TROCA("troca"),
+    COMPRA("compra"),
+    CONTRATO("contrato"),
+    DIVIDA("divida"),
+    INVESTIMENTO("investimento"),
+    RENDA("renda"),
+    MORADIA("moradia"),
+    OUTRO("outro");
+
+    companion object {
+        fun de(chave: String): TipoDecisao = entries.firstOrNull { it.chave == chave } ?: OUTRO
+    }
+}
+
+/**
+ * Um caminho considerado — inclusive os que não foram escolhidos.
+ *
+ * Guardar o descartado é metade do valor do registro: daqui a um ano,
+ * "comprei um celular novo" não informa nada, e "descartei o conserto porque a
+ * assistência não cobria a placa" evita reabrir a investigação inteira.
+ *
+ * Os dois derivados são a conta que decide a maioria das trocas e que ninguém
+ * faz de cabeça: R$ 700 que duram 8 meses custam mais por mês do que R$ 2.500
+ * que duram 36.
+ *
+ * Note o `horizonteMeses == 0`: o Python devolve `None` ali porque o `if not
+ * self.horizonte_meses` pega o zero junto com o nulo. A porta replica isso em
+ * vez de "consertar" para uma divisão por zero protegida — corrigir aqui faria
+ * o motor Kotlin devolver um número onde o Python devolve nada, e a diferença
+ * apareceria meses depois num campo vazio no app.
+ */
+data class Alternativa(
+    val nome: String,
+    val custo: Double = 0.0,
+    val custoMensal: Double = 0.0,
+    val horizonteMeses: Int? = null,
+    val consequencia: String = "",
+    val risco: String = "",
+    val descartadaPorque: String = "",
+) {
+    val custoNoHorizonte: Double?
+        get() {
+            val h = horizonteMeses ?: return null
+            return arredondar(custo + custoMensal * h, 2)
+        }
+
+    /** A régua que compara alternativas de vida útil diferente. */
+    val custoPorMesDeUso: Double?
+        get() {
+            val total = custoNoHorizonte ?: return null
+            val h = horizonteMeses ?: return null
+            if (h == 0) return null
+            return arredondar(total / h, 2)
+        }
+
+    fun paraMapa(): Map<String, Any?> = linkedMapOf(
+        "nome" to nome,
+        "custo" to arredondar(custo, 2),
+        "custo_mensal" to arredondar(custoMensal, 2),
+        "horizonte_meses" to horizonteMeses,
+        "custo_no_horizonte" to custoNoHorizonte,
+        "custo_por_mes_de_uso" to custoPorMesDeUso,
+        "consequencia" to consequencia,
+        "risco" to risco,
+        "descartada_porque" to descartadaPorque,
+    )
+}
+
+/**
+ * Um ADR financeiro: a pergunta, o que se considerou, o que se escolheu,
+ * contra que números, e no que deu.
+ *
+ * A diferença para [Causa] é o tempo. Causa explica um padrão que se repete;
+ * decisão registra uma bifurcação pontual — o celular que quebrou numa terça —
+ * que acontece uma vez e some, justamente antes da próxima igual.
+ *
+ * `instantaneo` é o que torna o registro legível depois: comprar à vista com
+ * quatro meses de reserva é outra decisão que a mesma compra com duas semanas
+ * de caixa. É a única parte que o app preenche sozinho, porque é a única que
+ * ele sabe. Como na causa, aqui não existe detecção: escolha nasce de agente
+ * ou usuário, sempre.
+ */
+data class Decisao(
+    val id: String,
+    val titulo: String,
+    val situacao: String,
+    val pergunta: String,
+    val tipo: TipoDecisao = TipoDecisao.OUTRO,
+    val alternativas: List<Alternativa> = emptyList(),
+    val escolhida: String = "",
+    val porque: String = "",
+    val status: StatusDecisao = StatusDecisao.ABERTA,
+    val ligacoes: List<String> = emptyList(),
+    val instantaneo: Map<String, Any?> = emptyMap(),
+    val desfecho: Map<String, Any?>? = null,
+    val substitui: String? = null,
+    val substituidaPor: String? = null,
+    val revisarEm: String? = null,
+    val proveniencia: Proveniencia = Proveniencia(),
+    val criadoEm: String = "",
+    val decididoEm: String? = null,
+) {
+    val alternativaEscolhida: Alternativa? get() = alternativas.firstOrNull { it.nome == escolhida }
+
+    val custoDaEscolha: Double get() = alternativaEscolhida?.custo ?: 0.0
+
+    /** Só conta como aprendizado o desfecho que já dá para ler. */
+    val aprendeu: Boolean
+        get() {
+            val v = desfecho?.get("veredito") as? String ?: return false
+            return v.isNotEmpty() && v != Veredito.CEDO_PARA_SABER.chave
+        }
+
+    fun vencida(hoje: LocalDate): Boolean {
+        val prazo = revisarEm ?: return false
+        return try {
+            LocalDate.parse(prazo) < hoje
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+
+    fun paraMapa(hoje: LocalDate): Map<String, Any?> = linkedMapOf(
+        "id" to id,
+        "titulo" to titulo,
+        "situacao" to situacao,
+        "pergunta" to pergunta,
+        "tipo" to tipo.chave,
+        "alternativas" to alternativas.map { it.paraMapa() },
+        "escolhida" to escolhida,
+        "porque" to porque,
+        "status" to status.chave,
+        "ligacoes" to ligacoes,
+        "instantaneo" to instantaneo,
+        "desfecho" to desfecho,
+        "substitui" to substitui,
+        "substituida_por" to substituidaPor,
+        "revisar_em" to revisarEm,
+        "vencida" to vencida(hoje),
+        "custo_da_escolha" to custoDaEscolha,
+        "criado_em" to criadoEm,
+        "decidido_em" to decididoEm,
+        "proveniencia" to proveniencia.paraMapa(),
+    )
+}
+
+/**
+ * Arredondamento meio-para-o-par sobre Double, **como o `round()` do Python**.
+ *
+ * A primeira versão disto escalava por 10^casas e decidia o empate no valor
+ * escalado. Funciona quase sempre, e é errado: o Python arredonda o valor
+ * binário **exato** do double, não o produto reescalado. A diferença aparece
+ * quando o erro de representação some na multiplicação —
+ *
+ *     33.33 * 1.5 = 49.99499999999999744...  (o double de verdade)
+ *     python round(…, 2) → 49.99   porque 49.994999… < 49.995
+ *     escalado * 100      → 4999.5 exatos, e o empate vira 50.0
+ *
+ * — e foi assim que o harness pegou: um peso novo na fila de triagem caiu
+ * justamente num desses valores. O mesmo vale para o caso clássico
+ * `round(2.675, 2)`, que em Python dá 2.67 porque 2.675 é, por baixo,
+ * 2.67499999999999982...
+ *
+ * Por isso a função virou `expect`: replicar de verdade exige a expansão
+ * decimal exata do double, que na JVM é `BigDecimal(double)`. Os outros alvos
+ * ganham a sua implementação quando entrarem — e o ouro cobra de cada um.
+ */
+internal expect fun arredondar(valor: Double, casas: Int): Double
+

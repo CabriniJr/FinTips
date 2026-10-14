@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Literal
 
-CONTRACTS_SCHEMA = 2   # 2: entra o contrato Causa
+CONTRACTS_SCHEMA = 3   # 3: entram os contratos Decisao e Alternativa
 
 # Quem decidiu. A ordem é de autoridade crescente.
 Origem = Literal["heuristica", "importacao", "agente", "usuario"]
@@ -439,7 +439,8 @@ class ItemDeTriagem:
     tipo: str                        # contraparte_nova | classificacao_fraca |
                                      # candidato_custo_fixo | custo_fixo_derivou |
                                      # fato_ausente | fato_vencido | evento_sem_explicacao |
-                                     # causa_ausente | causa_a_revisar | causa_sem_atitude
+                                     # causa_ausente | causa_a_revisar | causa_sem_atitude |
+                                     # decisao_aberta | decisao_a_revisar | decisao_sem_desfecho
     titulo: str
     impacto_mensal: float            # em reais — é o que ordena a fila
     porque_importa: str              # qual cálculo muda quando isto for resolvido
@@ -459,6 +460,9 @@ class ItemDeTriagem:
             # revisão e decisão pendentes não têm impacto em reais, então não
             # competem por posição na fila — entram pelo peso, não pelo valor.
             "causa_ausente": 1.1, "causa_a_revisar": 1.0, "causa_sem_atitude": 0.9,
+            # decisão em aberto pesa mais que tudo: é a única fila em que a
+            # pessoa está esperando para agir, e não o motor esperando dados.
+            "decisao_aberta": 1.5, "decisao_a_revisar": 1.0, "decisao_sem_desfecho": 0.7,
         }.get(self.tipo, 1.0)
         return round(abs(self.impacto_mensal) * peso_tipo, 2)
 
@@ -501,3 +505,208 @@ def valida_regex(padrao: str) -> str:
     except re.error as e:
         raise ValueError(f"expressão regular inválida: {padrao!r} ({e})") from e
     return padrao
+
+
+# Estados de uma decisão. Fechados porque a triagem e o histórico contam em
+# cima deles: uma decisão aberta cobra conclusão, uma decidida sem desfecho
+# cobra revisão, e uma substituída sai da conta sem sumir do histórico.
+STATUS_DECISAO = (
+    "aberta",         # a pergunta existe, a resposta ainda não
+    "decidida",       # escolheu-se uma alternativa, e está valendo
+    "revisada",       # o desfecho foi registrado: sabe-se no que deu
+    "substituida",    # outra decisão tomou o lugar desta
+)
+
+# O que se aprendeu depois. `cedo_para_saber` é resposta honesta e existe para
+# a pessoa não ser forçada a inventar um veredito antes da hora — a decisão
+# volta para a fila em vez de virar aprendizado falso.
+VEREDITOS = ("funcionou", "arrependi", "indiferente", "cedo_para_saber")
+
+# Que tipo de pergunta esta decisão responde. Lista fechada porque o histórico
+# agrupa por ela: "como eu costumo decidir troca de equipamento" é uma pergunta
+# respondível; "como eu costumo decidir coisas" não é.
+TIPOS_DECISAO = (
+    "troca",          # consertar, substituir, aguentar mais um tempo
+    "compra",         # adquirir algo que não se tinha
+    "contrato",       # assinar, cancelar, trocar de plano
+    "divida",         # antecipar, parcelar, refinanciar
+    "investimento",   # onde colocar dinheiro que sobrou
+    "renda",          # aceitar um trabalho, mudar de arranjo
+    "moradia",        # mudar, renovar, dividir
+    "outro",
+)
+
+
+@dataclass
+class Alternativa:
+    """Um caminho considerado — inclusive os que não foram escolhidos.
+
+    Guardar o que foi descartado é metade do valor de um registro de decisão.
+    Daqui a um ano, "comprei um celular novo" não diz nada; "considerei
+    consertar por R$ 700 e descartei porque a assistência não dava garantia da
+    placa" diz por que a mesma pergunta não deve ser reaberta do zero.
+
+    Os dois cálculos derivados existem porque são a conta que ninguém faz de
+    cabeça e que decide a maioria dos casos de troca: R$ 700 que duram 8 meses
+    custam mais por mês do que R$ 2.500 que duram 36.
+    """
+
+    nome: str
+    custo: float = 0.0                    # desembolso imediato
+    custo_mensal: float = 0.0             # o que ela acrescenta ao custo fixo
+    horizonte_meses: int | None = None    # por quanto tempo resolve o problema
+    consequencia: str = ""                # o que passa a ser verdade se for esta
+    risco: str = ""
+    descartada_porque: str = ""
+
+    @property
+    def custo_no_horizonte(self) -> float | None:
+        if self.horizonte_meses is None:
+            return None
+        return round(float(self.custo) + float(self.custo_mensal) * self.horizonte_meses, 2)
+
+    @property
+    def custo_por_mes_de_uso(self) -> float | None:
+        """A régua que compara alternativas de vida útil diferente."""
+        total = self.custo_no_horizonte
+        if total is None or not self.horizonte_meses:
+            return None
+        return round(total / self.horizonte_meses, 2)
+
+    def to_dict(self) -> dict:
+        return {
+            "nome": self.nome,
+            "custo": round(float(self.custo), 2),
+            "custo_mensal": round(float(self.custo_mensal), 2),
+            "horizonte_meses": self.horizonte_meses,
+            "custo_no_horizonte": self.custo_no_horizonte,
+            "custo_por_mes_de_uso": self.custo_por_mes_de_uso,
+            "consequencia": self.consequencia,
+            "risco": self.risco,
+            "descartada_porque": self.descartada_porque,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Alternativa":
+        return cls(
+            nome=d["nome"],
+            custo=float(d.get("custo", 0) or 0),
+            custo_mensal=float(d.get("custo_mensal", 0) or 0),
+            horizonte_meses=d.get("horizonte_meses"),
+            consequencia=d.get("consequencia", ""),
+            risco=d.get("risco", ""),
+            descartada_porque=d.get("descartada_porque", ""),
+        )
+
+
+@dataclass
+class Decisao:
+    """Um ADR financeiro: a pergunta, o que se considerou, o que se escolheu,
+    contra que números, e no que deu.
+
+    A diferença para `Causa` é o tempo. Causa explica um padrão que se repete
+    ("por que sai R$ 400 de delivery todo mês"). Decisão registra uma
+    bifurcação pontual ("o celular quebrou: consertar ou trocar"), que acontece
+    uma vez e some — e some justamente antes da próxima igual, quando ela seria
+    útil.
+
+    `instantaneo` é o que torna o registro legível depois. Uma escolha não é
+    boa ou ruim em abstrato: comprar à vista com quatro meses de reserva é
+    outra decisão que a mesma compra com duas semanas de caixa. Congelar os
+    números do motor no momento da decisão é o que separa "eu errei" de "as
+    condições eram outras" — e é a única parte deste contrato que o app
+    preenche sozinho, porque é a única que ele sabe.
+
+    `desfecho` fecha o ciclo, e é o que transforma registro em aprendizado: sem
+    ele o histórico é uma lista de coisas que aconteceram, não uma base para
+    decidir a próxima.
+    """
+
+    id: str
+    titulo: str
+    situacao: str                    # o que aconteceu, nas palavras da pessoa
+    pergunta: str                    # o que precisa ser decidido
+    tipo: str = "outro"              # ver TIPOS_DECISAO
+    alternativas: list[Alternativa] = field(default_factory=list)
+    escolhida: str = ""              # nome da alternativa; vazio enquanto aberta
+    porque: str = ""                 # por que essa e não as outras
+    status: str = "aberta"
+    ligacoes: list[str] = field(default_factory=list)   # "categoria:x", "plano:y"
+    instantaneo: dict = field(default_factory=dict)     # números congelados
+    desfecho: dict | None = None
+    substitui: str | None = None
+    substituida_por: str | None = None
+    revisar_em: str | None = None
+    proveniencia: Proveniencia = field(default_factory=Proveniencia)
+    criado_em: str = field(default_factory=agora)
+    decidido_em: str | None = None
+
+    def vencida(self, hoje: date | None = None) -> bool:
+        if not self.revisar_em:
+            return False
+        try:
+            return date.fromisoformat(self.revisar_em) < (hoje or date.today())
+        except ValueError:
+            return False
+
+    @property
+    def alternativa_escolhida(self) -> "Alternativa | None":
+        return next((a for a in self.alternativas if a.nome == self.escolhida), None)
+
+    @property
+    def custo_da_escolha(self) -> float:
+        a = self.alternativa_escolhida
+        return float(a.custo) if a else 0.0
+
+    @property
+    def aprendeu(self) -> bool:
+        """Só conta como aprendizado o desfecho que já dá para ler."""
+        v = (self.desfecho or {}).get("veredito")
+        return bool(v) and v != "cedo_para_saber"
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "titulo": self.titulo,
+            "situacao": self.situacao,
+            "pergunta": self.pergunta,
+            "tipo": self.tipo,
+            "alternativas": [a.to_dict() for a in self.alternativas],
+            "escolhida": self.escolhida,
+            "porque": self.porque,
+            "status": self.status,
+            "ligacoes": self.ligacoes,
+            "instantaneo": self.instantaneo,
+            "desfecho": self.desfecho,
+            "substitui": self.substitui,
+            "substituida_por": self.substituida_por,
+            "revisar_em": self.revisar_em,
+            "vencida": self.vencida(),
+            "custo_da_escolha": self.custo_da_escolha,
+            "criado_em": self.criado_em,
+            "decidido_em": self.decidido_em,
+            "proveniencia": self.proveniencia.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Decisao":
+        return cls(
+            id=d["id"],
+            titulo=d.get("titulo", ""),
+            situacao=d.get("situacao", ""),
+            pergunta=d.get("pergunta", ""),
+            tipo=d.get("tipo", "outro"),
+            alternativas=[Alternativa.from_dict(a) for a in d.get("alternativas") or []],
+            escolhida=d.get("escolhida", ""),
+            porque=d.get("porque", ""),
+            status=d.get("status", "aberta"),
+            ligacoes=list(d.get("ligacoes") or []),
+            instantaneo=d.get("instantaneo") or {},
+            desfecho=d.get("desfecho"),
+            substitui=d.get("substitui"),
+            substituida_por=d.get("substituida_por"),
+            revisar_em=d.get("revisar_em"),
+            criado_em=d.get("criado_em") or agora(),
+            decidido_em=d.get("decidido_em"),
+            proveniencia=Proveniencia.from_dict(d.get("proveniencia")),
+        )

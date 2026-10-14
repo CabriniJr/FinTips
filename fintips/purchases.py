@@ -326,6 +326,8 @@ def evaluate(
     patrimonio: Decimal | float = 0,
     perfil: dict | None = None,
     causas: list[dict] | None = None,
+    precedentes: list[dict] | None = None,
+    aprendizados: dict | None = None,
 ) -> dict:
     saldo = Decimal(str(saldo_conta))
     patr = Decimal(str(patrimonio))
@@ -383,6 +385,7 @@ def evaluate(
             intent, perfil, causas,
             despesa_mes=despesa, saldo_mais_patrimonio=saldo + patr,
         ),
+        "precedentes": precedentes_desta_compra(precedentes, aprendizados, intent),
     }
 
 
@@ -399,3 +402,42 @@ def _best(cen: list[dict], fura_reserva: bool, risco: int) -> str:
     if parcelado and parcelado.get("custo_do_credito", 0) == 0 and a_vista:
         return "parcelado"             # sem juros, mantém liquidez rendendo
     return a_vista["estrategia"] if a_vista else viaveis[0]["estrategia"]
+
+
+def precedentes_desta_compra(
+    precedentes: list[dict] | None,
+    aprendizados: dict | None,
+    intent: PurchaseIntent,
+) -> dict:
+    """O que a pessoa já decidiu em situação parecida, e no que deu.
+
+    Isto não move o veredito, e a omissão é deliberada. Ter se arrependido de
+    uma compra parecida não torna esta errada — pode ter sido outro momento,
+    outro preço, outra necessidade. O que o histórico faz é devolver à conversa
+    a informação que costuma sumir: que a pergunta já foi feita antes, o que
+    se considerou na época, e o que a própria pessoa disse depois sobre a
+    escolha. Quem lê isso e conclui alguma coisa é o agente, com ela junto.
+    """
+    lista = precedentes or []
+    ap = aprendizados or {}
+    por_tipo = (ap.get("por_tipo") or {})
+    taxa = por_tipo.get("compra", {}).get("taxa_arrependimento_pct")
+    arrependidos = [p for p in lista if p.get("deu_em") == "arrependi"]
+
+    return {
+        "decisoes_parecidas": lista,
+        "quantas": len(lista),
+        "arrependimentos_parecidos": len(arrependidos),
+        "taxa_de_arrependimento_em_compras_pct": taxa,
+        "sem_historico": not lista,
+        "o_que_perguntar": (
+            [f"na vez do '{p['titulo']}' você {p['deu_em']}. O que era diferente?"
+             for p in arrependidos[:3]]
+            if arrependidos else
+            ["o que faria esta decisão parecer errada daqui a seis meses?"]
+        ),
+        "nota": (
+            "precedente não é veredito: as condições da época estão em "
+            "`numeros_da_epoca` de cada um, e podem não ser as de hoje"
+        ),
+    }

@@ -1,0 +1,2160 @@
+{
+  "o_que_e": "perfil: formato :g, casamento do catálogo, empate e as recusas de assinatura",
+  "gerado_por": "fintips.profile",
+  "formato_g": [
+    {
+      "valor": 0,
+      "texto": "0"
+    },
+    {
+      "valor": 0.0,
+      "texto": "0"
+    },
+    {
+      "valor": 1,
+      "texto": "1"
+    },
+    {
+      "valor": 100,
+      "texto": "100"
+    },
+    {
+      "valor": 100.0,
+      "texto": "100"
+    },
+    {
+      "valor": 0.9926,
+      "texto": "0.9926"
+    },
+    {
+      "valor": 0.2,
+      "texto": "0.2"
+    },
+    {
+      "valor": 35,
+      "texto": "35"
+    },
+    {
+      "valor": 121.4,
+      "texto": "121.4"
+    },
+    {
+      "valor": 2.5,
+      "texto": "2.5"
+    },
+    {
+      "valor": 0.5,
+      "texto": "0.5"
+    },
+    {
+      "valor": 99.99999,
+      "texto": "100"
+    },
+    {
+      "valor": 0.30000000000000004,
+      "texto": "0.3"
+    },
+    {
+      "valor": -3.75,
+      "texto": "-3.75"
+    },
+    {
+      "valor": 0.0001,
+      "texto": "0.0001"
+    },
+    {
+      "valor": 1e-05,
+      "texto": "1e-05"
+    },
+    {
+      "valor": 1.2e-05,
+      "texto": "1.2e-05"
+    },
+    {
+      "valor": 999999.0,
+      "texto": "999999"
+    },
+    {
+      "valor": 1000000,
+      "texto": "1e+06"
+    },
+    {
+      "valor": 1234567.0,
+      "texto": "1.23457e+06"
+    },
+    {
+      "valor": 12345678,
+      "texto": "1.23457e+07"
+    },
+    {
+      "valor": 0.123456789,
+      "texto": "0.123457"
+    },
+    {
+      "valor": 1.5e-07,
+      "texto": "1.5e-07"
+    },
+    {
+      "valor": 999999.4,
+      "texto": "999999"
+    },
+    {
+      "valor": 999999.5,
+      "texto": "1e+06"
+    },
+    {
+      "valor": 999999.9,
+      "texto": "1e+06"
+    },
+    {
+      "valor": 9.999999e-05,
+      "texto": "0.0001"
+    }
+  ],
+  "catalogo": [
+    {
+      "id": "fase",
+      "nome": "Fase financeira",
+      "o_que_e": "onde a pessoa está entre não fechar o mês e acumular com folga",
+      "minimo": 0.55,
+      "arquetipos": [
+        {
+          "id": "sobrevivencia",
+          "nome": "Sobrevivência",
+          "descricao": "o mês não fecha sozinho, ou fecha raspando",
+          "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+          "eixo": "fase",
+          "sinais": [
+            {
+              "indicador": "taxa_poupanca",
+              "min": null,
+              "max": 0.05,
+              "peso": 3.0
+            },
+            {
+              "indicador": "meses_no_vermelho",
+              "min": 1,
+              "max": null,
+              "peso": 2.0
+            },
+            {
+              "indicador": "meses_de_reserva",
+              "min": null,
+              "max": 1.0,
+              "peso": 2.0
+            }
+          ]
+        },
+        {
+          "id": "equilibrio",
+          "nome": "Equilíbrio sem colchão",
+          "descricao": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+          "o_que_muda": "existe capacidade de aporte, e ela vai toda para a reserva antes de qualquer meta; a projeção deve responder em que mês a reserva fecha",
+          "eixo": "fase",
+          "sinais": [
+            {
+              "indicador": "taxa_poupanca",
+              "min": 0.05,
+              "max": 0.25,
+              "peso": 3.0
+            },
+            {
+              "indicador": "meses_de_reserva",
+              "min": 0.5,
+              "max": 3.0,
+              "peso": 3.0
+            },
+            {
+              "indicador": "meses_no_vermelho",
+              "min": null,
+              "max": 0,
+              "peso": 1.0
+            }
+          ]
+        },
+        {
+          "id": "acumulacao",
+          "nome": "Acumulação",
+          "descricao": "sobra consistente e reserva a caminho de completar",
+          "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+          "eixo": "fase",
+          "sinais": [
+            {
+              "indicador": "taxa_poupanca",
+              "min": 0.2,
+              "max": null,
+              "peso": 3.0
+            },
+            {
+              "indicador": "meses_de_reserva",
+              "min": 2.0,
+              "max": 6.0,
+              "peso": 2.0
+            },
+            {
+              "indicador": "meses_no_vermelho",
+              "min": null,
+              "max": 0,
+              "peso": 1.0
+            }
+          ]
+        },
+        {
+          "id": "consolidacao",
+          "nome": "Consolidação",
+          "descricao": "reserva completa e sobra que excede o que está planejado",
+          "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+          "eixo": "fase",
+          "sinais": [
+            {
+              "indicador": "meses_de_reserva",
+              "min": 6.0,
+              "max": null,
+              "peso": 4.0
+            },
+            {
+              "indicador": "taxa_poupanca",
+              "min": 0.25,
+              "max": null,
+              "peso": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "renda",
+      "nome": "Natureza da renda",
+      "o_que_e": "se o que entra todo mês é previsível",
+      "minimo": 0.55,
+      "arquetipos": [
+        {
+          "id": "fixa",
+          "nome": "Renda fixa",
+          "descricao": "mesma entrada, mesma época, todo mês",
+          "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+          "eixo": "renda",
+          "sinais": [
+            {
+              "indicador": "renda_variacao",
+              "min": null,
+              "max": 0.1,
+              "peso": 3.0
+            },
+            {
+              "indicador": "meses_com_renda_pct",
+              "min": 0.9,
+              "max": null,
+              "peso": 2.0
+            }
+          ]
+        },
+        {
+          "id": "mista",
+          "nome": "Renda mista",
+          "descricao": "uma base previsível mais entradas que variam",
+          "o_que_muda": "só a base previsível deve sustentar compromisso mensal; o excedente variável cabe em aporte pontual, não em parcela",
+          "eixo": "renda",
+          "sinais": [
+            {
+              "indicador": "renda_variacao",
+              "min": 0.1,
+              "max": 0.35,
+              "peso": 3.0
+            },
+            {
+              "indicador": "meses_com_renda_pct",
+              "min": 0.9,
+              "max": null,
+              "peso": 2.0
+            }
+          ]
+        },
+        {
+          "id": "variavel",
+          "nome": "Renda variável",
+          "descricao": "valor e frequência mudam mês a mês",
+          "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+          "eixo": "renda",
+          "sinais": [
+            {
+              "indicador": "renda_variacao",
+              "min": 0.35,
+              "max": null,
+              "peso": 3.0
+            },
+            {
+              "indicador": "meses_com_renda_pct",
+              "min": null,
+              "max": 0.9,
+              "peso": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custo",
+      "nome": "Estrutura de custo",
+      "o_que_e": "quanto da renda já está comprometido antes de qualquer escolha do mês",
+      "minimo": 0.6,
+      "arquetipos": [
+        {
+          "id": "enxuto",
+          "nome": "Custo enxuto",
+          "descricao": "o comprometido ocupa pouco da renda",
+          "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+          "eixo": "custo",
+          "sinais": [
+            {
+              "indicador": "comprometido_pct_renda",
+              "min": null,
+              "max": 35.0,
+              "peso": 4.0
+            }
+          ]
+        },
+        {
+          "id": "carregado",
+          "nome": "Custo carregado",
+          "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+          "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+          "eixo": "custo",
+          "sinais": [
+            {
+              "indicador": "comprometido_pct_renda",
+              "min": 35.0,
+              "max": 60.0,
+              "peso": 4.0
+            }
+          ]
+        },
+        {
+          "id": "sufocado",
+          "nome": "Custo sufocado",
+          "descricao": "o comprometido consome quase tudo o que entra",
+          "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+          "eixo": "custo",
+          "sinais": [
+            {
+              "indicador": "comprometido_pct_renda",
+              "min": 60.0,
+              "max": null,
+              "peso": 4.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "consumo",
+      "nome": "Padrão de consumo",
+      "o_que_e": "se o gasto variável se concentra em poucas decisões ou se espalha em muitas",
+      "minimo": 0.6,
+      "arquetipos": [
+        {
+          "id": "concentrado",
+          "nome": "Consumo concentrado",
+          "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+          "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+          "eixo": "consumo",
+          "sinais": [
+            {
+              "indicador": "concentracao_top3_categorias",
+              "min": 60.0,
+              "max": null,
+              "peso": 2.0
+            },
+            {
+              "indicador": "despesa_em_micro_pct",
+              "min": null,
+              "max": 10.0,
+              "peso": 3.0
+            }
+          ]
+        },
+        {
+          "id": "pulverizado",
+          "nome": "Consumo pulverizado",
+          "descricao": "muitas transações pequenas somam o grosso do mês",
+          "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+          "eixo": "consumo",
+          "sinais": [
+            {
+              "indicador": "despesa_em_micro_pct",
+              "min": 10.0,
+              "max": null,
+              "peso": 3.0
+            },
+            {
+              "indicador": "transacoes_micro_pct",
+              "min": 40.0,
+              "max": null,
+              "peso": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "constancia",
+      "nome": "Constância do gasto",
+      "o_que_e": "se o gasto mensal se repete ou salta de um mês para o outro",
+      "minimo": 0.6,
+      "arquetipos": [
+        {
+          "id": "estavel",
+          "nome": "Gasto estável",
+          "descricao": "os meses se parecem",
+          "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+          "eixo": "constancia",
+          "sinais": [
+            {
+              "indicador": "volatilidade_despesa",
+              "min": null,
+              "max": 0.2,
+              "peso": 4.0
+            }
+          ]
+        },
+        {
+          "id": "oscilante",
+          "nome": "Gasto oscilante",
+          "descricao": "um mês não parece com o outro",
+          "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+          "eixo": "constancia",
+          "sinais": [
+            {
+              "indicador": "volatilidade_despesa",
+              "min": 0.2,
+              "max": null,
+              "peso": 4.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "casamentos": [
+    {
+      "nome": "tudo_ausente",
+      "indicadores": {
+        "taxa_poupanca": null,
+        "meses_de_reserva": null,
+        "meses_no_vermelho": null,
+        "volatilidade_despesa": null,
+        "comprometido_pct_renda": null,
+        "comprometido_pct_despesa": null,
+        "despesa_em_micro_pct": null,
+        "transacoes_micro_pct": null,
+        "concentracao_top3_categorias": null,
+        "renda_variacao": null,
+        "meses_com_renda_pct": null,
+        "meses_observados": null
+      },
+      "eixos": [
+        {
+          "eixo": "fase",
+          "nome": "Fase financeira",
+          "o_que_e": "onde a pessoa está entre não fechar o mês e acumular com folga",
+          "minimo": 0.55,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "sobrevivencia",
+              "nome": "Sobrevivência",
+              "descricao": "o mês não fecha sozinho, ou fecha raspando",
+              "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "taxa_poupanca = sem dado (esperado ≤ 0.05)",
+                "meses_no_vermelho = sem dado (esperado ≥ 1)",
+                "meses_de_reserva = sem dado (esperado ≤ 1)"
+              ]
+            },
+            {
+              "id": "equilibrio",
+              "nome": "Equilíbrio sem colchão",
+              "descricao": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+              "o_que_muda": "existe capacidade de aporte, e ela vai toda para a reserva antes de qualquer meta; a projeção deve responder em que mês a reserva fecha",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "taxa_poupanca = sem dado (esperado entre 0.05 e 0.25)",
+                "meses_de_reserva = sem dado (esperado entre 0.5 e 3)",
+                "meses_no_vermelho = sem dado (esperado ≤ 0)"
+              ]
+            },
+            {
+              "id": "acumulacao",
+              "nome": "Acumulação",
+              "descricao": "sobra consistente e reserva a caminho de completar",
+              "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "taxa_poupanca = sem dado (esperado ≥ 0.2)",
+                "meses_de_reserva = sem dado (esperado entre 2 e 6)",
+                "meses_no_vermelho = sem dado (esperado ≤ 0)"
+              ]
+            },
+            {
+              "id": "consolidacao",
+              "nome": "Consolidação",
+              "descricao": "reserva completa e sobra que excede o que está planejado",
+              "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "meses_de_reserva = sem dado (esperado ≥ 6)",
+                "taxa_poupanca = sem dado (esperado ≥ 0.25)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "renda",
+          "nome": "Natureza da renda",
+          "o_que_e": "se o que entra todo mês é previsível",
+          "minimo": 0.55,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "fixa",
+              "nome": "Renda fixa",
+              "descricao": "mesma entrada, mesma época, todo mês",
+              "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = sem dado (esperado ≤ 0.1)",
+                "meses_com_renda_pct = sem dado (esperado ≥ 0.9)"
+              ]
+            },
+            {
+              "id": "mista",
+              "nome": "Renda mista",
+              "descricao": "uma base previsível mais entradas que variam",
+              "o_que_muda": "só a base previsível deve sustentar compromisso mensal; o excedente variável cabe em aporte pontual, não em parcela",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = sem dado (esperado entre 0.1 e 0.35)",
+                "meses_com_renda_pct = sem dado (esperado ≥ 0.9)"
+              ]
+            },
+            {
+              "id": "variavel",
+              "nome": "Renda variável",
+              "descricao": "valor e frequência mudam mês a mês",
+              "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = sem dado (esperado ≥ 0.35)",
+                "meses_com_renda_pct = sem dado (esperado ≤ 0.9)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "custo",
+          "nome": "Estrutura de custo",
+          "o_que_e": "quanto da renda já está comprometido antes de qualquer escolha do mês",
+          "minimo": 0.6,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "enxuto",
+              "nome": "Custo enxuto",
+              "descricao": "o comprometido ocupa pouco da renda",
+              "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = sem dado (esperado ≤ 35)"
+              ]
+            },
+            {
+              "id": "carregado",
+              "nome": "Custo carregado",
+              "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+              "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = sem dado (esperado entre 35 e 60)"
+              ]
+            },
+            {
+              "id": "sufocado",
+              "nome": "Custo sufocado",
+              "descricao": "o comprometido consome quase tudo o que entra",
+              "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = sem dado (esperado ≥ 60)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "consumo",
+          "nome": "Padrão de consumo",
+          "o_que_e": "se o gasto variável se concentra em poucas decisões ou se espalha em muitas",
+          "minimo": 0.6,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "concentrado",
+              "nome": "Consumo concentrado",
+              "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+              "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "concentracao_top3_categorias = sem dado (esperado ≥ 60)",
+                "despesa_em_micro_pct = sem dado (esperado ≤ 10)"
+              ]
+            },
+            {
+              "id": "pulverizado",
+              "nome": "Consumo pulverizado",
+              "descricao": "muitas transações pequenas somam o grosso do mês",
+              "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "despesa_em_micro_pct = sem dado (esperado ≥ 10)",
+                "transacoes_micro_pct = sem dado (esperado ≥ 40)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "constancia",
+          "nome": "Constância do gasto",
+          "o_que_e": "se o gasto mensal se repete ou salta de um mês para o outro",
+          "minimo": 0.6,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "estavel",
+              "nome": "Gasto estável",
+              "descricao": "os meses se parecem",
+              "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "volatilidade_despesa = sem dado (esperado ≤ 0.2)"
+              ]
+            },
+            {
+              "id": "oscilante",
+              "nome": "Gasto oscilante",
+              "descricao": "um mês não parece com o outro",
+              "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "volatilidade_despesa = sem dado (esperado ≥ 0.2)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        }
+      ]
+    },
+    {
+      "nome": "poupador_disciplinado",
+      "indicadores": {
+        "taxa_poupanca": 0.35,
+        "meses_de_reserva": 8.0,
+        "meses_no_vermelho": 0.0,
+        "volatilidade_despesa": 0.08,
+        "comprometido_pct_renda": 22.0,
+        "comprometido_pct_despesa": null,
+        "despesa_em_micro_pct": 5.0,
+        "transacoes_micro_pct": 20.0,
+        "concentracao_top3_categorias": 55.0,
+        "renda_variacao": 0.02,
+        "meses_com_renda_pct": 1.0,
+        "meses_observados": null
+      },
+      "eixos": [
+        {
+          "eixo": "fase",
+          "nome": "Fase financeira",
+          "o_que_e": "onde a pessoa está entre não fechar o mês e acumular com folga",
+          "minimo": 0.55,
+          "sugerido": {
+            "id": "consolidacao",
+            "nome": "Consolidação",
+            "descricao": "reserva completa e sobra que excede o que está planejado",
+            "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+            "aderencia": 1.0,
+            "evidencia": [
+              "meses_de_reserva = 8 (esperado ≥ 6)",
+              "taxa_poupanca = 0.35 (esperado ≥ 0.25)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "consolidacao",
+              "nome": "Consolidação",
+              "descricao": "reserva completa e sobra que excede o que está planejado",
+              "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+              "aderencia": 1.0,
+              "evidencia": [
+                "meses_de_reserva = 8 (esperado ≥ 6)",
+                "taxa_poupanca = 0.35 (esperado ≥ 0.25)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "acumulacao",
+              "nome": "Acumulação",
+              "descricao": "sobra consistente e reserva a caminho de completar",
+              "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+              "aderencia": 0.67,
+              "evidencia": [
+                "taxa_poupanca = 0.35 (esperado ≥ 0.2)",
+                "meses_no_vermelho = 0 (esperado ≤ 0)"
+              ],
+              "contra": [
+                "meses_de_reserva = 8 (esperado entre 2 e 6)"
+              ]
+            },
+            {
+              "id": "equilibrio",
+              "nome": "Equilíbrio sem colchão",
+              "descricao": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+              "o_que_muda": "existe capacidade de aporte, e ela vai toda para a reserva antes de qualquer meta; a projeção deve responder em que mês a reserva fecha",
+              "aderencia": 0.14,
+              "evidencia": [
+                "meses_no_vermelho = 0 (esperado ≤ 0)"
+              ],
+              "contra": [
+                "taxa_poupanca = 0.35 (esperado entre 0.05 e 0.25)",
+                "meses_de_reserva = 8 (esperado entre 0.5 e 3)"
+              ]
+            },
+            {
+              "id": "sobrevivencia",
+              "nome": "Sobrevivência",
+              "descricao": "o mês não fecha sozinho, ou fecha raspando",
+              "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "taxa_poupanca = 0.35 (esperado ≤ 0.05)",
+                "meses_no_vermelho = 0 (esperado ≥ 1)",
+                "meses_de_reserva = 8 (esperado ≤ 1)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "renda",
+          "nome": "Natureza da renda",
+          "o_que_e": "se o que entra todo mês é previsível",
+          "minimo": 0.55,
+          "sugerido": {
+            "id": "fixa",
+            "nome": "Renda fixa",
+            "descricao": "mesma entrada, mesma época, todo mês",
+            "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+            "aderencia": 1.0,
+            "evidencia": [
+              "renda_variacao = 0.02 (esperado ≤ 0.1)",
+              "meses_com_renda_pct = 1 (esperado ≥ 0.9)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "fixa",
+              "nome": "Renda fixa",
+              "descricao": "mesma entrada, mesma época, todo mês",
+              "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+              "aderencia": 1.0,
+              "evidencia": [
+                "renda_variacao = 0.02 (esperado ≤ 0.1)",
+                "meses_com_renda_pct = 1 (esperado ≥ 0.9)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "mista",
+              "nome": "Renda mista",
+              "descricao": "uma base previsível mais entradas que variam",
+              "o_que_muda": "só a base previsível deve sustentar compromisso mensal; o excedente variável cabe em aporte pontual, não em parcela",
+              "aderencia": 0.4,
+              "evidencia": [
+                "meses_com_renda_pct = 1 (esperado ≥ 0.9)"
+              ],
+              "contra": [
+                "renda_variacao = 0.02 (esperado entre 0.1 e 0.35)"
+              ]
+            },
+            {
+              "id": "variavel",
+              "nome": "Renda variável",
+              "descricao": "valor e frequência mudam mês a mês",
+              "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = 0.02 (esperado ≥ 0.35)",
+                "meses_com_renda_pct = 1 (esperado ≤ 0.9)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "custo",
+          "nome": "Estrutura de custo",
+          "o_que_e": "quanto da renda já está comprometido antes de qualquer escolha do mês",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "enxuto",
+            "nome": "Custo enxuto",
+            "descricao": "o comprometido ocupa pouco da renda",
+            "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+            "aderencia": 1.0,
+            "evidencia": [
+              "comprometido_pct_renda = 22 (esperado ≤ 35)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "enxuto",
+              "nome": "Custo enxuto",
+              "descricao": "o comprometido ocupa pouco da renda",
+              "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+              "aderencia": 1.0,
+              "evidencia": [
+                "comprometido_pct_renda = 22 (esperado ≤ 35)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "carregado",
+              "nome": "Custo carregado",
+              "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+              "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 22 (esperado entre 35 e 60)"
+              ]
+            },
+            {
+              "id": "sufocado",
+              "nome": "Custo sufocado",
+              "descricao": "o comprometido consome quase tudo o que entra",
+              "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 22 (esperado ≥ 60)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "consumo",
+          "nome": "Padrão de consumo",
+          "o_que_e": "se o gasto variável se concentra em poucas decisões ou se espalha em muitas",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "concentrado",
+            "nome": "Consumo concentrado",
+            "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+            "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+            "aderencia": 0.6,
+            "evidencia": [
+              "despesa_em_micro_pct = 5 (esperado ≤ 10)"
+            ],
+            "contra": [
+              "concentracao_top3_categorias = 55 (esperado ≥ 60)"
+            ]
+          },
+          "candidatos": [
+            {
+              "id": "concentrado",
+              "nome": "Consumo concentrado",
+              "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+              "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+              "aderencia": 0.6,
+              "evidencia": [
+                "despesa_em_micro_pct = 5 (esperado ≤ 10)"
+              ],
+              "contra": [
+                "concentracao_top3_categorias = 55 (esperado ≥ 60)"
+              ]
+            },
+            {
+              "id": "pulverizado",
+              "nome": "Consumo pulverizado",
+              "descricao": "muitas transações pequenas somam o grosso do mês",
+              "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "despesa_em_micro_pct = 5 (esperado ≥ 10)",
+                "transacoes_micro_pct = 20 (esperado ≥ 40)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "constancia",
+          "nome": "Constância do gasto",
+          "o_que_e": "se o gasto mensal se repete ou salta de um mês para o outro",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "estavel",
+            "nome": "Gasto estável",
+            "descricao": "os meses se parecem",
+            "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+            "aderencia": 1.0,
+            "evidencia": [
+              "volatilidade_despesa = 0.08 (esperado ≤ 0.2)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "estavel",
+              "nome": "Gasto estável",
+              "descricao": "os meses se parecem",
+              "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+              "aderencia": 1.0,
+              "evidencia": [
+                "volatilidade_despesa = 0.08 (esperado ≤ 0.2)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "oscilante",
+              "nome": "Gasto oscilante",
+              "descricao": "um mês não parece com o outro",
+              "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "volatilidade_despesa = 0.08 (esperado ≥ 0.2)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        }
+      ]
+    },
+    {
+      "nome": "sufocado",
+      "indicadores": {
+        "taxa_poupanca": -0.05,
+        "meses_de_reserva": 0.2,
+        "meses_no_vermelho": 3.0,
+        "volatilidade_despesa": 0.4,
+        "comprometido_pct_renda": 82.0,
+        "comprometido_pct_despesa": null,
+        "despesa_em_micro_pct": 30.0,
+        "transacoes_micro_pct": 60.0,
+        "concentracao_top3_categorias": 40.0,
+        "renda_variacao": 0.5,
+        "meses_com_renda_pct": 0.6,
+        "meses_observados": null
+      },
+      "eixos": [
+        {
+          "eixo": "fase",
+          "nome": "Fase financeira",
+          "o_que_e": "onde a pessoa está entre não fechar o mês e acumular com folga",
+          "minimo": 0.55,
+          "sugerido": {
+            "id": "sobrevivencia",
+            "nome": "Sobrevivência",
+            "descricao": "o mês não fecha sozinho, ou fecha raspando",
+            "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+            "aderencia": 1.0,
+            "evidencia": [
+              "taxa_poupanca = -0.05 (esperado ≤ 0.05)",
+              "meses_no_vermelho = 3 (esperado ≥ 1)",
+              "meses_de_reserva = 0.2 (esperado ≤ 1)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "sobrevivencia",
+              "nome": "Sobrevivência",
+              "descricao": "o mês não fecha sozinho, ou fecha raspando",
+              "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+              "aderencia": 1.0,
+              "evidencia": [
+                "taxa_poupanca = -0.05 (esperado ≤ 0.05)",
+                "meses_no_vermelho = 3 (esperado ≥ 1)",
+                "meses_de_reserva = 0.2 (esperado ≤ 1)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "equilibrio",
+              "nome": "Equilíbrio sem colchão",
+              "descricao": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+              "o_que_muda": "existe capacidade de aporte, e ela vai toda para a reserva antes de qualquer meta; a projeção deve responder em que mês a reserva fecha",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "taxa_poupanca = -0.05 (esperado entre 0.05 e 0.25)",
+                "meses_de_reserva = 0.2 (esperado entre 0.5 e 3)",
+                "meses_no_vermelho = 3 (esperado ≤ 0)"
+              ]
+            },
+            {
+              "id": "acumulacao",
+              "nome": "Acumulação",
+              "descricao": "sobra consistente e reserva a caminho de completar",
+              "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "taxa_poupanca = -0.05 (esperado ≥ 0.2)",
+                "meses_de_reserva = 0.2 (esperado entre 2 e 6)",
+                "meses_no_vermelho = 3 (esperado ≤ 0)"
+              ]
+            },
+            {
+              "id": "consolidacao",
+              "nome": "Consolidação",
+              "descricao": "reserva completa e sobra que excede o que está planejado",
+              "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "meses_de_reserva = 0.2 (esperado ≥ 6)",
+                "taxa_poupanca = -0.05 (esperado ≥ 0.25)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "renda",
+          "nome": "Natureza da renda",
+          "o_que_e": "se o que entra todo mês é previsível",
+          "minimo": 0.55,
+          "sugerido": {
+            "id": "variavel",
+            "nome": "Renda variável",
+            "descricao": "valor e frequência mudam mês a mês",
+            "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+            "aderencia": 1.0,
+            "evidencia": [
+              "renda_variacao = 0.5 (esperado ≥ 0.35)",
+              "meses_com_renda_pct = 0.6 (esperado ≤ 0.9)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "variavel",
+              "nome": "Renda variável",
+              "descricao": "valor e frequência mudam mês a mês",
+              "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+              "aderencia": 1.0,
+              "evidencia": [
+                "renda_variacao = 0.5 (esperado ≥ 0.35)",
+                "meses_com_renda_pct = 0.6 (esperado ≤ 0.9)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "fixa",
+              "nome": "Renda fixa",
+              "descricao": "mesma entrada, mesma época, todo mês",
+              "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = 0.5 (esperado ≤ 0.1)",
+                "meses_com_renda_pct = 0.6 (esperado ≥ 0.9)"
+              ]
+            },
+            {
+              "id": "mista",
+              "nome": "Renda mista",
+              "descricao": "uma base previsível mais entradas que variam",
+              "o_que_muda": "só a base previsível deve sustentar compromisso mensal; o excedente variável cabe em aporte pontual, não em parcela",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = 0.5 (esperado entre 0.1 e 0.35)",
+                "meses_com_renda_pct = 0.6 (esperado ≥ 0.9)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "custo",
+          "nome": "Estrutura de custo",
+          "o_que_e": "quanto da renda já está comprometido antes de qualquer escolha do mês",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "sufocado",
+            "nome": "Custo sufocado",
+            "descricao": "o comprometido consome quase tudo o que entra",
+            "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+            "aderencia": 1.0,
+            "evidencia": [
+              "comprometido_pct_renda = 82 (esperado ≥ 60)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "sufocado",
+              "nome": "Custo sufocado",
+              "descricao": "o comprometido consome quase tudo o que entra",
+              "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+              "aderencia": 1.0,
+              "evidencia": [
+                "comprometido_pct_renda = 82 (esperado ≥ 60)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "enxuto",
+              "nome": "Custo enxuto",
+              "descricao": "o comprometido ocupa pouco da renda",
+              "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 82 (esperado ≤ 35)"
+              ]
+            },
+            {
+              "id": "carregado",
+              "nome": "Custo carregado",
+              "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+              "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 82 (esperado entre 35 e 60)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "consumo",
+          "nome": "Padrão de consumo",
+          "o_que_e": "se o gasto variável se concentra em poucas decisões ou se espalha em muitas",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "pulverizado",
+            "nome": "Consumo pulverizado",
+            "descricao": "muitas transações pequenas somam o grosso do mês",
+            "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+            "aderencia": 1.0,
+            "evidencia": [
+              "despesa_em_micro_pct = 30 (esperado ≥ 10)",
+              "transacoes_micro_pct = 60 (esperado ≥ 40)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "pulverizado",
+              "nome": "Consumo pulverizado",
+              "descricao": "muitas transações pequenas somam o grosso do mês",
+              "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+              "aderencia": 1.0,
+              "evidencia": [
+                "despesa_em_micro_pct = 30 (esperado ≥ 10)",
+                "transacoes_micro_pct = 60 (esperado ≥ 40)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "concentrado",
+              "nome": "Consumo concentrado",
+              "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+              "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "concentracao_top3_categorias = 40 (esperado ≥ 60)",
+                "despesa_em_micro_pct = 30 (esperado ≤ 10)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "constancia",
+          "nome": "Constância do gasto",
+          "o_que_e": "se o gasto mensal se repete ou salta de um mês para o outro",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "oscilante",
+            "nome": "Gasto oscilante",
+            "descricao": "um mês não parece com o outro",
+            "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+            "aderencia": 1.0,
+            "evidencia": [
+              "volatilidade_despesa = 0.4 (esperado ≥ 0.2)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "oscilante",
+              "nome": "Gasto oscilante",
+              "descricao": "um mês não parece com o outro",
+              "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+              "aderencia": 1.0,
+              "evidencia": [
+                "volatilidade_despesa = 0.4 (esperado ≥ 0.2)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "estavel",
+              "nome": "Gasto estável",
+              "descricao": "os meses se parecem",
+              "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "volatilidade_despesa = 0.4 (esperado ≤ 0.2)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        }
+      ]
+    },
+    {
+      "nome": "renda_variavel",
+      "indicadores": {
+        "taxa_poupanca": 0.15,
+        "meses_de_reserva": 4.0,
+        "meses_no_vermelho": 1.0,
+        "volatilidade_despesa": 0.25,
+        "comprometido_pct_renda": 45.0,
+        "comprometido_pct_despesa": null,
+        "despesa_em_micro_pct": 12.0,
+        "transacoes_micro_pct": 45.0,
+        "concentracao_top3_categorias": 62.0,
+        "renda_variacao": 0.35,
+        "meses_com_renda_pct": 0.75,
+        "meses_observados": null
+      },
+      "eixos": [
+        {
+          "eixo": "fase",
+          "nome": "Fase financeira",
+          "o_que_e": "onde a pessoa está entre não fechar o mês e acumular com folga",
+          "minimo": 0.55,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "equilibrio",
+              "nome": "Equilíbrio sem colchão",
+              "descricao": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+              "o_que_muda": "existe capacidade de aporte, e ela vai toda para a reserva antes de qualquer meta; a projeção deve responder em que mês a reserva fecha",
+              "aderencia": 0.43,
+              "evidencia": [
+                "taxa_poupanca = 0.15 (esperado entre 0.05 e 0.25)"
+              ],
+              "contra": [
+                "meses_de_reserva = 4 (esperado entre 0.5 e 3)",
+                "meses_no_vermelho = 1 (esperado ≤ 0)"
+              ]
+            },
+            {
+              "id": "acumulacao",
+              "nome": "Acumulação",
+              "descricao": "sobra consistente e reserva a caminho de completar",
+              "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+              "aderencia": 0.33,
+              "evidencia": [
+                "meses_de_reserva = 4 (esperado entre 2 e 6)"
+              ],
+              "contra": [
+                "taxa_poupanca = 0.15 (esperado ≥ 0.2)",
+                "meses_no_vermelho = 1 (esperado ≤ 0)"
+              ]
+            },
+            {
+              "id": "sobrevivencia",
+              "nome": "Sobrevivência",
+              "descricao": "o mês não fecha sozinho, ou fecha raspando",
+              "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+              "aderencia": 0.29,
+              "evidencia": [
+                "meses_no_vermelho = 1 (esperado ≥ 1)"
+              ],
+              "contra": [
+                "taxa_poupanca = 0.15 (esperado ≤ 0.05)",
+                "meses_de_reserva = 4 (esperado ≤ 1)"
+              ]
+            },
+            {
+              "id": "consolidacao",
+              "nome": "Consolidação",
+              "descricao": "reserva completa e sobra que excede o que está planejado",
+              "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "meses_de_reserva = 4 (esperado ≥ 6)",
+                "taxa_poupanca = 0.15 (esperado ≥ 0.25)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "nenhum arquétipo atingiu a aderência mínima"
+        },
+        {
+          "eixo": "renda",
+          "nome": "Natureza da renda",
+          "o_que_e": "se o que entra todo mês é previsível",
+          "minimo": 0.55,
+          "sugerido": {
+            "id": "variavel",
+            "nome": "Renda variável",
+            "descricao": "valor e frequência mudam mês a mês",
+            "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+            "aderencia": 1.0,
+            "evidencia": [
+              "renda_variacao = 0.35 (esperado ≥ 0.35)",
+              "meses_com_renda_pct = 0.75 (esperado ≤ 0.9)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "variavel",
+              "nome": "Renda variável",
+              "descricao": "valor e frequência mudam mês a mês",
+              "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+              "aderencia": 1.0,
+              "evidencia": [
+                "renda_variacao = 0.35 (esperado ≥ 0.35)",
+                "meses_com_renda_pct = 0.75 (esperado ≤ 0.9)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "mista",
+              "nome": "Renda mista",
+              "descricao": "uma base previsível mais entradas que variam",
+              "o_que_muda": "só a base previsível deve sustentar compromisso mensal; o excedente variável cabe em aporte pontual, não em parcela",
+              "aderencia": 0.6,
+              "evidencia": [
+                "renda_variacao = 0.35 (esperado entre 0.1 e 0.35)"
+              ],
+              "contra": [
+                "meses_com_renda_pct = 0.75 (esperado ≥ 0.9)"
+              ]
+            },
+            {
+              "id": "fixa",
+              "nome": "Renda fixa",
+              "descricao": "mesma entrada, mesma época, todo mês",
+              "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = 0.35 (esperado ≤ 0.1)",
+                "meses_com_renda_pct = 0.75 (esperado ≥ 0.9)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "custo",
+          "nome": "Estrutura de custo",
+          "o_que_e": "quanto da renda já está comprometido antes de qualquer escolha do mês",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "carregado",
+            "nome": "Custo carregado",
+            "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+            "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+            "aderencia": 1.0,
+            "evidencia": [
+              "comprometido_pct_renda = 45 (esperado entre 35 e 60)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "carregado",
+              "nome": "Custo carregado",
+              "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+              "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+              "aderencia": 1.0,
+              "evidencia": [
+                "comprometido_pct_renda = 45 (esperado entre 35 e 60)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "enxuto",
+              "nome": "Custo enxuto",
+              "descricao": "o comprometido ocupa pouco da renda",
+              "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 45 (esperado ≤ 35)"
+              ]
+            },
+            {
+              "id": "sufocado",
+              "nome": "Custo sufocado",
+              "descricao": "o comprometido consome quase tudo o que entra",
+              "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 45 (esperado ≥ 60)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "consumo",
+          "nome": "Padrão de consumo",
+          "o_que_e": "se o gasto variável se concentra em poucas decisões ou se espalha em muitas",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "pulverizado",
+            "nome": "Consumo pulverizado",
+            "descricao": "muitas transações pequenas somam o grosso do mês",
+            "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+            "aderencia": 1.0,
+            "evidencia": [
+              "despesa_em_micro_pct = 12 (esperado ≥ 10)",
+              "transacoes_micro_pct = 45 (esperado ≥ 40)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "pulverizado",
+              "nome": "Consumo pulverizado",
+              "descricao": "muitas transações pequenas somam o grosso do mês",
+              "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+              "aderencia": 1.0,
+              "evidencia": [
+                "despesa_em_micro_pct = 12 (esperado ≥ 10)",
+                "transacoes_micro_pct = 45 (esperado ≥ 40)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "concentrado",
+              "nome": "Consumo concentrado",
+              "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+              "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+              "aderencia": 0.4,
+              "evidencia": [
+                "concentracao_top3_categorias = 62 (esperado ≥ 60)"
+              ],
+              "contra": [
+                "despesa_em_micro_pct = 12 (esperado ≤ 10)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "constancia",
+          "nome": "Constância do gasto",
+          "o_que_e": "se o gasto mensal se repete ou salta de um mês para o outro",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "oscilante",
+            "nome": "Gasto oscilante",
+            "descricao": "um mês não parece com o outro",
+            "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+            "aderencia": 1.0,
+            "evidencia": [
+              "volatilidade_despesa = 0.25 (esperado ≥ 0.2)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "oscilante",
+              "nome": "Gasto oscilante",
+              "descricao": "um mês não parece com o outro",
+              "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+              "aderencia": 1.0,
+              "evidencia": [
+                "volatilidade_despesa = 0.25 (esperado ≥ 0.2)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "estavel",
+              "nome": "Gasto estável",
+              "descricao": "os meses se parecem",
+              "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "volatilidade_despesa = 0.25 (esperado ≤ 0.2)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        }
+      ]
+    },
+    {
+      "nome": "empate_acima_do_minimo",
+      "indicadores": {
+        "taxa_poupanca": 0.2,
+        "meses_de_reserva": 3.0,
+        "meses_no_vermelho": 0.0,
+        "volatilidade_despesa": 0.2,
+        "comprometido_pct_renda": 35.0,
+        "comprometido_pct_despesa": null,
+        "despesa_em_micro_pct": 8.0,
+        "transacoes_micro_pct": 30.0,
+        "concentracao_top3_categorias": 70.0,
+        "renda_variacao": 0.1,
+        "meses_com_renda_pct": 1.0,
+        "meses_observados": null
+      },
+      "eixos": [
+        {
+          "eixo": "fase",
+          "nome": "Fase financeira",
+          "o_que_e": "onde a pessoa está entre não fechar o mês e acumular com folga",
+          "minimo": 0.55,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "equilibrio",
+              "nome": "Equilíbrio sem colchão",
+              "descricao": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+              "o_que_muda": "existe capacidade de aporte, e ela vai toda para a reserva antes de qualquer meta; a projeção deve responder em que mês a reserva fecha",
+              "aderencia": 1.0,
+              "evidencia": [
+                "taxa_poupanca = 0.2 (esperado entre 0.05 e 0.25)",
+                "meses_de_reserva = 3 (esperado entre 0.5 e 3)",
+                "meses_no_vermelho = 0 (esperado ≤ 0)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "acumulacao",
+              "nome": "Acumulação",
+              "descricao": "sobra consistente e reserva a caminho de completar",
+              "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+              "aderencia": 1.0,
+              "evidencia": [
+                "taxa_poupanca = 0.2 (esperado ≥ 0.2)",
+                "meses_de_reserva = 3 (esperado entre 2 e 6)",
+                "meses_no_vermelho = 0 (esperado ≤ 0)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "sobrevivencia",
+              "nome": "Sobrevivência",
+              "descricao": "o mês não fecha sozinho, ou fecha raspando",
+              "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "taxa_poupanca = 0.2 (esperado ≤ 0.05)",
+                "meses_no_vermelho = 0 (esperado ≥ 1)",
+                "meses_de_reserva = 3 (esperado ≤ 1)"
+              ]
+            },
+            {
+              "id": "consolidacao",
+              "nome": "Consolidação",
+              "descricao": "reserva completa e sobra que excede o que está planejado",
+              "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "meses_de_reserva = 3 (esperado ≥ 6)",
+                "taxa_poupanca = 0.2 (esperado ≥ 0.25)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "renda",
+          "nome": "Natureza da renda",
+          "o_que_e": "se o que entra todo mês é previsível",
+          "minimo": 0.55,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "fixa",
+              "nome": "Renda fixa",
+              "descricao": "mesma entrada, mesma época, todo mês",
+              "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+              "aderencia": 1.0,
+              "evidencia": [
+                "renda_variacao = 0.1 (esperado ≤ 0.1)",
+                "meses_com_renda_pct = 1 (esperado ≥ 0.9)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "mista",
+              "nome": "Renda mista",
+              "descricao": "uma base previsível mais entradas que variam",
+              "o_que_muda": "só a base previsível deve sustentar compromisso mensal; o excedente variável cabe em aporte pontual, não em parcela",
+              "aderencia": 1.0,
+              "evidencia": [
+                "renda_variacao = 0.1 (esperado entre 0.1 e 0.35)",
+                "meses_com_renda_pct = 1 (esperado ≥ 0.9)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "variavel",
+              "nome": "Renda variável",
+              "descricao": "valor e frequência mudam mês a mês",
+              "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = 0.1 (esperado ≥ 0.35)",
+                "meses_com_renda_pct = 1 (esperado ≤ 0.9)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "custo",
+          "nome": "Estrutura de custo",
+          "o_que_e": "quanto da renda já está comprometido antes de qualquer escolha do mês",
+          "minimo": 0.6,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "enxuto",
+              "nome": "Custo enxuto",
+              "descricao": "o comprometido ocupa pouco da renda",
+              "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+              "aderencia": 1.0,
+              "evidencia": [
+                "comprometido_pct_renda = 35 (esperado ≤ 35)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "carregado",
+              "nome": "Custo carregado",
+              "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+              "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+              "aderencia": 1.0,
+              "evidencia": [
+                "comprometido_pct_renda = 35 (esperado entre 35 e 60)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "sufocado",
+              "nome": "Custo sufocado",
+              "descricao": "o comprometido consome quase tudo o que entra",
+              "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 35 (esperado ≥ 60)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "consumo",
+          "nome": "Padrão de consumo",
+          "o_que_e": "se o gasto variável se concentra em poucas decisões ou se espalha em muitas",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "concentrado",
+            "nome": "Consumo concentrado",
+            "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+            "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+            "aderencia": 1.0,
+            "evidencia": [
+              "concentracao_top3_categorias = 70 (esperado ≥ 60)",
+              "despesa_em_micro_pct = 8 (esperado ≤ 10)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "concentrado",
+              "nome": "Consumo concentrado",
+              "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+              "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+              "aderencia": 1.0,
+              "evidencia": [
+                "concentracao_top3_categorias = 70 (esperado ≥ 60)",
+                "despesa_em_micro_pct = 8 (esperado ≤ 10)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "pulverizado",
+              "nome": "Consumo pulverizado",
+              "descricao": "muitas transações pequenas somam o grosso do mês",
+              "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "despesa_em_micro_pct = 8 (esperado ≥ 10)",
+                "transacoes_micro_pct = 30 (esperado ≥ 40)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "constancia",
+          "nome": "Constância do gasto",
+          "o_que_e": "se o gasto mensal se repete ou salta de um mês para o outro",
+          "minimo": 0.6,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "estavel",
+              "nome": "Gasto estável",
+              "descricao": "os meses se parecem",
+              "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+              "aderencia": 1.0,
+              "evidencia": [
+                "volatilidade_despesa = 0.2 (esperado ≤ 0.2)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "oscilante",
+              "nome": "Gasto oscilante",
+              "descricao": "um mês não parece com o outro",
+              "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+              "aderencia": 1.0,
+              "evidencia": [
+                "volatilidade_despesa = 0.2 (esperado ≥ 0.2)"
+              ],
+              "contra": []
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        }
+      ]
+    },
+    {
+      "nome": "fixture_um_mes_so",
+      "indicadores": {
+        "taxa_poupanca": 0.9926,
+        "meses_de_reserva": 0.0,
+        "meses_no_vermelho": 0.0,
+        "volatilidade_despesa": 0.0,
+        "comprometido_pct_renda": 0.0,
+        "comprometido_pct_despesa": null,
+        "despesa_em_micro_pct": 100.0,
+        "transacoes_micro_pct": 100.0,
+        "concentracao_top3_categorias": 100.0,
+        "renda_variacao": null,
+        "meses_com_renda_pct": 1.0,
+        "meses_observados": null
+      },
+      "eixos": [
+        {
+          "eixo": "fase",
+          "nome": "Fase financeira",
+          "o_que_e": "onde a pessoa está entre não fechar o mês e acumular com folga",
+          "minimo": 0.55,
+          "sugerido": {
+            "id": "acumulacao",
+            "nome": "Acumulação",
+            "descricao": "sobra consistente e reserva a caminho de completar",
+            "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+            "aderencia": 0.67,
+            "evidencia": [
+              "taxa_poupanca = 0.9926 (esperado ≥ 0.2)",
+              "meses_no_vermelho = 0 (esperado ≤ 0)"
+            ],
+            "contra": [
+              "meses_de_reserva = 0 (esperado entre 2 e 6)"
+            ]
+          },
+          "candidatos": [
+            {
+              "id": "acumulacao",
+              "nome": "Acumulação",
+              "descricao": "sobra consistente e reserva a caminho de completar",
+              "o_que_muda": "a sobra já comporta meta com prazo; o cálculo decisivo passa a ser a ordem dos planos e o que cada um adia",
+              "aderencia": 0.67,
+              "evidencia": [
+                "taxa_poupanca = 0.9926 (esperado ≥ 0.2)",
+                "meses_no_vermelho = 0 (esperado ≤ 0)"
+              ],
+              "contra": [
+                "meses_de_reserva = 0 (esperado entre 2 e 6)"
+              ]
+            },
+            {
+              "id": "consolidacao",
+              "nome": "Consolidação",
+              "descricao": "reserva completa e sobra que excede o que está planejado",
+              "o_que_muda": "com reserva coberta, o excedente deixa de ter destino automático; a conta que falta é a de alocação, que este motor não faz — ele só mostra quanto está sobrando sem função",
+              "aderencia": 0.33,
+              "evidencia": [
+                "taxa_poupanca = 0.9926 (esperado ≥ 0.25)"
+              ],
+              "contra": [
+                "meses_de_reserva = 0 (esperado ≥ 6)"
+              ]
+            },
+            {
+              "id": "sobrevivencia",
+              "nome": "Sobrevivência",
+              "descricao": "o mês não fecha sozinho, ou fecha raspando",
+              "o_que_muda": "com sobra nula ou negativa, plano com aporte mensal não cabe e a projeção fecha no vermelho; o cálculo que importa primeiro é o de custo comprometido, não o de meta",
+              "aderencia": 0.29,
+              "evidencia": [
+                "meses_de_reserva = 0 (esperado ≤ 1)"
+              ],
+              "contra": [
+                "taxa_poupanca = 0.9926 (esperado ≤ 0.05)",
+                "meses_no_vermelho = 0 (esperado ≥ 1)"
+              ]
+            },
+            {
+              "id": "equilibrio",
+              "nome": "Equilíbrio sem colchão",
+              "descricao": "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+              "o_que_muda": "existe capacidade de aporte, e ela vai toda para a reserva antes de qualquer meta; a projeção deve responder em que mês a reserva fecha",
+              "aderencia": 0.14,
+              "evidencia": [
+                "meses_no_vermelho = 0 (esperado ≤ 0)"
+              ],
+              "contra": [
+                "taxa_poupanca = 0.9926 (esperado entre 0.05 e 0.25)",
+                "meses_de_reserva = 0 (esperado entre 0.5 e 3)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "renda",
+          "nome": "Natureza da renda",
+          "o_que_e": "se o que entra todo mês é previsível",
+          "minimo": 0.55,
+          "sugerido": null,
+          "candidatos": [
+            {
+              "id": "fixa",
+              "nome": "Renda fixa",
+              "descricao": "mesma entrada, mesma época, todo mês",
+              "o_que_muda": "a média mensal vale como capacidade de aporte, e a projeção pode repetir a renda sem desconto",
+              "aderencia": 0.4,
+              "evidencia": [
+                "meses_com_renda_pct = 1 (esperado ≥ 0.9)"
+              ],
+              "contra": [
+                "renda_variacao = sem dado (esperado ≤ 0.1)"
+              ]
+            },
+            {
+              "id": "mista",
+              "nome": "Renda mista",
+              "descricao": "uma base previsível mais entradas que variam",
+              "o_que_muda": "só a base previsível deve sustentar compromisso mensal; o excedente variável cabe em aporte pontual, não em parcela",
+              "aderencia": 0.4,
+              "evidencia": [
+                "meses_com_renda_pct = 1 (esperado ≥ 0.9)"
+              ],
+              "contra": [
+                "renda_variacao = sem dado (esperado entre 0.1 e 0.35)"
+              ]
+            },
+            {
+              "id": "variavel",
+              "nome": "Renda variável",
+              "descricao": "valor e frequência mudam mês a mês",
+              "o_que_muda": "média mensal engana: a capacidade real é mais próxima do pior mês observado, e a reserva precisa cobrir mais meses que o padrão",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "renda_variacao = sem dado (esperado ≥ 0.35)",
+                "meses_com_renda_pct = 1 (esperado ≤ 0.9)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": "empate entre arquétipos"
+        },
+        {
+          "eixo": "custo",
+          "nome": "Estrutura de custo",
+          "o_que_e": "quanto da renda já está comprometido antes de qualquer escolha do mês",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "enxuto",
+            "nome": "Custo enxuto",
+            "descricao": "o comprometido ocupa pouco da renda",
+            "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+            "aderencia": 1.0,
+            "evidencia": [
+              "comprometido_pct_renda = 0 (esperado ≤ 35)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "enxuto",
+              "nome": "Custo enxuto",
+              "descricao": "o comprometido ocupa pouco da renda",
+              "o_que_muda": "a maior parte do gasto é decisão do mês, então corte e aumento de aporte têm efeito rápido na projeção",
+              "aderencia": 1.0,
+              "evidencia": [
+                "comprometido_pct_renda = 0 (esperado ≤ 35)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "carregado",
+              "nome": "Custo carregado",
+              "descricao": "o comprometido pesa, mas ainda sobra margem de manobra",
+              "o_que_muda": "metade da projeção já está decidida por compromissos anteriores; mexer no mês seguinte rende pouco sem renegociar compromisso",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 0 (esperado entre 35 e 60)"
+              ]
+            },
+            {
+              "id": "sufocado",
+              "nome": "Custo sufocado",
+              "descricao": "o comprometido consome quase tudo o que entra",
+              "o_que_muda": "com quase toda a renda comprometida, a projeção é rígida: nenhum ajuste de consumo muda o mês em que a reserva fecha",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "comprometido_pct_renda = 0 (esperado ≥ 60)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "consumo",
+          "nome": "Padrão de consumo",
+          "o_que_e": "se o gasto variável se concentra em poucas decisões ou se espalha em muitas",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "pulverizado",
+            "nome": "Consumo pulverizado",
+            "descricao": "muitas transações pequenas somam o grosso do mês",
+            "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+            "aderencia": 1.0,
+            "evidencia": [
+              "despesa_em_micro_pct = 100 (esperado ≥ 10)",
+              "transacoes_micro_pct = 100 (esperado ≥ 40)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "pulverizado",
+              "nome": "Consumo pulverizado",
+              "descricao": "muitas transações pequenas somam o grosso do mês",
+              "o_que_muda": "o gasto não aparece em nenhuma decisão isolada, só no total; a conta que revela é a soma mensal por contraparte, não a transação",
+              "aderencia": 1.0,
+              "evidencia": [
+                "despesa_em_micro_pct = 100 (esperado ≥ 10)",
+                "transacoes_micro_pct = 100 (esperado ≥ 40)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "concentrado",
+              "nome": "Consumo concentrado",
+              "descricao": "poucas transações grandes respondem pela maior parte do gasto",
+              "o_que_muda": "rever meia dúzia de decisões cobre a maior parte da despesa; o detalhamento por transação pequena rende pouco",
+              "aderencia": 0.4,
+              "evidencia": [
+                "concentracao_top3_categorias = 100 (esperado ≥ 60)"
+              ],
+              "contra": [
+                "despesa_em_micro_pct = 100 (esperado ≤ 10)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        },
+        {
+          "eixo": "constancia",
+          "nome": "Constância do gasto",
+          "o_que_e": "se o gasto mensal se repete ou salta de um mês para o outro",
+          "minimo": 0.6,
+          "sugerido": {
+            "id": "estavel",
+            "nome": "Gasto estável",
+            "descricao": "os meses se parecem",
+            "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+            "aderencia": 1.0,
+            "evidencia": [
+              "volatilidade_despesa = 0 (esperado ≤ 0.2)"
+            ],
+            "contra": []
+          },
+          "candidatos": [
+            {
+              "id": "estavel",
+              "nome": "Gasto estável",
+              "descricao": "os meses se parecem",
+              "o_que_muda": "a média mensal é uma boa previsão, e a projeção pode ser lida com confiança maior nos meses distantes",
+              "aderencia": 1.0,
+              "evidencia": [
+                "volatilidade_despesa = 0 (esperado ≤ 0.2)"
+              ],
+              "contra": []
+            },
+            {
+              "id": "oscilante",
+              "nome": "Gasto oscilante",
+              "descricao": "um mês não parece com o outro",
+              "o_que_muda": "a média mensal esconde o pior mês; a reserva precisa cobrir a oscilação, e o cenário conservador vale mais que o base",
+              "aderencia": 0.0,
+              "evidencia": [],
+              "contra": [
+                "volatilidade_despesa = 0 (esperado ≥ 0.2)"
+              ]
+            }
+          ],
+          "sem_leitura_porque": null
+        }
+      ]
+    }
+  ],
+  "recusas": [
+    {
+      "caso": "origem_heuristica",
+      "recusou": true,
+      "erro": "perfil só aceita origem 'agente' ou 'usuario': o casamento por número é sugestão, não assinatura"
+    },
+    {
+      "caso": "origem_importacao",
+      "recusou": true,
+      "erro": "perfil só aceita origem 'agente' ou 'usuario': o casamento por número é sugestão, não assinatura"
+    },
+    {
+      "caso": "porque_vazio",
+      "recusou": true,
+      "erro": "assinar um traço de perfil exige `porque`"
+    },
+    {
+      "caso": "eixo_desconhecido",
+      "recusou": true,
+      "erro": "eixo desconhecido: signo. Conhecidos: ['constancia', 'consumo', 'custo', 'fase', 'renda']"
+    },
+    {
+      "caso": "arquetipo_fora_do_eixo",
+      "recusou": true,
+      "erro": "arquétipo 'acumulacao' não existe no eixo 'renda'. Use um de ['fixa', 'mista', 'variavel'] ou 'personalizado' com nome e descrição próprios"
+    },
+    {
+      "caso": "personalizado_sem_nome",
+      "recusou": true,
+      "erro": "arquétipo personalizado exige nome e descrição"
+    },
+    {
+      "caso": "personalizado_sem_descricao",
+      "recusou": true,
+      "erro": "arquétipo personalizado exige nome e descrição"
+    },
+    {
+      "caso": "personalizado_completo",
+      "recusou": false,
+      "erro": null
+    }
+  ],
+  "autoridade": {
+    "agente_nao_derruba_usuario": {
+      "eixo": "renda",
+      "arquetipo": "variavel",
+      "nome": "Renda variável",
+      "descricao": "valor e frequência mudam mês a mês",
+      "substituiu": null,
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa afirmou",
+        "evidencia": [],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    },
+    "usuario_derruba_agente": {
+      "eixo": "renda",
+      "arquetipo": "fixa",
+      "nome": "Renda fixa",
+      "descricao": "mesma entrada, mesma época, todo mês",
+      "substituiu": "variavel",
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "a pessoa corrigiu",
+        "evidencia": [],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    },
+    "mesma_autoridade_substitui": {
+      "eixo": "renda",
+      "arquetipo": "mista",
+      "nome": "Renda mista",
+      "descricao": "uma base previsível mais entradas que variam",
+      "substituiu": "variavel",
+      "proveniencia": {
+        "origem": "usuario",
+        "confianca": 1.0,
+        "porque": "pensando melhor, é mista",
+        "evidencia": [],
+        "quando": "2026-06-15T10:30:00",
+        "por_quem": "claude"
+      }
+    }
+  }
+}

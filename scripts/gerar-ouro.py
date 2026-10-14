@@ -204,7 +204,8 @@ def ouro_contratos() -> dict:
     e quem estiver migrando perde o histórico de decisões.
     """
     from fintips.contracts import (
-        AUTORIDADE, ATITUDES, Causa, Condicao, CustoFixo, Efeito, Fato,
+        AUTORIDADE, ATITUDES, STATUS_DECISAO, TIPOS_DECISAO, VEREDITOS,
+        Alternativa, Causa, Condicao, CustoFixo, Decisao, Efeito, Fato,
         ItemDeTriagem, Proveniencia, Regra, novo_id,
     )
 
@@ -266,6 +267,7 @@ def ouro_contratos() -> dict:
                  "candidato_custo_fixo", "classificacao_fraca",
                  "evento_sem_explicacao", "fato_vencido",
                  "causa_ausente", "causa_a_revisar", "causa_sem_atitude",
+                 "decisao_aberta", "decisao_a_revisar", "decisao_sem_desfecho",
                  "tipo_que_nao_existe"):
         for impacto in (100.0, 33.33, 0.0, -50.0):
             it = ItemDeTriagem(id="t", tipo=tipo, titulo="", impacto_mensal=impacto,
@@ -287,6 +289,48 @@ def ouro_contratos() -> dict:
         base_ref="transporte-trabalho", valor_mensal=79.5,
         metodo="mediana_meses_completos", natureza="rotina", proveniencia=prov,
     )
+    # Alternativas: a conta que decide troca. Os casos de fronteira são o que
+    # o ouro existe para travar — sem horizonte não há custo por mês de uso, e
+    # horizonte zero não pode virar divisão por zero em nenhum dos dois motores.
+    alternativas = []
+    for nome, desembolso, mensal, horizonte in (
+        ("consertar", 700.0, 0.0, 8),
+        ("comprar novo", 2500.0, 0.0, 36),
+        ("com plano", 0.0, 90.0, 36),
+        ("sem horizonte", 700.0, 0.0, None),
+        ("horizonte zero", 700.0, 0.0, 0),
+        ("empate de arredondamento", 100.0, 0.0, 3),
+        ("centavo", 0.01, 0.0, 3),
+    ):
+        a = Alternativa(nome=nome, custo=desembolso, custo_mensal=mensal,
+                        horizonte_meses=horizonte)
+        alternativas.append({
+            "nome": nome, "custo": desembolso, "custo_mensal": mensal,
+            "horizonte_meses": horizonte,
+            "custo_no_horizonte": a.custo_no_horizonte,
+            "custo_por_mes_de_uso": a.custo_por_mes_de_uso,
+        })
+
+    decisao = Decisao(
+        id="dec-abc", titulo="Celular quebrou",
+        situacao="caiu na terça, tela e carregamento",
+        pergunta="consertar, trocar ou aguentar?", tipo="troca",
+        alternativas=[
+            Alternativa(nome="consertar", custo=700.0, horizonte_meses=8,
+                        consequencia="volta a funcionar, sem garantia de placa",
+                        descartada_porque="assistência não cobre a placa"),
+            Alternativa(nome="comprar novo", custo=2500.0, horizonte_meses=36,
+                        consequencia="resolve por três anos"),
+        ],
+        escolhida="comprar novo", porque="o conserto não cobria o que quebrou",
+        status="revisada", ligacoes=["categoria:eletronicos"],
+        instantaneo={"em": "2026-06-15", "sobra_media_mes": 4963.1, "score": 55.0},
+        desfecho={"veredito": "funcionou", "nota": "durou", "custo_real": 2480.0,
+                  "em": QUANDO_FIXO},
+        revisar_em="2027-01-01", proveniencia=prov,
+        criado_em=QUANDO_FIXO, decidido_em=QUANDO_FIXO,
+    )
+
     fato = Fato(chave="moradia.situacao", valor="com_familia", tipo="texto",
                 proveniencia=prov, expira_em=None, substituiu=None)
 
@@ -296,6 +340,10 @@ def ouro_contratos() -> dict:
         "quando_fixo": QUANDO_FIXO,
         "autoridade": autoridade,
         "atitudes": list(ATITUDES),
+        "status_decisao": list(STATUS_DECISAO),
+        "tipos_decisao": list(TIPOS_DECISAO),
+        "vereditos": list(VEREDITOS),
+        "custo_de_alternativa": alternativas,
         "ids": ids,
         "especificidade": especificidade,
         "prioridade_de_regra": regras,
@@ -303,9 +351,999 @@ def ouro_contratos() -> dict:
         "serializacao": {
             "proveniencia": prov.to_dict(),
             "causa": causa.to_dict(),
+            "decisao": decisao.to_dict(),
             "custo_fixo": custo.to_dict(),
             "fato": fato.to_dict(),
         },
+    }
+
+
+def ouro_projecao() -> dict:
+    """Projeção de caixa: cenários, consumo da sobra pelos planos e reserva.
+
+    O ponto delicado deste módulo não é a fórmula, é **quando se arredonda**. O
+    Python multiplica a renda pelo fator do cenário em `Decimal` de precisão
+    cheia e só arredonda na saída de cada mês; o patrimônio, porém, acumula o
+    valor **não arredondado** ao longo dos doze meses. Uma porta que arredonde
+    a renda para centavos antes do laço acerta o primeiro mês e erra o décimo
+    segundo por alguns centavos — o tipo de divergência que ninguém vê revisando
+    código e que aparece como saldo estranho no app.
+
+    Por isso os casos incluem renda que não fecha em centavo depois do fator
+    (3333.33 × 0.9 = 2999.997) e cenário conservador, que multiplica o variável
+    por 1.15. Sem eles o ouro passa e o erro dorme.
+
+    O segundo caso de fronteira é o mês da reserva: o Python compara o
+    patrimônio **já arredondado** da linha contra o alvo **não arredondado**.
+    Trocar uma coisa pela outra muda o mês em que a meta fecha, que é a
+    pergunta que o usuário faz.
+    """
+    from datetime import date as _date
+
+    from fintips import projection
+
+    def plano(pid, nome, falta, prioridade="media", aporte=None, status="em_andamento"):
+        d = {"id": pid, "nome": nome, "falta": falta, "prioridade": prioridade,
+             "status": status}
+        if aporte is not None:
+            d["aporte_planejado_mes"] = aporte
+        return d
+
+    casos = []
+    entradas = [
+        # o caso simples: sobra folgada, nenhum plano, reserva fecha cedo
+        {"nome": "sem_planos", "cenario": "base", "meses": 6,
+         "baseline": {"renda_media_mes": 5000.0, "despesa_media_mes": 3000.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1200.0, "saldo_conta": 2000.0, "patrimonio": 5000.0,
+         "planos": []},
+
+        # renda que não fecha em centavo depois do fator: 3333.33 * 0.9
+        {"nome": "fator_nao_fecha_em_centavo", "cenario": "conservador", "meses": 12,
+         "baseline": {"renda_media_mes": 3333.33, "despesa_media_mes": 2222.22,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1111.11, "saldo_conta": 500.0, "patrimonio": 1500.0,
+         "planos": []},
+
+        # o variável multiplicado por 1.15, com plano consumindo a sobra
+        {"nome": "conservador_com_planos", "cenario": "conservador", "meses": 12,
+         "baseline": {"renda_media_mes": 6000.0, "despesa_media_mes": 4000.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1500.0, "saldo_conta": 3000.0, "patrimonio": 10000.0,
+         "planos": [plano("viagem", "Viagem", 8000.0, "alta", 500.0),
+                    plano("notebook", "Notebook", 4000.0, "baixa"),
+                    plano("curso", "Curso", 2000.0, "media", 300.0)]},
+
+        # otimista: renda 1.05, variável 0.90
+        {"nome": "otimista", "cenario": "otimista", "meses": 12,
+         "baseline": {"renda_media_mes": 4500.0, "despesa_media_mes": 3100.0,
+                      "reserva_alvo_meses": 3},
+         "fixed_monthly": 900.0, "saldo_conta": 1000.0, "patrimonio": 4000.0,
+         "planos": [plano("reforma", "Reforma", 15000.0, "alta")]},
+
+        # sobra negativa todo mês: o caixa afunda e a reserva nunca fecha
+        {"nome": "sobra_negativa", "cenario": "base", "meses": 12,
+         "baseline": {"renda_media_mes": 2500.0, "despesa_media_mes": 3200.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 2000.0, "saldo_conta": 4000.0, "patrimonio": 6000.0,
+         "planos": [plano("divida", "Quitar dívida", 3000.0, "alta")]},
+
+        # plano concluído entra? não deve. E o custo fixo maior que a despesa
+        # total zera o variável em vez de virar negativo.
+        {"nome": "fixo_maior_que_despesa", "cenario": "base", "meses": 4,
+         "baseline": {"renda_media_mes": 5000.0, "despesa_media_mes": 1000.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1800.0, "saldo_conta": 1000.0, "patrimonio": 2000.0,
+         "planos": [plano("feito", "Já concluído", 0.0, "alta", status="concluido"),
+                    plano("aberto", "Em aberto", 1200.0, "media")]},
+
+        # renda zero: fixo_pct_da_renda não pode dividir por zero
+        {"nome": "renda_zero", "cenario": "base", "meses": 3,
+         "baseline": {"renda_media_mes": 0.0, "despesa_media_mes": 800.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 500.0, "saldo_conta": 900.0, "patrimonio": 900.0,
+         "planos": []},
+
+        # resto de plano que NÃO fecha em centavo: o Python serializa
+        # `falta_ao_fim` sem quantize, então 2666.674 sai com três casas. Uma
+        # porta que guarde o resto em centavos arredonda e diverge.
+        {"nome": "resto_de_plano_com_mais_de_duas_casas", "cenario": "conservador",
+         "meses": 12,
+         "baseline": {"renda_media_mes": 3333.33, "despesa_media_mes": 2222.22,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1111.11, "saldo_conta": 0.0, "patrimonio": 0.0,
+         "planos": [plano("longo", "Plano longo", 10000.0, "alta")]},
+
+        # O mês da reserva compara o patrimônio **já arredondado** da linha
+        # contra o alvo **não arredondado**. Aqui o alvo exato é 14333,6640 e o
+        # publicado é 14333,66 — o patrimônio do primeiro mês bate exatamente no
+        # publicado, e a resposta certa mesmo assim é o segundo mês. Sem este
+        # caso, uma porta que compare contra o alvo arredondado passa limpa: foi
+        # o que aconteceu na primeira rodada deste harness.
+        {"nome": "reserva_no_fio_do_sub_centavo", "cenario": "conservador", "meses": 4,
+         "baseline": {"renda_media_mes": 3333.33, "despesa_media_mes": 2222.27,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1111.11, "saldo_conta": 0.0, "patrimonio": 13722.61,
+         "planos": []},
+
+        # cenário desconhecido cai no base, em vez de estourar
+        {"nome": "cenario_desconhecido", "cenario": "inventado", "meses": 3,
+         "baseline": {"renda_media_mes": 4000.0, "despesa_media_mes": 2500.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 1000.0, "saldo_conta": 1000.0, "patrimonio": 1000.0,
+         "planos": []},
+
+        # o plano de prioridade alta come a sobra antes, e a ordem entre dois
+        # de mesma prioridade é a de entrada (ordenação estável)
+        {"nome": "prioridade_ordena_e_empate_mantem_ordem", "cenario": "base", "meses": 8,
+         "baseline": {"renda_media_mes": 5000.0, "despesa_media_mes": 3500.0,
+                      "reserva_alvo_meses": 6},
+         "fixed_monthly": 2000.0, "saldo_conta": 0.0, "patrimonio": 0.0,
+         "planos": [plano("b_baixa", "Baixa", 2000.0, "baixa"),
+                    plano("m1", "Média primeira", 1000.0, "media"),
+                    plano("m2", "Média segunda", 1000.0, "media"),
+                    plano("a_alta", "Alta", 3000.0, "alta")]},
+    ]
+
+    for e in entradas:
+        saida = projection.project(
+            baseline=e["baseline"], fixed_monthly=e["fixed_monthly"],
+            saldo_conta=e["saldo_conta"], patrimonio=e["patrimonio"],
+            planos=e["planos"], meses=e["meses"], cenario=e["cenario"],
+            inicio=_date(2026, 6, 15),
+        )
+        casos.append({"nome": e["nome"], "entrada": e, "saida": saida})
+
+    # a virada de ano dentro do laço: _add_months tem que somar mês, não dia
+    virada = projection.project(
+        baseline={"renda_media_mes": 4000.0, "despesa_media_mes": 2000.0,
+                  "reserva_alvo_meses": 6},
+        fixed_monthly=800.0, saldo_conta=0.0, patrimonio=0.0, planos=[],
+        meses=14, cenario="base", inicio=_date(2026, 11, 30),
+    )
+
+    return {
+        "o_que_e": "projeção de caixa: cenários, consumo da sobra pelos planos e mês da reserva",
+        "gerado_por": "fintips.projection",
+        "inicio_fixo": "2026-06-15",
+        "cenarios": projection.CENARIOS,
+        "casos": casos,
+        "virada_de_ano": {
+            "inicio": "2026-11-30",
+            "meses": [l["mes"] for l in virada["linhas"]],
+        },
+    }
+
+
+def ouro_planos() -> dict:
+    """Planos: viabilidade, ritmo necessário e o que o extrato já gastou neles.
+
+    Três armadilhas de porte moram aqui, e as três são silenciosas.
+
+    **`if meses` trata zero como ausente.** Prazo vencido devolve `0` em
+    `months_until`, e `0` é falso em Python: o aporte necessário vira o valor
+    inteiro que falta, não uma divisão por zero. Uma porta que teste
+    `meses != null` divide por zero ou devolve infinito.
+
+    **Os limiares são `<=`, não `<`.** Um plano cujo aporte necessário bate
+    exatamente em 60% da capacidade é *confortável*; exatamente na capacidade é
+    *apertado*. Os dois casos de borda estão no ouro de propósito.
+
+    **O ritmo arredonda para cima.** Faltando R$ 1.000,01 com aporte de
+    R$ 500,00 são três meses, não dois — quem trunca promete uma data que não
+    acontece.
+    """
+    from datetime import date as _date
+
+    from fintips import plans as plans_mod
+
+    hoje = _date(2026, 6, 15)
+
+    # um extrato com gastos que os planos vão querer reconhecer como seus
+    stmt = _extrato_sintetico([
+        {"mes": "2026-04", "renda_centavos": 500000, "despesa_centavos": 120000,
+         "categoria": "viagem", "contraparte": "Companhia Aérea"},
+        {"mes": "2026-05", "renda_centavos": 500000, "despesa_centavos": 80000,
+         "categoria": "educacao", "contraparte": "Curso de Inglês"},
+        {"mes": "2026-06", "renda_centavos": 500000, "despesa_centavos": 60000,
+         "categoria": "outros", "contraparte": "Padaria"},
+    ])
+
+    entradas = [
+        # prazo folgado: necessário bem abaixo de 60% da capacidade
+        {"nome": "confortavel", "sobra": 3000.0,
+         "plano": {"id": "viagem", "nome": "Viagem", "tipo": "viagem",
+                   "custo_alvo": 6000.0, "data_alvo": "2027-06-01",
+                   "aporte_mensal": 500.0, "guardado": 0.0,
+                   "categorias": ["viagem"]}},
+
+        # borda exata do limiar de 60%: necessário == 0.6 * capacidade
+        {"nome": "borda_exata_dos_60_pct", "sobra": 1000.0,
+         "plano": {"id": "borda", "nome": "Borda", "custo_alvo": 3600.0,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # borda exata da capacidade: necessário == capacidade
+        {"nome": "borda_exata_da_capacidade", "sobra": 600.0,
+         "plano": {"id": "limite", "nome": "No limite", "custo_alvo": 3600.0,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # um centavo além da capacidade: vira inviável
+        {"nome": "um_centavo_alem_da_capacidade", "sobra": 600.0,
+         "plano": {"id": "estourou", "nome": "Estourou", "custo_alvo": 3600.06,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # prazo vencido: months_until devolve 0, e 0 é falso em Python
+        {"nome": "prazo_vencido_nao_divide_por_zero", "sobra": 2000.0,
+         "plano": {"id": "atrasado", "nome": "Atrasado", "custo_alvo": 1500.0,
+                   "data_alvo": "2026-01-01", "guardado": 200.0}},
+
+        # sem prazo nenhum
+        {"nome": "sem_prazo", "sobra": 2000.0,
+         "plano": {"id": "algum_dia", "nome": "Algum dia", "custo_alvo": 9000.0,
+                   "guardado": 1000.0}},
+
+        # já concluído: guardado passou do alvo
+        {"nome": "concluido", "sobra": 1000.0,
+         "plano": {"id": "feito", "nome": "Feito", "custo_alvo": 2000.0,
+                   "data_alvo": "2026-12-01", "guardado": 2500.0}},
+
+        # sobra negativa: a capacidade vira zero, não um número negativo
+        {"nome": "sobra_negativa_zera_a_capacidade", "sobra": -800.0,
+         "plano": {"id": "sonho", "nome": "Sonho", "custo_alvo": 5000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0}},
+
+        # custo alvo zero: progresso não pode dividir por zero
+        {"nome": "custo_alvo_zero", "sobra": 1000.0,
+         "plano": {"id": "vazio", "nome": "Vazio", "custo_alvo": 0.0,
+                   "data_alvo": "2026-12-01", "guardado": 0.0}},
+
+        # ritmo que não divide exato: arredonda para cima
+        {"nome": "ritmo_arredonda_para_cima", "sobra": 2000.0,
+         "plano": {"id": "ritmo", "nome": "Ritmo", "custo_alvo": 1000.01,
+                   "aporte_mensal": 500.0, "guardado": 0.0}},
+
+        # divisão que não fecha em centavo: 1000 / 3
+        {"nome": "aporte_necessario_nao_fecha_em_centavo", "sobra": 2000.0,
+         "plano": {"id": "terco", "nome": "Um terço", "custo_alvo": 1000.0,
+                   "data_alvo": "2026-09-01", "guardado": 0.0}},
+
+        # casamento por contraparte, com acento e caixa diferentes
+        {"nome": "casa_por_contraparte_com_acento", "sobra": 2000.0,
+         "plano": {"id": "ingles", "nome": "Inglês", "custo_alvo": 4000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0,
+                   "merchants": ["CURSO DE INGLES"]}},
+
+        # casamento por categoria
+        {"nome": "casa_por_categoria", "sobra": 2000.0,
+         "plano": {"id": "viagem2", "nome": "Viagem 2", "custo_alvo": 8000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0,
+                   "categorias": ["viagem"]}},
+
+        # nem contraparte nem categoria: não conta gasto nenhum
+        {"nome": "sem_casamento_nao_conta_gasto", "sobra": 2000.0,
+         "plano": {"id": "solto", "nome": "Solto", "custo_alvo": 3000.0,
+                   "data_alvo": "2027-01-01", "guardado": 0.0}},
+    ]
+
+    casos = []
+    for e in entradas:
+        plano = plans_mod.Plan.from_dict(e["plano"])
+        base = {"sobra_media_mes": e["sobra"]}
+        casos.append({
+            "nome": e["nome"],
+            "entrada": {"plano": e["plano"], "sobra_media_mes": e["sobra"]},
+            "saida": plans_mod.evaluate(plano, stmt, base, today=hoje),
+        })
+
+    meses_ate = [
+        {"alvo": alvo, "meses": plans_mod.months_until(
+            _date.fromisoformat(alvo) if alvo else None, hoje)}
+        for alvo in ("2026-06-01", "2026-06-30", "2026-07-01", "2027-06-15",
+                     "2025-01-01", "2026-12-31", None)
+    ]
+
+    return {
+        "o_que_e": "planos: viabilidade, ritmo necessário e gasto já feito no plano",
+        "gerado_por": "fintips.plans",
+        "hoje_fixo": hoje.isoformat(),
+        "extrato": [
+            {"id": t.id, "dia": t.day.isoformat(), "valor_centavos": centavos(t.amount),
+             "fluxo": t.flow, "categoria": t.category, "contraparte": t.counterparty}
+            for t in stmt.transactions
+        ],
+        "meses_ate_o_alvo": meses_ate,
+        "casos": casos,
+    }
+
+
+def ouro_compras() -> dict:
+    """Consultor de compras: sinais de arrependimento, estratégias e veredito.
+
+    Só a parte **calculável** entra aqui. `contexto_pessoal` e `precedentes`
+    dependem de Perfil, Causas e Decisões, que são o item 9 da ordem do porte —
+    e a regra é que cada linha só começa quando a anterior tem ouro fechando.
+
+    Os pontos que mordem:
+
+    - **A mediana do ticket cai no meio centavo** com contagem par, e o Python
+      a guarda em `float` de propósito. O múltiplo do preço sai dessa divisão.
+    - **A janela de 60 dias conta a partir do fim do período**, não de hoje, e
+      a comparação é `>=` — o gasto que cai exatamente no limite entra.
+    - **"Compra de porte parecido" é `>= 50% do preço`**, também `>=`.
+    - **A parcela sem juros divide em `Decimal`**: 2599,99 ÷ 2 dá 1300,00, e
+      não 1299,99 como daria arredondando o `float`. Com juros, a fórmula Price
+      em `Decimal` e em `Double` bateu nas 105 combinações testadas.
+    - **O risco satura em 100** (20 por sinal), e a prudência tem piso em 0.
+    """
+    from datetime import date as _date, datetime, timedelta, timezone
+    from decimal import Decimal
+
+    from fintips import purchases
+    from fintips.models import Account, Statement, Transaction
+
+    tz = timezone(timedelta(hours=-3))
+    fim = _date(2026, 6, 30)
+
+    def tx(n, dias_antes, valor, categoria="eletronicos", contraparte="Loja",
+           fluxo="expense"):
+        d = fim - timedelta(days=dias_antes)
+        return Transaction(
+            id=f"t{n}", ts=datetime(d.year, d.month, d.day, 12, 0, tzinfo=tz),
+            amount=Decimal(str(valor)), memo_raw="", flow=fluxo,
+            category=categoria, counterparty=contraparte,
+        )
+
+    # histórico com contagem PAR na categoria: a mediana cai no meio centavo
+    transacoes = [
+        tx(1, 10, "-100.01"), tx(2, 20, "-100.02"),
+        tx(3, 30, "-900.01"), tx(4, 40, "-1200.00"),
+        # exatamente na borda dos 60 dias: entra
+        tx(5, 60, "-1000.00"),
+        # um dia fora: não entra
+        tx(6, 61, "-1100.00"),
+        # outra categoria, casada por palavra-chave
+        tx(7, 15, "-250.00", categoria="outros", contraparte="Fone Store"),
+        tx(8, 5, "-80.00", categoria="alimentacao", contraparte="Mercado"),
+        # categoria de valores miúdos: a mediana dá 0,57, e 10x disso é 5,70.
+        # Em Double, 5.70/0.57 é 10.000000000000002 — dispararia o sinal que o
+        # Decimal do Python não dispara. É o caso que trava a comparação inteira.
+        tx(13, 3, "-0.50", categoria="miudezas", contraparte="Banca"),
+        tx(14, 4, "-0.57", categoria="miudezas", contraparte="Banca"),
+        tx(15, 6, "-0.57", categoria="miudezas", contraparte="Banca"),
+        tx(16, 7, "-2.00", categoria="miudezas", contraparte="Banca"),
+        tx(9, 12, "5000.00", categoria="renda", contraparte="Empregador", fluxo="income"),
+        tx(10, 8, "60.00", fluxo="refund", contraparte="Devolucao 1"),
+        tx(11, 9, "70.00", fluxo="refund", contraparte="Devolucao 2"),
+        tx(12, 11, "80.00", fluxo="refund", contraparte="Devolucao 3"),
+    ]
+    stmt = Statement(
+        account=Account(id_hash="acct:teste"),
+        period_start=_date(2026, 1, 1), period_end=fim,
+        ledger_balance=Decimal("0"), balance_as_of=fim,
+        transactions=transacoes, source="sintetico",
+    )
+
+    def entrada(nome, **kw):
+        d = {"nome": nome, "item": "Fone X", "preco": 1800.0, "categoria": "eletronicos",
+             "urgencia": "media", "parcelas_possiveis": 1, "juros_parcelamento": 0.0,
+             "substitui": "", "tags": [], "saldo_conta": 5000.0, "patrimonio": 10000.0,
+             "reserva_alvo_meses": 6.0,
+             "baseline": {"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0},
+             "planos": []}
+        d.update(kw)
+        return d
+
+    plano_apertado = {"nome": "Viagem", "status": "apertado",
+                      "aporte_necessario_mes": 800.0}
+    plano_concluido = {"nome": "Feito", "status": "concluido",
+                       "aporte_necessario_mes": 500.0}
+    plano_sem_aporte = {"nome": "Sem aporte", "status": "confortavel",
+                        "aporte_necessario_mes": 0.0}
+
+    entradas = [
+        entrada("caso_base"),
+
+        # sem histórico nenhum na categoria: ticket médio 0, múltiplo nulo
+        entrada("sem_historico_na_categoria", categoria="viagem", preco=500.0),
+
+        # o múltiplo do ticket é `> 10`: exatamente 10x não dispara o sinal,
+        # e um centavo acima dispara. Com a mediana em 950,005, 10x é 9500,05.
+        entrada("multiplo_exatamente_10x", preco=9500.05, patrimonio=90000.0,
+                saldo_conta=30000.0,
+                baseline={"despesa_media_mes": 12000.0, "sobra_media_mes": 9000.0}),
+        entrada("multiplo_um_centavo_acima_de_10x", preco=9500.06, patrimonio=90000.0,
+                saldo_conta=30000.0,
+                baseline={"despesa_media_mes": 12000.0, "sobra_media_mes": 9000.0}),
+
+        # urgência alta sem substituir nada: um sinal a mais
+        entrada("urgente_sem_substituir", urgencia="alta"),
+        entrada("urgente_mas_substitui", urgencia="alta", substitui="fone antigo"),
+
+        # preço maior que um mês inteiro de despesa
+        entrada("preco_maior_que_um_mes_de_despesa", preco=2500.0,
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0}),
+
+        # casamento por palavra-chave fora da categoria
+        entrada("casa_por_palavra_chave", categoria="outros", tags=["fone"]),
+
+        # parcelamento sem juros que cai no meio centavo: 2599.99 / 2
+        entrada("parcela_sem_juros_no_meio_centavo", preco=2599.99,
+                parcelas_possiveis=2),
+
+        # parcelamento com juros: fórmula Price
+        entrada("parcelado_com_juros", preco=1800.0, parcelas_possiveis=12,
+                juros_parcelamento=1.99),
+        entrada("parcelado_juros_alto_longo", preco=12345.67, parcelas_possiveis=36,
+                juros_parcelamento=3.49),
+
+        # sobra zero: juntar_e_comprar não tem quantos meses
+        entrada("sobra_zero_nao_tem_ritmo",
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 0.0}),
+
+        # sobra negativa
+        entrada("sobra_negativa",
+                baseline={"despesa_media_mes": 3000.0, "sobra_media_mes": -400.0}),
+
+        # fura a reserva e custa mais de 3 meses de sobra: nao_agora
+        entrada("fura_reserva_e_custa_caro", preco=9000.0, saldo_conta=1000.0,
+                patrimonio=2000.0),
+
+        # cabe folgado: pode_comprar
+        entrada("cabe_folgado", preco=800.0, patrimonio=60000.0, saldo_conta=20000.0,
+                categoria="viagem"),
+
+        # conflito com plano
+        entrada("conflito_com_plano", preco=1200.0, patrimonio=60000.0,
+                saldo_conta=20000.0, categoria="viagem",
+                planos=[plano_apertado, plano_concluido, plano_sem_aporte]),
+
+        # 10x exatos sobre uma mediana que o Double não representa: a comparação
+        # inteira diz "não dispara", e a em Double diria "dispara"
+        entrada("multiplo_10x_que_o_double_erraria", preco=5.70, categoria="miudezas",
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0}),
+        entrada("multiplo_um_centavo_acima_no_miudo", preco=5.71, categoria="miudezas",
+                baseline={"despesa_media_mes": 2000.0, "sobra_media_mes": 1500.0}),
+
+        # gasto que vale exatamente metade do preço: a comparação é `>=`
+        entrada("porte_parecido_na_borda_exata", preco=1800.02),
+
+        # preço zero: exercita os dois ramos em que o Python trata 0 como falso
+        # (`custo_em_meses` e `atraso_em_meses` saem nulos, não zero)
+        entrada("preco_zero_e_o_ramo_falso_do_python", preco=0.0,
+                planos=[plano_apertado]),
+
+        # risco alto o bastante para saturar em 100
+        entrada("risco_saturado", preco=200.0, urgencia="alta",
+                baseline={"despesa_media_mes": 150.0, "sobra_media_mes": 100.0}),
+    ]
+
+    casos = []
+    for e in entradas:
+        intent = purchases.PurchaseIntent.from_dict({
+            "item": e["item"], "preco": e["preco"], "categoria": e["categoria"],
+            "urgencia": e["urgencia"], "parcelas_possiveis": e["parcelas_possiveis"],
+            "juros_parcelamento": e["juros_parcelamento"], "substitui": e["substitui"],
+            "tags": e["tags"],
+        })
+        saida = purchases.evaluate(
+            intent, stmt, e["baseline"], e["planos"],
+            saldo_conta=Decimal(str(e["saldo_conta"])),
+            patrimonio=Decimal(str(e["patrimonio"])),
+            reserva_alvo_meses=e["reserva_alvo_meses"],
+        )
+        # o que depende de Perfil/Causas/Decisões fica para o item 9
+        saida.pop("contexto_pessoal", None)
+        saida.pop("precedentes", None)
+        casos.append({"nome": e["nome"], "entrada": e, "saida": saida})
+
+    return {
+        "o_que_e": "consultor de compras: arrependimento, estratégias e veredito (parte calculável)",
+        "gerado_por": "fintips.purchases",
+        "fora_do_escopo": ["contexto_pessoal", "precedentes"],
+        "periodo_fim": fim.isoformat(),
+        "extrato": [
+            {"id": t.id, "dia": t.day.isoformat(), "valor_centavos": centavos(t.amount),
+             "fluxo": t.flow, "categoria": t.category, "contraparte": t.counterparty}
+            for t in transacoes
+        ],
+        "casos": casos,
+    }
+
+
+def ouro_causas() -> dict:
+    """Causas: o que o motor recusa gravar, e quanto da despesa tem explicação.
+
+    Aqui o que se protege é mais regra de produto do que aritmética. As cinco
+    recusas de `gravar` são o desenho do FinTips em código — se a porta aceitar
+    uma causa de origem `importacao`, o app passa a deduzir motivo do extrato,
+    que é exatamente o erro que este projeto existe para não cometer.
+
+    A cobertura tem duas sutilezas de conta:
+
+    - o `por_mes` divide pelo número de meses **distintos** do extrato, não
+      pelo período em dias;
+    - causa vencida **sai** do conjunto que explica dinheiro, então a cobertura
+      cai sozinha quando o prazo de revisão passa. É o que faz a fila de
+      triagem voltar a cobrar.
+    """
+    from datetime import date as _date
+
+    from fintips import causes as causes_mod
+    from fintips.contracts import Causa, Proveniencia
+
+    hoje = _date(2026, 6, 15)
+
+    def prov(origem="usuario", porque="a pessoa contou", confianca=1.0):
+        return Proveniencia(origem=origem, confianca=confianca, porque=porque,
+                            quando=QUANDO_FIXO, por_quem="claude")
+
+    # extrato com três categorias e contrapartes repetidas em dois meses
+    stmt = _extrato_sintetico([
+        {"mes": "2026-05", "renda_centavos": 500000, "despesa_centavos": 40000,
+         "categoria": "alimentacao", "contraparte": "Delivery"},
+        {"mes": "2026-06", "renda_centavos": 500000, "despesa_centavos": 30000,
+         "categoria": "transporte", "contraparte": "App de Corrida"},
+    ])
+
+    # as cinco recusas, uma a uma
+    recusas = []
+    base = dict(efeito_tipo="categoria", efeito_ref="alimentacao", natureza="gatilho",
+                enunciado="peço delivery depois do plantão")
+    for nome, kw in [
+        ("origem_heuristica", {"proveniencia": prov(origem="heuristica")}),
+        ("origem_importacao", {"proveniencia": prov(origem="importacao")}),
+        ("porque_vazio", {"proveniencia": prov(porque="")}),
+        ("enunciado_vazio", {"enunciado": "   ", "proveniencia": prov()}),
+        ("efeito_tipo_invalido", {"efeito_tipo": "chute", "proveniencia": prov()}),
+        ("efeito_ref_vazio", {"efeito_ref": "  ", "proveniencia": prov()}),
+        ("atitude_invalida", {"atitude": "sumir", "proveniencia": prov()}),
+        ("natureza_vazia", {"natureza": " ", "proveniencia": prov()}),
+    ]:
+        args = dict(base); args.update(kw)
+        loja = causes_mod.CauseStore(RAIZ / ".ouro-tmp-causas.yaml")
+        try:
+            loja.gravar(**args)
+            recusas.append({"caso": nome, "recusou": False, "erro": None})
+        except ValueError as e:
+            recusas.append({"caso": nome, "recusou": True, "erro": str(e)})
+    (RAIZ / ".ouro-tmp-causas.yaml").unlink(missing_ok=True)
+
+    # ids estáveis: mesma tripla, mesmo id
+    ids = []
+    for tipo, ref, nat in [
+        ("categoria", "alimentacao", "gatilho"),
+        ("categoria", "alimentacao", "habito"),
+        ("contraparte", "delivery", "gatilho"),
+        ("categoria", "alimentação", "gatilho"),
+    ]:
+        from fintips.contracts import novo_id
+        ids.append({"efeito_tipo": tipo, "efeito_ref": ref, "natureza": nat,
+                    "id": novo_id("causa", tipo, ref, nat)})
+
+    # o conjunto que a cobertura enxerga
+    causas = [
+        Causa(id="c1", efeito_tipo="categoria", efeito_ref="alimentacao",
+              natureza="gatilho", enunciado="chego destruído às 22h",
+              atitude="aceitar", proveniencia=prov(), criado_em=QUANDO_FIXO),
+        Causa(id="c2", efeito_tipo="contraparte", efeito_ref="App de Corrida",
+              natureza="necessidade", enunciado="não tem ônibus nesse horário",
+              atitude="nenhuma", proveniencia=prov(), criado_em=QUANDO_FIXO,
+              revisar_em="2026-12-31"),
+        # vencida: sai das ativas e para de explicar dinheiro
+        Causa(id="c3", efeito_tipo="categoria", efeito_ref="transporte",
+              natureza="evento", enunciado="obra na linha do metrô",
+              atitude="observar", proveniencia=prov(), criado_em=QUANDO_FIXO,
+              revisar_em="2026-03-01"),
+    ]
+
+    def cobertura_com(lista, quando):
+        loja = causes_mod.CauseStore(RAIZ / ".ouro-tmp-cob.yaml")
+        loja.causas = {c.id: c for c in lista}
+        out = {
+            "cobertura": loja.cobertura(stmt, hoje=quando),
+            "ativas": sorted(c.id for c in loja.ativas(quando)),
+            "vencidas": sorted(c.id for c in loja.vencidas(quando)),
+            "sem_atitude": sorted(c.id for c in loja.sem_atitude()),
+            "por_alvo": {k: sorted(x["id"] for x in v) for k, v in loja.por_alvo().items()},
+        }
+        (RAIZ / ".ouro-tmp-cob.yaml").unlink(missing_ok=True)
+        return out
+
+    cenarios = [
+        {"nome": "sem_causa_nenhuma", "causas": [], "hoje": hoje.isoformat()},
+        {"nome": "com_as_tres", "causas": [c.id for c in causas], "hoje": hoje.isoformat()},
+        # antes de a c3 vencer, a cobertura é maior
+        {"nome": "antes_de_vencer", "causas": [c.id for c in causas], "hoje": "2026-02-01"},
+        # aqui o transporte só é explicado pela causa vencida: quando o prazo
+        # passa, a cobertura cai sozinha e a triagem volta a cobrar. É este par
+        # de cenários que trava a regra do vencimento
+        {"nome": "so_a_vencida_explica_o_transporte", "causas": ["c1", "c3"],
+         "hoje": hoje.isoformat()},
+        {"nome": "a_mesma_antes_de_vencer", "causas": ["c1", "c3"], "hoje": "2026-02-01"},
+    ]
+    por_cenario = []
+    for c in cenarios:
+        lista = [x for x in causas if x.id in c["causas"]]
+        por_cenario.append({
+            "nome": c["nome"], "hoje": c["hoje"], "causas": c["causas"],
+            "saida": cobertura_com(lista, _date.fromisoformat(c["hoje"])),
+        })
+
+    return {
+        "o_que_e": "causas: as recusas de gravação, os filtros por prazo e a cobertura da despesa",
+        "gerado_por": "fintips.causes",
+        "hoje_fixo": hoje.isoformat(),
+        "efeitos": list(causes_mod.EFEITOS),
+        "extrato": [
+            {"id": t.id, "dia": t.day.isoformat(), "valor_centavos": centavos(t.amount),
+             "fluxo": t.flow, "categoria": t.category, "contraparte": t.counterparty}
+            for t in stmt.transactions
+        ],
+        "causas": [c.to_dict() for c in causas],
+        "recusas": recusas,
+        "ids_estaveis": ids,
+        "cenarios": por_cenario,
+    }
+
+
+def ouro_perfil() -> dict:
+    """Perfil: o catálogo casado por número, e a assinatura que só gente dá.
+
+    Três coisas separadas moram aqui, e a porta erra em cada uma de um jeito:
+
+    **O formato `:g`.** A evidência sai como `"taxa_poupanca = 0.9926 (esperado
+    ≥ 0.2)"`, e aquele número passa por `f"{v:g}"` — seis dígitos
+    significativos, zeros à direita cortados, notação científica abaixo de 1e-4
+    e a partir de 1e+6. Kotlin não tem equivalente direto, e uma aproximação
+    ("tira o .0 do fim") acerta os casos comuns e escreve `99.99999` onde o
+    Python escreve `100`. A tabela abaixo é o que trava isso.
+
+    **O empate.** `casar` ordena por aderência decrescente com ordenação
+    **estável** e, se os dois primeiros empatam, devolve `sugerido: None` com o
+    motivo. Não ter leitura é estado honesto — a triagem prefere perguntar a
+    chutar. Uma porta com ordenação instável devolve um arquétipo diferente a
+    cada execução, sem nunca acusar empate.
+
+    **A assinatura.** Heurística e importação não assinam perfil, por
+    definição. E um traço de autoridade menor não derruba um maior: o palpite
+    do agente não apaga o que a pessoa afirmou.
+    """
+    from fintips import profile as profile_mod
+    from fintips.contracts import Proveniencia
+
+    catalogo = profile_mod.carregar_catalogo()
+
+    # 1. o formato :g, com as bordas da notação científica
+    valores_g = [0, 0.0, 1, 100, 100.0, 0.9926, 0.2, 35, 121.4, 2.5, 0.5,
+                 99.99999, 0.30000000000000004, -3.75, 0.0001, 1e-05, 1.2e-05,
+                 999999.0, 1000000, 1234567.0, 12345678, 0.123456789, 1.5e-07,
+                 # o arredondamento para 6 dígitos empurra para a próxima
+                 # potência e vira a chave da notação científica: 999999,5 sai
+                 # como 1e+06, e 9,999999e-05 sai como 0,0001. Sem estes, uma
+                 # porta que não reconfira o expoente passa limpa
+                 999999.4, 999999.5, 999999.9, 9.999999e-05]
+    formato_g = [{"valor": v, "texto": f"{v:g}"} for v in valores_g]
+
+    # 2. o catálogo inteiro, para o Kotlin montar sem depender de YAML
+    catalogo_json = [
+        {"id": e.id, "nome": e.nome, "o_que_e": e.o_que_e, "minimo": e.minimo,
+         "arquetipos": [
+             {"id": a.id, "nome": a.nome, "descricao": a.descricao,
+              "o_que_muda": a.o_que_muda, "eixo": a.eixo,
+              "sinais": [{"indicador": s.indicador, "min": s.minimo,
+                          "max": s.maximo, "peso": s.peso} for s in a.sinais]}
+             for a in e.arquetipos
+         ]}
+        for e in catalogo
+    ]
+
+    # 3. conjuntos de indicadores que exercitam casamento, empate e piso
+    conjuntos = [
+        {"nome": "tudo_ausente", "ind": {}},
+        {"nome": "poupador_disciplinado", "ind": {
+            "taxa_poupanca": 0.35, "meses_de_reserva": 8.0, "meses_no_vermelho": 0.0,
+            "volatilidade_despesa": 0.08, "comprometido_pct_renda": 22.0,
+            "despesa_em_micro_pct": 5.0, "transacoes_micro_pct": 20.0,
+            "concentracao_top3_categorias": 55.0, "renda_variacao": 0.02,
+            "meses_com_renda_pct": 1.0}},
+        {"nome": "sufocado", "ind": {
+            "taxa_poupanca": -0.05, "meses_de_reserva": 0.2, "meses_no_vermelho": 3.0,
+            "volatilidade_despesa": 0.4, "comprometido_pct_renda": 82.0,
+            "despesa_em_micro_pct": 30.0, "transacoes_micro_pct": 60.0,
+            "concentracao_top3_categorias": 40.0, "renda_variacao": 0.5,
+            "meses_com_renda_pct": 0.6}},
+        {"nome": "renda_variavel", "ind": {
+            "taxa_poupanca": 0.15, "meses_de_reserva": 4.0, "meses_no_vermelho": 1.0,
+            "volatilidade_despesa": 0.25, "comprometido_pct_renda": 45.0,
+            "despesa_em_micro_pct": 12.0, "transacoes_micro_pct": 45.0,
+            "concentracao_top3_categorias": 62.0, "renda_variacao": 0.35,
+            "meses_com_renda_pct": 0.75}},
+        # as faixas do catálogo são inclusivas dos dois lados, então 35,0 casa
+        # com 'enxuto' (máx 35) e 'carregado' (mín 35) ao mesmo tempo, e 0,2
+        # casa com 'estavel' e 'oscilante'. Dá empate com aderência 1.0 — acima
+        # do mínimo do eixo, que é o único empate capaz de virar sugestão falsa
+        {"nome": "empate_acima_do_minimo", "ind": {
+            "taxa_poupanca": 0.2, "meses_de_reserva": 3.0, "meses_no_vermelho": 0.0,
+            "volatilidade_despesa": 0.2, "comprometido_pct_renda": 35.0,
+            "despesa_em_micro_pct": 8.0, "transacoes_micro_pct": 30.0,
+            "concentracao_top3_categorias": 70.0, "renda_variacao": 0.1,
+            "meses_com_renda_pct": 1.0}},
+        # o do fixture: sobra altíssima de um mês só
+        {"nome": "fixture_um_mes_so", "ind": {
+            "taxa_poupanca": 0.9926, "meses_de_reserva": 0.0, "meses_no_vermelho": 0.0,
+            "volatilidade_despesa": 0.0, "comprometido_pct_renda": 0.0,
+            "despesa_em_micro_pct": 100.0, "transacoes_micro_pct": 100.0,
+            "concentracao_top3_categorias": 100.0, "renda_variacao": None,
+            "meses_com_renda_pct": 1.0}},
+    ]
+
+    casamentos = []
+    for c in conjuntos:
+        ind = dict.fromkeys(
+            ["taxa_poupanca", "meses_de_reserva", "meses_no_vermelho",
+             "volatilidade_despesa", "comprometido_pct_renda", "comprometido_pct_despesa",
+             "despesa_em_micro_pct", "transacoes_micro_pct",
+             "concentracao_top3_categorias", "renda_variacao", "meses_com_renda_pct",
+             "meses_observados"],
+        )
+        ind.update(c["ind"])
+        ctx_falso = {"__indicadores__": ind}
+        # `casar` chama `indicadores(ctx)`; aqui o teste quer controlar os
+        # números, então o casamento é feito arquétipo a arquétipo
+        eixos = []
+        for eixo in catalogo:
+            avaliados = sorted((a.avaliar(ind) for a in eixo.arquetipos),
+                               key=lambda d: d["aderencia"], reverse=True)
+            melhor = avaliados[0] if avaliados else None
+            empate = (len(avaliados) > 1 and melhor is not None
+                      and avaliados[1]["aderencia"] == melhor["aderencia"])
+            sugerido = (melhor if melhor and melhor["aderencia"] >= eixo.minimo
+                        and not empate else None)
+            eixos.append({
+                "eixo": eixo.id, "nome": eixo.nome, "o_que_e": eixo.o_que_e,
+                "minimo": eixo.minimo, "sugerido": sugerido, "candidatos": avaliados,
+                "sem_leitura_porque": (
+                    None if sugerido
+                    else "empate entre arquétipos" if empate
+                    else "nenhum arquétipo atingiu a aderência mínima"),
+            })
+        casamentos.append({"nome": c["nome"], "indicadores": ind, "eixos": eixos})
+
+    # 4. as recusas de assinatura
+    def tenta(**kw):
+        loja = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil.yaml")
+        try:
+            loja.assinar(catalogo=catalogo, **kw)
+            return {"recusou": False, "erro": None}
+        except ValueError as e:
+            return {"recusou": True, "erro": str(e)}
+        finally:
+            (RAIZ / ".ouro-tmp-perfil.yaml").unlink(missing_ok=True)
+
+    def prov(origem="usuario", porque="sou PJ e recebo por projeto"):
+        return Proveniencia(origem=origem, confianca=1.0, porque=porque,
+                            quando=QUANDO_FIXO, por_quem="claude")
+
+    recusas = [
+        {"caso": "origem_heuristica", **tenta(
+            eixo="renda", arquetipo="variavel", proveniencia=prov(origem="heuristica"))},
+        {"caso": "origem_importacao", **tenta(
+            eixo="renda", arquetipo="variavel", proveniencia=prov(origem="importacao"))},
+        {"caso": "porque_vazio", **tenta(
+            eixo="renda", arquetipo="variavel", proveniencia=prov(porque=""))},
+        {"caso": "eixo_desconhecido", **tenta(
+            eixo="signo", arquetipo="variavel", proveniencia=prov())},
+        {"caso": "arquetipo_fora_do_eixo", **tenta(
+            eixo="renda", arquetipo="acumulacao", proveniencia=prov())},
+        {"caso": "personalizado_sem_nome", **tenta(
+            eixo="renda", arquetipo="personalizado", proveniencia=prov())},
+        {"caso": "personalizado_sem_descricao", **tenta(
+            eixo="renda", arquetipo="personalizado", nome="Meu jeito",
+            proveniencia=prov())},
+        {"caso": "personalizado_completo", **tenta(
+            eixo="renda", arquetipo="personalizado", nome="Meu jeito",
+            descricao="recebo por projeto e por aluguel", proveniencia=prov())},
+    ]
+
+    # 5. autoridade: agente não derruba usuário, e o inverso derruba
+    loja = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil2.yaml")
+    loja.assinar(eixo="renda", arquetipo="variavel", catalogo=catalogo,
+                 proveniencia=prov(origem="usuario", porque="a pessoa afirmou"))
+    depois_do_agente = loja.assinar(
+        eixo="renda", arquetipo="fixa", catalogo=catalogo,
+        proveniencia=prov(origem="agente", porque="o agente concluiu")).to_dict()
+    loja2 = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil3.yaml")
+    loja2.assinar(eixo="renda", arquetipo="variavel", catalogo=catalogo,
+                  proveniencia=prov(origem="agente", porque="o agente concluiu"))
+    depois_do_usuario = loja2.assinar(
+        eixo="renda", arquetipo="fixa", catalogo=catalogo,
+        proveniencia=prov(origem="usuario", porque="a pessoa corrigiu")).to_dict()
+    # autoridade IGUAL substitui: a pessoa muda de ideia sobre o próprio perfil,
+    # e a segunda afirmação dela vale. Com `>=` no lugar de `>`, a primeira
+    # assinatura trancaria o eixo para sempre
+    loja3 = profile_mod.PerfilStore(RAIZ / ".ouro-tmp-perfil4.yaml")
+    loja3.assinar(eixo="renda", arquetipo="variavel", catalogo=catalogo,
+                  proveniencia=prov(origem="usuario", porque="achei que era isso"))
+    mesma_autoridade = loja3.assinar(
+        eixo="renda", arquetipo="mista", catalogo=catalogo,
+        proveniencia=prov(origem="usuario", porque="pensando melhor, é mista")).to_dict()
+    for f in (".ouro-tmp-perfil2.yaml", ".ouro-tmp-perfil3.yaml", ".ouro-tmp-perfil4.yaml"):
+        (RAIZ / f).unlink(missing_ok=True)
+
+    return {
+        "o_que_e": "perfil: formato :g, casamento do catálogo, empate e as recusas de assinatura",
+        "gerado_por": "fintips.profile",
+        "formato_g": formato_g,
+        "catalogo": catalogo_json,
+        "casamentos": casamentos,
+        "recusas": recusas,
+        "autoridade": {
+            "agente_nao_derruba_usuario": depois_do_agente,
+            "usuario_derruba_agente": depois_do_usuario,
+            "mesma_autoridade_substitui": mesma_autoridade,
+        },
+    }
+
+
+def ouro_yaml() -> dict:
+    """O YAML que o Python grava, caractere por caractere.
+
+    Este é o ouro que protege a migração. Se o motor Kotlin gravar um arquivo
+    que o Python leia diferente — ou não leia —, a pessoa perde o histórico, e
+    **isso não aparece em cálculo nenhum**: aparece como arquivo estranho
+    semanas depois.
+
+    O que parece detalhe de formatação e não é:
+
+    - `hora: '10:00'` sai com aspas e `hora: 08:00` sai sem. YAML 1.1 lê
+      `10:00` como inteiro sexagesimal (600 minutos), e o PyYAML cita para
+      impedir isso; `08:00` começa com zero, não casa o padrão sexagesimal, e
+      fica em texto puro. Os dois estão no mesmo arquivo canônico hoje.
+    - `-a` é texto puro, `- a` precisa de aspas: o indicador só vale seguido de
+      espaço.
+    - `nan` é texto puro e `.nan` é citado; `1e3` é puro e `1.5` é citado.
+    - sequência dentro de mapa **não indenta** no PyYAML: `transacoes:` e o
+      `- id:` começam na mesma coluna.
+
+    Nenhuma dessas regras é adivinhável. Todas estão aqui como caso.
+    """
+    import yaml as _yaml
+
+    def emitir(obj):
+        return _yaml.safe_dump(obj, allow_unicode=True, sort_keys=False,
+                               default_flow_style=False)
+
+    # 1. escalares: o corpus que decide quando citar
+    escalares = [
+        # texto que colide com outro tipo do YAML 1.1
+        "10:00", "08:00", "1:30", "60:00", "0:00", "123", "0123", "0x1f", "12_3",
+        "1.5", "1e3", "+12", "-12", "0", "0o17",
+        "yes", "no", "true", "True", "false", "on", "off", "y", "n", "Y", "N",
+        "null", "Null", "NULL", "~", ".inf", "-.inf", ".nan", "nan", "inf",
+        "2026-06-15", "2026-6-5", "2026-06-15T10:30:00",
+        # vazio, espaço e indicadores
+        "", " ", "  ", "a b", "a: b", "a:b", "a #b", "a#b", "#a", "-a", "- a",
+        "-", "?", "a?", "? a", ":", ":a", "[a]", "{a}", "*a", "&a", "!a", "|a",
+        ">a", "%a", "@a", "`a", '"a', "'a", "a'b", 'a"b', ",a", "a,b",
+        "  começo", "fim  ", "---", "...", "a\tb", "a\nb",
+        # o que o projeto de fato grava
+        "acentuação", "é", "alimentacao", "Gelato Roma", "EMV CMT",
+        "acct:b125ff343a", "ofx:PagSeguro Internet S/A", "dec-87cc5cf5",
+        "peço delivery depois do plantão", "não tem ônibus nesse horário",
+        "transporte.reembolsado_pela_empresa", "R$ 1.234,56",
+        "sobra alguma coisa todo mês, mas a reserva ainda não cobre um tombo",
+    ]
+    casos_escalares = [
+        {"valor": v, "linha": emitir({"k": v}).rstrip("\n")} for v in escalares
+    ]
+
+    # 1b. float: o `repr` do Python vira científico só a partir de 1e16, e o
+    # `toString` do Kotlin vira em 1e7. Um patrimônio de dez milhões sairia
+    # como `1.0E7` e o Python leria outra coisa
+    floats = [0.0, -0.0, 1.0, 100.0, 4533.1, -0.01, 0.9926, 1.5, 0.1, 1234.56,
+              1e6, 1e7, 1e15, 1e16, 1e17, 1e-3, 1e-4, 1e-5, 123456789.12,
+              1 / 3, 2 / 3, 1e22, 1e-300, 2.2250738585072014e-308,
+              1.7976931348623157e308]
+    # Fora: `5e-324`, o menor subnormal. Ali o `Double.toString` da JVM devolve
+    # "4.9E-324" e o `repr` do Python devolve "5e-324" — os dois fazem
+    # round-trip, e os dois discordam sobre qual é a forma mais curta. Numa
+    # amostra de 8 mil doubles (metade em faixa de dinheiro, metade em padrões
+    # de bits aleatórios) foi a única discordância encontrada, e é um valor que
+    # não existe em extrato. Fica registrado aqui em vez de escondido.
+    casos_floats = [{"valor_repr": repr(f), "linha": emitir({"k": f}).rstrip("\n")}
+                    for f in floats]
+
+    # 2. os outros tipos que os arquivos carregam
+    outros = [
+        {"nome": "inteiro", "obj": {"k": 42}},
+        {"nome": "inteiro_negativo", "obj": {"k": -7}},
+        {"nome": "zero", "obj": {"k": 0}},
+        {"nome": "float", "obj": {"k": 1.5}},
+        {"nome": "float_inteiro", "obj": {"k": 100.0}},
+        {"nome": "float_negativo", "obj": {"k": -0.01}},
+        {"nome": "float_longo", "obj": {"k": 0.9926}},
+        {"nome": "bool_true", "obj": {"k": True}},
+        {"nome": "bool_false", "obj": {"k": False}},
+        {"nome": "nulo", "obj": {"k": None}},
+        {"nome": "lista_vazia", "obj": {"k": []}},
+        {"nome": "mapa_vazio", "obj": {"k": {}}},
+        {"nome": "lista_de_texto", "obj": {"k": ["a", "b"]}},
+        {"nome": "lista_de_mapas", "obj": {"k": [{"a": 1}, {"a": 2}]}},
+        {"nome": "mapa_aninhado", "obj": {"k": {"a": {"b": {"c": 1}}}}},
+        {"nome": "lista_em_mapa_em_lista",
+         "obj": {"k": [{"a": ["x", "y"]}, {"a": []}]}},
+        {"nome": "chave_que_precisa_de_aspas", "obj": {"10:00": "v", "sim": 1}},
+        {"nome": "raiz_lista", "obj": [{"a": 1}, {"b": 2}]},
+        {"nome": "ordem_preservada",
+         "obj": {"z": 1, "a": 2, "m": 3, "b": 4}},
+    ]
+    casos_outros = [{"nome": o["nome"], "texto": emitir(o["obj"])} for o in outros]
+
+    # 3. documentos inteiros, no formato exato que o motor grava
+    documentos = [
+        {"nome": "causas", "obj": {
+            "schema_version": 1,
+            "atualizado_em": "2026-06-15T10:30:00",
+            "causas": [{
+                "id": "causa-abc",
+                "efeito": {"tipo": "categoria", "ref": "alimentacao"},
+                "alvo": "categoria:alimentacao",
+                "natureza": "gatilho",
+                "enunciado": "peço delivery depois do plantão",
+                "atitude": "aceitar",
+                "atitude_nota": "é o custo de trabalhar à noite",
+                "evidencia": ["tx-9", "tx-12"],
+                "revisar_em": "2027-01-01",
+                "vencida": False,
+                "criado_em": "2026-06-15T10:30:00",
+                "proveniencia": {
+                    "origem": "usuario", "confianca": 1.0,
+                    "porque": "a pessoa afirmou", "evidencia": [],
+                    "quando": "2026-06-15T10:30:00", "por_quem": "claude",
+                },
+            }],
+        }},
+        {"nome": "canonico_com_hora", "obj": {
+            "schema_version": 1,
+            "gerado_em": "2026-09-25T18:07:53",
+            "origem": "ofx:PagSeguro Internet S/A",
+            "conta": {"id_hash": "acct:b125ff343a", "bank_id": "290",
+                      "type": "CHECKING", "currency": "BRL"},
+            "periodo": {"inicio": "2026-06-01", "fim": "2026-06-15"},
+            "saldo": {"conta": 4533.1, "em": "2026-06-30"},
+            "transacoes": [
+                {"id": "f1", "data": "2026-06-01", "hora": "10:00",
+                 "valor": -100.0, "fluxo": "savings_out"},
+                {"id": "f2", "data": "2026-06-05", "hora": "08:00",
+                 "valor": -50.25, "fluxo": "expense"},
+            ],
+        }},
+        {"nome": "patrimonio", "obj": {
+            "atualizado_em": "2026-06-15",
+            "posicoes": [
+                {"nome": "Conta corrente", "tipo": "conta", "valor": 1500.0,
+                 "liquidez": "imediata"},
+                {"nome": "CDB", "tipo": "renda_fixa", "valor": 20000.0,
+                 "liquidez": "d_mais_1"},
+            ],
+        }},
+        {"nome": "vazios", "obj": {
+            "schema_version": 1, "itens": [], "mapa": {}, "nada": None,
+            "texto_vazio": "",
+        }},
+    ]
+    casos_documentos = [
+        {"nome": d["nome"], "objeto_json": d["obj"], "texto": emitir(d["obj"])}
+        for d in documentos
+    ]
+
+    return {
+        "o_que_e": "o YAML que o Python grava: quando citar, como indentar, e os documentos inteiros",
+        "gerado_por": "yaml.safe_dump(allow_unicode=True, sort_keys=False)",
+        "escalares": casos_escalares,
+        "floats": casos_floats,
+        "outros_tipos": casos_outros,
+        "documentos": casos_documentos,
     }
 
 
@@ -749,6 +1787,12 @@ GERADORES = {
     "regras.json": ouro_regras,
     "analise.json": ouro_analise,
     "score.json": ouro_score,
+    "projecao.json": ouro_projecao,
+    "planos.json": ouro_planos,
+    "compras.json": ouro_compras,
+    "causas.json": ouro_causas,
+    "perfil.json": ouro_perfil,
+    "yaml.json": ouro_yaml,
     # Os próximos entram aqui, na ordem da porta:
     #   "classificacao.json" — regras determinísticas e cobertura
     #   "analise.json"       — baseline, meses, recorrências
