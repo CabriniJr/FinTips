@@ -1,0 +1,56 @@
+name: Android CI
+
+on:
+  push:
+    branches: ["codex/**", "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Testar e reconstruir a UI embarcada
+        working-directory: web
+        run: |
+          npm ci
+          npm test
+          npm run build
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Compilar debug e Compose release
+        working-directory: kotlin
+        run: ./gradlew -Pfintips.android=true -Pfintips.ciPreview=true :app:assembleDebug :app:assembleRelease --no-daemon
+      - name: Verificar e empacotar o APK de teste
+        env:
+          FINTIPS_EXPECTED_PACKAGE: com.fintips.app.ci
+          FINTIPS_APK_NAME: FinTips-Android-ci.apk
+        run: python3 scripts/verificar-apk.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-ci-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Resumo
+        run: |
+          echo '## APK de teste disponível em Artifacts' >> "$GITHUB_STEP_SUMMARY"
+          echo 'FinTips CI usa pacote próprio; não substitui o FinTips UI instalado.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'A UI do APK ainda é WebView; o alvo Compose também foi compilado.' >> "$GITHUB_STEP_SUMMARY"

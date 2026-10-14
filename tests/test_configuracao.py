@@ -133,9 +133,26 @@ def test_as_permissoes_vem_do_manifesto_compilado(ws):
     """A pergunta que importa é o que o binário pede, não o que alguém
     lembrou de escrever numa lista paralela."""
     d = cfg.montar(ws, RAIZ)
-    assert d["privacidade"]["permissoes_do_app"] == []
+    # AndroidX Core protege receivers com uma permissão própria de assinatura.
+    # Ela aparece após assembleDebug/Release; não é uma permissão de usuário.
+    internas = {f"{pacote}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" for pacote in (
+        "com.fintips.app", "com.fintips.app.ui", "com.fintips.app.ci")}
+    assert set(d["privacidade"]["permissoes_do_app"]) <= internas
     assert d["privacidade"]["sem_permissao_de_rede"] is True
     assert d["privacidade"]["backup_automatico"] == "false"
+
+
+def test_manifesto_compilado_nao_esconde_permissao_de_rede(tmp_path):
+    manifesto = tmp_path / "kotlin/app/build/intermediates/merged_manifests/debug/AndroidManifest.xml"
+    manifesto.parent.mkdir(parents=True)
+    manifesto.write_text('''<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+      <uses-permission android:name="com.fintips.app.ui.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+      <uses-permission android:name="android.permission.INTERNET"/>
+    </manifest>''', encoding="utf-8")
+    assert cfg._permissoes_do_manifesto(tmp_path) == [
+        "android.permission.INTERNET",
+        "com.fintips.app.ui.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+    ]
 
 
 def test_a_ficha_da_loja_diz_que_nao_coleta_e_diz_por_que(ws):

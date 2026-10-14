@@ -18,8 +18,10 @@ android {
     buildFeatures { compose = true }
     buildTypes {
         getByName("debug") {
-            applicationIdSuffix = ".ui"
-            versionNameSuffix = "-ui-preview.3"
+            val ci = providers.gradleProperty("fintips.ciPreview").orNull == "true"
+            applicationIdSuffix = if (ci) ".ci" else ".ui"
+            versionNameSuffix = if (ci) "-ci" else "-ui-preview.3"
+            manifestPlaceholders["previewLabel"] = if (ci) "FinTips CI" else "FinTips UI"
         }
     }
     // APK de avaliação: a UI revisada roda sem servidor no próprio aparelho.
