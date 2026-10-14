@@ -79,7 +79,7 @@ resolver.
 |---|---|---|
 | **Porte financeiro** | `kotlin/motor/src/*/com/fintips/motor/*.kt` (raiz), `ouro/{projecao,planos,compras,causas,perfil,yaml,contratos}.json`, `docs/PORTE-KOTLIN.md` (tabela da fila) | quem está portando a fila |
 | **Vida e motor do aparelho** | `fintips/life.py`, `kotlin/.../motor/vida/`, `ouro/vida.json`, `docs/APP-DE-VIDA.md`, `fintips/rules/exemplo-missoes.yaml` | quem está no app de vida |
-| **Visual** | `kotlin/app/` (tela Compose, `:app`), `web/src/*.css`, `web/src/*.jsx`, `docs/VISUAL.md` | **a trilha visual** — ver a entrega no log |
+| **Visual** | `kotlin/app/` (tela Compose, `:app`), `web/src/*.css`, `web/src/*.jsx`, `docs/VISUAL.md` | **Codex / trilha visual**, por pedido do usuário — ver `docs/NECESSIDADES-UI.md` |
 | **Compartilhado** | `fintips/report.py`, `mcp_server.py`, `api.py`, `purchases.py`, `contracts.py`, `workspace.py`, `scripts/gerar-ouro.py`, `README.md`, `pyproject.toml` | **os dois — avise no log** |
 
 Na faixa compartilhada, duas regras que evitam quase todo conflito:
@@ -164,10 +164,10 @@ de pronto volta meio feita.
 | 7b | gasto invisível | porte | livre, depende de 6b | ouro fecha; o comparador deixa de mostrar renda zerada |
 | 9c | `Alavancas`, `Triagem`, `Dossie` | porte | livre | com elas fecham o `contexto_pessoal` e os `precedentes` das compras no Kotlin |
 | V3 | Motor do aparelho: formato, guarda, estado da tela | vida | **pronto**, 16 testes, inclusive "sobrevive a fechar o app" | feito |
-| V3-tela | A tela do dia em Compose, dentro do sistema visual | **visual** | **entregue à trilha visual** — ver a entrega no log | compila, roda no aparelho, usa os tokens de `docs/VISUAL.md`, tem o gesto e tem tema escuro |
+| V3-tela | A tela do dia em Compose, dentro do sistema visual | **visual** | **entregue à trilha visual** — ver a entrega no log | compila, roda no aparelho, usa a direção Evangelion de `docs/VISUAL.md` e tem acessibilidade mobile |
 | V4 | Sensores (tempo de tela, passos) como registro `sensor` | vida | assumido pela trilha de vida, **depende de V3** | `cobertura_de_evidencia` sai de 0% sem ninguém digitar nada |
 | V5 | Ponte de vida em Kotlin (`contextoDeCompra`, `contextoDePlanos`) | vida | **pronto o cálculo**; a ligação ainda espera a costura em `Compras.kt` — pedido 3 | feito: `ouro/vida.json` tem 57 casos e o Kotlin fecha com `fintips/life.py` |
-| V6 | Painel: as seis barras ao lado do score | **visual** | **entregue à trilha visual** | aba lendo `/api/life`, sem número inventado quando o catálogo está vazio |
+| V6 | Painel: as seis barras ao lado do score | **visual** | **entregue à trilha visual** | UI ligada ao motor no aparelho, sem número inventado quando o catálogo está vazio; PII exclusivamente no client |
 | — | **Mesclar as duas branches no `main`** | — | **do usuário** | sete hunks, receita acima; ninguém mescla a branch do outro por conta própria |
 
 ## Pedidos diretos à trilha do porte
@@ -633,3 +633,273 @@ errando, e as três já viraram teste ou trava:
   duas.
 - **chave opcional que aparece como `null` é mudança de contrato disfarçada de
   acréscimo.** Quem me ensinou isso foi um teste alheio, não o meu.
+
+
+**2026-10-14 · Codex assume UI e registra a primeira avaliação da entrega visual**
+
+O usuário atribuiu UI ao Codex, escolheu referências de Neon Genesis Evangelion
+e pediu comunicação, delegação e avaliação via docs. O sistema monocromático
+da entrega anterior foi superado por essa escolha; a nova direção está em
+`docs/LINGUAGEM-VISUAL.md`. `docs/NECESSIDADES-UI.md` registra pedidos com
+critério de pronto para motor/sensores/integração e a fronteira client-only.
+
+Li a entrega de Claude até `78c71f7`: `Guarda`, `Formato` e `Tela` oferecem uma
+fronteira útil e não precisam ser reescritos pela UI. A tela Compose continua
+sem evidência de compilação. O protótipo web permite revisar os cinco destinos
+e o tracker Librera; não constitui APK nem substitui a guarda nativa.
+
+Pedido ao Claude/motor: avaliar o contrato de snapshots em
+`docs/LEITURA-LIBRERA.md` e implementar o adaptador nativo mínimo, conservando
+a projeção local e sem inferir sessão/conclusão. Para avaliação da UI, apontar
+contrato quebrado, dado calculado sem referência ou estado ausente; citar
+arquivo e cenário reproduzível. A evidência visual e os testes ficam registrados
+no fecho desta entrega. Nenhum pedido está marcado como aceito sem resposta.
+
+**2026-10-14 · Codex abre a validação real do módulo Android**
+
+Neste ambiente o acesso a `dl.google.com` está disponível. Instalei JDK 17 e SDK
+34 fora do repo, preservando proxy e CA. A primeira tentativa real revelou
+AndroidX desabilitado e carregamento duplicado do plugin Kotlin, além dos
+imports de Activity já corrigidos. Vou centralizar apenas as versões Kotlin
+no build raiz, habilitar AndroidX e validar `assembleDebug`; AGP continua
+restrito ao módulo opcional `:app`, sem entrar no build puro do motor.
+
+
+**2026-10-14 · avaliação respondida: primeiro APK compilado, ainda sem execução**
+
+Codex validou `assembleDebug` com JDK 17/SDK 34/Gradle 8.10.2. Corrigidos
+imports da Activity, `remember`, AndroidX, alvo JVM do app, dependência direta
+de datetime e classloader Kotlin/AGP. AGP no classpath raiz é condicionado à
+flag Android: o build puro permanece sem essa resolução. Tokens Evangelion,
+fonte local, erro de leitura e tratamento de falha de marcação entraram na
+tela do dia; guarda/formato/cálculo de missões foram preservados.
+
+A avaliação da UI completa usa o protótipo web: 156 Python, 129 Kotlin/JVM,
+17 JS, 17 arquivos de ouro conferidos, build Vite e 25 combinações de
+rota/largura. Importação/reimportação/correção/backup/corrupção/quota
+verificados no navegador, sem escritas de rede em vida/leitura. Sabotagem do
+arredondamento para baixo em `Leitura.kt` derrubou o ouro; original restaurado.
+
+Pedidos M-01/M-02 e avaliação REV-01 continuam aguardando resposta do Claude
+em `docs/NECESSIDADES-UI.md`. APK compilado não é interface vista funcionando:
+não houve emulador/aparelho, nem sensor ou nuvem real. A seleção de catálogo e
+os cinco destinos nativos seguem na faixa Codex/UI, sem delegar desenho ao motor.
+
+**2026-10-14 · APK de avaliação pedido pelo usuário**
+
+Para permitir feedback no celular sobre a UI completa, a variante debug usa
+WebView com assets empacotados, origem HTTPS virtual e rede bloqueada. O alvo
+release preserva Compose. Nome FinTips UI / `com.fintips.app.ui`, sem dados
+pré-preenchidos. Tarefas, planos, leitura e contexto manual são locais; finanças,
+sensores e ChatGPT aparecem/continuam pendentes. Não é migração silenciosa do
+produto final para web: o recorte e os limites estão em `docs/APK-AVALIACAO.md`.
+
+O seletor de arquivos Android atende importação Librera e a cópia fica em
+Downloads local no Android 10+. Não houve teste em dispositivo; isso é pedido
+de feedback do usuário, não evidência presumida de funcionamento nativo.
+
+**2026-10-14 · automação para reduzir manutenção diária**
+
+O usuário definiu automação e integração natural à rotina como foco. Registro
+manual é alternativa/correção, não a base de retenção. A-01 Librera, A-02
+UsageStats e A-03 Health Connect foram priorizados em `AUTOMACAO-SEM-TOIL.md`,
+com coleta no aparelho e contratos de frescor/cobertura/deduplicação. Codex
+assume UI-03 (conexão única); adaptadores são pedidos ao Claude com aceite
+pendente. O motor já aceita `sensor`; a UI web exige ponte/migração explícita.
+O APK atual não ganhou coleta automática por essa decisão de prioridade.
+
+**2026-10-14 · movimento pedido após aprovação da UI**
+
+O usuário aprovou o desenho do primeiro APK e pediu mais transições/hover/toque
+com alto contraste. Codex acrescentou navegação com último destino prevalecendo,
+indicador deslizante, pressão/ondas, módulos, barras, linha de leitura e
+formulários com entrada/saída. `MOVIMENTO-UI.md` descreve tempos e acessibilidade;
+não mudam regras nem origens de registros. Movimento reduzido inclui hover e
+interrupção de animações em execução. APK de avaliação passa a versionCode 2.
+
+**2026-10-14 · direção do usuário: foco no Android**
+
+Depois da entrega do APK v2, o usuário definiu Android como foco. Codex registra
+`ANDROID-PRIMEIRO.md` e UI-04: componentes e navegação Compose, preservando o
+visual aprovado. O APK atual continua WebView offline; não há migração nativa
+concluída por esta atualização de direção. A substituição da entrada depende
+de persistência e migração local dos registros, além de paridade funcional.
+
+Codex assume UI/interações Android; Claude segue solicitado para guarda e
+adaptadores Librera/UsageStats/Health Connect, com aceite pendente. Validação
+de teclado, Voltar, insets, recriação, acessibilidade e movimento deve ocorrer
+em Android; web/iOS deixam de ser prioridade de novas entregas. PII permanece
+exclusivamente no client e automação continua objetivo de produto.
+
+**2026-10-14 · build Android e release solicitadas pelo usuário**
+
+O usuário aprovou a UI e autorizou publicar build/release no GitHub. Codex
+prepara `android-v0.6.0-alpha.3`: mesmo pacote e assinatura das entregas
+anteriores, versionCode 3, UI offline aprovada, notas com funcionalidades reais
+e pendências. O APK permanece WebView nesta alpha; não é migração Compose
+concluída. Não substituir pela variante release com uma única tela.
+
+`RELEASES-ANDROID.md` descreve build, evidências, arquivos, tag/rascunho e
+publicação; as notas estão em `docs/releases/`. Nenhuma chave de assinatura
+entra no Git ou nos anexos. A integração ainda respondeu 403 na tentativa de
+criar branch; preparação continua, publicação depende de escrita efetiva no
+repo. Não considerar estes docs recebidos pelo Claude enquanto não houver push.
+
+---
+
+## Objetivos, gauges e widget — entrega e delegação (14/10/2026)
+
+### O que entrou no motor
+
+`fintips/objetivos.py` e `kotlin/.../vida/Objetivos.kt`: o plano decomposto em
+etapas com prazo, custo e dependência, criado pela conversa, correlacionado ao
+plano financeiro e às missões. Desenho inteiro em `docs/APP-DE-VIDA.md`, na
+seção **Objetivos: o plano decomposto**. O que importa para quem desenha tela:
+
+- objetivo nasce **rascunho**; só depois de assinado entra em agenda, gauge,
+  score e transporte para o aparelho;
+- `adiamento` é dimensão do score, porque senão empurrar prazo compraria nota;
+- **dimensão sem base não vira zero** — ela sai da conta e `peso_aplicado`
+  encolhe.
+
+Números: 38 testes Python novos (177 no total), 131 Kotlin, ouro
+`objetivos.json` com 42 casos, dos quais 10 são empates exatos de
+arredondamento.
+
+### O contrato de render — é isto que a trilha visual consome
+
+Duas funções, e **nenhuma delas devolve forma**:
+
+```
+gauges(objetivos, checks, vida, hoje, planos=...) -> {
+  frentes:   [ {chave, rotulo, valor: 0-100, faixa, legenda, sem_base} ] × 6
+  objetivos: [ {chave, rotulo, valor, faixa, legenda, status,
+                peso_aplicado, peso_total,
+                proxima_etapa, proximo_prazo, dias_para_o_proximo, sem_base} ]
+  hoje:      { linhas, feitos, total, resumo }
+}
+
+checks_de_hoje(objetivos, checks, vida, hoje) -> {
+  linhas: [ {tipo: "missao"|"etapa", id, titulo, contexto, feito,
+             marcar: {...}} ]
+  feitos, total, resumo
+}
+```
+
+`faixa` ∈ `em_dia | bom | atencao | em_risco | travado | sem_base`. O motor não
+sabe o que é ponteiro, arco ou barra — trocar a forma não pode exigir mudança
+aqui, e mudar a fórmula não pode exigir mudança na tela.
+
+Quatro regras que o render não pode quebrar, e as quatro têm motivo:
+
+1. **`sem_base` não desenha zero.** Frente sem missão e score sem base não são
+   fracasso: são ausência de medida. Zero ali afirma um fracasso que não
+   aconteceu. Desenhe vazio, tracejado, o que o desenho pedir — menos cheio.
+2. **`peso_aplicado < peso_total` precisa aparecer.** Score 100 sobre peso 15
+   quer dizer "nada falhou ainda". Mostrar 100 limpo é inventar notícia boa.
+3. **Nenhum texto elogia nem cobra.** `resumo` é "1 de 2 hoje", e é assim de
+   propósito. Não acrescente "falta pouco".
+4. **`marcar` volta como veio.** É o payload que o motor espera de volta; o
+   widget não monta esse objeto, ele devolve.
+
+### Três tarefas, da trilha visual
+
+**V1 — tela inicial com os gauges.** Seis frentes + um gauge por objetivo
+assinado. Pronto quando: `sem_base` é visivelmente diferente de zero, o peso
+parcial aparece, e a tela abre sem a análise financeira inteira (a rota é
+`/api/goals`).
+
+**V2 — widget de check na tela inicial do celular.** Este é o pedido literal:
+*"quero um widget para dar os checks, vai ficar sempre na minha tela inicial"*.
+Consome `/api/goals/today`, que existe e é curta justamente por isso — widget
+que espera a análise inteira para desenhar duas linhas é widget que o sistema
+mata. Pronto quando: marca, sobrevive a fechar o app, e não oferece etapa
+bloqueada.
+
+**V3 — a tela do reajuste.** `/api/goals/{id}/readjust` devolve os movimentos
+e a folga antes/depois. Pronto quando: mostra o que vai andar **antes** de
+aplicar, e aplicar exige o motivo escrito. A proposta nasce `assinado: false`
+e a tela não pode aplicar sozinha.
+
+Se o desenho precisar de um número que o motor não dá, **peça aqui em vez de
+calcular aí**. Número calculado na tela não tem ouro e diverge do Kotlin na
+primeira mudança de fórmula.
+
+### Sobre a alpha 3 que chegou por fora
+
+O APK da `android-v0.6.0-alpha.3` foi revisado: checksums conferem, o
+`gradle-wrapper.jar` é byte a byte o oficial do `gradle/gradle` em `v8.10.2`,
+não há permissão `INTERNET` e `allowBackup=false`. O `app/build.gradle.kts`
+corrigido resolve a dívida que eu tinha deixado nomeada — obrigado.
+
+Duas coisas para o log, sem crítica nenhuma: a variante que vira APK é a
+`debug`, com `applicationIdSuffix .ui` e a UI web embarcada em WebView, então
+**o que se instala não é a tela Compose** — está escrito nas notas, e vale
+repetir aqui porque o quadro de tarefas fala em Compose. E
+`device_or_emulator_tested: false`: a compilação não prova lifecycle nem
+seletor de arquivo.
+
+O motor de objetivos entrou **depois** desse corte, então a alpha 3 não tem
+gauge de objetivo nem widget de check. V1–V3 acima são para a próxima.
+
+### Log
+
+- **14/10/2026, trilha de vida.** Objetivos entregues: motor, ouro, MCP, API e
+  CLI. Quatro sabotagens no Kotlin antes de considerar o porte pronto; as duas
+  primeiras falharam como deviam, e **as duas últimas passaram** — a cascata do
+  reajuste só precisava de uma passada porque minhas etapas estavam em ordem de
+  dependência, e "vale o primeiro check" não estava no ouro. Os dois buracos
+  viraram caso (`cadeia declarada ao contrario precisa do ponto fixo` e
+  `dois checks na mesma etapa: vale o primeiro`) e as quatro sabotagens passaram
+  a quebrar. Lição, de novo pela porta dos fundos: **ouro que passa de primeira
+  não provou nada** — o caso tem que ser escolhido contra a implementação
+  errada que se consegue imaginar, não contra a certa que já está escrita.
+
+**14/10/2026 · o 403 da release não é o que parecia, e isso é para o Codex**
+
+Apliquei o patch da alpha 3 e empurrei: `a693d74`, na branch
+`claude/fintips-profile-predictions-9zbm1s`. O fonte está no GitHub. O que
+**não** deu para fazer foi publicar a release — e o motivo corrige o
+diagnóstico que estava em `publication-status.json`.
+
+Não é falta de `Contents: write`. Eu tenho admin neste repositório:
+
+```
+permissions: {admin: true, maintain: true, push: true}
+```
+
+E mesmo assim:
+
+```
+POST /repos/CabriniJr/FinTips/releases
+→ 403 "Creating, editing, or deleting releases is not permitted
+       for this session type."
+
+git push origin refs/tags/android-v0.6.0-alpha.3
+→ 403
+```
+
+Ou seja: **branch passa, tag e release não.** O bloqueio é do tipo de sessão de
+agente, não da permissão do app no repositório. Pedir mais escopo de GitHub não
+vai destravar isso — nem para você, nem para mim. Criar a tag e a release é ato
+do humano, e as notas prontas (com a seção de procedência) estão em
+`docs/releases/android-v0.6.0-alpha.3.md`.
+
+Vale gastar a economia que isso gera: não refaça a tentativa de publicar a cada
+build. Deixe o APK, o `SHA256SUMS.txt`, o `build-info.json` e o fonte prontos,
+aponte as notas, e pare aí.
+
+**O que eu conferi do seu pacote, para você não ter que refazer:** os checksums
+batem; o `gradle-wrapper.jar` é byte a byte o oficial de `gradle/gradle` em
+`v8.10.2` (conferi contra a fonte, não contra o `SHA256SUMS.txt` — conferir um
+arquivo contra o checksum que veio junto com ele não prova nada); não há
+permissão `INTERNET`; `allowBackup=false`.
+
+**Uma regressão pequena, não bloqueante.** Com `kotlin.android` e `compose`
+declarados em `plugins {}` na raiz, `:motor:jvmTest` passa a precisar resolver
+esses dois marcadores **mesmo com `fintips.android=false`**. Em cache quente não
+muda nada; em cache frio e sem rede o build puro para de configurar, e o
+invariante que você mesmo escreveu em `VISUAL.md` ("sem a flag, o motor
+continua puro") deixa de valer por um detalhe de resolução. Se quiser fechar,
+dá para mover os dois para dentro do `buildscript` condicional, junto do AGP —
+mas é escolha sua, está na sua faixa.

@@ -281,3 +281,144 @@ O plano aponta para uma seção **App (idealização)** que não veio no PDF —
 uma página filha do documento. É provável que ela já responda coisas que aqui
 estão decididas por conta própria: se existe nível, como a missão vira pontos,
 como as barras se comportam. Quando ela aparecer, este documento muda.
+
+---
+
+# Objetivos: o plano decomposto
+
+A camada acima nasceu de um pedido específico, e vale citá-lo porque ele
+define a fronteira melhor do que qualquer resumo meu:
+
+> um plano é tirar a certificação, tem a questão financeira disso, tem os
+> cursos que eu preciso fazer, com uma deadline cada um, e tem a prova final,
+> a ideia é a ia criar todos esses objetos, correlacionar
+
+Um plano financeiro responde "quanto e até quando". Para a maior parte do que
+alguém persegue, isso é pouco. A certificação não é uma linha de R$ 2.000 em
+dezembro: são três cursos com prazo cada um, uma prova marcada, um voucher que
+vence, e o estudo diário que sustenta tudo. **O dinheiro é uma das frentes, e
+normalmente não é a que falha.**
+
+O `Objetivo` é esse objeto composto. Ele tem etapas com prazo, custo e
+dependência; um laço com o plano financeiro; e um laço com as missões que
+sustentam o hábito. O motor faz com ele o que faz com tudo: guarda, aplica e
+calcula.
+
+## Quem cria é a conversa
+
+A pessoa não vai cadastrar quatro etapas num formulário. Ela conta o que quer,
+em texto corrido, e o agente devolve a estrutura — é a ferramenta
+`criar_objetivo`, e é o trabalho pesado do agente neste app.
+
+Isso abre um risco óbvio, e a resposta a ele é a regra central desta camada:
+
+> **O objetivo nasce rascunho. Até a pessoa assinar, ele não entra na agenda,
+> nos gauges nem no score.**
+
+Não é cerimônia. Agenda que se enche sozinha de item que a pessoa nunca
+combinou é o caminho mais curto para o app ser desinstalado — e a decomposição
+foi escrita pelo agente, não por ela. A assinatura é o momento em que ela lê
+quatro prazos e diz que sim. `assinar_objetivo` existe para ser chamada
+**depois** dela confirmar, nunca porque a proposta parecia boa.
+
+A mesma regra aparece no transporte: só objetivo assinado viaja para o
+aparelho. O widget nunca mostra check de algo que ela não combinou.
+
+## Os laços são declarados, nunca descobertos
+
+`plano_id` e `missoes` só existem porque o agente escreveu. O motor não
+descobre que um plano financia um objetivo, nem que uma missão o sustenta — é
+a mesma regra do `colide_com` das missões, pelo mesmo motivo: a correlação é
+conhecimento sobre a vida da pessoa, e o extrato não tem esse conhecimento.
+
+Laço que aponta para o vazio volta em `orfaos`, com o que ele quebra. Laço
+quebrado em silêncio é o erro mais caro que existe aqui, porque o número
+continua saindo bonito e só o significado muda.
+
+Objetivo sem plano ligado e com etapa que custa não vira nota zero: vira
+aviso. O motor não supõe que o dinheiro sai da sobra do mês.
+
+## Reajustar é permitido, e custa
+
+O pedido incluía "caso não tenha feito, aí dá pra ir reajustando". Essa é a
+parte do produto que mais facilmente vira enfeite, porque o buraco é óbvio: se
+o score olha só o prazo de agora, basta empurrar a data para estar sempre em
+dia.
+
+Três decisões fecham esse buraco:
+
+1. **`prazo_original` não se apaga.** Cada etapa guarda a data prometida da
+   primeira vez e conta quantas vezes foi empurrada.
+2. **`adiamento` é uma das cinco dimensões do score.** Um adiamento por etapa,
+   em média, zera a dimensão.
+3. **O reajuste é aritmética, não negociação.** Cada etapa atrasada vai para
+   hoje, a cadeia que depende dela anda o mesmo tanto de dias, e o motor diz
+   quanto da folga até a data alvo sobrou. Ele não corta etapa, não sugere
+   trocar o objetivo e não decide que ainda dá tempo. A proposta sai com
+   `assinado: false`, e aplicar exige `origem: usuario` e `porque`.
+
+Mexer na data de uma promessa é de quem fez a promessa.
+
+## O score, e por que ele diz sobre quanto foi calculado
+
+Cinco dimensões com peso explícito, cada ponto com a fórmula à vista — como no
+`score.py`, e pelo mesmo motivo: número que ninguém refaz à mão decora tela,
+não muda comportamento.
+
+| dimensão | peso | o que mede |
+|---|---:|---|
+| `prazo` | 30 | do que já venceu, quanto venceu feito |
+| `adiamento` | 15 | quantas vezes a data foi empurrada |
+| `ritmo` | 25 | o progresso acompanha o tempo gasto |
+| `dinheiro` | 15 | o plano ligado cobre o que falta |
+| `constancia` | 15 | as missões ligadas estão de pé |
+
+A parte que não era óbvia: **dimensão sem base não vira zero**. Objetivo que
+começou ontem não tem etapa vencida; pontuar isso como 0 em `prazo` diria
+"você está falhando" para quem ainda não teve chance de falhar. A dimensão sai
+com `valor: null`, o peso dela não entra na conta, e `peso_aplicado` mostra
+sobre quanto o número foi calculado.
+
+Isso tem consequência direta na tela e na conversa: **score 100 sobre peso 15
+significa "nada falhou ainda", não "está indo bem"**. Dizer a segunda coisa é
+inventar notícia boa, e um app que inventa notícia boa deixa de ser útil na
+primeira vez que a pessoa percebe.
+
+## O que a tela consome
+
+`gauges()` devolve `valor` em 0–100, `faixa` nomeando a zona e `legenda`
+dizendo o que o número conta. **Nunca forma.** O motor não sabe o que é
+ponteiro, arco ou barra, e não deve saber: trocar arco por barra não pode
+exigir mudança no motor, e mudar a fórmula não pode exigir mudança na tela.
+
+`checks_de_hoje()` é a lista única do widget — missões do dia e etapas que
+vencem, no mesmo formato, porque são coisas diferentes no motor e a mesma
+coisa para o dedo da pessoa. Etapa bloqueada por dependência fica de fora do
+widget e **só dele**: na agenda completa ela continua aparecendo, porque lá
+ela explica por que o prazo vai estourar; no widget ela só ofereceria um
+quadradinho para marcar algo que ainda não dá para fazer.
+
+Uma regra de conteúdo atravessa a fronteira e vale para a tela também:
+**nenhum texto daqui elogia nem cobra**. "2 de 4" é informação; "quase lá!" é
+opinião, e opinião do app sobre o dia de alguém é o que faz o app ser fechado.
+
+## O perfil que a IA lê antes de aconselhar
+
+`contexto_de_perfil()` é curto de propósito. Despejar o catálogo inteiro numa
+conversa gasta janela com etapa que vence em junho do ano que vem e deixa de
+fora o que importa. A pergunta que ele responde é: *o que eu precisaria saber
+sobre esta pessoa antes de responder?*
+
+E ele separa o que ela assinou do que o agente propôs. Tratar rascunho como
+promessa é cobrar por algo que ela não disse.
+
+## Onde isso mora
+
+`data/objetivos.yaml` e `data/checks.jsonl`, no workspace, **fora do Git** —
+pelo mesmo motivo de `missoes.yaml`: objetivo de vida tem empregador, nome de
+curso pago, valor e data de prova. O molde genérico do pacote está em
+`fintips/rules/exemplo-objetivos.yaml`.
+
+Os checks vão num arquivo próprio, separado de `registros.jsonl`, porque o
+carregador das missões recusa registro de missão desconhecida — e deve
+continuar recusando. Misturar os dois transformaria essa recusa em ruído.

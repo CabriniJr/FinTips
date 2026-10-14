@@ -12,6 +12,8 @@ Layout (tudo na sua máquina, nada sincronizado por padrão):
         compras.yaml       intenções de compra em avaliação
         missoes.yaml       as seis frentes: missões e regras declaradas
         registros.jsonl    cumprimento das missões, em append
+        objetivos.yaml     objetivos decompostos em etapas com prazo e custo
+        checks.jsonl       etapas marcadas como feitas, em append
       relatorios/          saídas geradas (dashboard, análises)
 
 Nada de `data/` entra no Git, e `missoes.yaml` é o caso mais sensível: plano
@@ -108,6 +110,14 @@ class Workspace:
     def registros_path(self) -> Path:
         """Histórico de cumprimento, em append. Fica em data/ — fora do Git."""
         return self.data / "registros.jsonl"
+    @property
+    def objetivos_path(self) -> Path:
+        """Objetivos decompostos em etapas. Fica em data/ — fora do Git."""
+        return self.data / "objetivos.yaml"
+    @property
+    def checks_path(self) -> Path:
+        """Etapas marcadas como feitas, em append. Fica em data/ — fora do Git."""
+        return self.data / "checks.jsonl"
     @property
     def regras_locais_path(self) -> Path:
         """Estabelecimentos do seu dia a dia. Fica em data/ — fora do Git."""

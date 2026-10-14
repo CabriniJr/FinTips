@@ -6,6 +6,7 @@ import com.fintips.motor.vida.LinhaDoDia
 import com.fintips.motor.vida.OrigemDoRegistro
 import com.fintips.motor.vida.montarTela
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,12 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,10 +45,9 @@ import kotlinx.datetime.todayIn
  *
  * ## A linguagem visual
  *
- * Monocromática, canto reto, sombra deslocada, maiúscula em mono. É a mesma do
- * painel, e a razão de ser assim num app de hábito é prática: cor que comemora
- * e ícone que celebra são o app opinando sobre o dia de alguém. A barra sobe
- * porque a pessoa fez; não há confete.
+ * Neon Genesis Evangelion, conforme escolha do usuário: preto, âmbar,
+ * títulos vermelhos e dados verdes. Tokens em docs/LINGUAGEM-VISUAL.md.
+ * A barra sobe por registro; o desenho não conclui nem inventa medidas.
  *
  * ## O que esta tela NÃO faz
  *
@@ -56,42 +59,69 @@ import kotlinx.datetime.todayIn
  *
  * ## Aviso honesto
  *
- * Este arquivo **não foi compilado**. O alvo Android exige SDK e `dl.google.com`
- * está bloqueado na máquina onde isto foi escrito. Toda a lógica que ele usa
- * tem teste (`AparelhoTest`, 16 casos); o que está aqui é desenho, e desenho
- * errado se vê na tela.
+ * `assembleDebug` passou em 14/10/2026 após instalar SDK/JDK e corrigir
+ * a configuração. Ainda não foi executado no aparelho. A lógica tem testes
+ * (`AparelhoTest`); aparência, toque e lifecycle exigem verificação Android.
  */
 
-private val TINTA = Color(0xFF1B1E24)
-private val PAPEL = Color(0xFFEDEEF1)
-private val LINHA = Color(0xFFB9BEC8)
-private val CARTAO = Color(0xFFFFFFFF)
+private val TINTA = Color(0xFFF1EFE6)
+private val PAPEL = Color(0xFF080808)
+private val LINHA = Color(0xFFFFA342)
+private val CARTAO = Color(0xFF0D0C0B)
+private val SINAL = Color(0xFFFF4B35)
+private val DADO = Color(0xFFA4EC8C)
+private val SECUNDARIO = Color(0xFFBDAD99)
+private val TITULO = FontFamily(Font(R.font.barlow_condensed_black, FontWeight.Black))
 
 @Composable
 fun TelaDoDia(guarda: Guarda, hojeFixo: kotlinx.datetime.LocalDate? = null) {
     val hoje = hojeFixo ?: Clock.System.todayIn(TimeZone.currentSystemDefault())
-    var vida by mutableStateOf(guarda.carregar())
-    var estado by mutableStateOf(montarTela(vida, hoje))
+    var tentativa by remember { mutableStateOf(0) }
+    val inicial = remember(guarda, tentativa) { runCatching { guarda.carregar() } }
+    if (inicial.isFailure) {
+        Column(Modifier.fillMaxSize().background(PAPEL).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)) {
+            Text("FINTIPS / HOJE", fontFamily = TITULO, fontSize = 36.sp, color = SINAL)
+            Text("Não foi possível abrir os registros locais. Nenhum arquivo foi substituído.",
+                fontSize = 16.sp, color = TINTA)
+            Text("Tentar novamente", color = LINHA, fontSize = 16.sp,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                    .clickable { tentativa++ }.border(1.dp, LINHA).padding(14.dp))
+        }
+        return
+    }
+    var vida by remember(guarda, tentativa) { mutableStateOf(inicial.getOrThrow()) }
+    val estado = remember(vida, hoje) { montarTela(vida, hoje) }
+    var erro by remember { mutableStateOf("") }
 
     fun marcar(missaoId: String) {
         // Origem `usuario`: quem tocou foi a pessoa. O app nunca marca sozinho
         // — `presumido` existe exatamente para não contar.
-        guarda.marcar(vida, missaoId, hoje, OrigemDoRegistro.USUARIO)
-        vida = guarda.carregar()
-        estado = montarTela(vida, hoje)
+        try {
+            guarda.marcar(vida, missaoId, hoje, OrigemDoRegistro.USUARIO)
+            vida = guarda.carregar()
+            erro = ""
+        } catch (_: Exception) {
+            erro = "Não foi possível confirmar a marcação. Tente reabrir os registros locais."
+        }
     }
 
     Column(
         Modifier.fillMaxSize().background(PAPEL).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        Text("FINTIPS / 01", fontFamily = FontFamily.Monospace,
+            fontSize = 11.sp, color = LINHA)
+        Text("HOJE", fontFamily = TITULO, fontSize = 64.sp, color = SINAL)
         Text(
             estado.resumo.uppercase(),
             fontFamily = FontFamily.Monospace,
             fontSize = 12.sp,
             letterSpacing = 1.sp,
-            color = TINTA,
+            color = DADO,
         )
+
+        if (erro.isNotEmpty()) Text(erro, fontSize = 14.sp, color = TINTA)
 
         SeisBarras(estado.frentes)
 
@@ -99,13 +129,13 @@ fun TelaDoDia(guarda: Guarda, hojeFixo: kotlinx.datetime.LocalDate? = null) {
             Cartao {
                 Text(
                     "Nenhuma missão neste aparelho.\n\n" +
-                        "No computador: fintips aparelho --saida missoes.json\n" +
-                        "Depois copie o arquivo para cá.",
+                        "Adicione um catálogo local para começar. " +
+                        "A seleção de arquivo ainda não está disponível nesta tela.",
                     fontSize = 14.sp, color = TINTA,
                 )
             }
         } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(estado.doDia, key = { it.missaoId }) { linha ->
                     LinhaDeMissao(linha) { marcar(linha.missaoId) }
                 }
@@ -116,7 +146,7 @@ fun TelaDoDia(guarda: Guarda, hojeFixo: kotlinx.datetime.LocalDate? = null) {
         val pct = estado.cobertura["pct_medido"]
         Text(
             "evidência de aparelho: $pct%".uppercase(),
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp, color = TINTA,
+            fontFamily = FontFamily.Monospace, fontSize = 10.sp, color = SECUNDARIO,
         )
     }
 }
@@ -131,23 +161,23 @@ private fun SeisBarras(frentes: List<ForcaDoAtributo>) {
         frentes.forEach { f ->
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
-                    Modifier.fillMaxWidth().height(72.dp).background(CARTAO),
+                    Modifier.fillMaxWidth().height(72.dp).background(CARTAO).border(1.dp, LINHA),
                     contentAlignment = Alignment.BottomCenter,
                 ) {
                     val altura = (72 * (f.pct / 100.0)).dp
-                    Box(Modifier.fillMaxWidth().height(altura).background(TINTA))
+                    Box(Modifier.fillMaxWidth().height(altura).background(DADO))
                 }
                 Text(
                     f.atributo.sigla,
                     fontFamily = FontFamily.Monospace, fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold, color = TINTA,
+                    fontWeight = FontWeight.Bold, color = LINHA,
                     textAlign = TextAlign.Center,
                 )
                 // Frente sem missão não fica vazia em silêncio: ela diz que
                 // está vazia, porque isso é informação.
                 Text(
                     if (f.missoes == 0) "—" else "${f.cumpridas}/${f.missoes}",
-                    fontFamily = FontFamily.Monospace, fontSize = 9.sp, color = TINTA,
+                    fontFamily = FontFamily.Monospace, fontSize = 9.sp, color = DADO,
                 )
             }
         }
@@ -160,7 +190,7 @@ private fun LinhaDeMissao(linha: LinhaDoDia, aoTocar: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 Modifier.width(22.dp).height(22.dp)
-                    .background(if (linha.cumprida) TINTA else CARTAO),
+                    .background(if (linha.cumprida) DADO else CARTAO),
                 contentAlignment = Alignment.Center,
             ) {
                 if (!linha.cumprida) {
@@ -181,19 +211,15 @@ private fun LinhaDeMissao(linha: LinhaDoDia, aoTocar: () -> Unit) {
                 }.joinToString(" · ")
                 Text(
                     detalhe.uppercase(),
-                    fontFamily = FontFamily.Monospace, fontSize = 9.sp, color = TINTA,
+                    fontFamily = FontFamily.Monospace, fontSize = 10.sp, color = SECUNDARIO,
                 )
             }
         }
     }
 }
 
-/** Cartão de canto reto com sombra deslocada, como no painel. */
+/** Painel reto: moldura em âmbar, sem elevação Material. */
 @Composable
 private fun Cartao(modifier: Modifier = Modifier, conteudo: @Composable () -> Unit) {
-    Box(modifier.fillMaxWidth()) {
-        Box(Modifier.fillMaxWidth().padding(start = 3.dp, top = 3.dp).background(LINHA)) {
-            Box(Modifier.fillMaxWidth().background(CARTAO).padding(14.dp)) { conteudo() }
-        }
-    }
+    Box(modifier.fillMaxWidth().background(CARTAO).border(1.dp, LINHA).padding(14.dp)) { conteudo() }
 }

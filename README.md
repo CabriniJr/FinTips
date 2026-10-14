@@ -1,19 +1,38 @@
 # FinTips
 
+[![portão](../../actions/workflows/portao.yml/badge.svg)](../../actions/workflows/portao.yml)
+[![android](../../actions/workflows/android.yml/badge.svg)](../../actions/workflows/android.yml)
+
 Centraliza extrato e perfil financeiro na sua máquina, e deixa a inteligência
 por conta do seu agente. O app guarda, aplica e calcula; o agente investiga,
 pergunta e registra; você assina. Um painel local mostra tudo.
 
 ```
                        ┌─ painel local (React, 127.0.0.1)
-extrato.ofx ─┐         │
-             ├─ motor ─┼─ agente Claude (MCP: 39 primitivas + 2 recursos)
-Open Finance ┘         │
+extrato.ofx ─┐         ├─ app Android (offline, sem permissão de rede)
+             ├─ motor ─┤
+Open Finance ┘         ├─ agente (MCP: 47 primitivas + 2 recursos)
   (Pluggy)             └─ YAML no seu disco (fonte de verdade)
 ```
 
 Nada sai da máquina: sem conta, sem servidor, sem telemetria. O agente recebe
 agregados, nunca o extrato bruto.
+
+## Baixar
+
+| | |
+|---|---|
+| **Android (último build da `main`)** | [android-main](../../releases/tag/android-main) — pré-release rolante, substituída a cada push |
+| **Todas as versões** | [releases](../../releases) |
+
+O APK é de **avaliação**: variante debug, com a UI web embarcada em WebView.
+Sem permissão `INTERNET`, sem analytics, sem upload — os dados ficam no
+aparelho, e desinstalar apaga os registros. Confira o download com
+`sha256sum -c SHA256SUMS.txt`, que vai junto na release.
+
+O motor Python é o produto que funciona hoje; o app é a porta em andamento.
+Enquanto o harness diferencial não fechar módulo a módulo, não se troca um
+motor testado por um que ninguém conferiu.
 
 ## A ideia
 
@@ -88,6 +107,18 @@ decisão e quanto ainda é palpite**. Começa em 0%.
   escreveu `colide_com` na missão dela. A única coisa dessa camada que mexe no
   veredito é a regra de espera que ela mesma assinou, e ela vai nomeada na
   resposta, com o `porque` dela ao lado.
+- **Decompõe o objetivo, em conversa.** Um plano financeiro responde "quanto e
+  até quando", e para a maior parte do que alguém persegue isso é pouco. Uma
+  certificação não é uma linha de R$ 2.000 em dezembro: são cursos com prazo
+  cada um, uma prova marcada, e o estudo diário que sustenta tudo — e o
+  dinheiro, normalmente, não é a frente que falha. Você conta em texto corrido;
+  o agente devolve as etapas com prazo, custo e dependência, ligadas ao plano
+  financeiro e às missões. **O objetivo nasce rascunho**: até você assinar, ele
+  não entra na agenda, nos gauges nem no score — agenda que se enche sozinha de
+  item que ninguém combinou é app desinstalado. Reajustar prazo é permitido e
+  **custa**: o prazo original não se apaga, e adiamento é uma das cinco
+  dimensões do score, senão bastaria empurrar a data para estar sempre em dia.
+  Ver `docs/APP-DE-VIDA.md`.
 
 ## A jornada, em três passos
 
@@ -163,6 +194,9 @@ fintips perfil                                 # sugestões, assinaturas, cobert
 fintips perfil --assinar renda --arquetipo variavel --porque "sou PJ"
 fintips alavancas                              # o que muda o número, e quanto
 fintips decisoes --historico "celular"         # precedentes de um assunto
+fintips objetivos                              # agenda, score e atrasos
+fintips objetivos --reajustar cert-nuvem       # calcula o atraso; não aplica
+fintips aparelho --saida missoes.json          # catálogo para o celular
 fintips mcp-config                             # config pronta do cliente MCP
 fintips serve                                  # painel em http://127.0.0.1:8420
 ```
@@ -186,6 +220,10 @@ FinTips/
     triagem.yaml       o que já foi resolvido ou adiado
     regras-locais.yaml estabelecimentos do seu dia a dia (fora do Git)
     planos.yaml        metas financeiras
+    missoes.yaml       as seis frentes (fora do Git)
+    registros.jsonl    cumprimento das missões, em append (fora do Git)
+    objetivos.yaml     objetivos decompostos em etapas (fora do Git)
+    checks.jsonl       etapas marcadas como feitas, em append (fora do Git)
     patrimonio.yaml    saldo + investimentos
   relatorios/          análises geradas
     dossie.json        briefing do agente + correlações (derivado)
@@ -266,6 +304,11 @@ python3 scripts/gerar-ouro.py --conferir     # o ouro ainda é o do Python?
 cp scripts/check-pii.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
+As duas primeiras linhas rodam também no CI, em `.github/workflows/portao.yml`,
+junto de `pytest`, `:motor:jvmTest` e os testes do painel. Rodar à mão continua
+valendo: o CI te avisa depois do push, e o `pre-commit` te avisa antes — e a
+diferença entre os dois é um commit com dado pessoal já existindo no histórico.
+
 A segunda linha existe por causa de um furo real: depois de um merge, o ouro no
 disco descrevia uma versão **anterior** do motor Python e a suíte Kotlin passava
 verde contra ouro velho. Teste vermelho interrompe; ouro velho deixa os dois
@@ -291,18 +334,62 @@ copiadas do plano. Em colisão, o Git cede.
 ## Testes
 
 ```bash
-for t in tests/test_*.py; do python "$t" || break; done
+python -m pytest tests/ -q              # 194 no motor Python
+cd kotlin && ./gradlew :motor:jvmTest   # 134 no motor Kotlin, contra o ouro
+cd web && npm test                      # o painel
 ```
+
+Os testes Kotlin não conferem comportamento: conferem **paridade**. Cada um lê
+um arquivo de `kotlin/motor/src/jvmTest/resources/ouro/`, gravado por
+`scripts/gerar-ouro.py` a partir do Python, e cobra o mesmo número. Uma fórmula
+pode estar certa nos dois lados e divergir na terceira casa — isso aparece ali
+ou não aparece em lugar nenhum.
 
 ## Documentos
 
 - `docs/ENTRE-AGENTES.md` — **leia primeiro se você é um agente**: faixas, estado e log
-- `docs/VISUAL.md` — a linguagem visual: tokens, o gesto, e o que a tela não decide
-- `docs/APP-DE-VIDA.md` — as seis frentes e por que elas servem ao dinheiro
+- `docs/VISUAL.md` — a linguagem visual, e o que a tela não decide
+- `docs/APP-DE-VIDA.md` — as seis frentes e **objetivos**: etapas, score e reajuste
+- `docs/RELEASES-ANDROID.md` — build, evidências e como a release é publicada
 - `docs/JORNADA.md` — o que a pessoa vive: importar, conversar, viver com isso
 - `docs/PORTE-KOTLIN.md` — a porta para Kotlin e o harness que a sustenta
 - `docs/ARQUITETURA.md` — a fronteira app/agente, contratos, regras, triagem
+- `docs/UI-MOBILE.md` — UI para celular: áreas de vida, tarefas diárias, planos e contexto com persistência no client
 - `docs/PRIVACIDADE.md` — modelo de ameaça e o que nunca sai da máquina
 - `docs/DECISOES.md` — o ADR financeiro: alternativas, números da época, desfecho
-- `docs/PORTE-KOTLIN.md` — a porta para Kotlin, que é o destino do projeto
 - `docs/OPEN-FINANCE.md` — por que via agregador e como plugar
+
+## Integração contínua
+
+Dois workflows, e os dois existem por um motivo que já custou caro:
+
+- **`portao.yml`** roda a cada push e PR: testes Python, `:motor:jvmTest` sem a
+  flag Android (é essa linha que prova que o motor continua puro), paridade do
+  ouro, varredura de PII e o build do painel.
+- **`android.yml`** compila o APK e publica. Push na `main` atualiza a
+  pré-release rolante `android-main`; uma tag `android-v*` cria a release
+  versionada, que não se reescreve.
+
+O segundo existe porque **a publicação não podia ser feita de outro jeito**. Os
+agentes que trabalham neste repositório recebem 403 ao criar tag ou release —
+não por falta de permissão (um deles tem admin), mas porque o tipo de sessão
+não permite esse ato. Um workflow do Actions, sim.
+
+### A assinatura, que não é detalhe
+
+O Android recusa instalar uma atualização assinada com chave diferente da
+instalada. A chave de depuração que o Gradle gera nasce na máquina de quem
+compila — então, sem intervenção, **cada build do CI sairia com uma chave nova**
+e atualizar exigiria desinstalar o app, o que apaga os registros. Num app cujos
+dados só existem no aparelho, isso é perda de dado, não inconveniência.
+
+Para resolver, em *Settings → Secrets and variables → Actions*:
+
+| nome | tipo | o quê |
+|---|---|---|
+| `ANDROID_KEYSTORE_BASE64` | secret | o `debug.keystore` em base64 (`base64 -w0 ~/.android/debug.keystore`) |
+| `ANDROID_CERT_SHA256` | variable | a impressão digital esperada; o build falha se mudar |
+
+Sem o secret o build continua, mas a release sai dizendo, em letra visível, que
+aquele APK não instala por cima do anterior. O workflow não finge que está tudo
+bem.

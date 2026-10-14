@@ -1,0 +1,660 @@
+{
+  "gerado_por": "fintips.reading",
+  "casos": [
+    {
+      "nome": "vazio",
+      "entrada": {
+        "points": [],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": null
+      },
+      "resultado": {
+        "estado": "sem_dados",
+        "progresso_bp": null,
+        "amostras": 0,
+        "intervalo_dias": 0,
+        "avanco_bp": 0,
+        "previsao_dias": null,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "uma_posicao",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3000
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "calibrando",
+        "progresso_bp": 3000,
+        "amostras": 1,
+        "intervalo_dias": 0,
+        "avanco_bp": 0,
+        "previsao_dias": null,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "ritmo_regular",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 1000
+          },
+          {
+            "dia": "2026-10-07",
+            "progresso_bp": 2200
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3600
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 4
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 3600,
+        "amostras": 3,
+        "intervalo_dias": 13,
+        "avanco_bp": 2600,
+        "previsao_dias": 32,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": 350,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "preliminar",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-07",
+            "progresso_bp": 3000
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3500
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 3500,
+        "amostras": 2,
+        "intervalo_dias": 7,
+        "avanco_bp": 500,
+        "previsao_dias": 91,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": 167,
+        "historico_reiniciado": false,
+        "preliminar": true
+      }
+    },
+    {
+      "nome": "prazo_e_sessoes",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-07",
+            "progresso_bp": 3000
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3500
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": "2026-11-14",
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 3500,
+        "amostras": 2,
+        "intervalo_dias": 7,
+        "avanco_bp": 500,
+        "previsao_dias": 91,
+        "prazo_dias": 31,
+        "necessario_bp_dia": 210,
+        "meta_bp_sessao": 465,
+        "historico_reiniciado": false,
+        "preliminar": true
+      }
+    },
+    {
+      "nome": "prazo_hoje",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3500
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": "2026-10-14",
+        "reading_days": 1
+      },
+      "resultado": {
+        "estado": "calibrando",
+        "progresso_bp": 3500,
+        "amostras": 1,
+        "intervalo_dias": 0,
+        "avanco_bp": 0,
+        "previsao_dias": null,
+        "prazo_dias": 0,
+        "necessario_bp_dia": 6500,
+        "meta_bp_sessao": 6500,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "prazo_vencido",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3500
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": "2026-10-13",
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "calibrando",
+        "progresso_bp": 3500,
+        "amostras": 1,
+        "intervalo_dias": 0,
+        "avanco_bp": 0,
+        "previsao_dias": null,
+        "prazo_dias": -1,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "sem_avanco",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 3500
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3500
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "sem_avanco",
+        "progresso_bp": 3500,
+        "amostras": 2,
+        "intervalo_dias": 13,
+        "avanco_bp": 0,
+        "previsao_dias": null,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "recuo",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 3000
+          },
+          {
+            "dia": "2026-10-07",
+            "progresso_bp": 5000
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 1000
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "calibrando",
+        "progresso_bp": 1000,
+        "amostras": 1,
+        "intervalo_dias": 0,
+        "avanco_bp": 0,
+        "previsao_dias": null,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": true,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "recuo_e_retomada",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 5000
+          },
+          {
+            "dia": "2026-10-07",
+            "progresso_bp": 1000
+          },
+          {
+            "dia": "2026-10-10",
+            "progresso_bp": 2000
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3000
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 3000,
+        "amostras": 3,
+        "intervalo_dias": 7,
+        "avanco_bp": 2000,
+        "previsao_dias": 25,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": 667,
+        "historico_reiniciado": true,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "arquivo_antigo",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 1000
+          },
+          {
+            "dia": "2026-10-06",
+            "progresso_bp": 2000
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "desatualizado",
+        "progresso_bp": 2000,
+        "amostras": 2,
+        "intervalo_dias": 5,
+        "avanco_bp": 1000,
+        "previsao_dias": null,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "limite_sete_dias",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 1000
+          },
+          {
+            "dia": "2026-10-07",
+            "progresso_bp": 2000
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 2000,
+        "amostras": 2,
+        "intervalo_dias": 6,
+        "avanco_bp": 1000,
+        "previsao_dias": 48,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": 389,
+        "historico_reiniciado": false,
+        "preliminar": true
+      }
+    },
+    {
+      "nome": "no_fim",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 10000
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "no_fim",
+        "progresso_bp": 10000,
+        "amostras": 1,
+        "intervalo_dias": 0,
+        "avanco_bp": 0,
+        "previsao_dias": 0,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "ordem_invertida",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 3600
+          },
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 1000
+          },
+          {
+            "dia": "2026-10-07",
+            "progresso_bp": 2200
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 4
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 3600,
+        "amostras": 3,
+        "intervalo_dias": 13,
+        "avanco_bp": 2600,
+        "previsao_dias": 32,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": 350,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "divisao_nao_exata",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 1000
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 2001
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 3
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 2001,
+        "amostras": 2,
+        "intervalo_dias": 13,
+        "avanco_bp": 1001,
+        "previsao_dias": 104,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": 180,
+        "historico_reiniciado": false,
+        "preliminar": true
+      }
+    },
+    {
+      "nome": "avanco_minimo",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 9998
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 9999
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 1
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 9999,
+        "amostras": 2,
+        "intervalo_dias": 13,
+        "avanco_bp": 1,
+        "previsao_dias": 13,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": 1,
+        "historico_reiniciado": false,
+        "preliminar": true
+      }
+    },
+    {
+      "nome": "observacao_fora_da_janela",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-09-01",
+            "progresso_bp": 0
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 2500
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": null,
+        "reading_days": 7
+      },
+      "resultado": {
+        "estado": "calibrando",
+        "progresso_bp": 2500,
+        "amostras": 1,
+        "intervalo_dias": 0,
+        "avanco_bp": 0,
+        "previsao_dias": null,
+        "prazo_dias": null,
+        "necessario_bp_dia": null,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": false
+      }
+    },
+    {
+      "nome": "sem_plano_semanal",
+      "entrada": {
+        "points": [
+          {
+            "dia": "2026-10-01",
+            "progresso_bp": 1000
+          },
+          {
+            "dia": "2026-10-14",
+            "progresso_bp": 2001
+          }
+        ],
+        "today": "2026-10-14",
+        "deadline": "2026-11-14",
+        "reading_days": null
+      },
+      "resultado": {
+        "estado": "estimado",
+        "progresso_bp": 2001,
+        "amostras": 2,
+        "intervalo_dias": 13,
+        "avanco_bp": 1001,
+        "previsao_dias": 104,
+        "prazo_dias": 31,
+        "necessario_bp_dia": 259,
+        "meta_bp_sessao": null,
+        "historico_reiniciado": false,
+        "preliminar": true
+      }
+    }
+  ],
+  "parser": [
+    {
+      "nome": "campos_minimos",
+      "entrada": {
+        "Livro A.epub": {
+          "p": 0.375,
+          "t": 1791986400000,
+          "pt": "trecho não exportado",
+          "path": "arquivo-local"
+        }
+      },
+      "resultado": {
+        "posicoes": [
+          {
+            "chave": "Livro A.epub",
+            "progresso_bp": 3750,
+            "tempo_ms": 1791986400000
+          }
+        ],
+        "ignorados": 0
+      }
+    },
+    {
+      "nome": "extremos_e_arredondamento",
+      "entrada": {
+        "zero.epub": {
+          "p": 0,
+          "t": 1
+        },
+        "fim.pdf": {
+          "p": 1,
+          "t": 2
+        },
+        "empate.epub": {
+          "p": 5e-05,
+          "t": 3
+        }
+      },
+      "resultado": {
+        "posicoes": [
+          {
+            "chave": "zero.epub",
+            "progresso_bp": 0,
+            "tempo_ms": 1
+          },
+          {
+            "chave": "fim.pdf",
+            "progresso_bp": 10000,
+            "tempo_ms": 2
+          },
+          {
+            "chave": "empate.epub",
+            "progresso_bp": 1,
+            "tempo_ms": 3
+          }
+        ],
+        "ignorados": 0
+      }
+    },
+    {
+      "nome": "legado_e_sem_data",
+      "entrada": {
+        "legado.pdf": {
+          "p": 38,
+          "t": 1
+        },
+        "sem_data.epub": {
+          "p": 0.5,
+          "t": 0
+        },
+        "texto.epub": {
+          "p": "0.5",
+          "t": 1
+        }
+      },
+      "resultado": {
+        "posicoes": [],
+        "ignorados": 3
+      }
+    },
+    {
+      "nome": "fora_da_escala",
+      "entrada": {
+        "negativo.pdf": {
+          "p": -1,
+          "t": 1
+        },
+        "booleano.pdf": {
+          "p": true,
+          "t": 1
+        },
+        "pasta/livro.pdf": {
+          "p": 0.5,
+          "t": 1
+        }
+      },
+      "resultado": {
+        "posicoes": [],
+        "ignorados": 3
+      }
+    }
+  ]
+}

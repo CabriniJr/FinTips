@@ -1,0 +1,72 @@
+# Molde de `data/objetivos.yaml` — dado de exemplo, de ninguém.
+#
+# O arquivo real fica em data/, fora do Git: objetivo de vida tem empregador,
+# nome de curso pago, valor e data de prova.
+#
+# Quem escreve isto normalmente não é você à mão: é a conversa. Você conta o
+# que quer, a IA decompõe em etapas com prazo e custo, liga ao plano financeiro
+# e às missões que sustentam o hábito — e o objetivo nasce `rascunho`. Só
+# depois que você assina ele entra na agenda, nos gauges e no score.
+schema_version: 1
+
+objetivos:
+  - id: cert-nuvem
+    titulo: Certificação de plataforma em nuvem
+    porque: >
+      é o requisito que falta para pleitear a vaga do nível seguinte, e a
+      janela de desconto do voucher fecha em dezembro
+    comecou_em: 2026-09-01
+    data_alvo: 2026-12-01
+
+    # Os dois laços. Nenhum deles é descoberto pelo motor: a conversa escreve,
+    # a pessoa assina. Laço apontando para o vazio aparece em `orfaos`.
+    plano_id: plano-certificacao       # de onde sai o dinheiro
+    missoes: [int-leitura]             # o hábito que sustenta o objetivo
+
+    origem: agente
+    porque_da_origem: montado na conversa a partir do texto que ela escreveu
+
+    etapas:
+      - id: curso-fundamentos
+        titulo: Curso de fundamentos
+        tipo: curso
+        prazo: 2026-09-30
+        custo: 120.00
+        porque: pré-requisito declarado pelo exame
+
+      - id: curso-arquitetura
+        titulo: Curso de arquitetura
+        tipo: curso
+        prazo: 2026-10-20
+        custo: 180.00
+        depende_de: [curso-fundamentos]
+
+      - id: simulados
+        titulo: Simulados
+        tipo: pratica
+        prazo: 2026-11-10
+        depende_de: [curso-arquitetura]
+        obrigatoria: false           # ajuda, mas não impede a prova
+
+      - id: prova
+        titulo: Prova final
+        tipo: prova
+        prazo: 2026-11-20
+        custo: 900.00
+        depende_de: [curso-arquitetura]
+        porque: a inscrição vence e não é reembolsável
+
+  # Um objetivo sem custo nenhum: nem tudo que se persegue custa dinheiro, e o
+  # motor não deve exigir um plano financeiro para aceitar isso.
+  - id: idioma
+    titulo: Conversar no idioma sem travar
+    porque: as reuniões com o time de fora viraram semanais
+    comecou_em: 2026-10-01
+    data_alvo: 2027-06-30
+    missoes: [int-leitura]
+    origem: usuario
+    etapas:
+      - id: aula-semanal
+        titulo: Fechar o primeiro bloco de aulas
+        tipo: entrega
+        prazo: 2026-12-15
