@@ -262,6 +262,18 @@ jobs:
             # "fonte desta release" mente, que é pior do que não existir.
             git tag -f "$VERSAO" "${{ github.sha }}"
             git push -f origin "refs/tags/$VERSAO"
+            # `--clobber` só substitui arquivo de MESMO nome. Se o nome do
+            # APK muda, o antigo fica para trás e a release passa a servir dois
+            # APKs diferentes, sem dizer qual é o atual — aconteceu quando o
+            # nome perdeu o prefixo duplicado. Numa release rolante o conjunto
+            # publicado tem de ser exatamente o build de agora, então os anexos
+            # anteriores saem antes.
+            gh release view "$VERSAO" --json assets \
+              --jq '.assets[].name' 2>/dev/null \
+              | while read -r velho; do
+                  [ -n "$velho" ] || continue
+                  gh release delete-asset "$VERSAO" "$velho" --yes || true
+                done
             gh release edit "$VERSAO" --notes-file dist/NOTAS.md --prerelease
             gh release upload "$VERSAO" dist/* --clobber
           else
