@@ -762,3 +762,18 @@ em `/repos/CabriniJr/FinTips/releases`. Nenhuma release publicada ou PR criado
 por estas tentativas. O pacote completo foi preparado fora do Git para entrega
 ao usuário. É necessário acesso efetivo `Contents: write` antes de subir a
 fonte e publicar a tag/release; não apontar ao main antigo para contornar isso.
+
+**2026-10-14 · nova tentativa após ajuste de permissões pelo usuário**
+
+O usuário informou ter liberado o conector e pediu nova sincronização. As
+tentativas efetivas de criar branch pelo conector, enviar a branch via Git e
+criar a release via CLI continuam retornando 403. Leitura e checksums do pacote
+funcionam; não há release ou PR desta branch no GitHub.
+
+Diagnóstico de conexão: CLI e conector autenticam como `CabriniJr`; metadata
+do repo informa admin/push para essa conta. Entretanto, a listagem de
+instalações/contas do app retorna somente `sf0rzin`, sem instalação de
+`CabriniJr`. Isso é um indício de configuração de conexão/instalação a conferir,
+não prova de falta de permissão pessoal do usuário. Não modificar permissões
+de execução do ChatGPT como se fossem scopes OAuth do GitHub, nem substituir
+credenciais. APK e fonte da alpha 3 permanecem intactos e prontos para publicar.
