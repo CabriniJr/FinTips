@@ -8,6 +8,8 @@ source=ROOT/'fintips/rules/triagem-catalogo.json'
 c=json.loads(source.read_text())
 raw=json.dumps(c,ensure_ascii=False,separators=(',',':'))
 kt='// Gerado por scripts/gerar-contratos-triagem.py; não editar.\npackage com.fintips.motor.triagem\n\ninternal const val CATALOGO_JSON = """'+raw+'"""\n'
+policy=json.dumps(json.loads((ROOT/'fintips/rules/triagem-agente.json').read_text()),ensure_ascii=False,separators=(',',':'))
+kt += '\ninternal const val AGENTE_POLICY_JSON = """'+policy+'"""\n'
 variants=[]
 for name,spec in c['tipos'].items():
  fields={};required=[]

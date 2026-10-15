@@ -1,10 +1,14 @@
 # Triagem conversacional no Android
 
-A preview 8 acrescenta **Hoje → Conversar** e **Contexto → Vamos organizar seus planos?**. O chat
-prepara rascunhos no aparelho, pergunta pelos campos necessários e permite
-confirmar um lote. Um texto por linha pode virar vários rascunhos. Tipos,
-campos, valores e vínculos aparecem antes da confirmação; conversar não cria
-registros definitivos.
+A preview 9 reformula **Hoje → Conversar** e **Contexto → Vamos organizar seus planos?**. O agente preenche vários campos, prepara novos registros e propõe vínculos durante a conversa.
+Perguntas e escolhas aparecem inline. Um resumo com **Está certo, salvar**
+confirma o conjunto; formulário, tipos e contratos ficam sob **Ver o que será
+guardado** e **Conexão e detalhes**, para inspeção opcional.
+
+O fluxo anterior deixava a pessoa operar os registros e a IA só escolher uma
+pergunta. Isso não atendia ao objetivo de delegar o preenchimento. O protocolo
+`fintips_agente_v2` substitui esse roteador no app, mantendo o contrato v1 de
+persistência e a API antiga para compatibilidade.
 
 O usuário manteve PII exclusivamente no client e esclareceu que **valores,
 relações e cálculos com labels abstratas podem ser enviados**, mas origem e
@@ -12,27 +16,37 @@ destino reais não. Essa é a fronteira implementada, também para agentes futur
 
 ## O que funciona
 
-- Extração **local e limitada**, por regras explícitas: tipo sugerido, área
-  quando não ambígua, recorrência diária, início, data ISO, porcentagem e
-  valor monetário simples. Não é um LLM local nem leitura remota da conversa.
-- Perguntas dos contratos, uma por vez, com opções de um toque e respostas
-  em unidades humanas: reais e porcentagem. Você pode ajustar qualquer campo.
-- API OpenAI opcional organiza a próxima pergunta, sugere números dentro dos
-  limites ou recomenda conferir uma relação. Não recebe o texto do chat.
-- Semelhanças de título são calculadas **no aparelho**. A pessoa escolhe
-  atualizar um registro existente, manter separado ou confirmar um vínculo.
-  Semelhança não vira causa ou escolha assinada automaticamente.
-- Uma confirmação aplica todo o lote. Proposta obsoleta, conteúdo alterado,
-  confirmação ausente ou falha de armazenamento não gravam metade do lote.
-- Tarefas, planos de vida, livros e medidas de tempo de uso alimentam as abas
-  existentes. Os outros tipos entram no **catálogo local**, com proveniência
-  e relações; **ainda não alimentam o cálculo financeiro nem sensores**.
-- A conversa pode continuar após reabrir o app; a chave fica fora do WebView.
-  Nova conversa limpa mensagens/rascunhos, preservando registros confirmados.
+- O agente recebe os contratos dos 14 tipos e uma tabela de referências locais.
+  Retorna um conjunto de campos preenchidos, novos registros, vínculos e no
+  máximo uma pergunta natural, escrita pelo agente. O client restaura textos e datas sem publicá-los.
+- Valores explícitos são reaproveitados: por exemplo, título entre aspas,
+  dias por semana e porcentagem lida podem preencher um livro numa resposta.
+  Uma referência de dias não pode virar dinheiro ou progresso. Motivos exigem
+  uma referência a um motivo que a pessoa declarou.
+- Correções como “na verdade, 4 dias por semana” ajustam o livro em andamento.
+  Havendo mais de um candidato, uma pergunta inline resolve qual deles.
+- Uma correspondência exata e única de tipo/título vira atualização, preservando
+  campos não fornecidos. Semelhança textual sozinha não provoca essa fusão.
+- Um único aceite confirma tudo. A confirmação continua atômica, com hash da
+  base, recibos e validação completa. Conversar prepara registros, sem gravar
+  alterações definitivas nas abas antes do aceite.
+- Tarefas, planos, livros e tempo de uso entram nas abas existentes. Outros
+  tipos vão para Anotações e **ainda não alimentam o cálculo financeiro nem sensores**.
+- Novas conversas preservam a ativação do assistente e a chave. Um turno já
+  processado não é reenviado ao reabrir a tela. Edições do agente não disparam
+  novas chamadas; falhas não têm repetição automática na mesma sessão.
+
+A interpretação do texto continua **local e limitada**, com vocabulário fechado
+para conceitos, unidades e estrutura da frase. A sequência preserva negação,
+condição e intenção; palavras não reconhecidas viram aliases `opaco_N`, sem
+publicar o termo original. Não há LLM embarcado; o modelo remoto não entende
+livremente cada frase pessoal. A IA agora pode executar preenchimento e
+correlação de verdade, mas não se promete compreensão irrestrita da conversa.
+Uma mensagem fora dessa cobertura pode precisar de esclarecimento inline.
 
 ## Chave e consentimento
 
-No painel de privacidade da triagem, toque **Adicionar chave OpenAI**. A janela
+Na primeira ativação, toque **Conectar minha OpenAI** na própria conversa. A janela
 nativa usa campo de senha, bloqueia captura enquanto aberta e desativa autofill
 nesse campo. O valor é cifrado com AES-GCM; a chave criptográfica fica no
 Android Keystore. O WebView recebe apenas `configurada: true/false`, nunca a
@@ -40,11 +54,12 @@ credencial. Ela não entra em localStorage, backups do app, MCP ou relay.
 É usada no header de autenticação enviado diretamente à OpenAI por HTTPS.
 
 O endpoint é `https://api.openai.com/v1/responses`, com modelo
-`gpt-4.1-mini`, Structured Outputs e `store: false`. A UI deixa conferir o
-JSON abstrato exato antes de habilitar a assistência para a conversa. Até
-20 consultas por conversa; nenhuma repetição automática após falha. É possível
-cancelar, pedir nova sugestão explicitamente, apagar a chave e continuar local.
-O custo é da conta API da pessoa. Nenhuma chave de produção foi usada nos testes.
+`gpt-4.1-mini`, Structured Outputs e `store: false`. A ativação informa quais
+categorias de dados podem sair antes do diálogo da chave e vale para os
+próximos turnos/conversas. **Conexão e detalhes** permite pausar, apagar/trocar a
+chave ou tentar novamente. Uma consulta por turno da pessoa, sem nova chamada
+provocada pelas próprias edições do agente. Cancelar uma consulta preserva os
+rascunhos. A cobrança é da conta API da pessoa; nenhuma chave real foi usada nos testes.
 
 `store: false` **não garante retenção zero**: controles de abuso e as políticas
 da conta/provedor continuam aplicáveis. Valores abstratos ainda revelam aspectos
@@ -58,7 +73,7 @@ flowchart LR
     local --> mapa[Mapa de aliases apenas local]
     local --> proj[Projeção tipada de valores e cálculos]
     proj --> api[OpenAI / HTTPS]
-    api --> sugestao[Opção e valor validados]
+    api --> sugestao[Campos e vínculos por referências validadas]
     sugestao --> revisao[Revisão e confirmação no app]
     revisao --> gravacao[Uma gravação local do lote]
 ```
@@ -70,7 +85,7 @@ descrições, justificativas livres, origem e destino reais ficam locais. Campos
 opcionais de origem/destino nem têm sua presença divulgada. Não é uma limpeza
 por regex de um prompt com dados pessoais.
 
-`item_0`, `rascunho_0`, `grupo_0` e `opcao_0` são referências do payload atual,
+`item_0`, `rascunho_0`, `grupo_0`, `novo_0` e `valor_0` são referências do payload atual,
 nunca hashes ou cópias dos identificadores reais. O mapa retorna ao client e
 não entra no corpo HTTP. O contexto explica números com componentes verificáveis:
 
@@ -79,10 +94,26 @@ não entra no corpo HTTP. O contexto explica números com componentes verificáv
 - leitura: cálculo existente de pacing, com amostras, intervalo, avanço e
   previsão. Datas futuras são omitidas. Ausência não é porcentagem zero.
 
-Toda sugestão usa uma opção existente e um valor dentro do schema. A resposta
-não pode escolher caminho de arquivo, operação livre, endpoint, novas áreas
-ou títulos. Não segue redirects com a credencial; erros retornam mensagens
-fixas, sem corpo remoto, token ou exception message.
+A resposta nova usa `{registros, relacoes, pergunta}`. A pergunta tem
+`{ref, campo, texto}`; menções `{{rascunho_0}}` são restauradas localmente e
+referências desconhecidas são recusadas. O texto da pergunta tem até 500
+caracteres e aparece como texto simples na UI. Campos são pares
+`{campo, valor}`: `valor` precisa ser uma referência existente. O texto livre do modelo serve somente à pergunta. Ele não vira campo de
+registro, operação de arquivo ou endpoint arbitrário. Novos
+registros são limitados a seis por resposta e vinte no conjunto. Cada campo
+é validado pelo catálogo antes de qualquer alteração; resposta parcialmente
+inválida é recusada por inteiro. Valores explícitos numéricos não podem ser
+substituídos por outro valor pelo agente; a pessoa pode corrigi-los na conversa.
+A tabela tem até 512 referências; `limitado` sinaliza cortes.
+
+O payload acrescenta códigos de conceitos e uma sequência de códigos
+semânticos de vocabulário fixo, com palavras desconhecidas substituídas por
+aliases, além de quantidades com unidades reconhecidas. Não publica palavras
+originais fora desse vocabulário nem usa detecção de nomes como garantia. A tabela `valores_locais`, os mapas e a
+conversa bruta **não** entram no HTTPS. Não é uma promessa de remoção perfeita
+por regex: o texto livre nunca é publicado. Origem e destino não fornecem nem
+referências. Não há redirects com credencial; erros são fixos e não ecoam
+corpo remoto ou exceções.
 
 O MCP comum de ChatGPT/Claude continua separado, com seus escopos readonly e
 sua própria allowlist. A autorização da triagem não amplia permissões do MCP,
@@ -101,6 +132,8 @@ Tipos registrados: `plano`, `tarefa`, `livro`, `medida`, `objetivo`, `fato`,
 
 | Operação | Entrada | Saída |
 |---|---|---|
+| `triagem.agente_contexto` | bundle, rascunhos, hoje | público abstrato, valores e mapas locais separados |
+| `triagem.agente_aplicar` | bundle, rascunhos, hoje, resposta | rascunhos e relações restaurados + pergunta |
 | `triagem.catalogo` | nenhuma | tipos, campos, perguntas, limites e destino |
 | `triagem.contexto` | bundle, rascunhos, hoje | público abstrato + mapa apenas local |
 | `triagem.preparar` | bundle, rascunhos, relações, ID do lote | proposta ligada ao hash da base |
@@ -137,7 +170,10 @@ POST /api/triagem/contexto
 POST /api/triagem/preparar
 POST /api/triagem/validar
 POST /api/triagem/aplicar
-POST /api/triagem/sugerir
+POST /api/triagem/organizar
+POST /api/triagem/agente_contexto
+POST /api/triagem/agente_aplicar
+POST /api/triagem/sugerir  # compatibilidade com o roteador anterior
 ```
 
 Os endpoints puros devolvem o resultado em memória; **não persistem no workspace
@@ -145,14 +181,14 @@ financeiro**. O client valida/revisa e persiste o bundle completo. Essa escolha
 permite usar a mesma API para qualquer tipo registrado sem criar uma segunda
 regra de negócio ou uma gravação parcial em vários arquivos.
 
-A opção `sugerir` exige `{bundle, rascunhos, hoje, confirmado_envio: true}` e a
+A opção `organizar` (e a antiga `sugerir`) exige `{bundle, rascunhos, hoje, confirmado_envio: true}` e a
 variável local `FINTIPS_OPENAI_API_KEY`. A chave não é aceita no corpo. O processo
 compila o mesmo contexto abstrato antes de fazer a chamada externa. Não
 publicar esses endpoints de registros na Internet; Host e Origin estrangeiros
 são recusados. A chamada exige JSON e tem corpo limitado; erros não ecoam dados.
 
 Um agente local também pode gerar uma proposta completa e exportar JSON. No
-chat Android, **Integrar uma proposta por contrato** importa somente rascunhos
+chat Android, **Conexão e detalhes → Integrar uma proposta por contrato** importa somente rascunhos
 para revisão, conferindo o hash da base atual. Só a confirmação cria registros.
 A cópia em Contexto fornece o bundle local; ela contém PII e não deve ser
 publicada nem enviada a um agente remoto. Agentes remotos devem trabalhar

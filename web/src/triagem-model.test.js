@@ -56,3 +56,16 @@ test("excluir um registro legado remove vínculos órfãos e backup não inclui 
   assert.equal(JSON.stringify(backupAll(s)).includes("SEGREDO_NAO_EXPORTAR"), false);
   s.setItem(CLIENT_STATE_KEY, "{broken"); assert.throws(() => readLife(s)); assert.throws(() => readReading(s));
 });
+
+test("resposta inline reaproveita unidades humanas e várias informações explícitas", async () => {
+  const { inlineAnswer, inlineFields, splitIntents, correctionCandidates } = await import("./triagem-model.js");
+  assert.deepEqual(inlineAnswer("Prefiro 4 dias por semana", { tipo: "inteiro", minimo: 1, maximo: 7 }, "dias_semana", "livro"), { dias_semana: 4 });
+  assert.deepEqual(inlineAnswer("3 dias porque quero ir devagar", { tipo: "inteiro", minimo: 1, maximo: 7 }, "dias_semana", "livro"), { dias_semana: 3 });
+  assert.deepEqual(inlineFields("3 dias por semana e já li 25%", "livro"), { dias_semana: 3, progresso_bp: 2500 });
+  assert.deepEqual(inlineFields("Quero chegar em 100%", "livro"), {});
+  assert.equal(makeDraft("Livro: Quero chegar em 100%").campos.progresso_bp, undefined);
+  assert.deepEqual(splitIntents("Quero ler Paz e Guerra e quero treinar; preciso estudar"), ["Quero ler Paz e Guerra", "quero treinar", "preciso estudar"]);
+  const drafts = [makeDraft('Livro: Exemplo'), makeDraft('Plano: estudar')];
+  assert.deepEqual(correctionCandidates("Na verdade, 4 dias por semana", drafts).map((d) => d.id), [drafts[0].id]);
+  assert.deepEqual(correctionCandidates("Outro livro: exemplo 4 dias por semana", drafts), []);
+});

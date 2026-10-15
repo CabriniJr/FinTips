@@ -34,7 +34,7 @@ fun main() {
                         "triagem.configurar_chave" -> { configured=true; buildJsonObject { put("status","dialogo_solicitado") } }
                         "triagem.apagar_chave" -> { configured=false; ai?.cancelar(); buildJsonObject { put("configurada",false) } }
                         "triagem.cancelar" -> { ai?.cancelar(); buildJsonObject { put("status","cancelado") } }
-                        "triagem.sugerir" -> { check(configured); ai!!.sugerir(i["bundle"]!!.jsonObject,i["rascunhos"]!!.jsonArray,"sk-"+"T".repeat(40),i["autorizado"]==JsonPrimitive(true),string("hoje")) }
+                        "triagem.sugerir", "triagem.organizar" -> { check(configured); ai!!.sugerir(i["bundle"]!!.jsonObject,i["rascunhos"]!!.jsonArray,"sk-"+"T".repeat(40),i["autorizado"]==JsonPrimitive(true),string("hoje"),agente=op=="triagem.organizar") }
 
                         "servidor.status" -> local.estado()
                         "servidor.iniciar" -> { val s = local.iniciar(i["context"]!!.jsonObject); local.verificar(s["sessao"]!!.jsonPrimitive.content) }

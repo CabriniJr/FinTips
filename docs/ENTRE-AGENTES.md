@@ -1634,3 +1634,69 @@ consumam o catálogo financeiro no motor. **Não mover o workspace para serviço
 remotos para simplificar a triagem.** Caminho e limites estão em
 `docs/TRIAGEM-CONVERSACIONAL.md`. Acrescentar novos tipos por catálogo/adaptador
 com ouro; não criar um formulário e uma API diferentes para cada asset.
+
+**15/10/2026 · Codex — corrigindo o papel do agente (preview 9)**
+
+Correção explícita do usuário: a IA deve fazer o preenchimento e a correlação,
+com perguntas inline, como um assistente de desenvolvimento. Deixar a pessoa
+configurar tipos/campos e a IA só rotear perguntas aumenta o toil. A preview 8
+não atendia a esse ponto. Não interpretar essa correção como autorização para
+publicar texto pessoal: valores/labels abstratos continuam permitidos; nomes
+e origem/destino reais continuam exclusivamente no aparelho.
+
+Branch `codex/android-agente-inline`, base `7f5f415`. Protocolo novo
+`fintips_agente_v2`: retorno com vários preenchimentos por referência local,
+criação de até seis registros por resposta, vínculos e uma pergunta. O contrato
+universal v1/persistência é preservado. Python é fonte em triagem_agente.py;
+AgenteTriagem.kt porta as mesmas validações, com ouro próprio. O payload é
+construído no Kotlin; não há encaminhamento de prompt arbitrário do WebView.
+Catálogo/limites e conceitos têm geração conferida. Origem/destino não geram
+referência nem metadado. Texto, mapas e valores privados são restaurados só
+localmente. Observações não podem ser copiadas entre rascunhos, unidades não
+são intercambiáveis e o agente não pode inventar motivos ou mudar um número
+explícito. Erros recusam a resposta inteira, sem gravação parcial.
+
+O chat agora apresenta resumo/aceite inline; formulários e importação de JSON
+ficam em detalhes opcionais. Ativação pela conversa, chave nativa uma vez,
+consentimento preservado nas próximas conversas, pausa disponível. Um turno
+processado não é reenviado ao reabrir, e escrita do agente não realimenta a
+API. Correções de ritmo atualizam o livro atual; ambiguidade vira uma escolha
+inline. Duplicata exata/única reaproveita o registro e obrigatórios existentes;
+a escolha explícita de manter separado prevalece. Medidas de dias diferentes
+não são fundidas. Ausência de progresso continua ausência de observação.
+
+**Limite deliberadamente declarado:** ainda não há LLM local. Extração privada
+usa regras e vocabulário fechado para publicar conceitos/unidades, sem enviar
+texto livre. O agente pode executar preenchimento e correlação, mas isso não
+é compreensão irrestrita de qualquer mensagem pessoal. Não prometer essa
+compreensão nem relaxar a privacidade em silêncio. Fórmulas financeiras,
+sensores e escopos readonly MCP não foram ampliados. Próxima evolução precisa
+medir mensagens que ainda exigem esclarecimento e ampliar interpretação local
+sem converter a experiência novamente em configuração de contratos.
+
+Validação/publicação: registrar o head aprovado e a build depois dos checks.
+
+Complemento do mesmo trabalho: o contexto agora inclui estrutura com negação,
+condição e intenção, compilada por léxico fechado. Qualquer palavra fora dele
+vira `opaco_N`; o texto original e mapas continuam locais. A pergunta pode ser
+redigida pelo agente, com placeholders de registros restaurados no client;
+não há escrita livre de campos pelo modelo. Título de leitura e ação podem
+ser extraídos localmente sem exigir aspas ou seleção de tipo. Ouro cobre
+“Quero ler …” → livro + tarefa relacionados, pergunta natural e negação,
+além da preservação da escolha explícita de manter registros separados.
+O teto artificial de 20 chamadas por conversa foi retirado: uma chamada por
+turno, recibo local do turno processado e cancelamento quando a pessoa muda a
+conversa evitam realimentação sem exigir que ela reconfigure/reinicie o chat.
+
+Validação local concluída: 266 Python, 148 motor JVM, 22 conector JVM, 26 JS,
+22 ouros, geração dos contratos, PII e licenças. Builds debug/release/testAPK.
+QA 320/390/768 com Kotlin/HTTPS reais e API simulada passou: preenchimento e
+vínculos, pergunta inline, correção de ritmo, persistência, backup, duplicata,
+importação, remoção e nenhuma chamada externa pelo WebView. A instrumentação
+CI mantém seis casos; o caso HTTPS Android agora inclui três campos e um
+vínculo do agente. Conferir o head e os runs do PR antes de integrar/publicar.
+
+Revisão visual: o chat passa a acompanhar o resultado do agente reservando
+espaço para o compositor e a navegação inferior. QA exige que o botão inline
+esteja acima da barra fixa. Deduplicação exige título igual com acentos
+preservados, além de tipo/ocorrência única; ouro distingue “avó” de “avô”.

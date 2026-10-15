@@ -109,7 +109,7 @@ class PreviewActivity : ComponentActivity() {
                         val op = request.getString("operation").also { operation = it }
                         val input = request.getJSONObject("input")
                         val result = when {
-                            op in setOf("triagem.chave_status", "triagem.configurar_chave", "triagem.apagar_chave", "triagem.sugerir", "triagem.cancelar") -> triagemOperation(op, input)
+                            op in setOf("triagem.chave_status", "triagem.configurar_chave", "triagem.apagar_chave", "triagem.sugerir", "triagem.organizar", "triagem.cancelar") -> triagemOperation(op, input)
                             op == "ponte.copiar_endpoint" -> copyLocal(McpLocalService.ponteOperation("ponte.status", JSONObject()).getString("origem") + "/mcp", false)
                             op == "ponte.abrir_cliente" -> openAIClient(input.getString("provedor"))
                             op.startsWith("ponte.") -> McpLocalService.ponteOperation(op, input)
@@ -208,10 +208,10 @@ class PreviewActivity : ComponentActivity() {
         "triagem.configurar_chave" -> { triagemAI.cancelar(); runOnUiThread { configurarChaveTriagem() }; JSONObject().put("status","dialogo_solicitado") }
         "triagem.apagar_chave" -> { triagemAI.cancelar(); chaveTriagem.apagar(); JSONObject().put("configurada",false) }
         "triagem.cancelar" -> { triagemAI.cancelar(); JSONObject().put("status","cancelado") }
-        "triagem.sugerir" -> {
+        "triagem.sugerir", "triagem.organizar" -> {
             val body=Json.parseToJsonElement(i.toString()).jsonObject
             JSONObject(triagemAI.sugerir(body["bundle"]!!.jsonObject,body["rascunhos"]!!.jsonArray,
-                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje")).toString())
+                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje"),agente=op=="triagem.organizar").toString())
         }
         else -> error("operação indisponível")
     }

@@ -265,6 +265,11 @@ def contexto(bundle, rascunhos, hoje):
 
 
 def executar(operacao, i):
+    if operacao.startswith('triagem.agente_'):
+        from . import triagem_agente as a
+        if operacao=='triagem.agente_contexto':return a.contexto(i['bundle'],i['rascunhos'],i['hoje'])
+        if operacao=='triagem.agente_pedido':return a.pedido(i['bundle'],i['rascunhos'],i['hoje'])
+        if operacao=='triagem.agente_aplicar':return a.resolver(i['bundle'],i['rascunhos'],i['hoje'],i['resposta'])
     if operacao == 'triagem.catalogo': return CATALOGO
     if operacao == 'triagem.contexto': return contexto(i['bundle'],i['rascunhos'],i['hoje'])
     if operacao == 'triagem.preparar': return preparar(i['bundle'],i['rascunhos'],i['relacoes'],i['id'])
