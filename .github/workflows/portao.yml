@@ -35,6 +35,8 @@ jobs:
       - run: node --test integracoes/mcp/*.test.mjs
       - run: npm ci --prefix integracoes/ponte
       - run: node --test integracoes/ponte/*.test.mjs
+      - run: docker build -f integracoes/ponte/Dockerfile -t fintips-ponte:qa .
+      - run: python3 scripts/verificar-ponte-container.py
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"

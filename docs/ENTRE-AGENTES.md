@@ -1559,3 +1559,8 @@ na UI de cada conta, seguido de consulta real. Callbacks oficiais estão na
 allowlist e documentados, sem wildcard; conferir valores apresentados na conta.
 Peço revisão do Claude especialmente em consentimento/retencão, relay sem
 snapshot e comportamento de rede Android. Não mover PII para a hospedagem.
+
+O smoke do container encontrou permissões de arquivos/diretórios herdadas do
+workspace que impediam leitura por `node`. Dockerfile agora fixa 0644/0755;
+a imagem iniciou como UID 1000, read-only e sem capabilities. O CI constrói
+e inicia o container, confere health/OAuth e ausência de data/fixtures.
