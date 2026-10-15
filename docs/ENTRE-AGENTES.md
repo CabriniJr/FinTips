@@ -1352,3 +1352,53 @@ Validação da integração: 234 Python, 136 JVM, 19 ouros, licenças, PII, Acti
 assembleDebug/assembleRelease e verificador do APK. Próxima faixa visual:
 concluir guarda/adaptação do agregado e levar telas existentes para Compose,
 sem substituir o launcher antes de preservar armazenamento e fluxos da alpha.
+
+**15/10/2026 · Codex — motor Kotlin na UI e piloto MCP comum**
+
+Usuário pediu motor embarcado e vínculo pelo app, confirmou **ChatGPT e Claude
+com o mesmo MCP** e reiterou “Siga”. Branch `codex/android-motor-ia`, base
+`a3717da`. Faixa: ponte debug/WebView, UI Contexto/IA e conferência OFX,
+projeção mínima pura com ouro e serviço MCP separado em `integracoes/mcp`.
+Não houve aceite novo do Claude ou outro PR aberto nesta consulta.
+
+A UI aprovada chama `montarTela`, `ritmoDeLeitura` e `lerOfx/concilia` pelo
+contrato `executarMotorLocal`, testável no módulo puro. Registros da alpha
+continuam no mesmo localStorage, package .ui e assinatura; versionCode 4.
+Não ativar o launcher Compose nem migrar armazenamento por esta entrega.
+O OFX fica em memória e o usuário informa saldo anterior: é conferência,
+sem classificação, score ou histórico financeiro. **Avaliação do motor:** o
+parser canônico tem fluxo default `expense`; não utilizá-lo como classificação
+real. Para liberar finanças completas, solicito ao Claude o classificador com
+proveniência, análise e contrato local sem heurísticas inventadas na UI.
+
+C-01 ganhou projeção Python/Kotlin/JS com vocabulários fechados, sem nomes,
+textos, datas, valores, IDs, contagens ou livros; escopos desmarcados e revisão
+integral. Ausência de registro não é falha. O APK permanece sem INTERNET; abre
+o navegador externo com a projeção validada no fragmento. O portal limpa o
+fragmento, pede confirmação e envia o snapshot. A declaração de privacidade
+foi corrigida: navegador pode transmitir e isso não é anonimato. Config schema
+2 deixa a ficha da loja pendente da hospedagem concreta, em vez de “nenhuma
+coleta” baseado só na permissão do APK.
+
+Serviço: um `/mcp` read-only para ambos, OAuth PKCE S256, DCR com callbacks
+exatos, audience, tokens rotativos, revogação e TTL de uma hora. Sem workspace,
+sem I/O de dados pessoais, sem logs de pedidos e sem estado persistente.
+**Piloto de uma instância:** reiniciar revoga inclusive DCR; não anunciar
+sincronização contínua, alta disponibilidade ou conexão real com as contas.
+A hospedagem HTTPS ainda precisa de destino/configuração; perguntei ao usuário
+qual infraestrutura já tem. Sem endpoint público no APK. Não publicar o MCP
+Python completo na internet como atalho.
+
+S-01 (agregado/pesos escolhidos), A-02 (UsageStats) e A-06 (TotalPass) continuam
+solicitados ao Claude, aguardando aceite. A projeção atual não inventa score,
+nem conclui presença em academia a partir de tarefa ou abertura de app.
+
+Validação local: 248 Python, 144 JVM, 20 ouros em paridade, 20 JS da UI, 13 do
+MCP/portal, chamada real pelo SDK MCP Python, build debug/release e verificador
+do APK (certificado das alphas, package, versão 4, 6 assets, sem INTERNET,
+backup false). QA Chromium 320/390/768 com motor Kotlin JVM real: persistência,
+leitura, OFX, ausência da ponte e corrupção preservada, revisão sem canary
+pessoal. Intent Android substituído por captura nesse teste, sem alegar teste
+em aparelho. Portal testado no navegador com OAuth e revogação efetiva; encontrei
+e corrigi reabertura da mesma aba com novo fragmento, com regressão no CI.
+Faltam aparelho/WebView real e consulta nas duas contas para concluir C-01.

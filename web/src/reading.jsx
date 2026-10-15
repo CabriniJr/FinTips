@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Icon } from "./icons.jsx";
 import { Sheet, closeSheet } from "./life.jsx";
 import { localDay, newId, shiftDay } from "./life-store.js";
-import { READING_KEY, emptyReading, libreraPositions, mergeLibrera, pacing, readReading, validateReading } from "./reading-model.js";
+import { READING_KEY, emptyReading, libreraPositions, mergeLibrera, readReading, validateReading } from "./reading-model.js";
 import "./reading.css";
+import { usePacing } from "./motor-hooks.js";
+import { isAndroid } from "./native-motor.js";
 
 const percent = (bp) => `${(bp / 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`;
 const pp = (bp) => `${(bp / 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} p.p.`;
@@ -144,9 +146,10 @@ function PositionChart({ observations }) {
 function BookCard({ book, store, onProgress, onPace, onRemove }) {
   const today = localDay();
   const observations = [...book.observacoes].sort((a, b) => a.dia.localeCompare(b.dia));
-  let r;
-  try { r = pacing(observations, { today, deadline: book.prazo || null, reading_days: book.dias_semana }); }
-  catch { return <article className="reading-book"><h3>{book.titulo}</h3><p className="form-error">Há uma data inconsistente neste histórico. Confira o relógio do aparelho e preserve uma cópia dos dados.</p></article>; }
+  const calculation = usePacing(observations, { today, deadline: book.prazo || null, reading_days: book.dias_semana });
+  if (calculation.error) return <article className="reading-book"><h3>{book.titulo}</h3><p role="alert" className="form-error">{calculation.error}</p></article>;
+  if (calculation.loading) return <article className="reading-book"><h3>{book.titulo}</h3><p role="status">Calculando no aparelho…</p></article>;
+  const r = calculation.data;
   const last = observations.at(-1);
   const demanding = r.estado === "estimado" && r.prazo_dias !== null && r.prazo_dias >= 0 &&
     (10000 - r.progresso_bp) * r.intervalo_dias > r.avanco_bp * Math.max(1, r.prazo_dias);
@@ -157,6 +160,7 @@ function BookCard({ book, store, onProgress, onPace, onRemove }) {
     {last && <p className="reading-caption">Última posição de {dateLabel(last.dia)} · {book.fonte === "librera" ? `perfil ${book.perfil}` : "registro local"}</p>}
     <PositionChart observations={observations}/>
     <div className="reading-pacing">
+      {isAndroid() && <small className="motor-label">Motor Kotlin · cálculo no aparelho</small>}
       {r.estado === "estimado" ? <><span className="eyebrow">{r.preliminar ? "Primeira estimativa" : "Seu ritmo observado"}</span>
         <strong>{pp(r.avanco_bp / r.intervalo_dias)} por dia de calendário</strong>
         <p>Nesse ritmo, o fim fica em aproximadamente <b>{r.previsao_dias} dias</b>, por volta de {dateLabel(shiftDay(today, r.previsao_dias))}.</p>

@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AREAS, STORAGE_KEY, dailyProgress, emptyLife, isDone, localDay, newId,
   readLife, removeTask, shiftDay, tasksForDay, toggleTask, validateLife } from "./life-store.js";
 import { Icon } from "./icons.jsx";
+import { useDailyMotor } from "./motor-hooks.js";
+import { isAndroid } from "./native-motor.js";
 import { ReadingTracker } from "./reading.jsx";
 import { reducedMotion } from "./motion.js";
 
@@ -142,19 +144,20 @@ function Tasks({ life, selectedDay, area, add, toast }) {
   </section>;
 }
 
-function AreaCards({ life, selectedDay, openArea }) {
+function AreaCards({ life, selectedDay, openArea, motor }) {
   return <div className="area-grid">{AREAS.map((a) => {
-    const progress = dailyProgress(life.state, selectedDay, a.id);
+    const progress = isAndroid() ? motor?.data?.fronts.find((f) => f.area === a.id) : dailyProgress(life.state, selectedDay, a.id);
     return <button className="area-card" key={a.id} onClick={() => openArea(a.id)} style={{ "--area": a.cor }}>
       <span className="area-card-top"><span className="area-icon"><Icon name={a.icone}/></span><span className="area-code" aria-hidden="true">{a.id}</span></span>
-      <strong>{a.nome}</strong><span className="area-reading" aria-hidden="true">{progress.total ? `${progress.done}/${progress.total}` : "—"}</span><small>{progress.total ? `${progress.done} de ${progress.total} tarefas` : "Sem tarefas ainda"}</small>
-      <span className="area-progress"><i style={{ width: `${progress.pct}%` }}/></span>
+      <strong>{a.nome}</strong><span className="area-reading" aria-hidden="true">{progress?.total ? `${progress.done}/${progress.total}` : "—"}</span><small>{!progress ? (motor?.error ? "Motor indisponível" : "Calculando…") : progress.total ? `${progress.done} de ${progress.total} tarefas` : "Sem tarefas ainda"}</small>
+      <span className="area-progress"><i style={{ width: `${progress?.pct || 0}%` }}/></span>
     </button>;
   })}</div>;
 }
 
 export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
   const [form, setForm] = useState(false);
+  const motor = useDailyMotor(life.state, selectedDay, tasksForDay, isDone);
   const progress = dailyProgress(life.state, selectedDay);
   const weekday = new Date(`${selectedDay}T12:00:00`).getDay();
   const start = shiftDay(selectedDay, -((weekday + 6) % 7));
@@ -179,7 +182,8 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
     </section>
     <Tasks life={life} selectedDay={selectedDay} add={() => setForm(true)} toast={toast}/>
     <div className="section-head outside"><h2>Suas áreas de vida</h2><button className="text-button" onClick={() => ir("vida")}>Explorar <Icon name="arrow" size={16}/></button></div>
-    <AreaCards life={life} selectedDay={selectedDay} openArea={openArea}/>
+    {isAndroid() && <p className="motor-label" role="status">{motor?.data ? "Áreas calculadas pelo motor Kotlin · no aparelho" : motor?.error ? "Motor indisponível. Atualize o Android System WebView; seus registros continuam salvos." : "Carregando motor Kotlin…"}</p>}
+    <AreaCards life={life} selectedDay={selectedDay} openArea={openArea} motor={motor}/>
     <button className="context-prompt" onClick={() => ir("contexto")}><span className="area-icon"><Icon name="context"/></span><span><strong>O celular também pode contar uma história</strong><small>Descubra quais sinais podem ajudar a entender sua rotina.</small></span><Icon name="arrow" size={18}/></button>
     {form && <TaskForm life={life} selectedDay={selectedDay} close={() => setForm(false)} toast={toast}/>}
   </>;
@@ -299,7 +303,8 @@ export function PhoneContext({ life, toast }) {
   };
   return <>
     <PageHeading code="05" overline="Sinais da rotina" title="Contexto" description="O que seu celular pode contar, sob seu controle."/>
-    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros desta tela ficam neste navegador. A coleta automática e a conexão com ChatGPT ainda não estão ativas.</p></div></section>
+    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros completos ficam no aparelho. A coleta automática ainda não está ativa. Você pode preparar um contexto mínimo para autorizar por MCP.</p></div></section>
+    <button className="context-prompt" onClick={() => { location.hash = "ia"; }}><span className="area-icon"><Icon name="context"/></span><span><strong>Conectar ChatGPT e Claude</strong><small>Mesmo MCP · revise o contexto · vínculo e revogação</small></span><Icon name="arrow" size={18}/></button>
     <section className="life-card"><div className="section-head"><h2>Seu tempo de tela</h2><span className="manual-tag">Registro manual</span></div>
       <label className="usage-date">Dia do registro<input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)}/></label>
       {!data.length ? <Empty icon="clock" title="Antes de concluir, observe">Registre o tempo que aparece nas configurações do celular. Não temos acesso automático aos seus apps nesta versão.</Empty>

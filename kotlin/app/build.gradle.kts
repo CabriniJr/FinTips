@@ -12,7 +12,7 @@ android {
         applicationId = "com.fintips.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
+        versionCode = 4
         versionName = "0.6.0"
     }
     buildFeatures { compose = true }
@@ -32,7 +32,7 @@ android {
         getByName("debug") {
             val ci = providers.gradleProperty("fintips.ciPreview").orNull == "true"
             applicationIdSuffix = if (ci) ".ci" else ".ui"
-            versionNameSuffix = if (ci) "-ci" else "-ui-preview.3"
+            versionNameSuffix = if (ci) "-ci" else "-ui-preview.4"
             manifestPlaceholders["previewLabel"] = if (ci) "FinTips CI" else "FinTips UI"
         }
     }
@@ -57,6 +57,7 @@ dependencies {
     // Esta tela importa Clock/LocalDate diretamente; não depender da
     // dependência implementation interna do motor para compilá-los.
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+    debugImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     val compose = "1.7.5"
     implementation("androidx.compose.ui:ui:$compose")
     implementation("androidx.compose.foundation:foundation:$compose")

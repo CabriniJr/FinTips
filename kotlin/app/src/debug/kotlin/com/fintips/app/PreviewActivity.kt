@@ -1,6 +1,7 @@
 package com.fintips.app
 
 import android.content.ContentValues
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
+import androidx.webkit.WebMessageCompat
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.util.concurrent.Executors
@@ -26,6 +30,8 @@ class PreviewActivity : ComponentActivity() {
     private lateinit var view: WebView
     private var files: ValueCallback<Array<Uri>>? = null
     private val io = Executors.newSingleThreadExecutor()
+    private val motor = MotorBridge()
+    private var closed = false
     private val picker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         files?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
         files = null
@@ -62,6 +68,27 @@ class PreviewActivity : ComponentActivity() {
             }
         }
         view.addJavascriptInterface(LocalBackup(), "FinTipsLocal")
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addWebMessageListener(view, "FinTipsMotor", setOf("https://$HOST")) { _, message, origin, mainFrame, reply ->
+                if (!mainFrame || origin.scheme != "https" || origin.host != HOST || origin.port !in listOf(-1, 443) || message.type != WebMessageCompat.TYPE_STRING) return@addWebMessageListener
+                val raw = message.data ?: return@addWebMessageListener
+                if (raw.toByteArray(Charsets.UTF_8).size > 1536 * 1024) return@addWebMessageListener
+                io.execute {
+                    var id: String? = null
+                    val response = try {
+                        val request = JSONObject(raw)
+                        id = request.getString("id").also { require(it.length <= 100) }
+                        val op = request.getString("operation")
+                        val input = request.getJSONObject("input")
+                        val result = if (op == "ia.abrir") openConnector(input) else motor.execute(op, input)
+                        JSONObject().put("id", id).put("result", result)
+                    } catch (_: Exception) {
+                        JSONObject().put("id", id ?: JSONObject.NULL).put("error", "O motor não aceitou este pedido. Confira os dados e tente novamente.")
+                    }
+                    runOnUiThread { if (!closed) reply.postMessage(response.toString()) }
+                }
+            }
+        }
         view.setDownloadListener { url, _, _, _, _ ->
             if (url.startsWith("blob:https://$HOST/")) {
                 val quoted = JSONObject.quote(url)
@@ -124,14 +151,40 @@ class PreviewActivity : ComponentActivity() {
 
     private fun notice(message: String) = runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
 
+    /** Somente a projeção validada sai, por gesto explícito, no navegador externo.
+     * O fragmento não é enviado no pedido HTTP; a página de pareamento o consome.
+     * O WebView segue offline e nunca recebe conteúdo remoto.
+     */
+    private fun openConnector(i: JSONObject): JSONObject {
+        val base = Uri.parse(i.getString("endpoint"))
+        require(base.scheme == "https" && !base.host.isNullOrBlank() && base.userInfo == null)
+        require(base.encodedPath in listOf("", "/") && base.query == null && base.fragment == null)
+        val revocation = i.getString("revocation")
+        require(Regex("[a-f0-9]{64}").matches(revocation))
+        val payload = JSONObject().put("revocation", revocation)
+        if (i.optBoolean("revoke", false)) payload.put("revoke", true) else {
+            val code = i.getString("code").replace("-", "").uppercase()
+            require(Regex("[A-Z2-7]{12}").matches(code))
+            payload.put("code", code).put("context", JSONObject(MotorBridge.validateContext(i.getJSONObject("context").toString())))
+        }
+        val url = base.buildUpon().path("/link").fragment(payload.toString()).build()
+        runOnUiThread {
+            if (!closed) try { startActivity(Intent(Intent.ACTION_VIEW, url).addCategory(Intent.CATEGORY_BROWSABLE)) }
+            catch (_: Exception) { notice("Nenhum navegador disponível para abrir o conector.") }
+        }
+        return JSONObject().put("status", "navegador_solicitado")
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         view.saveState(outState)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
+        closed = true
         files?.onReceiveValue(null); files = null
         view.removeJavascriptInterface("FinTipsLocal")
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) WebViewCompat.removeWebMessageListener(view, "FinTipsMotor")
         view.destroy()
         io.shutdown()
         super.onDestroy()

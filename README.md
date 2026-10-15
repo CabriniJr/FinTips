@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/CabriniJr/FinTips/actions/workflows/portao.yml"><img src="https://github.com/CabriniJr/FinTips/actions/workflows/portao.yml/badge.svg" alt="CI: testes, paridade e privacidade"></a>
-  <a href="https://github.com/CabriniJr/FinTips/releases/tag/android-v0.6.0-alpha.3"><img src="https://img.shields.io/badge/Android-alpha.3-ffa342?style=flat-square&logo=android&logoColor=080808" alt="Android alpha 3"></a>
+  <a href="https://github.com/CabriniJr/FinTips/releases/tag/android-main"><img src="https://img.shields.io/badge/Android-main-ffa342?style=flat-square&logo=android&logoColor=080808" alt="Android — build contínuo da main"></a>
   <a href="docs/PORTE-KOTLIN.md"><img src="https://img.shields.io/badge/Kotlin-Multiplatform-ff4b35?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin Multiplatform"></a>
   <a href="docs/PRIVACIDADE.md"><img src="https://img.shields.io/badge/dados-no_client-a4ec8c?style=flat-square" alt="Dados pessoais no client"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-bdad99?style=flat-square" alt="Licença MIT"></a>
@@ -83,18 +83,21 @@ Dado ausente aparece como ausência, sem inventar progresso ou fracasso.
 ## Android
 
 <p>
-  <a href="https://github.com/CabriniJr/FinTips/releases/download/android-v0.6.0-alpha.3/FinTips-Android-v0.6.0-alpha.3.apk"><strong>↓ Baixar APK — alpha 3</strong></a>
+  <a href="https://github.com/CabriniJr/FinTips/releases/download/android-main/FinTips-Android-main.apk"><strong>↓ Baixar APK — último build da main</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/CabriniJr/FinTips/releases/tag/android-v0.6.0-alpha.3">Notas, código-fonte e checksums</a>
+  <a href="https://github.com/CabriniJr/FinTips/releases/tag/android-main">Notas, código-fonte e checksums</a>
 </p>
 
 A alpha é uma build de avaliação com a interface web embarcada em WebView.
-Você já pode testar tarefas, áreas da vida, planos e leitura. **As finanças do
-motor local ainda não estão disponíveis nesse APK**; use o painel no computador
-para essa parte. A migração da tela para Compose está em andamento.
+Você já pode testar tarefas, áreas da vida, planos e leitura. O **motor Kotlin
+está ligado à UI** para as frentes do dia, o ritmo dos livros e a conferência
+de saldo OFX. Classificação, score e histórico financeiro completos continuam
+no computador. A migração da tela para Compose está em andamento.
 
 O APK não tem permissão `INTERNET`, analytics ou backup automático. Os registros
-ficam no aparelho; **desinstalar apaga os dados**. Faça uma cópia local antes de
+completos ficam no aparelho. O vínculo MCP opcional abre o navegador externo
+com o contexto mínimo revisado e exige servidor HTTPS próprio. **Desinstalar
+apaga os dados**. Faça uma cópia local antes de
 remover o app. Baixe APKs pelas releases e confira `SHA256SUMS.txt`.
 
 [Todas as releases](https://github.com/CabriniJr/FinTips/releases) ·
@@ -135,9 +138,12 @@ fintips mcp-config                 # configuração para Claude Desktop
 fintips mcp-config --claude-code   # comando de registro no Claude Code
 ```
 
-A conexão nativa com **ChatGPT** faz parte do objetivo do projeto; ainda não
-está disponível na alpha Android. O contrato do contexto e seus limites estão
-em [Arquitetura](docs/ARQUITETURA.md) e [Privacidade](docs/PRIVACIDADE.md).
+Para **ChatGPT e Claude**, há agora um [serviço MCP comum](integracoes/mcp/README.md)
+e o fluxo Contexto → Conectar IA no APK: escolha áreas, revise a representação
+exata e continue a autorização no navegador. O piloto oferece somente leitura,
+snapshots de uma hora e revogação. **A hospedagem HTTPS e a conexão real nas
+duas contas ainda estão pendentes**; não há sincronização contínua.
+[Motor embarcado](docs/MOTOR-EMBARCADO-MCP.md) · [Privacidade](docs/PRIVACIDADE.md).
 
 ## Privacidade como arquitetura
 
@@ -157,10 +163,12 @@ escolhido. O [modelo de privacidade](docs/PRIVACIDADE.md) detalha essa fronteira
 |---|---|
 | Tarefas, planos e leitura no Android | Disponíveis na alpha de avaliação. |
 | Motor financeiro e MCP local | Disponíveis no computador; porte Kotlin em andamento. |
+| Motor Kotlin na UI Android | Frentes, pacing e conferência OFX; sem migração dos registros. |
+| Mesmo MCP para ChatGPT e Claude | Piloto e vínculo no app; hospedagem e conexão nas contas pendentes. |
 | UI nativa em Compose | Em desenvolvimento. |
 | Scores por área e agregado | Contratos e motor; integração visual nativa em andamento. |
 | Tempo de uso e atividade física | Discovery documentado; coleta automática ainda pendente. |
-| Librera cloud, TotalPass e ChatGPT nativo | Integrações planejadas; ainda não conectadas no APK. |
+| Librera cloud e TotalPass | Integrações planejadas; ainda não conectadas no APK. |
 
 A direção é reduzir o registro manual e fazer o contexto entrar naturalmente
 na rotina, com permissões explícitas e processamento no client.

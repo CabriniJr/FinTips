@@ -1,0 +1,3294 @@
+{
+  "casos": [
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "VIT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "INT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "FOC",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "OURO",
+            "total": 0,
+            "done": 0
+          }
+        ],
+        "plans": [],
+        "reading": [],
+        "scopes": []
+      },
+      "resultado": {
+        "schema_version": 1
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 1,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "INT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "FOC",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "OURO",
+            "total": 1,
+            "done": 1
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          }
+        ],
+        "scopes": []
+      },
+      "resultado": {
+        "schema_version": 1
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 2,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 2,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "FOC",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "OURO",
+            "total": 2,
+            "done": 2
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          }
+        ],
+        "scopes": []
+      },
+      "resultado": {
+        "schema_version": 1
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 3,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 3,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 3,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "OURO",
+            "total": 3,
+            "done": 3
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          }
+        ],
+        "scopes": []
+      },
+      "resultado": {
+        "schema_version": 1
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 4,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 4,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 4,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 4,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 4,
+            "done": 4
+          },
+          {
+            "area": "OURO",
+            "total": 4,
+            "done": 4
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          },
+          {
+            "state": "sem_avanco",
+            "source": "librera"
+          }
+        ],
+        "scopes": []
+      },
+      "resultado": {
+        "schema_version": 1
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "VIT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "INT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "FOC",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "OURO",
+            "total": 0,
+            "done": 0
+          }
+        ],
+        "plans": [],
+        "reading": [],
+        "scopes": [
+          "rotina"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 1,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "INT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "FOC",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "OURO",
+            "total": 1,
+            "done": 1
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "rotina"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 2,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 2,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "FOC",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "OURO",
+            "total": 2,
+            "done": 2
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "rotina"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 3,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 3,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 3,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "OURO",
+            "total": 3,
+            "done": 3
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "rotina"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 4,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 4,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 4,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 4,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 4,
+            "done": 4
+          },
+          {
+            "area": "OURO",
+            "total": 4,
+            "done": 4
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          },
+          {
+            "state": "sem_avanco",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "rotina"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "VIT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "INT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "FOC",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "OURO",
+            "total": 0,
+            "done": 0
+          }
+        ],
+        "plans": [],
+        "reading": [],
+        "scopes": [
+          "planos"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 1,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "INT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "FOC",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "OURO",
+            "total": 1,
+            "done": 1
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "planos"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 2,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 2,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "FOC",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "OURO",
+            "total": 2,
+            "done": 2
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "planos"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 3,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 3,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 3,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "OURO",
+            "total": 3,
+            "done": 3
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "planos"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 4,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 4,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 4,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 4,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 4,
+            "done": 4
+          },
+          {
+            "area": "OURO",
+            "total": 4,
+            "done": 4
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          },
+          {
+            "state": "sem_avanco",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "planos"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ]
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "VIT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "INT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "FOC",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "OURO",
+            "total": 0,
+            "done": 0
+          }
+        ],
+        "plans": [],
+        "reading": [],
+        "scopes": [
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "leitura": {
+          "estados": [],
+          "fontes": []
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 1,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "INT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "FOC",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "OURO",
+            "total": 1,
+            "done": 1
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "leitura": {
+          "estados": [
+            "sem_dados"
+          ],
+          "fontes": [
+            "usuario"
+          ]
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 2,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 2,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "FOC",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "OURO",
+            "total": 2,
+            "done": 2
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "leitura": {
+          "estados": [
+            "sem_dados",
+            "desatualizado"
+          ],
+          "fontes": [
+            "usuario",
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 3,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 3,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 3,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "OURO",
+            "total": 3,
+            "done": 3
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "leitura": {
+          "estados": [
+            "sem_dados",
+            "desatualizado",
+            "calibrando"
+          ],
+          "fontes": [
+            "usuario",
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 4,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 4,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 4,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 4,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 4,
+            "done": 4
+          },
+          {
+            "area": "OURO",
+            "total": 4,
+            "done": 4
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          },
+          {
+            "state": "sem_avanco",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "leitura": {
+          "estados": [
+            "sem_dados",
+            "desatualizado",
+            "calibrando",
+            "sem_avanco"
+          ],
+          "fontes": [
+            "usuario",
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "VIT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "INT",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "FOC",
+            "total": 0,
+            "done": 0
+          },
+          {
+            "area": "OURO",
+            "total": 0,
+            "done": 0
+          }
+        ],
+        "plans": [],
+        "reading": [],
+        "scopes": [
+          "rotina",
+          "planos",
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [],
+          "fontes": []
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 1,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "INT",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "FOC",
+            "total": 1,
+            "done": 1
+          },
+          {
+            "area": "OURO",
+            "total": 1,
+            "done": 1
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "rotina",
+          "planos",
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "sem_dados"
+          ],
+          "fontes": [
+            "usuario"
+          ]
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 2,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 2,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "FOC",
+            "total": 2,
+            "done": 2
+          },
+          {
+            "area": "OURO",
+            "total": 2,
+            "done": 2
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "rotina",
+          "planos",
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "sem_dados",
+            "desatualizado"
+          ],
+          "fontes": [
+            "usuario",
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 3,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 3,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 3,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 3,
+            "done": 3
+          },
+          {
+            "area": "OURO",
+            "total": 3,
+            "done": 3
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          }
+        ],
+        "scopes": [
+          "rotina",
+          "planos",
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "sem_dados",
+            "desatualizado",
+            "calibrando"
+          ],
+          "fontes": [
+            "usuario",
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "entrada": {
+        "fronts": [
+          {
+            "area": "FOR",
+            "total": 4,
+            "done": 0
+          },
+          {
+            "area": "AGI",
+            "total": 4,
+            "done": 1
+          },
+          {
+            "area": "VIT",
+            "total": 4,
+            "done": 2
+          },
+          {
+            "area": "INT",
+            "total": 4,
+            "done": 3
+          },
+          {
+            "area": "FOC",
+            "total": 4,
+            "done": 4
+          },
+          {
+            "area": "OURO",
+            "total": 4,
+            "done": 4
+          }
+        ],
+        "plans": [
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "FOR",
+            "done": true
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "AGI",
+            "done": false
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "VIT",
+            "done": true
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "INT",
+            "done": false
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "FOC",
+            "done": true
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "OURO",
+            "done": false
+          },
+          {
+            "area": "FOR",
+            "done": false
+          }
+        ],
+        "reading": [
+          {
+            "state": "sem_dados",
+            "source": "usuario"
+          },
+          {
+            "state": "desatualizado",
+            "source": "librera"
+          },
+          {
+            "state": "calibrando",
+            "source": "usuario"
+          },
+          {
+            "state": "sem_avanco",
+            "source": "librera"
+          }
+        ],
+        "scopes": [
+          "rotina",
+          "planos",
+          "leitura"
+        ]
+      },
+      "resultado": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_registro",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "parcial",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "completa",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "completa",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "misto"
+          },
+          {
+            "area": "AGI",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "VIT",
+            "estado": "concluidos"
+          },
+          {
+            "area": "INT",
+            "estado": "em_andamento"
+          },
+          {
+            "area": "FOC",
+            "estado": "concluidos"
+          },
+          {
+            "area": "OURO",
+            "estado": "em_andamento"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "sem_dados",
+            "desatualizado",
+            "calibrando",
+            "sem_avanco"
+          ],
+          "fontes": [
+            "usuario",
+            "librera"
+          ]
+        }
+      }
+    }
+  ]
+}

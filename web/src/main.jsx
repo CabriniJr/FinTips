@@ -7,6 +7,9 @@ import { Data, Fixed, Overview, Plans, Spending } from "./views.jsx";
 import { LifeAreas, LifePlans, PageHeading, PhoneContext, Today, useLocalLife } from "./life.jsx";
 import { AREAS, localDay } from "./life-store.js";
 import { Icon } from "./icons.jsx";
+import { ConnectAI } from "./connect-ai.jsx";
+import { NativeFinance } from "./native-finance.jsx";
+import { isAndroid } from "./native-motor.js";
 import { useRouteMotion, useTouchFeedback } from "./motion.js";
 import "./styles.css";
 import "./mobile.css";
@@ -20,20 +23,15 @@ const NAV = [["hoje", "Hoje", "today"], ["vida", "Vida", "life"], ["visao", "Fin
   ["projetos", "Planos", "plans"], ["contexto", "Contexto", "context"]];
 function route() {
   const [page, area] = location.hash.slice(1).split("/");
-  const known = [...NAV, ...FINANCE].some(([id]) => id === page);
+  const known = page === "ia" || [...NAV, ...FINANCE].some(([id]) => id === page);
   return { page: known ? page : "hoje", area: AREAS.some((a) => a.id === area) ? area : "FOR" };
 }
-const pageGroup = (page) => FINANCE.some(([id]) => id === page) ? "visao" : page;
+const pageGroup = (page) => page === "ia" ? "contexto" : FINANCE.some(([id]) => id === page) ? "visao" : page;
 
 function FinanceEmpty({ erro, reload, toast }) {
   const [file, setFile] = useState(null);
   const [busy, setBusy] = useState(false);
   const [issue, setIssue] = useState("");
-  if (location.hostname === "appassets.androidplatform.net") {
-    return <section className="life-card finance-empty"><span className="empty-icon"><Icon name="wallet" size={30}/></span>
-      <h2>Finanças em preparação</h2><p>As finanças ainda não estão disponíveis neste APK de avaliação. Você já pode registrar tarefas, planos de vida e o progresso dos livros.</p>
-    </section>;
-  }
   return <section className="life-card finance-empty"><span className="empty-icon"><Icon name="wallet" size={30}/></span>
     <h2>Vamos conhecer suas finanças?</h2><p>Importe um extrato para ver seus gastos, sua reserva e o efeito das escolhas. Suas outras áreas já podem ser usadas.</p>
     <form onSubmit={async (e) => {
@@ -68,7 +66,7 @@ function App() {
     api.context().then((data) => setCtx(data)).catch((e) => setFinanceError(e.message))
       .finally(() => setLoading(false));
   }, []);
-  useEffect(() => { if (financeiro && !ctx && !loading && !financeError) carregar(); }, [financeiro, ctx, loading, financeError, carregar]);
+  useEffect(() => { if (!isAndroid() && financeiro && !ctx && !loading && !financeError) carregar(); }, [financeiro, ctx, loading, financeError, carregar]);
   useEffect(() => {
     let lastDay = localDay();
     const refreshDay = () => { const next = localDay(); if (next !== lastDay) { setDay((d) => d === lastDay ? next : d); lastDay = next; } };
@@ -99,7 +97,9 @@ function App() {
       {current.page === "vida" && <LifeAreas life={life} selectedDay={day} areaId={current.area} setArea={openArea} toast={toast} ir={ir}/>}
       {current.page === "projetos" && <LifePlans life={life} toast={toast} ir={ir}/>}
       {current.page === "contexto" && <PhoneContext life={life} toast={toast}/>}
-      {financeiro && <div className="finance-content"><PageHeading code="03" overline="Reserva, escolhas e metas" title="Finanças" description="Entenda o presente. Abra espaço para seus planos."/>
+      {current.page === "ia" && <ConnectAI life={life} toast={toast}/>}
+      {financeiro && isAndroid() && <NativeFinance/>}
+      {financeiro && !isAndroid() && <div className="finance-content"><PageHeading code="03" overline="Reserva, escolhas e metas" title="Finanças" description="Entenda o presente. Abra espaço para seus planos."/>
         <div className="finance-tabs" aria-label="Seções financeiras">{FINANCE.map(([id, label]) => <button key={id} aria-pressed={current.page === id} onClick={() => ir(id)}>{label}{id === "triagem" && ctx?.triagem?.resumo?.abertos > 0 && <span className="finance-count">{ctx.triagem.resumo.abertos}</span>}</button>)}</div>
         {loading && <div className="loading-card" role="status">Organizando suas finanças…</div>}
         {!loading && financeError && <FinanceEmpty erro={financeError} reload={carregar} toast={toast}/>}
