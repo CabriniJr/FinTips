@@ -1564,3 +1564,8 @@ O smoke do container encontrou permissões de arquivos/diretórios herdadas do
 workspace que impediam leitura por `node`. Dockerfile agora fixa 0644/0755;
 a imagem iniciou como UID 1000, read-only e sem capabilities. O CI constrói
 e inicia o container, confere health/OAuth e ausência de data/fixtures.
+
+Na revisão final da UI, trocar o código OAuth passou a limpar também as áreas
+selecionadas. Um conector não deve herdar seleções de uma autorização anterior
+interrompida. O QA móvel conferiu esse reinício e os dois estados de consulta
+recebida, além da revogação. Nenhum fetch externo no navegador da UI.

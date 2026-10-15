@@ -24,7 +24,7 @@ export function ConnectRemote({ life, server, toast }) {
   const allowedKey = JSON.stringify(server?.escopos || []);
   useEffect(() => { const allowed = JSON.parse(allowedKey); setScopes((s) => s.filter((v) => allowed.includes(v))); }, [allowedKey]);
   useEffect(() => { setSnapshot(null); setAck(false); }, [life.state, scopes, server?.sessao]);
-  useEffect(() => { setInfo(null); setSnapshot(null); setAck(false); }, [code]);
+  useEffect(() => { setInfo(null); setScopes([]); setSnapshot(null); setAck(false); }, [code]);
   useEffect(() => {
     const clear = () => { setSnapshot(null); setAck(false); };
     addEventListener("fintips:reading-changed", clear); addEventListener("storage", clear);
