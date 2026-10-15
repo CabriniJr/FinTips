@@ -30,7 +30,7 @@ def catalogo(request:Request):
 @router.post('/{operacao}')
 async def executar(operacao:str,request:Request):
     fronteira(request)
-    if operacao not in ['contexto','preparar','aplicar','validar','sugerir']:raise HTTPException(404,'Operação indisponível')
+    if operacao not in ['contexto','preparar','aplicar','validar','sugerir','organizar','agente_contexto','agente_aplicar']:raise HTTPException(404,'Operação indisponível')
     if request.headers.get('content-type','').split(';')[0]!='application/json':raise HTTPException(415,'Use JSON')
     raw=bytearray()
     async for chunk in request.stream():
@@ -38,11 +38,11 @@ async def executar(operacao:str,request:Request):
         if len(raw)>1536*1024:raise HTTPException(413,'Contrato excede o limite local')
     try:
         body=json.loads(raw)
-        if operacao=='sugerir':
+        if operacao in ['sugerir','organizar']:
             t.exigir(t.exato(body,['bundle','rascunhos','confirmado_envio','hoje']))
             # A chave só é lida pelo processo local. Não é aceita no corpo HTTP.
             import asyncio
-            return await asyncio.to_thread(triagem_openai.sugerir,body['bundle'],body['rascunhos'],os.environ.get('FINTIPS_OPENAI_API_KEY',''),body['confirmado_envio'],body['hoje'])
+            return await asyncio.to_thread(triagem_openai.sugerir,body['bundle'],body['rascunhos'],os.environ.get('FINTIPS_OPENAI_API_KEY',''),body['confirmado_envio'],body['hoje'],operacao=='organizar')
         return t.executar('triagem.'+operacao,body)
     except Exception:
         raise HTTPException(400,'Contrato ou sugestão recusados; nenhum registro foi persistido') from None

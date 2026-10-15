@@ -269,8 +269,9 @@ jobs:
             echo
             echo "Servidor MCP Kotlin embarcado no celular, somente em 127.0.0.1 e com token por sessão."
             echo "Inicie/encerre em Contexto → Servidor IA local. Serviço com notificação de controle."
-            echo "Preview 8: chat de triagem em Contexto → Vamos organizar seus planos?"
-            echo "14 contratos, perguntas curtas, rascunhos e confirmação de um lote no aparelho."
+            echo "Preview 9: agente de preenchimento em Hoje → Conversar."
+            echo "A IA preenche vários campos, prepara vínculos e pergunta inline; uma ação salva o conjunto."
+            echo "Correções de ritmo pela conversa; formulários e contratos ficam nos detalhes. A extração privada ainda é limitada. JSON/HTTPS testados com API simulada."
             echo "Tarefas, planos, livros e tempo de uso entram nas abas existentes."
             echo "Outros tipos ficam no catálogo local; ainda não alimentam o cálculo financeiro."
             echo "OpenAI opcional: chave cifrada com Android Keystore e valores com aliases."

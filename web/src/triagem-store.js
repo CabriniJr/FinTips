@@ -28,9 +28,11 @@ export function readChat(storage) {
   if (!raw) return null;
   const c = JSON.parse(raw);
   if (c?.schema_version !== 1 || !Array.isArray(c.messages) || !Array.isArray(c.drafts) || !Array.isArray(c.links) ||
+      (c.handledTurn !== undefined && (typeof c.handledTurn !== "string" || c.handledTurn.length > 5000)) ||
+      (c.agentQuestion !== undefined && c.agentQuestion !== null && (!Number.isInteger(c.agentQuestion.index) || c.agentQuestion.index < 0 || c.agentQuestion.index >= c.drafts.length || typeof c.agentQuestion.field !== "string" || (c.agentQuestion.text !== undefined && (typeof c.agentQuestion.text !== "string" || c.agentQuestion.text.length > 5000)))) ||
       c.messages.length > 80 || c.drafts.length > 20 || c.links.length > 30 ||
       !Array.isArray(c.separate) || !c.separate.every((v) => typeof v === "string") || typeof c.cloudConsent !== "boolean" ||
-      !Number.isInteger(c.requests) || c.requests < 0 || c.requests > 20 ||
+      !Number.isInteger(c.requests) || c.requests < 0 || c.requests > 1000000 ||
       !c.drafts.every((d) => typeof d.id === "string" && typeof d.tipo === "string" && d.campos && typeof d.campos === "object" && !Array.isArray(d.campos) && typeof d.porque === "string" && ["criar", "atualizar"].includes(d.acao)) ||
       !c.messages.every((m) => ["usuario", "assistente"].includes(m.role) && typeof m.text === "string" && m.text.length <= 5000))
     throw new Error("A conversa local não pôde ser lida. Faça uma cópia antes de recuperá-la.");

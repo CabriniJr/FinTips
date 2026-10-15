@@ -4,11 +4,11 @@ import com.fintips.motor.sha256Hex
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.*
 
-private val catalogo = Json.parseToJsonElement(CATALOGO_JSON).jsonObject
-private val tipos = catalogo["tipos"]!!.jsonObject
-private fun JsonObject.obj(k: String) = this[k]!!.jsonObject
-private fun JsonObject.arr(k: String) = this[k]!!.jsonArray
-private fun JsonObject.str(k: String) = this[k]!!.jsonPrimitive.also { require(it.isString) }.content
+internal val catalogo = Json.parseToJsonElement(CATALOGO_JSON).jsonObject
+internal val tipos = catalogo["tipos"]!!.jsonObject
+internal fun JsonObject.obj(k: String) = this[k]!!.jsonObject
+internal fun JsonObject.arr(k: String) = this[k]!!.jsonArray
+internal fun JsonObject.str(k: String) = this[k]!!.jsonPrimitive.also { require(it.isString) }.content
 private fun texto(v: JsonElement?, limit: Int = 4000) = v is JsonPrimitive && v.isString && v.content.trim().isNotEmpty() && v.content.length <= limit
 private fun inteiro(v: JsonElement?, lo: Long = 0, hi: Long = 9_000_000_000_000L): Boolean = v is JsonPrimitive && !v.isString && v.longOrNull?.let { it in lo..hi } == true
 private fun dia(v: JsonElement?) = v is JsonPrimitive && v.isString && runCatching { LocalDate.parse(v.content).toString() == v.content }.getOrDefault(false)
@@ -19,9 +19,9 @@ private fun canonico(v: JsonElement): String = when(v) {
     is JsonArray -> v.joinToString(",", "[", "]") { canonico(it) }
     else -> v.toString()
 }
-private fun digest(v: JsonElement) = sha256Hex(canonico(v))
-private fun fields(tipo: String) = tipos[tipo]!!.jsonObject.obj("campos")
-private fun validarCampos(tipo: String, campos: JsonObject, completo: Boolean = true) {
+internal fun digest(v: JsonElement) = sha256Hex(canonico(v))
+internal fun fields(tipo: String) = tipos[tipo]!!.jsonObject.obj("campos")
+internal fun validarCampos(tipo: String, campos: JsonObject, completo: Boolean = true) {
     require(tipo in tipos)
     val specs = fields(tipo); require(specs.keys.containsAll(campos.keys))
     specs.forEach { (k,e) ->
@@ -38,7 +38,7 @@ private fun validarCampos(tipo: String, campos: JsonObject, completo: Boolean = 
     }
 }
 private fun ref(a: JsonObject) = a.str("tipo") to a.str("id")
-private fun assets(b: JsonObject): List<JsonObject> = buildList {
+internal fun assets(b: JsonObject): List<JsonObject> = buildList {
     listOf("tarefa" to "tarefas", "plano" to "planos", "medida" to "medidas").forEach { (type,col) ->
         b.obj("vida").arr(col).forEach { el -> val a=el.jsonObject
             val f=buildJsonObject { a.filterKeys { it in fields(type) }.forEach { (k,v)->put(k,v) }; if(type=="medida") put("rotulo",a["app"]!!) }
@@ -54,7 +54,7 @@ private fun assets(b: JsonObject): List<JsonObject> = buildList {
     }
     addAll(b.obj("caderno").arr("assets").map { it.jsonObject })
 }
-private fun validarRelacao(r: JsonObject, refs: Set<Pair<String,String>>) {
+internal fun validarRelacao(r: JsonObject, refs: Set<Pair<String,String>>) {
     require(exact(r,"de","para","tipo","porque") && r["tipo"] in catalogo.arr("relacoes") && texto(r["porque"]))
     for(k in listOf("de","para")) require(exact(r.obj(k),"tipo","id") && ref(r.obj(k)) in refs)
     require(r["de"] != r["para"])
@@ -157,7 +157,7 @@ private fun aplicar(b: JsonObject, p: JsonObject, confirmed: JsonElement?, today
     validarBundle(next)
     return buildJsonObject { put("bundle",next);put("repetido",false);put("id",p["id"]!!) }
 }
-private fun contexto(b: JsonObject, drafts: JsonArray, today: String): JsonObject {
+internal fun contexto(b: JsonObject, drafts: JsonArray, today: String): JsonObject {
     validarBundle(b);require(dia(JsonPrimitive(today)) && drafts.size in 1..20)
     val all=assets(b);val local=all.take(100).map { a ->
         if(a.str("tipo")!="livro") a else buildJsonObject {
@@ -242,6 +242,9 @@ private fun contexto(b: JsonObject, drafts: JsonArray, today: String): JsonObjec
     }
 }
 fun executarTriagem(operacao: String, i: JsonObject): JsonObject = when(operacao) {
+    "triagem.agente_contexto" -> contextoAgente(i.obj("bundle"),i.arr("rascunhos"),i.str("hoje"))
+    "triagem.agente_aplicar" -> resolverAgente(i.obj("bundle"),i.arr("rascunhos"),i.str("hoje"),i.obj("resposta"))
+    "triagem.agente_pedido" -> pedidoAgente(i.obj("bundle"),i.arr("rascunhos"),i.str("hoje"))
     "triagem.catalogo" -> catalogo
     "triagem.contexto" -> contexto(i.obj("bundle"),i.arr("rascunhos"),i.str("hoje"))
     "triagem.preparar" -> preparar(i.obj("bundle"),i.arr("rascunhos"),i.arr("relacoes"),i.str("id"))

@@ -1,0 +1,6065 @@
+{
+  "gerado_por": "fintips.triagem_agente (fontes sintéticas)",
+  "casos": [
+    {
+      "nome": "projeção sem texto, com referências e semântica fechada",
+      "operacao": "triagem.agente_contexto",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15"
+      },
+      "resultado": {
+        "publico": {
+          "schema_version": 1,
+          "itens": [],
+          "rascunhos": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "plano",
+              "preenchidos": [
+                "titulo",
+                "atributo"
+              ],
+              "faltantes": [],
+              "valores": {
+                "atributo": "INT"
+              },
+              "calculos": []
+            },
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "preenchidos": [
+                "titulo"
+              ],
+              "faltantes": [],
+              "valores": {},
+              "calculos": []
+            }
+          ],
+          "opcoes": [
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_0",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_0"
+            },
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_1",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_1"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "progresso_bp",
+              "alvo": null,
+              "id": "opcao_2"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "dias_semana",
+              "alvo": null,
+              "id": "opcao_3"
+            }
+          ],
+          "relacoes": [],
+          "metricas": [
+            {
+              "ref": "grupo_0",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_1",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_2",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_3",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_4",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_5",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            }
+          ],
+          "limitado": false,
+          "valores_disponiveis": [
+            {
+              "ref": "valor_0",
+              "dono": "rascunho_0",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "want",
+                "reading",
+                "more",
+                "opaco_0"
+              ],
+              "conceitos": [
+                "leitura",
+                "intencao"
+              ]
+            },
+            {
+              "ref": "valor_1",
+              "dono": "rascunho_0",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_2",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "observed",
+                "reading",
+                "opaco_1",
+                "opaco_0",
+                "opaco_2",
+                "day",
+                "per",
+                "week",
+                "and",
+                "already",
+                "observed",
+                "opaco_3"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_3",
+              "dono": "rascunho_1",
+              "campo": "dias_semana",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 3
+            },
+            {
+              "ref": "valor_4",
+              "dono": "rascunho_1",
+              "campo": "progresso_bp",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 2500
+            },
+            {
+              "ref": "valor_5",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "titulo_curto",
+              "estrutura": [
+                "opaco_1",
+                "opaco_0"
+              ],
+              "conceitos": []
+            },
+            {
+              "ref": "valor_6",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "acao_leitura",
+              "estrutura": [
+                "reading",
+                "opaco_1",
+                "opaco_0"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_7",
+              "dono": "catalogo",
+              "campo": "inicio",
+              "tipo": "data",
+              "papel": "padrao_hoje"
+            },
+            {
+              "ref": "valor_8",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "padrao",
+              "valor": false
+            },
+            {
+              "ref": "valor_9",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "recorrente",
+              "valor": true
+            },
+            {
+              "ref": "valor_10",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOR"
+            },
+            {
+              "ref": "valor_11",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "AGI"
+            },
+            {
+              "ref": "valor_12",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "VIT"
+            },
+            {
+              "ref": "valor_13",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_14",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOC"
+            },
+            {
+              "ref": "valor_15",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "OURO"
+            },
+            {
+              "ref": "valor_16",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "aceitar"
+            },
+            {
+              "ref": "valor_17",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "mudar"
+            },
+            {
+              "ref": "valor_18",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "investigar"
+            }
+          ],
+          "contratos": {
+            "plano": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "proximoPasso": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "tarefa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "inicio": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "repetir": {
+                "tipo": "booleano",
+                "obrigatorio": true
+              }
+            },
+            "livro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "progresso_bp": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 10000
+              },
+              "dias_semana": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 1,
+                "maximo": 7
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "medida": {
+              "rotulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "dia": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "minutos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1440
+              }
+            },
+            "objetivo": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "meta": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "atual": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "unidade": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "fato": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "decisao": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "pergunta": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "alternativa": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "causa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atitude": {
+                "tipo": "opcao",
+                "obrigatorio": false,
+                "opcoes": [
+                  "aceitar",
+                  "mudar",
+                  "investigar"
+                ]
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "compromisso": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "plano_financeiro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "meta_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "guardado_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "aporte_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "categoria": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "essencial": {
+                "tipo": "booleano",
+                "obrigatorio": false
+              }
+            },
+            "regra": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "condicao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "efeito": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              }
+            },
+            "perfil": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "patrimonio": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            }
+          }
+        },
+        "valores_locais": {
+          "valor_0": {
+            "valor": "Quero ler mais CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_0"
+          },
+          "valor_1": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "rascunho_0"
+          },
+          "valor_2": {
+            "valor": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_3": {
+            "valor": 3,
+            "campo": "dias_semana",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_4": {
+            "valor": 2500,
+            "campo": "progresso_bp",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_5": {
+            "valor": "BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_6": {
+            "valor": "Ler BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_7": {
+            "valor": "2026-10-15",
+            "campo": "inicio",
+            "tipo": "data",
+            "dono": "catalogo"
+          },
+          "valor_8": {
+            "valor": false,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_9": {
+            "valor": true,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_10": {
+            "valor": "FOR",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_11": {
+            "valor": "AGI",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_12": {
+            "valor": "VIT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_13": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_14": {
+            "valor": "FOC",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_15": {
+            "valor": "OURO",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_16": {
+            "valor": "aceitar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_17": {
+            "valor": "mudar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_18": {
+            "valor": "investigar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          }
+        },
+        "mapa_local": {
+          "rascunho_0": {
+            "tipo": "plano",
+            "id": "plan-local",
+            "titulo": "Quero ler mais CANARY"
+          },
+          "rascunho_1": {
+            "tipo": "livro",
+            "id": "book-local",
+            "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+          },
+          "grupo_0": {
+            "tipo": "area",
+            "id": "FOR",
+            "titulo": "FOR"
+          },
+          "grupo_1": {
+            "tipo": "area",
+            "id": "AGI",
+            "titulo": "AGI"
+          },
+          "grupo_2": {
+            "tipo": "area",
+            "id": "VIT",
+            "titulo": "VIT"
+          },
+          "grupo_3": {
+            "tipo": "area",
+            "id": "INT",
+            "titulo": "INT"
+          },
+          "grupo_4": {
+            "tipo": "area",
+            "id": "FOC",
+            "titulo": "FOC"
+          },
+          "grupo_5": {
+            "tipo": "area",
+            "id": "OURO",
+            "titulo": "OURO"
+          }
+        }
+      }
+    },
+    {
+      "nome": "pedido limitado e gerado a partir da fonte local",
+      "operacao": "triagem.agente_pedido",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15"
+      },
+      "resultado": {
+        "model": "gpt-4.1-mini",
+        "store": false,
+        "max_output_tokens": 3000,
+        "instructions": "Você é o agente que preenche e correlaciona os registros FinTips, não um seletor de perguntas. Use registros para aplicar vários campos de uma vez. Cada valor é uma referência local; não invente texto, motivos, números ou observações. Os conceitos descrevem trechos locais sem nomes; titulo_curto é um título entre aspas extraído localmente. Use dias_semana/progresso_bp/minutos extraídos quando pertinentes; não transforme intenção em progresso observado. Pode corrigir o tipo de um rascunho ou criar novo_0..novo_5 somente se a intenção justificar um registro distinto. Não duplique registros só para preencher todos os tipos. Relacione os rascunhos e itens que sustentam o mesmo plano; apoia não declara um motivo nem prova causalidade. Não invente evidência por área semelhante apenas. Se necessário faça uma única pergunta, escolhendo campo/ref. Prefira uma decisão que desbloqueie o conjunto. Não pergunte o que já está preenchido. Se os obrigatórios estiverem completos, pergunta=null: o app mostra um resumo e a pessoa confirma numa ação. Origens/destinos e a conversa real ficam no aparelho. Campos ausentes são desconhecidos, nunca zero. Dinheiro está em centavos; progresso_bp em 0..10000. Cada texto tem estrutura, uma sequência de códigos semânticos e opaco_N. A ordem preserva negação, condição e intenção; opaco_N não revela a palavra e não prova identidade. Não registre uma intenção negada como meta. Use o contexto para preencher, não peça novamente números já disponíveis. acao_leitura é um título local de ação; padrao_hoje permite uma tarefa começar hoje. Dinheiro só se vincula a campos de centavos. A pergunta inclui texto natural curto em português; use {{rascunho_0}} ou {{novo_0}} para mencionar o registro sem inventar nomes. Faça uma pergunta que ajude a pessoa a decidir, evitando linguagem de cadastro. Não solicite credenciais, CPF ou identificação pessoal para organizar um plano.",
+        "input": "{\"schema_version\":1,\"itens\":[],\"rascunhos\":[{\"ref\":\"rascunho_0\",\"tipo\":\"plano\",\"preenchidos\":[\"titulo\",\"atributo\"],\"faltantes\":[],\"valores\":{\"atributo\":\"INT\"},\"calculos\":[]},{\"ref\":\"rascunho_1\",\"tipo\":\"livro\",\"preenchidos\":[\"titulo\"],\"faltantes\":[],\"valores\":{},\"calculos\":[]}],\"opcoes\":[{\"acao\":\"revisar\",\"rascunho\":\"rascunho_0\",\"campo\":null,\"alvo\":null,\"id\":\"opcao_0\"},{\"acao\":\"revisar\",\"rascunho\":\"rascunho_1\",\"campo\":null,\"alvo\":null,\"id\":\"opcao_1\"},{\"acao\":\"sugerir_valor\",\"rascunho\":\"rascunho_1\",\"campo\":\"progresso_bp\",\"alvo\":null,\"id\":\"opcao_2\"},{\"acao\":\"sugerir_valor\",\"rascunho\":\"rascunho_1\",\"campo\":\"dias_semana\",\"alvo\":null,\"id\":\"opcao_3\"}],\"relacoes\":[],\"metricas\":[{\"ref\":\"grupo_0\",\"tipo\":\"tarefas\",\"previstas\":0,\"conclusoes_registradas\":0,\"evidencia\":\"sem_metas\"},{\"ref\":\"grupo_1\",\"tipo\":\"tarefas\",\"previstas\":0,\"conclusoes_registradas\":0,\"evidencia\":\"sem_metas\"},{\"ref\":\"grupo_2\",\"tipo\":\"tarefas\",\"previstas\":0,\"conclusoes_registradas\":0,\"evidencia\":\"sem_metas\"},{\"ref\":\"grupo_3\",\"tipo\":\"tarefas\",\"previstas\":0,\"conclusoes_registradas\":0,\"evidencia\":\"sem_metas\"},{\"ref\":\"grupo_4\",\"tipo\":\"tarefas\",\"previstas\":0,\"conclusoes_registradas\":0,\"evidencia\":\"sem_metas\"},{\"ref\":\"grupo_5\",\"tipo\":\"tarefas\",\"previstas\":0,\"conclusoes_registradas\":0,\"evidencia\":\"sem_metas\"}],\"limitado\":false,\"valores_disponiveis\":[{\"ref\":\"valor_0\",\"dono\":\"rascunho_0\",\"campo\":\"titulo\",\"tipo\":\"texto\",\"papel\":\"campo\",\"estrutura\":[\"want\",\"reading\",\"more\",\"opaco_0\"],\"conceitos\":[\"leitura\",\"intencao\"]},{\"ref\":\"valor_1\",\"dono\":\"rascunho_0\",\"campo\":\"atributo\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"INT\"},{\"ref\":\"valor_2\",\"dono\":\"rascunho_1\",\"campo\":\"titulo\",\"tipo\":\"texto\",\"papel\":\"campo\",\"estrutura\":[\"observed\",\"reading\",\"opaco_1\",\"opaco_0\",\"opaco_2\",\"day\",\"per\",\"week\",\"and\",\"already\",\"observed\",\"opaco_3\"],\"conceitos\":[\"leitura\"]},{\"ref\":\"valor_3\",\"dono\":\"rascunho_1\",\"campo\":\"dias_semana\",\"tipo\":\"inteiro\",\"papel\":\"extraido\",\"valor\":3},{\"ref\":\"valor_4\",\"dono\":\"rascunho_1\",\"campo\":\"progresso_bp\",\"tipo\":\"inteiro\",\"papel\":\"extraido\",\"valor\":2500},{\"ref\":\"valor_5\",\"dono\":\"rascunho_1\",\"campo\":\"titulo\",\"tipo\":\"texto\",\"papel\":\"titulo_curto\",\"estrutura\":[\"opaco_1\",\"opaco_0\"],\"conceitos\":[]},{\"ref\":\"valor_6\",\"dono\":\"rascunho_1\",\"campo\":\"titulo\",\"tipo\":\"texto\",\"papel\":\"acao_leitura\",\"estrutura\":[\"reading\",\"opaco_1\",\"opaco_0\"],\"conceitos\":[\"leitura\"]},{\"ref\":\"valor_7\",\"dono\":\"catalogo\",\"campo\":\"inicio\",\"tipo\":\"data\",\"papel\":\"padrao_hoje\"},{\"ref\":\"valor_8\",\"dono\":\"catalogo\",\"campo\":\"repetir\",\"tipo\":\"booleano\",\"papel\":\"padrao\",\"valor\":false},{\"ref\":\"valor_9\",\"dono\":\"catalogo\",\"campo\":\"repetir\",\"tipo\":\"booleano\",\"papel\":\"recorrente\",\"valor\":true},{\"ref\":\"valor_10\",\"dono\":\"catalogo\",\"campo\":\"atributo\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"FOR\"},{\"ref\":\"valor_11\",\"dono\":\"catalogo\",\"campo\":\"atributo\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"AGI\"},{\"ref\":\"valor_12\",\"dono\":\"catalogo\",\"campo\":\"atributo\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"VIT\"},{\"ref\":\"valor_13\",\"dono\":\"catalogo\",\"campo\":\"atributo\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"INT\"},{\"ref\":\"valor_14\",\"dono\":\"catalogo\",\"campo\":\"atributo\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"FOC\"},{\"ref\":\"valor_15\",\"dono\":\"catalogo\",\"campo\":\"atributo\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"OURO\"},{\"ref\":\"valor_16\",\"dono\":\"catalogo\",\"campo\":\"atitude\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"aceitar\"},{\"ref\":\"valor_17\",\"dono\":\"catalogo\",\"campo\":\"atitude\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"mudar\"},{\"ref\":\"valor_18\",\"dono\":\"catalogo\",\"campo\":\"atitude\",\"tipo\":\"opcao\",\"papel\":\"campo\",\"valor\":\"investigar\"}],\"contratos\":{\"plano\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"atributo\":{\"tipo\":\"opcao\",\"obrigatorio\":true,\"opcoes\":[\"FOR\",\"AGI\",\"VIT\",\"INT\",\"FOC\",\"OURO\"]},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":false},\"proximoPasso\":{\"tipo\":\"texto\",\"obrigatorio\":false},\"prazo\":{\"tipo\":\"data\",\"obrigatorio\":false}},\"tarefa\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"atributo\":{\"tipo\":\"opcao\",\"obrigatorio\":true,\"opcoes\":[\"FOR\",\"AGI\",\"VIT\",\"INT\",\"FOC\",\"OURO\"]},\"inicio\":{\"tipo\":\"data\",\"obrigatorio\":true},\"repetir\":{\"tipo\":\"booleano\",\"obrigatorio\":true}},\"livro\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"progresso_bp\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":0,\"maximo\":10000},\"dias_semana\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":1,\"maximo\":7},\"prazo\":{\"tipo\":\"data\",\"obrigatorio\":false}},\"medida\":{\"rotulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"dia\":{\"tipo\":\"data\",\"obrigatorio\":true},\"minutos\":{\"tipo\":\"inteiro\",\"obrigatorio\":true,\"minimo\":0,\"maximo\":1440}},\"objetivo\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"atributo\":{\"tipo\":\"opcao\",\"obrigatorio\":true,\"opcoes\":[\"FOR\",\"AGI\",\"VIT\",\"INT\",\"FOC\",\"OURO\"]},\"meta\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":0,\"maximo\":1000000000},\"atual\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":0,\"maximo\":1000000000},\"unidade\":{\"tipo\":\"texto\",\"obrigatorio\":false},\"prazo\":{\"tipo\":\"data\",\"obrigatorio\":false},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":false}},\"fato\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"descricao\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"valor_centavos\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":0,\"maximo\":9000000000000},\"revisar_em\":{\"tipo\":\"data\",\"obrigatorio\":false}},\"decisao\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"pergunta\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"alternativa\":{\"tipo\":\"texto\",\"obrigatorio\":false},\"valor_centavos\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":0,\"maximo\":9000000000000},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":false},\"prazo\":{\"tipo\":\"data\",\"obrigatorio\":false}},\"causa\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"atitude\":{\"tipo\":\"opcao\",\"obrigatorio\":false,\"opcoes\":[\"aceitar\",\"mudar\",\"investigar\"]},\"revisar_em\":{\"tipo\":\"data\",\"obrigatorio\":false}},\"compromisso\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"valor_centavos\":{\"tipo\":\"inteiro\",\"obrigatorio\":true,\"minimo\":0,\"maximo\":1000000000000},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":false}},\"plano_financeiro\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"meta_centavos\":{\"tipo\":\"inteiro\",\"obrigatorio\":true,\"minimo\":0,\"maximo\":1000000000000},\"guardado_centavos\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":0,\"maximo\":1000000000000},\"aporte_centavos\":{\"tipo\":\"inteiro\",\"obrigatorio\":false,\"minimo\":0,\"maximo\":1000000000000},\"prazo\":{\"tipo\":\"data\",\"obrigatorio\":false},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":false}},\"categoria\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"descricao\":{\"tipo\":\"texto\",\"obrigatorio\":false},\"essencial\":{\"tipo\":\"booleano\",\"obrigatorio\":false}},\"regra\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"condicao\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"efeito\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":true}},\"perfil\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"atributo\":{\"tipo\":\"opcao\",\"obrigatorio\":true,\"opcoes\":[\"FOR\",\"AGI\",\"VIT\",\"INT\",\"FOC\",\"OURO\"]},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"revisar_em\":{\"tipo\":\"data\",\"obrigatorio\":false}},\"patrimonio\":{\"titulo\":{\"tipo\":\"texto\",\"obrigatorio\":true},\"valor_centavos\":{\"tipo\":\"inteiro\",\"obrigatorio\":true,\"minimo\":0,\"maximo\":1000000000000},\"porque\":{\"tipo\":\"texto\",\"obrigatorio\":false}}}}",
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "name": "fintips_agente_v2",
+            "strict": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "registros",
+                "relacoes",
+                "pergunta"
+              ],
+              "properties": {
+                "registros": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "ref",
+                      "tipo",
+                      "campos"
+                    ],
+                    "properties": {
+                      "ref": {
+                        "type": "string",
+                        "enum": [
+                          "rascunho_0",
+                          "rascunho_1",
+                          "novo_0",
+                          "novo_1",
+                          "novo_2",
+                          "novo_3",
+                          "novo_4",
+                          "novo_5"
+                        ]
+                      },
+                      "tipo": {
+                        "type": "string",
+                        "enum": [
+                          "plano",
+                          "tarefa",
+                          "livro",
+                          "medida",
+                          "objetivo",
+                          "fato",
+                          "decisao",
+                          "causa",
+                          "compromisso",
+                          "plano_financeiro",
+                          "categoria",
+                          "regra",
+                          "perfil",
+                          "patrimonio"
+                        ]
+                      },
+                      "campos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "campo",
+                            "valor"
+                          ],
+                          "properties": {
+                            "campo": {
+                              "type": "string",
+                              "enum": [
+                                "alternativa",
+                                "aporte_centavos",
+                                "atitude",
+                                "atributo",
+                                "atual",
+                                "condicao",
+                                "descricao",
+                                "dia",
+                                "dias_semana",
+                                "efeito",
+                                "essencial",
+                                "guardado_centavos",
+                                "inicio",
+                                "meta",
+                                "meta_centavos",
+                                "minutos",
+                                "pergunta",
+                                "porque",
+                                "prazo",
+                                "progresso_bp",
+                                "proximoPasso",
+                                "repetir",
+                                "revisar_em",
+                                "rotulo",
+                                "titulo",
+                                "unidade",
+                                "valor_centavos"
+                              ]
+                            },
+                            "valor": {
+                              "type": "string",
+                              "enum": [
+                                "valor_0",
+                                "valor_1",
+                                "valor_2",
+                                "valor_3",
+                                "valor_4",
+                                "valor_5",
+                                "valor_6",
+                                "valor_7",
+                                "valor_8",
+                                "valor_9",
+                                "valor_10",
+                                "valor_11",
+                                "valor_12",
+                                "valor_13",
+                                "valor_14",
+                                "valor_15",
+                                "valor_16",
+                                "valor_17",
+                                "valor_18"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "relacoes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "de",
+                      "para",
+                      "tipo"
+                    ],
+                    "properties": {
+                      "de": {
+                        "type": "string",
+                        "enum": [
+                          "rascunho_0",
+                          "rascunho_1",
+                          "novo_0",
+                          "novo_1",
+                          "novo_2",
+                          "novo_3",
+                          "novo_4",
+                          "novo_5"
+                        ]
+                      },
+                      "para": {
+                        "type": "string",
+                        "enum": [
+                          "rascunho_0",
+                          "rascunho_1",
+                          "novo_0",
+                          "novo_1",
+                          "novo_2",
+                          "novo_3",
+                          "novo_4",
+                          "novo_5"
+                        ]
+                      },
+                      "tipo": {
+                        "type": "string",
+                        "enum": [
+                          "apoia",
+                          "depende_de",
+                          "relacionado"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "pergunta": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "ref",
+                        "campo",
+                        "texto"
+                      ],
+                      "properties": {
+                        "ref": {
+                          "type": "string",
+                          "enum": [
+                            "rascunho_0",
+                            "rascunho_1",
+                            "novo_0",
+                            "novo_1",
+                            "novo_2",
+                            "novo_3",
+                            "novo_4",
+                            "novo_5"
+                          ]
+                        },
+                        "campo": {
+                          "type": "string",
+                          "enum": [
+                            "alternativa",
+                            "aporte_centavos",
+                            "atitude",
+                            "atributo",
+                            "atual",
+                            "condicao",
+                            "descricao",
+                            "dia",
+                            "dias_semana",
+                            "efeito",
+                            "essencial",
+                            "guardado_centavos",
+                            "inicio",
+                            "meta",
+                            "meta_centavos",
+                            "minutos",
+                            "pergunta",
+                            "porque",
+                            "prazo",
+                            "progresso_bp",
+                            "proximoPasso",
+                            "repetir",
+                            "revisar_em",
+                            "rotulo",
+                            "titulo",
+                            "unidade",
+                            "valor_centavos"
+                          ]
+                        },
+                        "texto": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "nome": "agente preenche três campos e correlaciona sem cliques por campo",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "titulo",
+                  "valor": "valor_5"
+                },
+                {
+                  "campo": "dias_semana",
+                  "valor": "valor_3"
+                },
+                {
+                  "campo": "progresso_bp",
+                  "valor": "valor_4"
+                }
+              ]
+            }
+          ],
+          "relacoes": [
+            {
+              "de": "rascunho_1",
+              "para": "rascunho_0",
+              "tipo": "apoia"
+            }
+          ],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "BOOK_CANARY",
+              "dias_semana": 3,
+              "progresso_bp": 2500
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "relacoes": [
+          {
+            "de": {
+              "id": "book-local",
+              "tipo": "livro"
+            },
+            "para": {
+              "id": "plan-local",
+              "tipo": "plano"
+            },
+            "tipo": "apoia",
+            "porque": "Relação proposta pelo agente a partir do contexto abstrato; revisão da pessoa."
+          }
+        ],
+        "pergunta": null,
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "agente cria asset adicional e vínculo via contrato universal",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "novo_0",
+              "tipo": "objetivo",
+              "campos": [
+                {
+                  "campo": "titulo",
+                  "valor": "valor_5"
+                },
+                {
+                  "campo": "atributo",
+                  "valor": "valor_1"
+                }
+              ]
+            }
+          ],
+          "relacoes": [
+            {
+              "de": "novo_0",
+              "para": "rascunho_1",
+              "tipo": "relacionado"
+            }
+          ],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "agente-a4ed1e9f82abc811a2188008",
+            "tipo": "objetivo",
+            "campos": {
+              "titulo": "BOOK_CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Organizado pelo agente a partir de referências da conversa; revisão da pessoa."
+          }
+        ],
+        "relacoes": [
+          {
+            "de": {
+              "id": "agente-a4ed1e9f82abc811a2188008",
+              "tipo": "objetivo"
+            },
+            "para": {
+              "id": "book-local",
+              "tipo": "livro"
+            },
+            "tipo": "relacionado",
+            "porque": "Relação proposta pelo agente a partir do contexto abstrato; revisão da pessoa."
+          }
+        ],
+        "pergunta": null,
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "modelo esquece pergunta: aparelho recupera obrigatório",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [],
+          "relacoes": [],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "relacoes": [],
+        "pergunta": {
+          "index": 0,
+          "field": "atributo"
+        },
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "origem e destino não viram referências nem metadados",
+      "operacao": "triagem.agente_contexto",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "money-local",
+            "tipo": "compromisso",
+            "campos": {
+              "titulo": "SERVICE_CANARY",
+              "valor_centavos": 12345,
+              "origem_real": "ORIGIN_CANARY",
+              "destino_real": "DEST_CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15"
+      },
+      "resultado": {
+        "publico": {
+          "schema_version": 1,
+          "itens": [],
+          "rascunhos": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "plano",
+              "preenchidos": [
+                "titulo",
+                "atributo"
+              ],
+              "faltantes": [],
+              "valores": {
+                "atributo": "INT"
+              },
+              "calculos": []
+            },
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "preenchidos": [
+                "titulo"
+              ],
+              "faltantes": [],
+              "valores": {},
+              "calculos": []
+            },
+            {
+              "ref": "rascunho_2",
+              "tipo": "compromisso",
+              "preenchidos": [
+                "titulo",
+                "valor_centavos"
+              ],
+              "faltantes": [],
+              "valores": {
+                "valor_centavos": 12345
+              },
+              "calculos": []
+            }
+          ],
+          "opcoes": [
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_0",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_0"
+            },
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_1",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_1"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "progresso_bp",
+              "alvo": null,
+              "id": "opcao_2"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "dias_semana",
+              "alvo": null,
+              "id": "opcao_3"
+            },
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_2",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_4"
+            }
+          ],
+          "relacoes": [],
+          "metricas": [
+            {
+              "ref": "grupo_0",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_1",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_2",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_3",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_4",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_5",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            }
+          ],
+          "limitado": false,
+          "valores_disponiveis": [
+            {
+              "ref": "valor_0",
+              "dono": "rascunho_0",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "want",
+                "reading",
+                "more",
+                "opaco_0"
+              ],
+              "conceitos": [
+                "leitura",
+                "intencao"
+              ]
+            },
+            {
+              "ref": "valor_1",
+              "dono": "rascunho_0",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_2",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "observed",
+                "reading",
+                "opaco_1",
+                "opaco_0",
+                "opaco_2",
+                "day",
+                "per",
+                "week",
+                "and",
+                "already",
+                "observed",
+                "opaco_3"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_3",
+              "dono": "rascunho_1",
+              "campo": "dias_semana",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 3
+            },
+            {
+              "ref": "valor_4",
+              "dono": "rascunho_1",
+              "campo": "progresso_bp",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 2500
+            },
+            {
+              "ref": "valor_5",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "titulo_curto",
+              "estrutura": [
+                "opaco_1",
+                "opaco_0"
+              ],
+              "conceitos": []
+            },
+            {
+              "ref": "valor_6",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "acao_leitura",
+              "estrutura": [
+                "reading",
+                "opaco_1",
+                "opaco_0"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_7",
+              "dono": "rascunho_2",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "opaco_4",
+                "opaco_0"
+              ],
+              "conceitos": []
+            },
+            {
+              "ref": "valor_8",
+              "dono": "rascunho_2",
+              "campo": "valor_centavos",
+              "tipo": "inteiro",
+              "papel": "campo",
+              "valor": 12345
+            },
+            {
+              "ref": "valor_9",
+              "dono": "catalogo",
+              "campo": "inicio",
+              "tipo": "data",
+              "papel": "padrao_hoje"
+            },
+            {
+              "ref": "valor_10",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "padrao",
+              "valor": false
+            },
+            {
+              "ref": "valor_11",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "recorrente",
+              "valor": true
+            },
+            {
+              "ref": "valor_12",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOR"
+            },
+            {
+              "ref": "valor_13",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "AGI"
+            },
+            {
+              "ref": "valor_14",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "VIT"
+            },
+            {
+              "ref": "valor_15",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_16",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOC"
+            },
+            {
+              "ref": "valor_17",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "OURO"
+            },
+            {
+              "ref": "valor_18",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "aceitar"
+            },
+            {
+              "ref": "valor_19",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "mudar"
+            },
+            {
+              "ref": "valor_20",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "investigar"
+            }
+          ],
+          "contratos": {
+            "plano": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "proximoPasso": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "tarefa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "inicio": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "repetir": {
+                "tipo": "booleano",
+                "obrigatorio": true
+              }
+            },
+            "livro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "progresso_bp": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 10000
+              },
+              "dias_semana": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 1,
+                "maximo": 7
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "medida": {
+              "rotulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "dia": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "minutos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1440
+              }
+            },
+            "objetivo": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "meta": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "atual": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "unidade": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "fato": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "decisao": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "pergunta": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "alternativa": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "causa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atitude": {
+                "tipo": "opcao",
+                "obrigatorio": false,
+                "opcoes": [
+                  "aceitar",
+                  "mudar",
+                  "investigar"
+                ]
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "compromisso": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "plano_financeiro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "meta_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "guardado_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "aporte_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "categoria": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "essencial": {
+                "tipo": "booleano",
+                "obrigatorio": false
+              }
+            },
+            "regra": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "condicao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "efeito": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              }
+            },
+            "perfil": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "patrimonio": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            }
+          }
+        },
+        "valores_locais": {
+          "valor_0": {
+            "valor": "Quero ler mais CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_0"
+          },
+          "valor_1": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "rascunho_0"
+          },
+          "valor_2": {
+            "valor": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_3": {
+            "valor": 3,
+            "campo": "dias_semana",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_4": {
+            "valor": 2500,
+            "campo": "progresso_bp",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_5": {
+            "valor": "BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_6": {
+            "valor": "Ler BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_7": {
+            "valor": "SERVICE_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_2"
+          },
+          "valor_8": {
+            "valor": 12345,
+            "campo": "valor_centavos",
+            "tipo": "inteiro",
+            "dono": "rascunho_2"
+          },
+          "valor_9": {
+            "valor": "2026-10-15",
+            "campo": "inicio",
+            "tipo": "data",
+            "dono": "catalogo"
+          },
+          "valor_10": {
+            "valor": false,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_11": {
+            "valor": true,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_12": {
+            "valor": "FOR",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_13": {
+            "valor": "AGI",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_14": {
+            "valor": "VIT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_15": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_16": {
+            "valor": "FOC",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_17": {
+            "valor": "OURO",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_18": {
+            "valor": "aceitar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_19": {
+            "valor": "mudar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_20": {
+            "valor": "investigar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          }
+        },
+        "mapa_local": {
+          "rascunho_0": {
+            "tipo": "plano",
+            "id": "plan-local",
+            "titulo": "Quero ler mais CANARY"
+          },
+          "rascunho_1": {
+            "tipo": "livro",
+            "id": "book-local",
+            "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+          },
+          "rascunho_2": {
+            "tipo": "compromisso",
+            "id": "money-local",
+            "titulo": "SERVICE_CANARY"
+          },
+          "grupo_0": {
+            "tipo": "area",
+            "id": "FOR",
+            "titulo": "FOR"
+          },
+          "grupo_1": {
+            "tipo": "area",
+            "id": "AGI",
+            "titulo": "AGI"
+          },
+          "grupo_2": {
+            "tipo": "area",
+            "id": "VIT",
+            "titulo": "VIT"
+          },
+          "grupo_3": {
+            "tipo": "area",
+            "id": "INT",
+            "titulo": "INT"
+          },
+          "grupo_4": {
+            "tipo": "area",
+            "id": "FOC",
+            "titulo": "FOC"
+          },
+          "grupo_5": {
+            "tipo": "area",
+            "id": "OURO",
+            "titulo": "OURO"
+          }
+        }
+      }
+    },
+    {
+      "nome": "duplicata exata e única atualiza sem pedir operação de cadastro",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [
+              {
+                "porque": "",
+                "proximoPasso": "",
+                "prazo": "",
+                "concluido": false,
+                "id": "plan-local",
+                "titulo": "Quero ler mais CANARY",
+                "atributo": "INT",
+                "proveniencia": {
+                  "origem": "usuario",
+                  "porque": "Pedido sintético",
+                  "quando": "2026-10-15",
+                  "por_quem": "triagem_confirmada",
+                  "proposta": "base-existing"
+                }
+              }
+            ],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": [
+              {
+                "id": "base-existing",
+                "hash": "9b4ef209078a39c895c05a93100b7db9a06985ebddbca196a6cc2dcf9bc53e40"
+              }
+            ]
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "titulo",
+                  "valor": "valor_5"
+                },
+                {
+                  "campo": "dias_semana",
+                  "valor": "valor_3"
+                },
+                {
+                  "campo": "progresso_bp",
+                  "valor": "valor_4"
+                }
+              ]
+            }
+          ],
+          "relacoes": [
+            {
+              "de": "rascunho_1",
+              "para": "rascunho_0",
+              "tipo": "apoia"
+            }
+          ],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "atualizar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "BOOK_CANARY",
+              "dias_semana": 3,
+              "progresso_bp": 2500
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "relacoes": [
+          {
+            "de": {
+              "id": "book-local",
+              "tipo": "livro"
+            },
+            "para": {
+              "id": "plan-local",
+              "tipo": "plano"
+            },
+            "tipo": "apoia",
+            "porque": "Relação proposta pelo agente a partir do contexto abstrato; revisão da pessoa."
+          }
+        ],
+        "pergunta": null,
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "escolha explícita de manter separado prevalece sobre deduplicação",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [
+              {
+                "porque": "",
+                "proximoPasso": "",
+                "prazo": "",
+                "concluido": false,
+                "id": "plan-local",
+                "titulo": "Quero ler mais CANARY",
+                "atributo": "INT",
+                "proveniencia": {
+                  "origem": "usuario",
+                  "porque": "Pedido sintético",
+                  "quando": "2026-10-15",
+                  "por_quem": "triagem_confirmada",
+                  "proposta": "base-existing"
+                }
+              }
+            ],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": [
+              {
+                "id": "base-existing",
+                "hash": "9b4ef209078a39c895c05a93100b7db9a06985ebddbca196a6cc2dcf9bc53e40"
+              }
+            ]
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Registro separado por escolha explícita da pessoa na conversa."
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "titulo",
+                  "valor": "valor_5"
+                },
+                {
+                  "campo": "dias_semana",
+                  "valor": "valor_3"
+                },
+                {
+                  "campo": "progresso_bp",
+                  "valor": "valor_4"
+                }
+              ]
+            }
+          ],
+          "relacoes": [
+            {
+              "de": "rascunho_1",
+              "para": "rascunho_0",
+              "tipo": "apoia"
+            }
+          ],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Registro separado por escolha explícita da pessoa na conversa."
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "BOOK_CANARY",
+              "dias_semana": 3,
+              "progresso_bp": 2500
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "relacoes": [
+          {
+            "de": {
+              "id": "book-local",
+              "tipo": "livro"
+            },
+            "para": {
+              "id": "plan-local",
+              "tipo": "plano"
+            },
+            "tipo": "apoia",
+            "porque": "Relação proposta pelo agente a partir do contexto abstrato; revisão da pessoa."
+          }
+        ],
+        "pergunta": null,
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "duplicata reaproveita área existente e dispensa pergunta redundante",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [
+              {
+                "porque": "",
+                "proximoPasso": "",
+                "prazo": "",
+                "concluido": false,
+                "id": "plan-local",
+                "titulo": "Quero ler mais CANARY",
+                "atributo": "INT",
+                "proveniencia": {
+                  "origem": "usuario",
+                  "porque": "Pedido sintético",
+                  "quando": "2026-10-15",
+                  "por_quem": "triagem_confirmada",
+                  "proposta": "base-existing"
+                }
+              }
+            ],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": [
+              {
+                "id": "base-existing",
+                "hash": "9b4ef209078a39c895c05a93100b7db9a06985ebddbca196a6cc2dcf9bc53e40"
+              }
+            ]
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [],
+          "relacoes": [],
+          "pergunta": {
+            "ref": "rascunho_0",
+            "campo": "atributo",
+            "texto": "Qual área faz sentido para {{rascunho_0}}?"
+          }
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "atualizar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "relacoes": [],
+        "pergunta": null,
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "sem aspas nem seleção de tipo: agente prepara livro e tarefa relacionados",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler DUNA_CANARY 3 dias por semana"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "titulo",
+                  "valor": "valor_4"
+                },
+                {
+                  "campo": "dias_semana",
+                  "valor": "valor_3"
+                }
+              ]
+            },
+            {
+              "ref": "novo_0",
+              "tipo": "tarefa",
+              "campos": [
+                {
+                  "campo": "titulo",
+                  "valor": "valor_5"
+                },
+                {
+                  "campo": "inicio",
+                  "valor": "valor_6"
+                },
+                {
+                  "campo": "repetir",
+                  "valor": "valor_7"
+                },
+                {
+                  "campo": "atributo",
+                  "valor": "valor_1"
+                }
+              ]
+            }
+          ],
+          "relacoes": [
+            {
+              "de": "novo_0",
+              "para": "rascunho_1",
+              "tipo": "apoia"
+            }
+          ],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "DUNA_CANARY",
+              "dias_semana": 3
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "agente-a4ed1e9f82abc811a2188008",
+            "tipo": "tarefa",
+            "campos": {
+              "titulo": "Ler DUNA_CANARY",
+              "inicio": "2026-10-15",
+              "repetir": false,
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Organizado pelo agente a partir de referências da conversa; revisão da pessoa."
+          }
+        ],
+        "relacoes": [
+          {
+            "de": {
+              "id": "agente-a4ed1e9f82abc811a2188008",
+              "tipo": "tarefa"
+            },
+            "para": {
+              "id": "book-local",
+              "tipo": "livro"
+            },
+            "tipo": "apoia",
+            "porque": "Relação proposta pelo agente a partir do contexto abstrato; revisão da pessoa."
+          }
+        ],
+        "pergunta": null,
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "pergunta natural do agente restaura o nome só no aparelho",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [],
+          "relacoes": [],
+          "pergunta": {
+            "ref": "rascunho_0",
+            "campo": "atributo",
+            "texto": "Para {{rascunho_0}}, qual área você quer priorizar?"
+          }
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "relacoes": [],
+        "pergunta": {
+          "index": 0,
+          "field": "atributo",
+          "text": "Para Quero ler mais CANARY, qual área você quer priorizar?"
+        },
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "estrutura preserva negação e condição sem publicar texto",
+      "operacao": "triagem.agente_contexto",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Não quero treinar com PRIVATE_PERSON_CANARY; se puder, quero ler",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15"
+      },
+      "resultado": {
+        "publico": {
+          "schema_version": 1,
+          "itens": [],
+          "rascunhos": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "plano",
+              "preenchidos": [
+                "titulo",
+                "atributo"
+              ],
+              "faltantes": [],
+              "valores": {
+                "atributo": "INT"
+              },
+              "calculos": []
+            },
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "preenchidos": [
+                "titulo"
+              ],
+              "faltantes": [],
+              "valores": {},
+              "calculos": []
+            }
+          ],
+          "opcoes": [
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_0",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_0"
+            },
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_1",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_1"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "progresso_bp",
+              "alvo": null,
+              "id": "opcao_2"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "dias_semana",
+              "alvo": null,
+              "id": "opcao_3"
+            }
+          ],
+          "relacoes": [],
+          "metricas": [
+            {
+              "ref": "grupo_0",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_1",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_2",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_3",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_4",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_5",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            }
+          ],
+          "limitado": false,
+          "valores_disponiveis": [
+            {
+              "ref": "valor_0",
+              "dono": "rascunho_0",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "not",
+                "want",
+                "gym",
+                "with",
+                "opaco_0",
+                "opaco_1",
+                "opaco_2",
+                "if",
+                "opaco_3",
+                "want",
+                "reading"
+              ],
+              "conceitos": [
+                "leitura",
+                "forca",
+                "intencao"
+              ]
+            },
+            {
+              "ref": "valor_1",
+              "dono": "rascunho_0",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_2",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "observed",
+                "reading",
+                "opaco_4",
+                "opaco_2",
+                "opaco_5",
+                "day",
+                "per",
+                "week",
+                "and",
+                "already",
+                "observed",
+                "opaco_6"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_3",
+              "dono": "rascunho_1",
+              "campo": "dias_semana",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 3
+            },
+            {
+              "ref": "valor_4",
+              "dono": "rascunho_1",
+              "campo": "progresso_bp",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 2500
+            },
+            {
+              "ref": "valor_5",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "titulo_curto",
+              "estrutura": [
+                "opaco_4",
+                "opaco_2"
+              ],
+              "conceitos": []
+            },
+            {
+              "ref": "valor_6",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "acao_leitura",
+              "estrutura": [
+                "reading",
+                "opaco_4",
+                "opaco_2"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_7",
+              "dono": "catalogo",
+              "campo": "inicio",
+              "tipo": "data",
+              "papel": "padrao_hoje"
+            },
+            {
+              "ref": "valor_8",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "padrao",
+              "valor": false
+            },
+            {
+              "ref": "valor_9",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "recorrente",
+              "valor": true
+            },
+            {
+              "ref": "valor_10",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOR"
+            },
+            {
+              "ref": "valor_11",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "AGI"
+            },
+            {
+              "ref": "valor_12",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "VIT"
+            },
+            {
+              "ref": "valor_13",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_14",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOC"
+            },
+            {
+              "ref": "valor_15",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "OURO"
+            },
+            {
+              "ref": "valor_16",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "aceitar"
+            },
+            {
+              "ref": "valor_17",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "mudar"
+            },
+            {
+              "ref": "valor_18",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "investigar"
+            }
+          ],
+          "contratos": {
+            "plano": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "proximoPasso": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "tarefa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "inicio": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "repetir": {
+                "tipo": "booleano",
+                "obrigatorio": true
+              }
+            },
+            "livro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "progresso_bp": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 10000
+              },
+              "dias_semana": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 1,
+                "maximo": 7
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "medida": {
+              "rotulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "dia": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "minutos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1440
+              }
+            },
+            "objetivo": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "meta": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "atual": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "unidade": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "fato": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "decisao": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "pergunta": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "alternativa": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "causa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atitude": {
+                "tipo": "opcao",
+                "obrigatorio": false,
+                "opcoes": [
+                  "aceitar",
+                  "mudar",
+                  "investigar"
+                ]
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "compromisso": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "plano_financeiro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "meta_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "guardado_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "aporte_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "categoria": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "essencial": {
+                "tipo": "booleano",
+                "obrigatorio": false
+              }
+            },
+            "regra": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "condicao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "efeito": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              }
+            },
+            "perfil": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "patrimonio": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            }
+          }
+        },
+        "valores_locais": {
+          "valor_0": {
+            "valor": "Não quero treinar com PRIVATE_PERSON_CANARY; se puder, quero ler",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_0"
+          },
+          "valor_1": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "rascunho_0"
+          },
+          "valor_2": {
+            "valor": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_3": {
+            "valor": 3,
+            "campo": "dias_semana",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_4": {
+            "valor": 2500,
+            "campo": "progresso_bp",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_5": {
+            "valor": "BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_6": {
+            "valor": "Ler BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_7": {
+            "valor": "2026-10-15",
+            "campo": "inicio",
+            "tipo": "data",
+            "dono": "catalogo"
+          },
+          "valor_8": {
+            "valor": false,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_9": {
+            "valor": true,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_10": {
+            "valor": "FOR",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_11": {
+            "valor": "AGI",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_12": {
+            "valor": "VIT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_13": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_14": {
+            "valor": "FOC",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_15": {
+            "valor": "OURO",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_16": {
+            "valor": "aceitar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_17": {
+            "valor": "mudar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_18": {
+            "valor": "investigar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          }
+        },
+        "mapa_local": {
+          "rascunho_0": {
+            "tipo": "plano",
+            "id": "plan-local",
+            "titulo": "Não quero treinar com PRIVATE_PERSON_CANARY; se puder, quero ler"
+          },
+          "rascunho_1": {
+            "tipo": "livro",
+            "id": "book-local",
+            "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+          },
+          "grupo_0": {
+            "tipo": "area",
+            "id": "FOR",
+            "titulo": "FOR"
+          },
+          "grupo_1": {
+            "tipo": "area",
+            "id": "AGI",
+            "titulo": "AGI"
+          },
+          "grupo_2": {
+            "tipo": "area",
+            "id": "VIT",
+            "titulo": "VIT"
+          },
+          "grupo_3": {
+            "tipo": "area",
+            "id": "INT",
+            "titulo": "INT"
+          },
+          "grupo_4": {
+            "tipo": "area",
+            "id": "FOC",
+            "titulo": "FOC"
+          },
+          "grupo_5": {
+            "tipo": "area",
+            "id": "OURO",
+            "titulo": "OURO"
+          }
+        }
+      }
+    },
+    {
+      "nome": "valor já declarado preenche meta financeira sem perguntar de novo",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "money-intent",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero guardar R$ 1500,50 para GOAL_CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido explícito sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "plano_financeiro",
+              "campos": [
+                {
+                  "campo": "meta_centavos",
+                  "valor": "valor_1"
+                }
+              ]
+            }
+          ],
+          "relacoes": [],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "money-intent",
+            "tipo": "plano_financeiro",
+            "campos": {
+              "titulo": "Quero guardar R$ 1500,50 para GOAL_CANARY",
+              "meta_centavos": 150050
+            },
+            "acao": "criar",
+            "porque": "Pedido explícito sintético"
+          }
+        ],
+        "relacoes": [],
+        "pergunta": null,
+        "origem": "openai"
+      }
+    },
+    {
+      "nome": "intenção de progresso não é uma observação",
+      "operacao": "triagem.agente_contexto",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Quero chegar em 100% do BOOK_CANARY"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15"
+      },
+      "resultado": {
+        "publico": {
+          "schema_version": 1,
+          "itens": [],
+          "rascunhos": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "plano",
+              "preenchidos": [
+                "titulo",
+                "atributo"
+              ],
+              "faltantes": [],
+              "valores": {
+                "atributo": "INT"
+              },
+              "calculos": []
+            },
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "preenchidos": [
+                "titulo"
+              ],
+              "faltantes": [],
+              "valores": {},
+              "calculos": []
+            }
+          ],
+          "opcoes": [
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_0",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_0"
+            },
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_1",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_1"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "progresso_bp",
+              "alvo": null,
+              "id": "opcao_2"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "dias_semana",
+              "alvo": null,
+              "id": "opcao_3"
+            }
+          ],
+          "relacoes": [],
+          "metricas": [
+            {
+              "ref": "grupo_0",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_1",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_2",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_3",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_4",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_5",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            }
+          ],
+          "limitado": false,
+          "valores_disponiveis": [
+            {
+              "ref": "valor_0",
+              "dono": "rascunho_0",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "want",
+                "reading",
+                "more",
+                "opaco_0"
+              ],
+              "conceitos": [
+                "leitura",
+                "intencao"
+              ]
+            },
+            {
+              "ref": "valor_1",
+              "dono": "rascunho_0",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_2",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "want",
+                "opaco_1",
+                "in",
+                "opaco_2",
+                "from",
+                "opaco_3",
+                "opaco_0"
+              ],
+              "conceitos": [
+                "intencao"
+              ]
+            },
+            {
+              "ref": "valor_3",
+              "dono": "catalogo",
+              "campo": "inicio",
+              "tipo": "data",
+              "papel": "padrao_hoje"
+            },
+            {
+              "ref": "valor_4",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "padrao",
+              "valor": false
+            },
+            {
+              "ref": "valor_5",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "recorrente",
+              "valor": true
+            },
+            {
+              "ref": "valor_6",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOR"
+            },
+            {
+              "ref": "valor_7",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "AGI"
+            },
+            {
+              "ref": "valor_8",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "VIT"
+            },
+            {
+              "ref": "valor_9",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_10",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOC"
+            },
+            {
+              "ref": "valor_11",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "OURO"
+            },
+            {
+              "ref": "valor_12",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "aceitar"
+            },
+            {
+              "ref": "valor_13",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "mudar"
+            },
+            {
+              "ref": "valor_14",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "investigar"
+            }
+          ],
+          "contratos": {
+            "plano": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "proximoPasso": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "tarefa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "inicio": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "repetir": {
+                "tipo": "booleano",
+                "obrigatorio": true
+              }
+            },
+            "livro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "progresso_bp": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 10000
+              },
+              "dias_semana": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 1,
+                "maximo": 7
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "medida": {
+              "rotulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "dia": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "minutos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1440
+              }
+            },
+            "objetivo": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "meta": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "atual": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "unidade": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "fato": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "decisao": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "pergunta": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "alternativa": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "causa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atitude": {
+                "tipo": "opcao",
+                "obrigatorio": false,
+                "opcoes": [
+                  "aceitar",
+                  "mudar",
+                  "investigar"
+                ]
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "compromisso": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "plano_financeiro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "meta_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "guardado_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "aporte_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "categoria": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "essencial": {
+                "tipo": "booleano",
+                "obrigatorio": false
+              }
+            },
+            "regra": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "condicao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "efeito": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              }
+            },
+            "perfil": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "patrimonio": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            }
+          }
+        },
+        "valores_locais": {
+          "valor_0": {
+            "valor": "Quero ler mais CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_0"
+          },
+          "valor_1": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "rascunho_0"
+          },
+          "valor_2": {
+            "valor": "Quero chegar em 100% do BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_3": {
+            "valor": "2026-10-15",
+            "campo": "inicio",
+            "tipo": "data",
+            "dono": "catalogo"
+          },
+          "valor_4": {
+            "valor": false,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_5": {
+            "valor": true,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_6": {
+            "valor": "FOR",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_7": {
+            "valor": "AGI",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_8": {
+            "valor": "VIT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_9": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_10": {
+            "valor": "FOC",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_11": {
+            "valor": "OURO",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_12": {
+            "valor": "aceitar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_13": {
+            "valor": "mudar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_14": {
+            "valor": "investigar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          }
+        },
+        "mapa_local": {
+          "rascunho_0": {
+            "tipo": "plano",
+            "id": "plan-local",
+            "titulo": "Quero ler mais CANARY"
+          },
+          "rascunho_1": {
+            "tipo": "livro",
+            "id": "book-local",
+            "titulo": "Quero chegar em 100% do BOOK_CANARY"
+          },
+          "grupo_0": {
+            "tipo": "area",
+            "id": "FOR",
+            "titulo": "FOR"
+          },
+          "grupo_1": {
+            "tipo": "area",
+            "id": "AGI",
+            "titulo": "AGI"
+          },
+          "grupo_2": {
+            "tipo": "area",
+            "id": "VIT",
+            "titulo": "VIT"
+          },
+          "grupo_3": {
+            "tipo": "area",
+            "id": "INT",
+            "titulo": "INT"
+          },
+          "grupo_4": {
+            "tipo": "area",
+            "id": "FOC",
+            "titulo": "FOC"
+          },
+          "grupo_5": {
+            "tipo": "area",
+            "id": "OURO",
+            "titulo": "OURO"
+          }
+        }
+      }
+    },
+    {
+      "nome": "título entre aspas não inventa uma ação de leitura em outro domínio",
+      "operacao": "triagem.agente_contexto",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero comprar “GOAL_CANARY”",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15"
+      },
+      "resultado": {
+        "publico": {
+          "schema_version": 1,
+          "itens": [],
+          "rascunhos": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "plano",
+              "preenchidos": [
+                "titulo",
+                "atributo"
+              ],
+              "faltantes": [],
+              "valores": {
+                "atributo": "INT"
+              },
+              "calculos": []
+            },
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "preenchidos": [
+                "titulo"
+              ],
+              "faltantes": [],
+              "valores": {},
+              "calculos": []
+            }
+          ],
+          "opcoes": [
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_0",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_0"
+            },
+            {
+              "acao": "revisar",
+              "rascunho": "rascunho_1",
+              "campo": null,
+              "alvo": null,
+              "id": "opcao_1"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "progresso_bp",
+              "alvo": null,
+              "id": "opcao_2"
+            },
+            {
+              "acao": "sugerir_valor",
+              "rascunho": "rascunho_1",
+              "campo": "dias_semana",
+              "alvo": null,
+              "id": "opcao_3"
+            }
+          ],
+          "relacoes": [],
+          "metricas": [
+            {
+              "ref": "grupo_0",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_1",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_2",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_3",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_4",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            },
+            {
+              "ref": "grupo_5",
+              "tipo": "tarefas",
+              "previstas": 0,
+              "conclusoes_registradas": 0,
+              "evidencia": "sem_metas"
+            }
+          ],
+          "limitado": false,
+          "valores_disponiveis": [
+            {
+              "ref": "valor_0",
+              "dono": "rascunho_0",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "want",
+                "buy",
+                "opaco_0",
+                "opaco_1"
+              ],
+              "conceitos": [
+                "intencao"
+              ]
+            },
+            {
+              "ref": "valor_1",
+              "dono": "rascunho_0",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "titulo_curto",
+              "estrutura": [
+                "opaco_0",
+                "opaco_1"
+              ],
+              "conceitos": []
+            },
+            {
+              "ref": "valor_2",
+              "dono": "rascunho_0",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_3",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "campo",
+              "estrutura": [
+                "observed",
+                "reading",
+                "opaco_2",
+                "opaco_1",
+                "opaco_3",
+                "day",
+                "per",
+                "week",
+                "and",
+                "already",
+                "observed",
+                "opaco_4"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_4",
+              "dono": "rascunho_1",
+              "campo": "dias_semana",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 3
+            },
+            {
+              "ref": "valor_5",
+              "dono": "rascunho_1",
+              "campo": "progresso_bp",
+              "tipo": "inteiro",
+              "papel": "extraido",
+              "valor": 2500
+            },
+            {
+              "ref": "valor_6",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "titulo_curto",
+              "estrutura": [
+                "opaco_2",
+                "opaco_1"
+              ],
+              "conceitos": []
+            },
+            {
+              "ref": "valor_7",
+              "dono": "rascunho_1",
+              "campo": "titulo",
+              "tipo": "texto",
+              "papel": "acao_leitura",
+              "estrutura": [
+                "reading",
+                "opaco_2",
+                "opaco_1"
+              ],
+              "conceitos": [
+                "leitura"
+              ]
+            },
+            {
+              "ref": "valor_8",
+              "dono": "catalogo",
+              "campo": "inicio",
+              "tipo": "data",
+              "papel": "padrao_hoje"
+            },
+            {
+              "ref": "valor_9",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "padrao",
+              "valor": false
+            },
+            {
+              "ref": "valor_10",
+              "dono": "catalogo",
+              "campo": "repetir",
+              "tipo": "booleano",
+              "papel": "recorrente",
+              "valor": true
+            },
+            {
+              "ref": "valor_11",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOR"
+            },
+            {
+              "ref": "valor_12",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "AGI"
+            },
+            {
+              "ref": "valor_13",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "VIT"
+            },
+            {
+              "ref": "valor_14",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "INT"
+            },
+            {
+              "ref": "valor_15",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "FOC"
+            },
+            {
+              "ref": "valor_16",
+              "dono": "catalogo",
+              "campo": "atributo",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "OURO"
+            },
+            {
+              "ref": "valor_17",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "aceitar"
+            },
+            {
+              "ref": "valor_18",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "mudar"
+            },
+            {
+              "ref": "valor_19",
+              "dono": "catalogo",
+              "campo": "atitude",
+              "tipo": "opcao",
+              "papel": "campo",
+              "valor": "investigar"
+            }
+          ],
+          "contratos": {
+            "plano": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "proximoPasso": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "tarefa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "inicio": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "repetir": {
+                "tipo": "booleano",
+                "obrigatorio": true
+              }
+            },
+            "livro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "progresso_bp": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 10000
+              },
+              "dias_semana": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 1,
+                "maximo": 7
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "medida": {
+              "rotulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "dia": {
+                "tipo": "data",
+                "obrigatorio": true
+              },
+              "minutos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1440
+              }
+            },
+            "objetivo": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "meta": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "atual": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000
+              },
+              "unidade": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "fato": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "decisao": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "pergunta": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "alternativa": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 9000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "causa": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atitude": {
+                "tipo": "opcao",
+                "obrigatorio": false,
+                "opcoes": [
+                  "aceitar",
+                  "mudar",
+                  "investigar"
+                ]
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "compromisso": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "plano_financeiro": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "meta_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "guardado_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "aporte_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": false,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "prazo": {
+                "tipo": "data",
+                "obrigatorio": false
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            },
+            "categoria": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "descricao": {
+                "tipo": "texto",
+                "obrigatorio": false
+              },
+              "essencial": {
+                "tipo": "booleano",
+                "obrigatorio": false
+              }
+            },
+            "regra": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "condicao": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "efeito": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              }
+            },
+            "perfil": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "atributo": {
+                "tipo": "opcao",
+                "obrigatorio": true,
+                "opcoes": [
+                  "FOR",
+                  "AGI",
+                  "VIT",
+                  "INT",
+                  "FOC",
+                  "OURO"
+                ]
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "revisar_em": {
+                "tipo": "data",
+                "obrigatorio": false
+              }
+            },
+            "patrimonio": {
+              "titulo": {
+                "tipo": "texto",
+                "obrigatorio": true
+              },
+              "valor_centavos": {
+                "tipo": "inteiro",
+                "obrigatorio": true,
+                "minimo": 0,
+                "maximo": 1000000000000
+              },
+              "porque": {
+                "tipo": "texto",
+                "obrigatorio": false
+              }
+            }
+          }
+        },
+        "valores_locais": {
+          "valor_0": {
+            "valor": "Quero comprar “GOAL_CANARY”",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_0"
+          },
+          "valor_1": {
+            "valor": "GOAL_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_0"
+          },
+          "valor_2": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "rascunho_0"
+          },
+          "valor_3": {
+            "valor": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_4": {
+            "valor": 3,
+            "campo": "dias_semana",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_5": {
+            "valor": 2500,
+            "campo": "progresso_bp",
+            "tipo": "inteiro",
+            "dono": "rascunho_1"
+          },
+          "valor_6": {
+            "valor": "BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_7": {
+            "valor": "Ler BOOK_CANARY",
+            "campo": "titulo",
+            "tipo": "texto",
+            "dono": "rascunho_1"
+          },
+          "valor_8": {
+            "valor": "2026-10-15",
+            "campo": "inicio",
+            "tipo": "data",
+            "dono": "catalogo"
+          },
+          "valor_9": {
+            "valor": false,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_10": {
+            "valor": true,
+            "campo": "repetir",
+            "tipo": "booleano",
+            "dono": "catalogo"
+          },
+          "valor_11": {
+            "valor": "FOR",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_12": {
+            "valor": "AGI",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_13": {
+            "valor": "VIT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_14": {
+            "valor": "INT",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_15": {
+            "valor": "FOC",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_16": {
+            "valor": "OURO",
+            "campo": "atributo",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_17": {
+            "valor": "aceitar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_18": {
+            "valor": "mudar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          },
+          "valor_19": {
+            "valor": "investigar",
+            "campo": "atitude",
+            "tipo": "opcao",
+            "dono": "catalogo"
+          }
+        },
+        "mapa_local": {
+          "rascunho_0": {
+            "tipo": "plano",
+            "id": "plan-local",
+            "titulo": "Quero comprar “GOAL_CANARY”"
+          },
+          "rascunho_1": {
+            "tipo": "livro",
+            "id": "book-local",
+            "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+          },
+          "grupo_0": {
+            "tipo": "area",
+            "id": "FOR",
+            "titulo": "FOR"
+          },
+          "grupo_1": {
+            "tipo": "area",
+            "id": "AGI",
+            "titulo": "AGI"
+          },
+          "grupo_2": {
+            "tipo": "area",
+            "id": "VIT",
+            "titulo": "VIT"
+          },
+          "grupo_3": {
+            "tipo": "area",
+            "id": "INT",
+            "titulo": "INT"
+          },
+          "grupo_4": {
+            "tipo": "area",
+            "id": "FOC",
+            "titulo": "FOC"
+          },
+          "grupo_5": {
+            "tipo": "area",
+            "id": "OURO",
+            "titulo": "OURO"
+          }
+        }
+      }
+    }
+  ],
+  "recusados": [
+    {
+      "nome": "referência inventada",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "titulo",
+                  "valor": "texto_privado_inventado"
+                }
+              ]
+            }
+          ],
+          "relacoes": [],
+          "pergunta": null
+        }
+      }
+    },
+    {
+      "nome": "minutos não viram porcentagem",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "progresso_bp",
+                  "valor": "valor_3"
+                }
+              ]
+            }
+          ],
+          "relacoes": [],
+          "pergunta": null
+        }
+      }
+    },
+    {
+      "nome": "não inventa motivos",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "plano",
+              "campos": [
+                {
+                  "campo": "porque",
+                  "valor": "valor_2"
+                }
+              ]
+            }
+          ],
+          "relacoes": [],
+          "pergunta": null
+        }
+      }
+    },
+    {
+      "nome": "origem privada não pode ser alvo",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "novo_0",
+              "tipo": "compromisso",
+              "campos": [
+                {
+                  "campo": "origem_real",
+                  "valor": "valor_2"
+                }
+              ]
+            }
+          ],
+          "relacoes": [],
+          "pergunta": null
+        }
+      }
+    },
+    {
+      "nome": "valor literal recusado",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_1",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "dias_semana",
+                  "valor": 3
+                }
+              ]
+            }
+          ],
+          "relacoes": [],
+          "pergunta": null
+        }
+      }
+    },
+    {
+      "nome": "observação não migra para outro rascunho",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [
+            {
+              "ref": "rascunho_0",
+              "tipo": "livro",
+              "campos": [
+                {
+                  "campo": "progresso_bp",
+                  "valor": "valor_4"
+                }
+              ]
+            }
+          ],
+          "relacoes": [],
+          "pergunta": null
+        }
+      }
+    },
+    {
+      "nome": "pergunta não pode inventar referência privada",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [],
+          "relacoes": [],
+          "pergunta": {
+            "ref": "rascunho_1",
+            "campo": "dias_semana",
+            "texto": "Como vai {{id_inventado}}?"
+          }
+        }
+      }
+    },
+    {
+      "nome": "pergunta sem necessidade",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [],
+          "relacoes": [],
+          "pergunta": {
+            "ref": "rascunho_0",
+            "campo": "titulo",
+            "texto": "Qual área faz sentido para {{rascunho_0}}?"
+          }
+        }
+      }
+    },
+    {
+      "nome": "vínculo com alias inventado",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": []
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "plan-local",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Quero ler mais CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          },
+          {
+            "id": "book-local",
+            "tipo": "livro",
+            "campos": {
+              "titulo": "Estou lendo “BOOK_CANARY” 3 dias por semana e já li 25%"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [],
+          "relacoes": [
+            {
+              "de": "inventado",
+              "para": "rascunho_0",
+              "tipo": "apoia"
+            }
+          ],
+          "pergunta": null
+        }
+      }
+    }
+  ]
+}

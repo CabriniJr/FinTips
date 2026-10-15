@@ -22,11 +22,13 @@ def pedido(publico):
             'text':{'format':{'type':'json_schema','name':'fintips_triagem_v1','strict':True,'schema':schema_sugestao(publico)}}}
 
 
-def sugerir(bundle,rascunhos,key,confirmado_envio,hoje):
+def sugerir(bundle,rascunhos,key,confirmado_envio,hoje,agente=False):
     if confirmado_envio is not True:raise ValueError('Autorize o envio do contexto abstrato')
     if not isinstance(key,str) or not key.startswith('sk-') or not 20<=len(key)<=512:raise ValueError('Configure a chave OpenAI neste dispositivo')
+    from . import triagem_agente as a
     public=contexto(bundle,rascunhos,hoje)['publico']
-    req=urllib.request.Request('https://api.openai.com/v1/responses',data=json.dumps(pedido(public)).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
+    payload=a.pedido(bundle,rascunhos,hoje) if agente else pedido(public)
+    req=urllib.request.Request('https://api.openai.com/v1/responses',data=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
     class SemRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self,*args,**kwargs):return None
     try:
@@ -37,7 +39,7 @@ def sugerir(bundle,rascunhos,key,confirmado_envio,hoje):
         if result.get('status')!='completed':raise ValueError('A API não concluiu a sugestão')
         text=[c['text'] for o in result.get('output',[]) if o.get('type')=='message' for c in o.get('content',[]) if c.get('type')=='output_text']
         if len(text)!=1:raise ValueError('Resposta OpenAI recusada')
-        return validar_sugestao(public,json.loads(text[0]))
+        return a.resolver(bundle,rascunhos,hoje,json.loads(text[0])) if agente else validar_sugestao(public,json.loads(text[0]))
     except HTTPError as e:
         raise ValueError('Chave OpenAI recusada' if e.code==401 else 'Limite ou indisponibilidade da API OpenAI') from None
     except (URLError,TimeoutError,json.JSONDecodeError,KeyError,TypeError):

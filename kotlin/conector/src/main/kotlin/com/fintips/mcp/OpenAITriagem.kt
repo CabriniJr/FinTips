@@ -2,6 +2,8 @@ package com.fintips.mcp
 
 import com.fintips.motor.triagem.pedidoOpenAITriagem
 import com.fintips.motor.triagem.validarSugestaoTriagem
+import com.fintips.motor.triagem.pedidoAgente
+import com.fintips.motor.triagem.resolverAgente
 import kotlinx.serialization.json.*
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -22,12 +24,12 @@ class OpenAITriagem(
     private val url=endpoint.toHttpUrl().also { require(it.isHttps && it.username.isEmpty() && it.password.isEmpty() && it.query==null && it.fragment==null) }
     private val current=AtomicReference<Call?>(null)
     fun cancelar() { current.getAndSet(null)?.cancel() }
-    fun sugerir(bundle: JsonObject, drafts: JsonArray, key: String, autorizado: Boolean, hoje: String = java.time.LocalDate.now().toString()): JsonObject {
+    fun sugerir(bundle: JsonObject, drafts: JsonArray, key: String, autorizado: Boolean, hoje: String = java.time.LocalDate.now().toString(), agente: Boolean = false): JsonObject {
         if(!autorizado) throw FalhaTriagem("CONSENTIMENTO")
         if(!key.startsWith("sk-") || key.length !in 20..512 || key.any { it.isWhitespace() || it.code < 32 }) throw FalhaTriagem("CHAVE")
-        val prepared=pedidoOpenAITriagem(bundle,drafts,hoje)
+        val prepared=if(agente) pedidoAgente(bundle,drafts,hoje) else pedidoOpenAITriagem(bundle,drafts,hoje)
         val req=Request.Builder().url(url).header("Authorization","Bearer $key")
-            .post(prepared["pedido"]!!.toString().toRequestBody("application/json; charset=utf-8".toMediaType())).build()
+            .post((if(agente) prepared else prepared["pedido"]!!).toString().toRequestBody("application/json; charset=utf-8".toMediaType())).build()
         val call=http.newCall(req)
         if(!current.compareAndSet(null,call)) throw FalhaTriagem("OCUPADO")
         try {
@@ -45,7 +47,7 @@ class OpenAITriagem(
                     .flatMap { it.jsonObject["content"]!!.jsonArray }.filter { it.jsonObject["type"]==JsonPrimitive("output_text") }
                 require(texts.size==1)
                 val choice=Json.parseToJsonElement(texts.single().jsonObject["text"]!!.jsonPrimitive.content).jsonObject
-                return validarSugestaoTriagem(prepared["publico"]!!.jsonObject,choice)
+                return if(agente) resolverAgente(bundle,drafts,hoje,choice) else validarSugestaoTriagem(prepared["publico"]!!.jsonObject,choice)
             }
         } catch(e: FalhaTriagem) { throw e }
         catch(_: Exception) { throw FalhaTriagem(if(call.isCanceled()) "CANCELADO" else "RESPOSTA") }

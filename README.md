@@ -94,11 +94,13 @@ está ligado à UI** para as frentes do dia, o ritmo dos livros e a conferência
 de saldo OFX. Classificação, score e histórico financeiro completos continuam
 no computador. A migração da tela para Compose está em andamento.
 
-A **preview 8 traz triagem por conversa**: Contexto → Vamos organizar seus
-planos? O app prepara rascunhos, pergunta o necessário e confirma um lote.
-Tarefas, planos e livros entram nas abas; outros tipos vão para o catálogo
-local. A assistência OpenAI é opcional, com sua chave no Android Keystore:
-recebe números, aliases e cálculos, sem mensagens ou origem/destino reais.
+A **preview 9 coloca o agente no trabalho de registro**: em Hoje → Conversar,
+você conta os planos e responde perguntas inline. A IA preenche vários campos,
+prepara vínculos e mostra um resumo para salvar de uma vez. Formulários e
+contratos ficam nos detalhes. Correções de ritmo podem ser feitas conversando.
+A OpenAI recebe valores e referências abstratas; mensagens, nomes e
+origem/destino reais ficam no Android, com a chave no Keystore. A interpretação
+privada ainda usa extração local limitada; não há LLM embarcado.
 [Fluxo, 14 contratos e API local](docs/TRIAGEM-CONVERSACIONAL.md).
 
 O APK embarca um **servidor MCP no próprio celular**, iniciado em Contexto →

@@ -26,7 +26,7 @@ export function makeDraft(text, type = inferType(text), today = localDay()) {
   if (parts.length > 1 && ["plano", "objetivo", "causa", "compromisso", "plano_financeiro", "regra", "perfil", "patrimonio", "decisao"].includes(type)) fields.porque = parts.slice(1).join(" porque ").trim();
   const date = clean.match(/\b(\d{4}-\d{2}-\d{2})\b/); if (date && ["plano", "livro", "objetivo", "decisao", "plano_financeiro"].includes(type)) fields.prazo = date[1];
   if (type === "tarefa") { fields.inicio = /amanh[aã](?:\s|$)/i.test(clean) ? shiftDay(today, 1) : today; fields.repetir = /\b(todos os dias|todo dia|diariamente)\b/i.test(clean); }
-  if (type === "livro") { const p = clean.match(/\b(\d+(?:[,.]\d{1,2})?)\s*%/); if (p) fields.progresso_bp = Math.round(Number(p[1].replace(",", ".")) * 100); }
+  if (type === "livro") { const p = clean.match(/(?:j[aá]\s+li|estou\s+em|progresso\s*(?:de|:)?)\s*(\d+(?:[,.]\d{1,2})?)\s*%/i) || (!/\b(quero|meta|chegar|alvo)\b/i.test(clean) && clean.match(/\b(\d+(?:[,.]\d{1,2})?)\s*%/)); if (p) fields.progresso_bp = Math.round(Number(p[1].replace(",", ".")) * 100); }
   if (["compromisso", "patrimonio"].includes(type)) { const value = clean.match(/R\$\s*([\d.,]+)/i); if (value && /^\d+(?:[.,]\d{1,2})?$/.test(value[1])) fields.valor_centavos = Math.round(Number(value[1].replace(",", ".")) * 100); }
   if (type === "medida") { fields.rotulo = fields.titulo; delete fields.titulo; fields.dia = today; }
   if (type === "fato") fields.descricao = clean;
@@ -66,3 +66,57 @@ export function displayValue(field, value) {
   return String(value);
 }
 export const containsKey = (text) => /\bsk-[A-Za-z0-9_-]{16,}/.test(text);
+
+// Pré-processamento privado: captura evidência explícita, sem escolher metas pela pessoa.
+export function inlineFields(raw, type, today = localDay()) {
+  const text = raw.trim(), t = normal(text), fields = {};
+  const area = inferArea(text);
+  if (area && ["plano", "tarefa", "objetivo", "perfil"].includes(type)) fields.atributo = area;
+  if (type === "livro") {
+    const days = t.match(/\b([1-7])\s*(?:dias?|vezes|x)\s*(?:por\s*|na\s*|\/\s*)semana\b/);
+    if (days) fields.dias_semana = Number(days[1]);
+    const p = t.match(/(?:ja\s+li|estou\s+em|progresso\s*(?:de|:)?)\s*(\d+(?:[,.]\d{1,2})?)\s*%/);
+    if (p && Number(p[1].replace(",", ".")) <= 100) fields.progresso_bp = Math.round(Number(p[1].replace(",", ".")) * 100);
+  }
+  const date = text.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+  if (date && ["plano", "livro", "objetivo", "decisao", "plano_financeiro"].includes(type)) fields.prazo = answerField(date[1], { tipo: "data" }, "prazo");
+  if (/\bamanha\b/.test(t) && type === "tarefa") fields.inicio = shiftDay(today, 1);
+  if (/\b(?:todo dia|todos os dias|diariamente)\b/.test(t) && type === "tarefa") fields.repetir = true;
+  const reason = text.match(/\bporque\s+(.+)/i);
+  if (reason && ["plano", "objetivo", "causa", "compromisso", "plano_financeiro", "regra", "perfil", "patrimonio", "decisao"].includes(type)) fields.porque = reason[1].trim();
+  return fields;
+}
+export function inlineAnswer(raw, spec, field, type) {
+  const fields = inlineFields(raw, type);
+  if (fields[field] !== undefined) return fields;
+  let value = raw;
+  if (field === "dias_semana") {
+    const brief = normal(raw).match(/^\s*(?:(?:na verdade|prefiro|pode ser)[, ]*)?([1-7])\s*dias?\b/);
+    if (brief) return { ...fields, dias_semana: Number(brief[1]) };
+  }
+  if (spec.tipo === "inteiro") {
+    // Aceita unidades na resposta curta, sem truncar um segundo valor/qualificador.
+    value = value.replace(/^\s*(?:na verdade,?\s*|prefiro\s*|pode ser\s*)/i, "");
+    if (field === "dias_semana") value = value.replace(/\s*dias?(?:\s*(?:por|na|\/)\s*semana)?\s*$/i, "");
+    if (field === "minutos") value = value.replace(/\s*(?:minutos?|min)\s*$/i, "");
+  }
+  if (spec.tipo === "opcao" && field === "atributo") value = inferArea(raw) || raw;
+  fields[field] = answerField(value, spec, field);
+  return fields;
+}
+export function splitIntents(raw) {
+  return raw.split(/\n+|;\s*|\s+e\s+(?=(?:tamb[eé]m\s+)?(?:quero|preciso|pretendo|planejo)\b)/i)
+    .map((s) => s.replace(/^[-*•]\s*/, "").trim()).filter(Boolean);
+}
+export function correctionCandidates(raw, drafts) {
+  const t = normal(raw);
+  if (/\b(?:novo|outro|outra|adicionar)\b/.test(t)) return [];
+  const named = drafts.filter((d) => {
+    const title = normal(d.campos.titulo || d.campos.rotulo || "");
+    return title.length >= 4 && t.includes(title);
+  });
+  if (named.length) return named;
+  const reading = /\b[1-7]\s*dias?\s*(?:por|na|\/)\s*semana\b|(?:ja li|estou em)\s*\d.*%/.test(t);
+  const candidates = reading ? drafts.filter((d) => d.tipo === "livro") : drafts;
+  return /^(?:na verdade|muda|troca|ajusta|corrige|prefiro|quero mudar)\b/.test(t) || reading ? candidates : [];
+}

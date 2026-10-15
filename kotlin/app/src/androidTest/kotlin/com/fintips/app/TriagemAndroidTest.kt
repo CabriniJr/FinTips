@@ -49,6 +49,27 @@ class TriagemAndroidTest {
             assertEquals(JsonPrimitive("revisar"),result["opcao"]!!.jsonObject["acao"])
             val raw=server.takeRequest(5,TimeUnit.SECONDS)!!.body.readUtf8()
             assertTrue(raw.contains("54321"));assertFalse(raw.contains("CANARY"));assertFalse(raw.contains("origem_real"));assertFalse(raw.contains("destino_real"));assertFalse(raw.contains("mapa_local"));assertFalse(raw.contains("sk-"))
+            // O agente novo escreve vários campos e um vínculo, ainda sem texto no HTTPS.
+            val agentDrafts=Json.parseToJsonElement("""[{"id":"PLAN_CANARY","tipo":"plano","campos":{"titulo":"Quero ler CANARY","atributo":"INT"},"porque":"Escolha sintética","acao":"criar"},{"id":"BOOK_CANARY","tipo":"livro","campos":{"titulo":"Estou lendo “TITLE_CANARY” 3 dias por semana e já li 25%"},"porque":"Escolha sintética","acao":"criar"}]""").jsonArray
+            val public=com.fintips.motor.triagem.contextoAgente(bundle,agentDrafts,"2026-10-15")["publico"]!!.jsonObject
+            fun value(field: String, short: Boolean=false)=public["valores_disponiveis"]!!.jsonArray.first { e->val v=e.jsonObject
+                v["dono"]==JsonPrimitive("rascunho_1") && v["campo"]==JsonPrimitive(field) && (!short || v["papel"]==JsonPrimitive("titulo_curto"))
+            }.jsonObject["ref"]!!
+            val filled=buildJsonObject {
+                putJsonArray("registros") { addJsonObject { put("ref","rascunho_1");put("tipo","livro");putJsonArray("campos") {
+                    for(field in listOf("titulo","dias_semana","progresso_bp")) addJsonObject { put("campo",field);put("valor",value(field,field=="titulo")) }
+                } } }
+                putJsonArray("relacoes") { addJsonObject { put("de","rascunho_1");put("para","rascunho_0");put("tipo","apoia") } };put("pergunta",JsonNull)
+            }
+            server.enqueue(MockResponse().setHeader("Content-Type","application/json").setBody(buildJsonObject {
+                put("status","completed");putJsonArray("output") { addJsonObject { put("type","message");putJsonArray("content") { addJsonObject { put("type","output_text");put("text",filled.toString()) } } } }
+            }.toString()))
+            val organized=ai.sugerir(bundle,agentDrafts,"sk-"+"T".repeat(40),true,"2026-10-15",agente=true)
+            val fields=organized["rascunhos"]!!.jsonArray[1].jsonObject["campos"]!!.jsonObject
+            assertEquals(JsonPrimitive("TITLE_CANARY"),fields["titulo"]);assertEquals(JsonPrimitive(3),fields["dias_semana"]);assertEquals(JsonPrimitive(2500),fields["progresso_bp"])
+            assertEquals(1,organized["relacoes"]!!.jsonArray.size)
+            val agentBody=server.takeRequest(5,TimeUnit.SECONDS)!!.body.readUtf8()
+            assertFalse(agentBody.contains("CANARY"));assertFalse(agentBody.contains("valores_locais"));assertFalse(agentBody.contains("sk-"));assertTrue(agentBody.contains("fintips_agente_v2"))
         } finally { ai.cancelar();server.shutdown();client.dispatcher.executorService.shutdown();client.connectionPool.evictAll() }
     }
 }
