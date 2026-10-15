@@ -94,9 +94,11 @@ está ligado à UI** para as frentes do dia, o ritmo dos livros e a conferência
 de saldo OFX. Classificação, score e histórico financeiro completos continuam
 no computador. A migração da tela para Compose está em andamento.
 
-O APK não tem permissão `INTERNET`, analytics ou backup automático. Os registros
-completos ficam no aparelho. O vínculo MCP opcional abre o navegador externo
-com o contexto mínimo revisado e exige servidor HTTPS próprio. **Desinstalar
+O APK embarca um **servidor MCP no próprio celular**, iniciado em Contexto →
+Servidor IA local. Ele escuta somente em `127.0.0.1`, com token por sessão e
+notificação de controle. Permissão INTERNET permite o socket local; a UI
+continua com assets locais. Não há túnel, upload automático, analytics ou
+backup automático. Registros completos ficam no aparelho. **Desinstalar
 apaga os dados**. Faça uma cópia local antes de
 remover o app. Baixe APKs pelas releases e confira `SHA256SUMS.txt`.
 
@@ -138,12 +140,16 @@ fintips mcp-config                 # configuração para Claude Desktop
 fintips mcp-config --claude-code   # comando de registro no Claude Code
 ```
 
-Para **ChatGPT e Claude**, há agora um [serviço MCP comum](integracoes/mcp/README.md)
-e o fluxo Contexto → Conectar IA no APK: escolha áreas, revise a representação
-exata e continue a autorização no navegador. O piloto oferece somente leitura,
-snapshots de uma hora e revogação. **A hospedagem HTTPS e a conexão real nas
-duas contas ainda estão pendentes**; não há sincronização contínua.
-[Motor embarcado](docs/MOTOR-EMBARCADO-MCP.md) · [Privacidade](docs/PRIVACIDADE.md).
+O mesmo contrato MCP roda agora **dentro do APK Android**, sem servidor externo
+para executar o motor ou guardar registros. Em Contexto → Servidor IA local,
+escolha áreas, revise o contexto e inicie a sessão. Os indicadores aprovados
+são recalculados ao usar o app; encerrar revoga o token e apaga o contexto.
+
+**ChatGPT e Claude ainda precisam de uma ponte HTTPS/túnel até o telefone**:
+os conectores remotos não acessam diretamente seu localhost. A ponte e a
+consulta real nas contas estão pendentes. O [piloto remoto anterior](integracoes/mcp/README.md)
+fica como referência e pode ter autorizações antigas revogadas.
+[Servidor no celular](docs/SERVIDOR-MCP-LOCAL.md) · [Privacidade](docs/PRIVACIDADE.md).
 
 ## Privacidade como arquitetura
 
@@ -164,7 +170,8 @@ escolhido. O [modelo de privacidade](docs/PRIVACIDADE.md) detalha essa fronteira
 | Tarefas, planos e leitura no Android | Disponíveis na alpha de avaliação. |
 | Motor financeiro e MCP local | Disponíveis no computador; porte Kotlin em andamento. |
 | Motor Kotlin na UI Android | Frentes, pacing e conferência OFX; sem migração dos registros. |
-| Mesmo MCP para ChatGPT e Claude | Piloto e vínculo no app; hospedagem e conexão nas contas pendentes. |
+| Servidor MCP no celular | Loopback Kotlin, token por sessão e atualização local das áreas aprovadas. |
+| Mesmo MCP para ChatGPT e Claude | Contrato comum; ponte até o telefone e conexão nas contas pendentes. |
 | UI nativa em Compose | Em desenvolvimento. |
 | Scores por área e agregado | Contratos e motor; integração visual nativa em andamento. |
 | Tempo de uso e atividade física | Discovery documentado; coleta automática ainda pendente. |

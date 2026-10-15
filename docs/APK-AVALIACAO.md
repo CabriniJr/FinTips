@@ -1,5 +1,11 @@
 # APK para avaliar a UI
 
+**Estado atual — preview 5:** servidor MCP Kotlin no próprio celular, loopback
+com token e controle por notificação. Sem túnel ou contas conectadas.
+[Funcionamento e avaliação atuais](SERVIDOR-MCP-LOCAL.md). As notas da
+preview 4 abaixo são históricas.
+
+
 **Atualização alpha 4 (`versionCode=4`):** a UI WebView agora chama o motor
 Kotlin para áreas do dia, pacing e conferência de saldo OFX. Inclui preparação
 de contexto e vínculo/revogação pelo navegador para um único MCP. Hospedagem

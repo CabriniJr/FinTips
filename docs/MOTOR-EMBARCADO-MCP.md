@@ -1,5 +1,11 @@
 # Motor embarcado e um MCP para ChatGPT e Claude
 
+**Estado atual — preview 5:** servidor MCP Kotlin no próprio celular, loopback
+com token e controle por notificação. Sem túnel ou contas conectadas.
+[Funcionamento e avaliação atuais](SERVIDOR-MCP-LOCAL.md). As notas da
+preview 4 abaixo são históricas.
+
+
 O usuário confirmou ambos com o mesmo conector. A entrega alpha 4 liga o
 motor Kotlin à UI WebView aprovada, preservando package `.ui`, assinatura,
 origem local e os schemas de tarefas, planos e livros. Não muda o launcher para

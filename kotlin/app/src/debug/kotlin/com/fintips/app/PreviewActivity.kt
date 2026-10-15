@@ -1,10 +1,18 @@
 package com.fintips.app
 
 import android.content.ContentValues
+import android.content.ClipData
+import android.content.ClipDescription
+import android.content.ClipboardManager
+import android.content.pm.PackageManager
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.ResultReceiver
 import android.provider.MediaStore
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -24,6 +32,8 @@ import androidx.webkit.WebMessageCompat
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.util.concurrent.Executors
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /** Apenas debug: APK offline para avaliar os cinco destinos do protótipo. */
 class PreviewActivity : ComponentActivity() {
@@ -32,6 +42,9 @@ class PreviewActivity : ComponentActivity() {
     private val io = Executors.newSingleThreadExecutor()
     private val motor = MotorBridge()
     private var closed = false
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        McpLocalService.refreshNotification()
+    }
     private val picker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         files?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
         files = null
@@ -80,7 +93,11 @@ class PreviewActivity : ComponentActivity() {
                         id = request.getString("id").also { require(it.length <= 100) }
                         val op = request.getString("operation")
                         val input = request.getJSONObject("input")
-                        val result = if (op == "ia.abrir") openConnector(input) else motor.execute(op, input)
+                        val result = when {
+                            op.startsWith("servidor.") -> localServer(op, input)
+                            op == "ia.abrir" -> openConnector(input)
+                            else -> motor.execute(op, input)
+                        }
                         JSONObject().put("id", id).put("result", result)
                     } catch (_: Exception) {
                         JSONObject().put("id", id ?: JSONObject.NULL).put("error", "O motor não aceitou este pedido. Confira os dados e tente novamente.")
@@ -106,7 +123,7 @@ class PreviewActivity : ComponentActivity() {
         })
         setContentView(view)
         if (savedInstanceState == null || view.restoreState(savedInstanceState) == null) {
-            view.loadUrl("https://$HOST/index.html")
+            view.loadUrl("https://$HOST/index.html" + if (intent.getBooleanExtra("abrir_ia", false)) "#ia" else "")
         }
     }
 
@@ -150,6 +167,92 @@ class PreviewActivity : ComponentActivity() {
     }
 
     private fun notice(message: String) = runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
+
+    private fun localServer(operation: String, i: JSONObject): JSONObject = when (operation) {
+        "servidor.status" -> McpLocalService.status()
+        "servidor.atualizar" -> McpLocalService.atualizar(i.getString("sessao"), i.getJSONObject("context").toString())
+        "servidor.invalidar" -> McpLocalService.atualizar(i.getString("sessao"), null)
+        "servidor.pausar" -> McpLocalService.pausar(i.getString("sessao"))
+        "servidor.copiar_token" -> copyLocal(McpLocalService.credencial(), true)
+        "servidor.copiar_endereco" -> copyLocal(McpLocalService.status().getString("endpoint"), false)
+        "servidor.notificacoes" -> {
+            runOnUiThread { requestNotifications(true) }
+            JSONObject().put("status", "solicitado")
+        }
+        "servidor.iniciar", "servidor.encerrar" -> {
+            if (operation == "servidor.encerrar" && !McpLocalService.status().optBoolean("ativo")) McpLocalService.status()
+            else {
+                val context = if (operation == "servidor.iniciar") MotorBridge.validateContext(i.getJSONObject("context").toString()) else null
+                val future = CompletableFuture<JSONObject>()
+                val receiver = object : ResultReceiver(Handler(Looper.getMainLooper())) {
+                    override fun onReceiveResult(code: Int, data: Bundle?) {
+                        if (code == 0) runCatching { JSONObject(data?.getString("json") ?: error("resposta ausente")) }
+                            .onSuccess { future.complete(it) }.onFailure { future.completeExceptionally(it) }
+                        else future.completeExceptionally(IllegalStateException("servidor indisponível"))
+                    }
+                }
+                runOnUiThread {
+                    try {
+                        check(!closed)
+                        val command = Intent(this, McpLocalService::class.java).putExtra("reply", receiver)
+                        if (context != null) {
+                            requestNotifications(false)
+                            command.action = McpLocalService.START; command.putExtra("context", context)
+                            startForegroundService(command)
+                        } else { command.action = McpLocalService.STOP; startService(command) }
+                    } catch (e: Exception) { future.completeExceptionally(e) }
+                }
+                future.get(10, TimeUnit.SECONDS)
+            }
+        }
+        else -> error("operação indisponível")
+    }
+
+    private fun copyLocal(value: String, secret: Boolean): JSONObject {
+        val future = CompletableFuture<JSONObject>()
+        runOnUiThread {
+            try {
+                check(!closed)
+                val clip = ClipData.newPlainText(if (secret) "Token MCP local" else "Endereço MCP local", value)
+                if (secret && Build.VERSION.SDK_INT >= 33) clip.description.extras = android.os.PersistableBundle().apply {
+                    putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+                getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
+                future.complete(JSONObject().put("status", "copiado"))
+            } catch (e: Exception) { future.completeExceptionally(e) }
+        }
+        return future.get(2, TimeUnit.SECONDS)
+    }
+
+    private fun requestNotifications(explicit: Boolean) {
+        if (closed) return
+        val prefs = getSharedPreferences("mcp-local", MODE_PRIVATE)
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            val asked = prefs.getBoolean("notificacoes_solicitadas", false)
+            if (!explicit && asked) return
+            if (explicit && asked && !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                startActivity(Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName))
+            } else {
+                prefs.edit().putBoolean("notificacoes_solicitadas", true).apply()
+                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else if (explicit) startActivity(Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::view.isInitialized) { view.onResume(); view.evaluateJavascript("dispatchEvent(new Event('fintips:resume'))", null) }
+    }
+
+    override fun onPause() {
+        if (::view.isInitialized) view.onPause()
+        super.onPause()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent); setIntent(intent)
+        if (intent.getBooleanExtra("abrir_ia", false)) view.evaluateJavascript("location.hash='ia'", null)
+    }
 
     /** Somente a projeção validada sai, por gesto explícito, no navegador externo.
      * O fragmento não é enviado no pedido HTTP; a página de pareamento o consome.

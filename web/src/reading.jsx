@@ -24,7 +24,7 @@ function useReading() {
     try {
       const next = transform(readReading(localStorage));
       if (!validateReading(next)) throw new Error("estado inválido");
-      localStorage.setItem(READING_KEY, JSON.stringify(next)); setState(next); setIssue(""); return true;
+      localStorage.setItem(READING_KEY, JSON.stringify(next)); setState(next); setIssue(""); dispatchEvent(new Event("fintips:reading-changed")); return true;
     } catch { setIssue("Não foi possível salvar os registros de leitura no aparelho. A alteração não foi gravada."); return false; }
   }, [blocked]);
   useEffect(() => {

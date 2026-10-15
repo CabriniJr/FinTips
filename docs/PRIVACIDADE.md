@@ -1,5 +1,31 @@
 # Privacidade e PII
 
+## Android preview 5: servidor no aparelho
+
+O motor e o servidor MCP agora rodam no Android. A pessoa escolhe as áreas,
+revisa o contexto e inicia uma sessão local. Ela escuta só em `127.0.0.1`,
+com token por sessão, em foreground service com controle pela notificação.
+Encerrar apaga o contexto e revoga o acesso. Alterar áreas pausa as consultas
+até nova revisão; atualizações automáticas não ampliam os escopos aprovados.
+
+O conteúdo segue a allowlist anterior, sem registros completos, nomes,
+títulos, valores ou texto livre. A atualização acontece ao usar o app;
+sem uma base válida, o MCP informa indisponibilidade. Nenhum túnel ou envio
+externo automático está ativo. Clientes autorizados podem ler os indicadores,
+que não são anunciados como anônimos.
+
+A variante debug tem permissão INTERNET para o socket loopback, além das
+permissões do foreground service/notificação. **A permissão não restringe
+os destinos:** o código e os testes verificam o bind local. O WebView continua
+restrito aos assets do APK. O transporte local é HTTP com bearer, não TLS.
+A futura ponte até as IAs deve manter a filtragem antes da saída e autenticar
+cada vínculo. [Contrato e limites](SERVIDOR-MCP-LOCAL.md).
+
+A seção seguinte é histórica: descreve o piloto remoto da preview 4, cuja
+UI foi substituída pelo servidor local. Códigos de revogação anteriores são
+preservados e podem ser usados no navegador; não há novos vínculos por esse
+fluxo na UI atual.
+
 ## Android alpha 4 e MCP remoto
 
 Registros completos continuam no client. O fluxo Conectar IA permite escolher

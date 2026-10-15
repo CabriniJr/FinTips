@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "fintips"
 include(":motor")
+include(":conector")
 
 // O app Android é o invólucro: uma Activity que abre a tela do dia. Toda a
 // lógica está em `:motor`, então este módulo é fino de propósito — e só existe

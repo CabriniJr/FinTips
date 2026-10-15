@@ -137,8 +137,10 @@ def test_as_permissoes_vem_do_manifesto_compilado(ws):
     # Ela aparece após assembleDebug/Release; não é uma permissão de usuário.
     internas = {f"{pacote}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" for pacote in (
         "com.fintips.app", "com.fintips.app.ui", "com.fintips.app.ci")}
-    assert set(d["privacidade"]["permissoes_do_app"]) <= internas
-    assert d["privacidade"]["sem_permissao_de_rede"] is True
+    locais = {"android.permission.INTERNET", "android.permission.FOREGROUND_SERVICE",
+              "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.POST_NOTIFICATIONS"}
+    assert locais <= set(d["privacidade"]["permissoes_do_app"]) <= internas | locais
+    assert d["privacidade"]["sem_permissao_de_rede"] is False
     assert d["privacidade"]["backup_automatico"] == "false"
 
 
@@ -161,6 +163,8 @@ def test_a_declaracao_revela_saida_opcional_mesmo_sem_internet_no_apk(ws):
     assert s["coleta_automatica"] is False
     assert s["compartilha_com_terceiros"] is True
     assert s["compartilhamento_opcional"] is True
+    assert s["dados_em_transito_criptografados"] is False
+    assert "loopback" in s["transporte_atual"]
     assert "pendente" in s["declaracao_play_store"]
     assert "navegador externo" in s["por_que_nao_coleta"]
     assert "INTERNET" in s["por_que_nao_coleta"]

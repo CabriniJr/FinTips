@@ -78,7 +78,13 @@ jobs:
       # prova. Se um dia ela precisar do SDK para passar, a separação quebrou.
       - name: jvmTest sem o alvo Android
         working-directory: kotlin
-        run: ./gradlew :motor:jvmTest --no-daemon
+        run: ./gradlew :motor:jvmTest :conector:test :conector:classpathDeTeste --no-daemon
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e ".[mcp]"
+      - run: python scripts/verificar-mcp-local-sdk.py
 
   painel:
     name: painel web

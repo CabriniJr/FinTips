@@ -1,115 +1,111 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./icons.jsx";
 import { PageHeading } from "./life.jsx";
-import { localDay, tasksForDay, isDone } from "./life-store.js";
-import { readReading } from "./reading-model.js";
 import { hasNativeMotor, nativeMotor } from "./native-motor.js";
+import { projectContext } from "./ai-projection.js";
 import "./connect-ai.css";
 
-const KEY = "fintips.ia.v1";
 const OPTIONS = [["rotina", "Rotina", "Evidência das metas escolhidas por você; sem nomes ou contagens."],
-  ["planos", "Planos por área", "Somente se há planos em andamento ou concluídos. Sem títulos, prazos ou motivos."],
+  ["planos", "Planos por área", "Somente o estado dos planos. Sem títulos, prazos ou motivos."],
   ["leitura", "Ritmo de leitura", "Estados do ritmo e origem dos registros. Sem livros, posições ou perfis."]];
-export function connectorOrigin(value) {
-  const url = new URL(value.trim());
-  if (url.protocol !== "https:" || url.username || url.password || !["", "/"].includes(url.pathname) || url.search || url.hash) throw new Error("Use apenas a origem HTTPS do seu conector, sem /mcp, caminhos ou credenciais.");
-  return url.origin;
-}
-function readLinks() {
-  const v = JSON.parse(localStorage.getItem(KEY) || "[]");
-  if (!Array.isArray(v) || v.length > 20 || v.some((l) => !l || connectorOrigin(l.endpoint) !== l.endpoint || !/^[a-f0-9]{64}$/.test(l.revocation))) throw new Error("Lista de vínculos inválida. Ela foi preservada.");
-  return v;
-}
-const makeSecret = () => [...crypto.getRandomValues(new Uint8Array(32))].map((v) => v.toString(16).padStart(2, "0")).join("");
 
-async function project(state, scopes) {
-  const today = localDay();
-  const front = await nativeMotor("vida.frentes", { today, tasks: tasksForDay(state, today).map((t) => ({ id: t.id, area: t.atributo, done: isDone(state, t.id, today) })) });
-  const books = scopes.includes("leitura") ? readReading(localStorage).livros : [];
-  const reading = [];
-  // Sequencial para não enfileirar milhares de mensagens no WebView.
-  for (const b of books) {
-    const r = await nativeMotor("leitura.ritmo", { today, points: b.observacoes.map(({ dia, progresso_bp }) => ({ dia, progresso_bp })), deadline: b.prazo || null, reading_days: b.dias_semana });
-    const last = [...b.observacoes].sort((a, b) => a.dia.localeCompare(b.dia)).at(-1);
-    reading.push({ state: r.estado, source: last?.origem || b.fonte });
-  }
-  return nativeMotor("ia.contexto", { fronts: front.fronts.map(({ area, total, done }) => ({ area, total, done })),
-    plans: scopes.includes("planos") ? state.planos.map((p) => ({ area: p.atributo, done: p.concluido })) : [], reading, scopes });
+function LegacyRevocations({ toast }) {
+  const [links] = useState(() => {
+    try {
+      const v = JSON.parse(localStorage.getItem("fintips.ia.v1") || "[]");
+      if (!Array.isArray(v) || v.length > 20) return null;
+      return v.filter((l) => {
+        if (!l || !/^[a-f0-9]{64}$/.test(l.revocation || "")) return false;
+        const u = new URL(l.endpoint);
+        return u.protocol === "https:" && u.origin === l.endpoint && !u.username && !u.password;
+      });
+    } catch { return null; }
+  });
+  if (links?.length === 0) return null;
+  return <details className="life-card ai-connect"><summary>Autorizações do piloto remoto anterior</summary><p>Os códigos locais anteriores foram preservados. Esta ação abre o navegador para revogar aquele snapshot; o servidor local é independente.</p>
+    {links === null ? <p>Não foi possível ler a lista anterior. Ela foi preservada.</p> : links.map((l, i) => <div key={i}><p>{l.endpoint}</p><button className="life-button" onClick={async () => {
+      try { await nativeMotor("ia.abrir", { ...l, revoke: true }); toast("Confirme a revogação no navegador."); }
+      catch { toast("Não foi possível solicitar a revogação. O código foi preservado."); }
+    }}>Abrir revogação anterior</button></div>)}</details>;
 }
 
-export function ConnectAI({ life, toast }) {
-  const [endpoint, setEndpoint] = useState("");
-  const [code, setCode] = useState("");
+export function ConnectAI({ life, toast, syncIssue }) {
+  const [server, setServer] = useState(null);
   const [scopes, setScopes] = useState([]);
   const [snapshot, setSnapshot] = useState(null);
   const [ack, setAck] = useState(false);
   const [busy, setBusy] = useState(false);
   const [issue, setIssue] = useState("");
-  const [links, setLinks] = useState(() => { try { return readLinks(); } catch { return null; } });
-  const [opened, setOpened] = useState(false);
-  const [forget, setForget] = useState(null);
-  useEffect(() => { setSnapshot(null); setAck(false); }, [life.state, scopes]);
-  useEffect(() => { setAck(false); }, [endpoint, code]);
+  const hydrated = useRef(false);
   const ready = hasNativeMotor();
-  const review = async () => {
-    setBusy(true); setIssue(""); setOpened(false); setSnapshot(null); setAck(false);
-    try { setSnapshot(await project(life.state, scopes)); }
-    catch (e) { setIssue(e.message); }
-    finally { setBusy(false); }
-  };
-  const open = async () => {
+  useEffect(() => { setSnapshot(null); setAck(false); }, [life.state, scopes]);
+  useEffect(() => {
+    const clear = () => { setSnapshot(null); setAck(false); };
+    addEventListener("fintips:reading-changed", clear); addEventListener("storage", clear);
+    return () => { removeEventListener("fintips:reading-changed", clear); removeEventListener("storage", clear); };
+  }, []);
+  useEffect(() => {
+    if (!ready) return;
+    let active = true;
+    const refresh = () => nativeMotor("servidor.status").then((s) => {
+      if (!active) return;
+      setServer(s);
+      if (!hydrated.current) { hydrated.current = true; if (s.ativo) setScopes(s.escopos); }
+    }).catch(() => { if (active) setIssue("Não foi possível consultar o servidor local."); });
+    refresh(); const id = setInterval(refresh, 3000);
+    addEventListener("fintips:resume", refresh);
+    return () => { active = false; clearInterval(id); removeEventListener("fintips:resume", refresh); };
+  }, [ready]);
+  const command = async (operation, input = {}) => {
     setBusy(true); setIssue("");
     try {
-      const origin = connectorOrigin(endpoint);
-      const normalized = code.toUpperCase().replaceAll("-", "").replaceAll(" ", "");
-      if (!/^[A-Z2-7]{12}$/.test(normalized)) throw new Error("Digite o código de 12 caracteres exibido pela autorização da IA.");
-      const record = { endpoint: origin, revocation: makeSecret() };
-      const previous = readLinks();
-      if (previous.length >= 20) throw new Error("O limite de 20 tentativas foi alcançado. Seus códigos de revogação foram preservados.");
-      // A chave precisa sobreviver mesmo se o processo fechar ao abrir o navegador.
-      const next = [...previous, record]; localStorage.setItem(KEY, JSON.stringify(next)); setLinks(next);
-      await nativeMotor("ia.abrir", { endpoint: origin, code: normalized, revocation: record.revocation, context: snapshot });
-      setOpened(true); setAck(false); setCode("");
-      toast("Continue a confirmação no navegador.");
-    } catch (e) { setIssue(e.message); }
+      const r = await nativeMotor(operation, input); setServer(r);
+      dispatchEvent(new Event("fintips:mcp-state")); return r;
+    } catch (e) { setIssue(e.message); throw e; }
     finally { setBusy(false); }
   };
+  const select = async (id, checked) => {
+    if (server?.ativo && !server.pausado) {
+      try { await command("servidor.pausar", { sessao: server.sessao }); }
+      catch { return; }
+    }
+    setScopes((s) => checked ? [...s, id] : s.filter((v) => v !== id));
+  };
+  const copy = async (operation, message) => {
+    try { await nativeMotor(operation); toast(message); }
+    catch { setIssue("Não foi possível copiar. Confira se o servidor está ativo."); }
+  };
   return <>
-    <PageHeading code="05.1" overline="Um contexto · duas IAs" title="Conectar IA" description="O motor fica com você. O contexto atravessa por escolha sua."/>
-    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>O mesmo MCP no ChatGPT e no Claude</h2><p>O servidor recebe apenas os indicadores reduzidos que você revisar. Extratos, nomes, títulos, motivos e registros completos continuam no aparelho. Esses indicadores ainda revelam aspectos da sua rotina.</p></div></section>
-    <section className="life-card ai-connect">
-      <div className="section-head"><h2>01 / Prepare a conexão</h2><span className="manual-tag">Piloto · snapshot</span></div>
-      <p>Cadastre <code>https://seu-servidor/mcp</code> como conector personalizado na IA e inicie a autorização. Use a mesma origem HTTPS abaixo e o código exibido na página de autorização. A disponibilidade depende da sua conta na IA.</p>
-      <p>Este APK não traz um servidor público configurado. O serviço MCP está no repositório e precisa ser hospedado antes do vínculo.</p>
-      <label className="life-field">Endereço do conector<input type="url" autoComplete="off" placeholder="https://seu-servidor" value={endpoint} onChange={(e) => setEndpoint(e.target.value)} disabled={busy}/></label>
-      <label className="life-field">Código da autorização<input autoComplete="off" autoCapitalize="characters" spellCheck="false" maxLength={20} placeholder="XXXX-XXXX-XXXX" value={code} onChange={(e) => setCode(e.target.value)} disabled={busy}/></label>
+    <PageHeading code="05.1" overline="Motor + MCP · no aparelho" title="IA local" description="Seu celular calcula. Seu celular responde."/>
+    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Servidor no seu celular</h2><p>O MCP roda em Kotlin neste aparelho. Só aceita conexões locais com o token desta sessão. Registros completos, títulos e valores financeiros continuam privados.</p></div></section>
+    <section className="life-card ai-connect"><div className="section-head"><h2>01 / Servidor local</h2><span className="manual-tag" role="status">{!ready ? "APK Android necessário" : !server ? "Consultando…" : server.ativo ? server.pausado ? "Pausado para revisão" : "Ativo neste celular" : "Encerrado"}</span></div>
+      <p>Inicie depois de escolher e revisar as áreas. Enquanto ativo, ele mantém uma notificação de controle e atualiza os indicadores autorizados ao usar o FinTips. Encerrar revoga o token e apaga o contexto da sessão.</p>
+      {server?.ativo && <><pre className="ai-payload" aria-label="Endereço do servidor local">{server.endpoint}</pre><p className="motor-label">Somente 127.0.0.1 · sem acesso pela rede Wi-Fi · {server.contexto_disponivel ? "contexto disponível" : "contexto indisponível"}</p>
+        <p>Áreas autorizadas: {server.escopos.map((id) => OPTIONS.find(([k]) => k === id)?.[1]).join(", ")}.</p>
+        <div className="local-mcp-actions"><button className="life-button" disabled={busy} onClick={() => copy("servidor.copiar_endereco", "Endereço local copiado")}>Copiar endereço</button><button className="life-button" disabled={busy} onClick={() => copy("servidor.copiar_token", "Token copiado. Cole apenas no cliente MCP autorizado.")}>Copiar token</button></div>
+        <p>Configure o cliente local com o endereço acima e o token no header Authorization: Bearer. O token não aparece no contexto da IA e muda ao reiniciar o servidor.</p>
+        <button className="life-button full" disabled={busy} onClick={() => command("servidor.encerrar").then(() => { setAck(false); setSnapshot(null); toast("Servidor encerrado e token revogado"); }).catch(() => {})}>Encerrar servidor</button>
+        <button className="text-button" onClick={() => nativeMotor("servidor.notificacoes").catch(() => setIssue("Abra as configurações de notificações do Android."))}>Notificação de controle</button>
+      </>}
+      {!ready && <p>Instale o APK Android atual e mantenha o Android System WebView atualizado para usar o servidor.</p>}
     </section>
-    <section className="life-card ai-connect">
-      <div className="section-head"><h2>02 / Escolha o contexto</h2><Icon name="context"/></div>
-      <p>As áreas começam desmarcadas. Sem registro significa ausência de evidência; não é uma meta descumprida. Não há acesso automático à sua rotina.</p>
-      <fieldset disabled={busy || life.blocked || !ready}><legend className="sr-only">Áreas compartilhadas com a IA</legend>
-        {OPTIONS.map(([id, title, detail]) => <label className="ai-scope" key={id}><input type="checkbox" checked={scopes.includes(id)} onChange={(e) => setScopes((s) => e.target.checked ? [...s, id] : s.filter((v) => v !== id))}/><span><strong>{title}</strong><small>{detail}</small></span></label>)}
-      </fieldset>
-      {!ready && <p role="status">Este fluxo usa o motor do APK Android. Instale a versão atual e mantenha o Android System WebView atualizado.</p>}
-      <button className="life-button full" disabled={!ready || !scopes.length || busy || life.blocked} onClick={review}>{busy ? "Preparando no aparelho…" : "Revisar exatamente o que será enviado"}<Icon name="arrow" size={18}/></button>
+    <section className="life-card ai-connect"><div className="section-head"><h2>02 / Escolha o contexto</h2><Icon name="context"/></div>
+      <p>Nenhuma área começa autorizada. Sem registro é ausência de evidência, não uma meta descumprida. Alterar a seleção pausa as consultas até você aplicar uma nova revisão.</p>
+      <fieldset disabled={busy || life.blocked || !ready}><legend className="sr-only">Áreas disponíveis no servidor local</legend>{OPTIONS.map(([id, title, detail]) => <label className="ai-scope" key={id}><input type="checkbox" checked={scopes.includes(id)} onChange={(e) => select(id, e.target.checked)}/><span><strong>{title}</strong><small>{detail}</small></span></label>)}</fieldset>
+      <button className="life-button full" disabled={!ready || !scopes.length || busy || life.blocked} onClick={async () => {
+        setBusy(true); setIssue(""); setSnapshot(null); setAck(false);
+        try { setSnapshot(await projectContext(life.state, scopes)); }
+        catch (e) { setIssue(e.message); } finally { setBusy(false); }
+      }}>{busy ? "Preparando no aparelho…" : "Revisar contexto local"}<Icon name="arrow" size={18}/></button>
     </section>
     {snapshot && <section className="life-card ai-connect"><div className="section-head"><h2>03 / Revise e autorize</h2><span className="manual-tag">Somente leitura</span></div>
-      <p>Este é o conteúdo integral do snapshot. Após confirmar no navegador, a IA poderá consultá-lo por uma hora. Para atualizar, revise um novo snapshot e autorize novamente.</p>
+      <p>Este é o formato integral consultável. As mesmas áreas serão recalculadas localmente ao usar o app. Sem atualização por uma hora, a ferramenta informa indisponibilidade. Encerrar ou pausar interrompe as consultas.</p>
       <pre className="ai-payload" tabIndex={0} aria-label="Conteúdo exato do contexto">{JSON.stringify(snapshot, null, 2)}</pre>
-      <label className="ai-scope"><input type="checkbox" checked={ack} disabled={busy} onChange={(e) => setAck(e.target.checked)}/><span>Revisei o contexto e o domínio. Quero abrir a confirmação no navegador.</span></label>
-      <button className="life-button primary full" disabled={!ack || busy || !endpoint.trim() || !code.trim() || links === null} onClick={open}>Continuar vínculo MCP <Icon name="arrow" size={18}/></button>
+      <label className="ai-scope"><input type="checkbox" checked={ack} disabled={busy} onChange={(e) => setAck(e.target.checked)}/><span>Autorizo estas áreas no servidor local e a atualização dos indicadores ao usar o FinTips.</span></label>
+      <button className="life-button primary full" disabled={!ack || busy || !ready || life.blocked} onClick={() => command("servidor.iniciar", { context: snapshot }).then(() => { setAck(false); setSnapshot(null); toast("Servidor MCP ativo neste celular"); }).catch(() => {})}>{server?.ativo ? "Aplicar áreas e retomar servidor" : "Iniciar servidor neste celular"}<Icon name="arrow" size={18}/></button>
     </section>}
-    {issue && <p role="alert" className="form-error">{issue}</p>}
-    {opened && <p className="ai-status" role="status">Abertura solicitada ao navegador. Confirme lá e volte à janela do ChatGPT ou Claude. O app não verifica a conclusão externa.</p>}
-    <section className="life-card ai-connect"><h2>Controle das autorizações</h2><p>A revogação apaga o snapshot do servidor e bloqueia novas consultas. Não apaga mensagens que a IA já recebeu. Reiniciar o servidor ou vencer uma hora também encerra o acesso.</p>
-      {links === null ? <p role="alert">Não foi possível ler os códigos locais de revogação. Eles foram preservados.</p> : !links.length ? <p>Nenhuma tentativa de vínculo iniciada neste aparelho.</p> : <ul className="ai-links">{links.map((l, n) => <li key={l.revocation}><strong>Tentativa {n + 1}</strong><span>{l.endpoint}</span><button className="life-button" disabled={busy || !ready} onClick={async () => {
-        setBusy(true); setIssue("");
-        try { await nativeMotor("ia.abrir", { ...l, revoke: true }); toast("Confirme a revogação no navegador."); }
-        catch (e) { setIssue(e.message); } finally { setBusy(false); }
-      }}>Abrir revogação</button>{forget !== l.revocation ? <button className="text-button" disabled={busy} onClick={() => setForget(l.revocation)}>Limpar código desta tentativa</button> : <div><p>Remover o código local não revoga o servidor. Faça isso somente depois de confirmar a revogação no navegador ou o vencimento do snapshot.</p><button className="life-button" disabled={busy} onClick={() => {
-        try { const next = readLinks().filter((v) => v.revocation !== l.revocation); localStorage.setItem(KEY, JSON.stringify(next)); setLinks(next); setForget(null); }
-        catch { setIssue("Não foi possível remover o código local. A lista foi preservada."); }
-      }}>Já encerrei o acesso; apagar código local</button><button className="text-button" onClick={() => setForget(null)}>Cancelar</button></div>}</li>)}</ul>}
-    </section>
+    {(issue || syncIssue) && <p role="alert" className="form-error">{issue || syncIssue}</p>}
+    <section className="life-card ai-connect"><div className="section-head"><h2>ChatGPT e Claude</h2><span className="manual-tag">Ponte pendente</span></div><p>Os conectores nativos fazem chamadas pela nuvem e não alcançam o endereço local do telefone. O servidor no celular já prepara essa base; a ligação aos chats ainda exige uma ponte HTTPS autenticada até ele.</p><p>Esta build não abre túnel, não envia o contexto a um servidor externo e não declara as contas conectadas. O Android pode encerrar o processo; não há promessa de disponibilidade contínua.</p></section>
+    <LegacyRevocations toast={toast}/>
   </>;
 }
