@@ -1,30 +1,38 @@
 # Privacidade e PII
 
-## Android preview 5: servidor no aparelho
+## Android preview 7: motor local, consulta remota autorizada
 
-O motor e o servidor MCP agora rodam no Android. A pessoa escolhe as áreas,
-revisa o contexto e inicia uma sessão local. Ela escuta só em `127.0.0.1`,
-com token por sessão, em foreground service com controle pela notificação.
-Encerrar apaga o contexto e revoga o acesso. Alterar áreas pausa as consultas
-até nova revisão; atualizações automáticas não ampliam os escopos aprovados.
+O motor e o servidor MCP vivem no Android, em `127.0.0.1`, com bearer em
+memória e foreground service controlado pela pessoa. Uma ponte externa
+opcional aceita OAuth PKCE dos chats e encaminha cada consulta por WSS aberto
+pelo telefone. O app conserva suas próprias aprovações por áreas. Não há cópia
+remota reutilizada: offline, pausa, fonte inválida ou contexto vencido resultam
+em indisponibilidade. Encerrar o serviço encerra também o canal externo.
 
-O conteúdo segue a allowlist anterior, sem registros completos, nomes,
-títulos, valores ou texto livre. A atualização acontece ao usar o app;
-sem uma base válida, o MCP informa indisponibilidade. Nenhum túnel ou envio
-externo automático está ativo. Clientes autorizados podem ler os indicadores,
-que não são anunciados como anônimos.
+Registros completos, nomes, títulos, datas, valores, contagens, identificadores
+pessoais, OFX e texto livre ficam no client. Só a projeção fechada de estados
+e fontes sai em consulta autorizada; app e relay validam a allowlist.
+**Indicadores reduzidos ainda revelam rotina e não são anônimos.** Mensagens
+já entregues à IA continuam sob as políticas do cliente escolhido.
 
-A variante debug tem permissão INTERNET para o socket loopback, além das
-permissões do foreground service/notificação. **A permissão não restringe
-os destinos:** o código e os testes verificam o bind local. O WebView continua
-restrito aos assets do APK. O transporte local é HTTP com bearer, não TLS.
-A futura ponte até as IAs deve manter a filtragem antes da saída e autenticar
-cada vínculo. [Contrato e limites](SERVIDOR-MCP-LOCAL.md).
+O relay guarda em memória metadados de autorização e hashes das credenciais,
+não arquivos pessoais nem snapshots de contexto. HTTPS/WSS protege o trânsito
+externo; o bearer do MCP local não sai do telefone. Credenciais do canal e
+aprovações do app também não são persistidas nesta alpha. Reiniciar app/relay
+exige nova autorização; os registros do app permanecem no armazenamento local.
+A hospedagem deve desativar logs de pedidos/corpos/tokens. Terminação TLS e
+políticas do provedor devem ser conferidas antes da publicação na Play Store.
 
-A seção seguinte é histórica: descreve o piloto remoto da preview 4, cuja
-UI foi substituída pelo servidor local. Códigos de revogação anteriores são
-preservados e podem ser usados no navegador; não há novos vínculos por esse
-fluxo na UI atual.
+A variante debug declara INTERNET, permissões do foreground service e
+notificação; essas permissões não limitam destinos. O código mantém o socket
+local no loopback e só abre conexão externa nativa após informar uma origem
+HTTPS e consentir. Não segue redirects HTTP. O WebView continua restrito aos
+assets locais, sem fetch remoto. O Compose release não ganha esse serviço.
+Não há domínio externo embutido, coleta automática de sensores ou analytics.
+
+A hospedagem e as contas reais ainda não foram ativadas; os testes usam OAuth
+real de protocolo, SDK MCP e fontes sintéticas. [Arquitetura e implantação](../integracoes/ponte/README.md).
+As próximas seções registram o piloto anterior e o workspace Python histórico.
 
 ## Android alpha 4 e MCP remoto
 

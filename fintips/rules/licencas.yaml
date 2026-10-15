@@ -16,6 +16,25 @@ schema_version: 1
 
 componentes:
   # ------------------------------------------------------------ no APK
+  - id: dados:public-suffix-list
+    nome: Public Suffix List (recurso do OkHttp)
+    licenca: MPL-2.0
+    url: https://publicsuffix.org/list/public_suffix_list.dat
+    embarca_em: [apk]
+    nota: dado de terceiros não modificado; NOTICE e licença em NOTICE-ponte.txt
+
+  - id: gradle:com.squareup.okhttp3:okhttp
+    nome: OkHttp
+    licenca: Apache-2.0
+    url: https://square.github.io/okhttp/
+    embarca_em: [apk]
+
+  - id: gradle:com.squareup.okio:okio
+    nome: Okio
+    licenca: Apache-2.0
+    url: https://square.github.io/okio/
+    embarca_em: [apk]
+
   - id: gradle:org.jetbrains.kotlin:kotlin-stdlib
     nome: Kotlin Standard Library
     licenca: Apache-2.0

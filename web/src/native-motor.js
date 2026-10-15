@@ -21,7 +21,7 @@ export function nativeMotor(operation, input = {}) {
   }
   return new Promise((resolve, reject) => {
     const id = String(++sequence);
-    const timer = setTimeout(() => { pending.delete(id); reject(new Error(operation.startsWith("servidor.") ? "MCP-05: O servidor não confirmou a ação a tempo. Confira o estado antes de tentar novamente." : "O motor não respondeu. Tente novamente.")); }, 20000);
+    const timer = setTimeout(() => { pending.delete(id); reject(new Error(operation.startsWith("ponte.") ? "PONTE-05: A conexão não confirmou a ação a tempo. Confira o estado antes de tentar novamente." : operation.startsWith("servidor.") ? "MCP-05: O servidor não confirmou a ação a tempo. Confira o estado antes de tentar novamente." : "O motor não respondeu. Tente novamente.")); }, operation.startsWith("ponte.") ? 45000 : 20000);
     pending.set(id, { resolve, reject, timer });
     try { bridge.postMessage(JSON.stringify({ id, operation, input })); }
     catch { clearTimeout(timer); pending.delete(id); reject(new Error("Não foi possível acessar o motor embarcado.")); }

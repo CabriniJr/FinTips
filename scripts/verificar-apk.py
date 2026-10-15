@@ -73,7 +73,7 @@ source = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=Tr
 info = {"commit": source, "variante": "debug", "application_id": package.group(1),
         "version_code": int(package.group(2)), "version_name": package.group(3),
         "apk_sha256": checksum, "certificado_sha256": digest,
-        "ui": "WebView com assets locais; MCP loopback em foreground service",
+        "ui": "WebView com assets locais; MCP loopback e ponte HTTPS/WSS opcional",
         "testado_em_aparelho": False, "assets_verificados": len(files)}
 (output / "build-info.json").write_text(json.dumps(info, ensure_ascii=False, indent=2) + "\n")
 (output / "SHA256SUMS.txt").write_text(f"{checksum}  {name}\n")

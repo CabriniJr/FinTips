@@ -30,16 +30,17 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import androidx.webkit.WebMessageCompat
 import org.json.JSONObject
+import com.fintips.mcp.FalhaPonte
 import java.io.ByteArrayInputStream
 import java.util.concurrent.Executors
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
-/** Apenas debug: APK offline para avaliar os cinco destinos do protótipo. */
+/** Apenas debug: assets locais e conexão MCP externa opcional e autorizada. */
 class PreviewActivity : ComponentActivity() {
     private lateinit var view: WebView
     private var files: ValueCallback<Array<Uri>>? = null
-    private val io = Executors.newSingleThreadExecutor()
+    private val io = Executors.newFixedThreadPool(3)
     private val motor = MotorBridge()
     private var closed = false
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -95,6 +96,9 @@ class PreviewActivity : ComponentActivity() {
                         val op = request.getString("operation").also { operation = it }
                         val input = request.getJSONObject("input")
                         val result = when {
+                            op == "ponte.copiar_endpoint" -> copyLocal(McpLocalService.ponteOperation("ponte.status", JSONObject()).getString("origem") + "/mcp", false)
+                            op == "ponte.abrir_cliente" -> openAIClient(input.getString("provedor"))
+                            op.startsWith("ponte.") -> McpLocalService.ponteOperation(op, input)
                             op.startsWith("servidor.") -> localServer(op, input)
                                 .put("versao_app", packageManager.getPackageInfo(packageName, 0).versionName)
                                 .put("android_sdk", Build.VERSION.SDK_INT)
@@ -104,7 +108,8 @@ class PreviewActivity : ComponentActivity() {
                         JSONObject().put("id", id).put("result", result)
                     } catch (e: Exception) {
                         val failure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaMcp>().firstOrNull()
-                        val message = failure?.codigo?.mensagem ?: if (operation?.startsWith("servidor.") == true)
+                        val bridgeFailure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaPonte>().firstOrNull()
+                        val message = if (operation?.startsWith("ponte.") == true) mensagemPonte(bridgeFailure?.codigo) else failure?.codigo?.mensagem ?: if (operation?.startsWith("servidor.") == true)
                             CodigoMcp.DESCONHECIDO.mensagem else "O motor não aceitou este pedido. Confira os dados e tente novamente."
                         JSONObject().put("id", id ?: JSONObject.NULL).put("error", message)
                     }
@@ -173,6 +178,22 @@ class PreviewActivity : ComponentActivity() {
     }
 
     private fun notice(message: String) = runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
+
+    private fun openAIClient(provider: String): JSONObject {
+        val url = when (provider) { "chatgpt" -> "https://chatgpt.com/"; "claude" -> "https://claude.ai/"; else -> error("provedor inválido") }
+        runOnUiThread {
+            if (!closed) try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)) }
+            catch (_: Exception) { notice("Abra o site da IA para configurar o conector MCP.") }
+        }
+        return JSONObject().put("status", "abertura_solicitada")
+    }
+
+    private fun mensagemPonte(code: String?): String = when (code) {
+        "CODIGO_EXPIRADO" -> "PONTE-02: Código expirado ou já usado. Inicie uma nova autorização na IA."
+        "AUTORIZACAO_RECUSADA" -> "PONTE-03: A ponte recusou a autorização. Confira o convite ou o código informado."
+        "SESSAO_ENCERRADA" -> "PONTE-04: Inicie o servidor local antes de conectar a ponte."
+        else -> "PONTE-01: Não foi possível concluir a conexão. Confira o endereço HTTPS, a rede e o estado da ponte."
+    }
 
     private fun localServer(operation: String, i: JSONObject): JSONObject = when (operation) {
         "servidor.status" -> McpLocalService.status()

@@ -96,12 +96,14 @@ no computador. A migração da tela para Compose está em andamento.
 
 O APK embarca um **servidor MCP no próprio celular**, iniciado em Contexto →
 Servidor IA local. Ele escuta somente em `127.0.0.1`, com token por sessão e
-notificação de controle. Permissão INTERNET permite o socket local; a UI
-continua com assets locais. Não há túnel, upload automático, analytics ou
-backup automático. Registros completos ficam no aparelho. **Desinstalar
+notificação de controle. A preview 7 adiciona a ponte HTTPS/WSS com OAuth
+para os dois chats: cada consulta chega ao motor no telefone, sem snapshot
+remoto. A conexão exige hospedagem e aprovação por áreas em cada IA; não vem
+ativada. A UI usa assets locais. Registros completos ficam no aparelho; não
+há analytics ou backup automático. **Desinstalar
 apaga os dados**. Faça uma cópia local antes de
 remover o app. Baixe APKs pelas releases e confira `SHA256SUMS.txt`.
-A preview 6 confirma o início por consulta MCP ao socket real e oferece
+O início continua confirmado por consulta MCP ao socket real e oferece
 **Testar servidor neste celular**, com códigos de erro e versão da build.
 
 [Todas as releases](https://github.com/CabriniJr/FinTips/releases) ·
@@ -147,10 +149,12 @@ para executar o motor ou guardar registros. Em Contexto → Servidor IA local,
 escolha áreas, revise o contexto e inicie a sessão. Os indicadores aprovados
 são recalculados ao usar o app; encerrar revoga o token e apaga o contexto.
 
-**ChatGPT e Claude ainda precisam de uma ponte HTTPS/túnel até o telefone**:
-os conectores remotos não acessam diretamente seu localhost. A ponte e a
-consulta real nas contas estão pendentes. O [piloto remoto anterior](integracoes/mcp/README.md)
-fica como referência e pode ter autorizações antigas revogadas.
+A **ponte comum para ChatGPT e Claude está implementada**: OAuth PKCE →
+HTTPS → canal WSS de saída → mesmo MCP Kotlin no telefone. Cada chat tem áreas
+aprovadas separadamente; pausa, offline e revogação não retornam dados antigos.
+[Implantação e vínculo](integracoes/ponte/README.md) incluem Render e Compose.
+**Hospedagem e consulta nas contas reais ainda precisam ser ativadas.** Código
+testado não significa conta vinculada. O piloto anterior fica como histórico.
 [Servidor no celular](docs/SERVIDOR-MCP-LOCAL.md) · [Privacidade](docs/PRIVACIDADE.md).
 
 ## Privacidade como arquitetura
@@ -173,7 +177,7 @@ escolhido. O [modelo de privacidade](docs/PRIVACIDADE.md) detalha essa fronteira
 | Motor financeiro e MCP local | Disponíveis no computador; porte Kotlin em andamento. |
 | Motor Kotlin na UI Android | Frentes, pacing e conferência OFX; sem migração dos registros. |
 | Servidor MCP no celular | Loopback Kotlin, token por sessão e atualização local das áreas aprovadas. |
-| Mesmo MCP para ChatGPT e Claude | Contrato comum; ponte até o telefone e conexão nas contas pendentes. |
+| Mesmo MCP para ChatGPT e Claude | Ponte HTTPS/OAuth + WSS implementada; hospedagem e contas a ativar. |
 | UI nativa em Compose | Em desenvolvimento. |
 | Scores por área e agregado | Contratos e motor; integração visual nativa em andamento. |
 | Tempo de uso e atividade física | Discovery documentado; coleta automática ainda pendente. |

@@ -1510,3 +1510,52 @@ os APKs CI, revoga POST_NOTIFICATIONS antes de iniciar o runner e executa os
 três casos em ordem: negativa real, socket, notificação permitida/background.
 O script recusa pacote .ui e exige OK (3 tests), pois am instrument pode
 retornar zero com JUnit vermelho. Sem testes simulados de permissão.
+
+**15/10/2026 · Codex — conexão MCP que faltava (preview 7)**
+
+O usuário esclareceu que o problema era a conexão às IAs não implementada,
+não uma falha do socket Android. A preview 6 não resolvia essa lacuna.
+Branch `codex/android-ponte-mcp`, base `c10e457`. Implementei o caminho
+ChatGPT/Claude → HTTPS/OAuth PKCE → WSS iniciado pelo telefone → mesmo socket
+MCP Kotlin. O motor e os registros não são hospedados; sem snapshot remoto.
+
+Arquivos novos: `integracoes/ponte/` (relay, OAuth/DCR, portal, testes,
+Docker/Compose), `render.yaml`, `PonteRemota.kt`, UI `connect-remote.jsx` e
+harness SDK. O serviço anterior `integracoes/mcp` é histórico, não entrypoint
+da ponte viva. Android mantém origem, package, armazenamento e assinatura;
+versionCode 7. Nenhuma nova permissão. WebView não faz rede externa: a conexão
+é Kotlin/OkHttp HTTPS/WSS e só começa por consentimento explícito.
+
+Cada chat precisa do próprio código OAuth e áreas revisadas (padrão vazio).
+O cliente conserva as aprovações localmente; relay não pode inventar grants
+nem ampliar escopos. Mostramos ponte online, aguardando IA, OAuth concluído e
+consulta recebida separadamente. Pausa, fonte inválida, TTL, offline e revogação
+não entregam conteúdo antigo. Encerrar fecha o canal, nega novas respostas
+localmente e tenta revogação HTTPS sem bloquear foreground. Sem credenciais
+persistentes nesta alpha: reinício exige nova sessão. Relay de uma instância,
+metadados e hashes em memória; sleep/restart exige reautorização.
+
+Faixa compartilhada: README, docs de privacidade/estado, CI e configuração de
+transparência. Regras de motor e ouro não mudaram. OkHttp/Okio e PSL declarados;
+Apache + NOTICE + MPL do PSL incluídos no APK. A regressão de dependência nova
+precisou usar um ID sintético, pois OkHttp agora é uma dependência declarada.
+
+Validação local: 249 Python; 144 motor JVM + 19 conector; 20 JS UI;
+13 testes do piloto + 7 do relay novo; 20 ouros; 17 licenças declaradas;
+Actionlint; builds debug/release/instrumentação; container com contexto fechado.
+SDK MCP real executou dois clientes OAuth PKCE até o socket Kotlin por HTTPS/WSS,
+incluindo atualização e pausa sem snapshot. Chromium + cliente Kotlin real
+validou autorização de ambos por áreas diferentes, revisão/consentimento,
+revogação, zero fetch externo do WebView e larguras 320/390/768. Wrappers de
+Android/clipboard são simulados nesse QA; instrumentação Android separada
+exige quatro casos reais no CI (três existentes + transporte TLS/WSS/pausa).
+Conferir checks do head antes de mesclar.
+
+**Ainda não concluído:** não há instância HTTPS publicada nem contas reais
+vinculadas. Perguntei ao usuário a hospedagem/domínio, sem resposta até aqui.
+Render blueprint e Compose são opções concretas; não declarar conexão pronta
+por SDK verde ou por abrir o site da IA. Ativação requer host HTTPS e o OAuth
+na UI de cada conta, seguido de consulta real. Callbacks oficiais estão na
+allowlist e documentados, sem wildcard; conferir valores apresentados na conta.
+Peço revisão do Claude especialmente em consentimento/retencão, relay sem
+snapshot e comportamento de rede Android. Não mover PII para a hospedagem.

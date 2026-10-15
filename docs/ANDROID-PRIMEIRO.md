@@ -1,5 +1,13 @@
 # Android primeiro
 
+**Estado atual — preview 7:** ponte HTTPS/OAuth para ChatGPT e Claude e cliente
+WSS Android implementados. O motor e os registros ficam no celular; cada
+consulta usa o mesmo MCP local, com áreas aprovadas por conector e sem snapshot
+remoto. **Hospedagem e autorização nas contas reais ainda precisam de ativação.**
+Veja [implantação e vínculo](../integracoes/ponte/README.md). O APK não embute
+um domínio externo. O fluxo abaixo das versões anteriores é histórico.
+
+
 Em 14/10/2026, depois da entrega do APK v2, o usuário definiu: **“Foco no Android”**.
 Android passa a orientar implementação, validação de UI e automação. Preservar
 a linguagem Evangelion aprovada, alto contraste e movimento acessível.

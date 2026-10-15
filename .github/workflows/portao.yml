@@ -33,6 +33,8 @@ jobs:
         with:
           node-version: "22"
       - run: node --test integracoes/mcp/*.test.mjs
+      - run: npm ci --prefix integracoes/ponte
+      - run: node --test integracoes/ponte/*.test.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -85,6 +87,13 @@ jobs:
           cache: pip
       - run: pip install -e ".[mcp]"
       - run: python scripts/verificar-mcp-local-sdk.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: integracoes/ponte/package-lock.json
+      - run: npm ci --prefix integracoes/ponte
+      - run: python scripts/verificar-ponte-mcp-sdk.py
 
   painel:
     name: painel web

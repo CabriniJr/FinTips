@@ -42,10 +42,10 @@ def test_dependencia_nova_sem_declaracao_quebra(tmp_path):
     continua bonita enquanto deixa de citar código que viaja no binário."""
     _copia_minima(tmp_path)
     g = tmp_path / "kotlin" / "app" / "build.gradle.kts"
-    g.write_text(g.read_text() + '\nimplementation("com.squareup.okhttp3:okhttp:4.12.0")\n')
+    g.write_text(g.read_text() + '\nimplementation("org.example:dependencia-nao-declarada:4.12.0")\n')
     r = lic.conferir(tmp_path)
     assert not r["ok"]
-    assert "gradle:com.squareup.okhttp3:okhttp" in r["nao_declarados"]
+    assert "gradle:org.example:dependencia-nao-declarada" in r["nao_declarados"]
 
 
 def test_declaracao_que_sobrou_tambem_quebra(tmp_path):
@@ -183,6 +183,8 @@ def test_a_declaracao_revela_saida_opcional_mesmo_sem_internet_no_apk(ws):
     assert "loopback" in s["transporte_atual"]
     assert "pendente" in s["declaracao_play_store"]
     assert "navegador externo" in s["por_que_nao_coleta"]
+    assert s["ponte_externa_criptografada"] is True
+    assert "HTTPS/WSS" in s["transporte_atual"]
     assert "INTERNET" in s["por_que_nao_coleta"]
 
 

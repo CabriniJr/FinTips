@@ -10,7 +10,7 @@
         <service android:name=".McpLocalService" android:exported="false"
             android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="User-started loopback-only MCP server for approved local context, with ongoing notification and stop action. No remote interface or automatic boot start." />
+                android:value="User-started loopback-only MCP server for approved local context, with ongoing notification and stop action. Optional user-authorized outbound HTTPS/WebSocket relay to AI clients. No boot start or raw records." />
         </service>
         <activity android:name=".MainActivity" android:enabled="false">
             <intent-filter tools:node="removeAll" />
