@@ -1491,3 +1491,9 @@ background, ação Encerrar, novo token e erro de contexto sem eco do conteúdo.
 O teste da base já passou; verificar os checks do novo head antes de integrar.
 O próximo dado necessário do aparelho é resultado/código exibido, nunca token,
 JSON de contexto ou arquivos pessoais.
+
+A compilação do APK de instrumentação revelou um problema na auditoria de
+privacidade: o scanner incluía manifestos de testes e atribuía REORDER_TASKS
+ao app entregue. A seleção agora exclui árvores androidTest/unitTest, com
+regressão que também protege allowBackup. Não ampliar a allowlist do APK para
+permissões de testes. Com a regressão, a suíte Python passa a 249 testes.
