@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./icons.jsx";
 import { PageHeading } from "./life.jsx";
-import { hasNativeMotor, nativeMotor } from "./native-motor.js";
+import { hasNativeMotor, isAndroid, nativeMotor } from "./native-motor.js";
 import { projectContext } from "./ai-projection.js";
 import "./connect-ai.css";
 
@@ -78,16 +78,19 @@ export function ConnectAI({ life, toast, syncIssue }) {
   return <>
     <PageHeading code="05.1" overline="Motor + MCP · no aparelho" title="IA local" description="Seu celular calcula. Seu celular responde."/>
     <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Servidor no seu celular</h2><p>O MCP roda em Kotlin neste aparelho. Só aceita conexões locais com o token desta sessão. Registros completos, títulos e valores financeiros continuam privados.</p></div></section>
-    <section className="life-card ai-connect"><div className="section-head"><h2>01 / Servidor local</h2><span className="manual-tag" role="status">{!ready ? "APK Android necessário" : !server ? "Consultando…" : server.ativo ? server.pausado ? "Pausado para revisão" : "Ativo neste celular" : "Encerrado"}</span></div>
+    <section className="life-card ai-connect"><div className="section-head"><h2>01 / Servidor local</h2><span className="manual-tag" role="status">{!ready ? isAndroid() ? "Atualize o WebView" : "APK Android necessário" : !server ? "Consultando…" : server.ativo ? server.pausado ? "Pausado para revisão" : server.teste_local === "ok" ? "MCP local verificado" : "Teste local pendente" : "Encerrado"}</span></div>
       <p>Inicie depois de escolher e revisar as áreas. Enquanto ativo, ele mantém uma notificação de controle e atualiza os indicadores autorizados ao usar o FinTips. Encerrar revoga o token e apaga o contexto da sessão.</p>
       {server?.ativo && <><pre className="ai-payload" aria-label="Endereço do servidor local">{server.endpoint}</pre><p className="motor-label">Somente 127.0.0.1 · sem acesso pela rede Wi-Fi · {server.contexto_disponivel ? "contexto disponível" : "contexto indisponível"}</p>
+        <p role="status">{server.teste_local === "ok" ? "O app inicializou o MCP e consultou a ferramenta pelo socket deste celular." : "O funcionamento ainda não foi confirmado por uma consulta MCP local."}</p>
+        <button className="life-button full" disabled={busy || server.pausado || !server.contexto_disponivel} onClick={() => command("servidor.verificar", { sessao: server.sessao }).then(() => toast("Teste MCP local aprovado. A conexão às contas de IA continua pendente.")).catch(() => {})}>Testar servidor neste celular</button>
         <p>Áreas autorizadas: {server.escopos.map((id) => OPTIONS.find(([k]) => k === id)?.[1]).join(", ")}.</p>
         <div className="local-mcp-actions"><button className="life-button" disabled={busy} onClick={() => copy("servidor.copiar_endereco", "Endereço local copiado")}>Copiar endereço</button><button className="life-button" disabled={busy} onClick={() => copy("servidor.copiar_token", "Token copiado. Cole apenas no cliente MCP autorizado.")}>Copiar token</button></div>
         <p>Configure o cliente local com o endereço acima e o token no header Authorization: Bearer. O token não aparece no contexto da IA e muda ao reiniciar o servidor.</p>
         <button className="life-button full" disabled={busy} onClick={() => command("servidor.encerrar").then(() => { setAck(false); setSnapshot(null); toast("Servidor encerrado e token revogado"); }).catch(() => {})}>Encerrar servidor</button>
         <button className="text-button" onClick={() => nativeMotor("servidor.notificacoes").catch(() => setIssue("Abra as configurações de notificações do Android."))}>Notificação de controle</button>
       </>}
-      {!ready && <p>Instale o APK Android atual e mantenha o Android System WebView atualizado para usar o servidor.</p>}
+      {server?.versao_app && <p className="motor-label">Build {server.versao_app} · Android API {server.android_sdk}</p>}
+      {!ready && <p>{isAndroid() ? "O WebView deste Android não oferece o canal necessário. Atualize o Android System WebView e o Chrome pela loja, feche o FinTips e abra novamente." : "Instale o APK Android atual para usar o servidor local."}</p>}
     </section>
     <section className="life-card ai-connect"><div className="section-head"><h2>02 / Escolha o contexto</h2><Icon name="context"/></div>
       <p>Nenhuma área começa autorizada. Sem registro é ausência de evidência, não uma meta descumprida. Alterar a seleção pausa as consultas até você aplicar uma nova revisão.</p>

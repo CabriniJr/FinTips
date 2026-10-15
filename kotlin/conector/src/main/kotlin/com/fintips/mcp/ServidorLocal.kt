@@ -63,6 +63,47 @@ class ServidorLocal(contexto: JsonObject, private val relogio: () -> Long = Syst
         putJsonArray("escopos") { s?.json?.keys?.filter { it != "schema_version" }?.forEach { add(it) } }
         put("validade_restante_segundos", s?.let { maxOf(0L, (it.vence - relogio()) / 1_000_000_000) } ?: 0)
     }
+    /** Prova de funcionamento pelo socket real, nunca só pelo estado da thread.
+     * Nenhum contexto ou credencial é devolvido por este diagnóstico local.
+     */
+    fun verificar() {
+        check(!encerrado)
+        fun pedir(method: String, params: JsonObject = buildJsonObject {}): JsonObject {
+            val request = buildJsonObject {
+                put("jsonrpc", "2.0"); put("id", "saude-local"); put("method", method); put("params", params)
+            }.toString().toByteArray(Charsets.UTF_8)
+            val response = Socket().use { s ->
+                s.connect(InetSocketAddress(InetAddress.getByAddress(byteArrayOf(127, 0, 0, 1)), socket.localPort), 1500)
+                s.soTimeout = 2000
+                s.getOutputStream().apply {
+                    write(("POST /mcp HTTP/1.1\r\nHost: $host\r\nAuthorization: Bearer $token\r\n" +
+                        "Content-Type: application/json\r\nContent-Length: ${request.size}\r\n\r\n").toByteArray(Charsets.US_ASCII))
+                    write(request); flush()
+                }
+                val bytes = ByteArrayOutputStream()
+                val input = s.getInputStream(); val buffer = ByteArray(1024)
+                while (true) {
+                    val n = input.read(buffer); if (n < 0) break
+                    check(bytes.size() + n <= 16384); bytes.write(buffer, 0, n)
+                }
+                bytes.toString("UTF-8")
+            }
+            check(response.startsWith("HTTP/1.1 200 "))
+            val r = Json.parseToJsonElement(response.substringAfter("\r\n\r\n")).jsonObject
+            check(r["id"] == JsonPrimitive("saude-local") && r["error"] == null)
+            return r["result"]!!.jsonObject
+        }
+        val initialized = pedir("initialize", buildJsonObject { put("protocolVersion", "2025-06-18") })
+        check(initialized["serverInfo"]!!.jsonObject["name"] == JsonPrimitive("fintips-local"))
+        val tools = pedir("tools/list")["tools"]!!.jsonArray
+        check(tools.size == 1 && tools[0].jsonObject["name"] == JsonPrimitive("ler_contexto_revisado"))
+        val result = pedir("tools/call", buildJsonObject {
+            put("name", "ler_contexto_revisado"); putJsonObject("arguments") {}
+        })
+        check(result["isError"] == JsonPrimitive(false))
+        validarContextoIA(result["structuredContent"]!!.jsonObject["contexto"]!!.jsonObject)
+    }
+
     private fun atual(): Snapshot? {
         val s = snapshot.get() ?: return null
         if (s.vence <= relogio()) { snapshot.compareAndSet(s, null); return null }

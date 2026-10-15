@@ -23,7 +23,7 @@ class ServidorLocalTest {
     }
     private fun call(method: String = "tools/call", params: String = """{"name":"ler_contexto_revisado","arguments":{}}""") = """{"jsonrpc":"2.0","id":1,"method":"$method","params":$params}"""
 
-    @Test fun somente_loopback_e_token_em_todas_as_chamadas() = ServidorLocal(context).use { s ->
+    @Test fun somente_loopback_e_token_em_todas_as_chamadas(): Unit = ServidorLocal(context).use { s ->
         assertTrue(s.endpoint.startsWith("http://127.0.0.1:"))
         assertEquals(43, s.credencial().length)
         assertEquals(401, request(s, call(), token = null).first)
@@ -33,7 +33,7 @@ class ServidorLocalTest {
         assertEquals(200, request(s, call()).first)
     }
 
-    @Test fun initialize_discovery_e_consulta_compartilham_contrato_mcp() = ServidorLocal(context).use { s ->
+    @Test fun initialize_discovery_e_consulta_compartilham_contrato_mcp(): Unit = ServidorLocal(context).use { s ->
         val init = Json.parseToJsonElement(request(s, call("initialize", """{"protocolVersion":"2025-06-18"}""")).second).jsonObject
         assertEquals("2025-06-18", init["result"]!!.jsonObject["protocolVersion"]!!.jsonPrimitive.content)
         val tools = Json.parseToJsonElement(request(s, call("tools/list", "{}")).second).jsonObject["result"]!!.jsonObject["tools"]!!.jsonArray
@@ -45,7 +45,7 @@ class ServidorLocalTest {
         assertEquals(202, request(s, """{"jsonrpc":"2.0","method":"notifications/initialized"}""").first)
     }
 
-    @Test fun nenhuma_escrita_ou_argumento_extra_e_aceito() = ServidorLocal(context).use { s ->
+    @Test fun nenhuma_escrita_ou_argumento_extra_e_aceito(): Unit = ServidorLocal(context).use { s ->
         for (p in listOf("""{"name":"gravar_fato","arguments":{}}""", """{"name":"ler_contexto_revisado","arguments":{"raw":true}}""")) {
             assertEquals(-32602, Json.parseToJsonElement(request(s, call(params = p)).second).jsonObject["error"]!!.jsonObject["code"]!!.jsonPrimitive.int)
         }
@@ -65,7 +65,7 @@ class ServidorLocalTest {
         }
     }
 
-    @Test fun pii_e_recusada_na_entrada_inclusive_em_atualizacoes() = ServidorLocal(context).use { s ->
+    @Test fun pii_e_recusada_na_entrada_inclusive_em_atualizacoes(): Unit = ServidorLocal(context).use { s ->
         val pii = Json.parseToJsonElement("""{"schema_version":1,"leitura":{"estados":["estimado"],"fontes":["usuario"],"titulo":"Livro inventado"}}""").jsonObject
         assertFails { s.atualizar(pii) }
         assertFails { ServidorLocal(pii) }
@@ -80,7 +80,7 @@ class ServidorLocalTest {
         ServidorLocal(context).use { assertTrue(old != it.credencial()) }
     }
 
-    @Test fun parser_recusa_smuggling_corpo_excessivo_e_json_invalido() = ServidorLocal(context).use { s ->
+    @Test fun parser_recusa_smuggling_corpo_excessivo_e_json_invalido(): Unit = ServidorLocal(context).use { s ->
         assertEquals(400, request(s, call(), headers = "Content-Length: 1\r\n").first)
         assertEquals(400, request(s, call(), headers = "Transfer-Encoding: chunked\r\n").first)
         assertEquals(413, request(s, "x".repeat(17000)).first)

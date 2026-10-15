@@ -6,7 +6,7 @@ a linguagem Evangelion aprovada, alto contraste e movimento acessível.
 
 ## Estado real
 
-Preview 5: o APK embarca servidor MCP Kotlin em loopback, iniciado e encerrado
+Preview 6: teste MCP real no início e códigos de diagnóstico; o APK embarca servidor MCP Kotlin em loopback, iniciado e encerrado
 pelo app/notificação, com atualização local das áreas autorizadas. Ponte até
 ChatGPT/Claude continua pendente. [Contrato](SERVIDOR-MCP-LOCAL.md).
 A descrição da alpha 4 a seguir é histórica.

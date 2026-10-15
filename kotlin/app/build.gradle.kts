@@ -12,7 +12,8 @@ android {
         applicationId = "com.fintips.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 5
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        versionCode = 6
         versionName = "0.6.0"
     }
     buildFeatures { compose = true }
@@ -32,7 +33,7 @@ android {
         getByName("debug") {
             val ci = providers.gradleProperty("fintips.ciPreview").orNull == "true"
             applicationIdSuffix = if (ci) ".ci" else ".ui"
-            versionNameSuffix = if (ci) "-ci" else "-ui-preview.5"
+            versionNameSuffix = if (ci) "-ci" else "-ui-preview.6"
             manifestPlaceholders["previewLabel"] = if (ci) "FinTips CI" else "FinTips UI"
         }
     }
@@ -52,6 +53,9 @@ kotlin {
 }
 
 dependencies {
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:core:1.6.1")
     debugImplementation(project(":conector"))
     debugImplementation("androidx.webkit:webkit:1.11.0")
     implementation(project(":motor"))

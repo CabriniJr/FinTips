@@ -157,6 +157,22 @@ def test_manifesto_compilado_nao_esconde_permissao_de_rede(tmp_path):
     ]
 
 
+def test_apk_de_instrumentacao_nao_muda_privacidade_do_aplicativo(tmp_path):
+    raiz = tmp_path / "kotlin/app"
+    real = raiz / "build/intermediates/merged_manifests/debug/AndroidManifest.xml"
+    test = raiz / "build/intermediates/merged_manifests/debugAndroidTest/AndroidManifest.xml"
+    source = raiz / "src/androidTest/AndroidManifest.xml"
+    for p in (test, source):
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text('<manifest><uses-permission android:name="android.permission.REORDER_TASKS"/>'
+                     '<application android:allowBackup="true"/></manifest>')
+    real.parent.mkdir(parents=True, exist_ok=True)
+    real.write_text('<manifest><uses-permission android:name="android.permission.INTERNET"/>'
+                    '<application android:allowBackup="false"/></manifest>')
+    assert cfg._permissoes_do_manifesto(tmp_path) == ["android.permission.INTERNET"]
+    assert cfg._flag_do_manifesto(tmp_path, "android:allowBackup") == "false"
+
+
 def test_a_declaracao_revela_saida_opcional_mesmo_sem_internet_no_apk(ws):
     s = cfg.montar(ws, RAIZ)["privacidade"]["seguranca_dos_dados"]
     assert s["coleta_dados"] is None  # Não publicar uma ficha "nenhuma coleta".

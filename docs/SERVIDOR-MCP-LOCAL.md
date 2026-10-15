@@ -1,6 +1,6 @@
 # Servidor MCP no próprio celular
 
-A direção do usuário é **servidor local no Android**. A preview 5 embarca
+A direção do usuário é **servidor local no Android**. A preview 6 embarca
 motor e transporte MCP Kotlin no APK; não exige hospedar o motor ou os
 registros num serviço externo. O piloto Node anterior permanece referência,
 não é dependência da sessão local.
@@ -21,7 +21,10 @@ flowchart LR
 3. Autorize a atualização dessas áreas ao usar o FinTips e inicie o servidor.
 4. Para um cliente MCP capaz de fazer chamadas locais, copie o endereço e o
    token. Transporte Streamable HTTP; header `Authorization: Bearer <token>`.
-5. Encerre pelo app ou pela notificação. A sessão, o contexto em memória e o
+5. A tela só mostra **MCP local verificado** depois de inicializar, listar as
+   ferramentas e consultar o contexto por três chamadas ao socket real. Use
+   **Testar servidor neste celular** para repetir a verificação.
+6. Encerre pelo app ou pela notificação. A sessão, o contexto em memória e o
    token são revogados. Uma nova sessão possui outra porta e outro token.
 
 O token só é copiado por ação explícita. Não entra no JSON da UI, no contexto
@@ -61,6 +64,37 @@ permissões e chave de runtime. Não foi validado como cliente embarcado Android
 e não demonstra suporte ao Claude. Como o objetivo é **um MCP para ambos**,
 a escolha da ponte continua pendente; não publicar URL local como se fosse
 um conector já utilizável dentro dos chats.
+
+## Diagnóstico da preview 6
+
+O usuário reportou falha na preview 5. O teste instrumentado da base passou
+em um emulador Android 14 com KVM no Actions; isso não reproduz nem descarta
+a falha do aparelho do usuário. A tentativa local sem KVM atingiu timeout ao
+inicializar o WebView e não serve como comprovação do serviço.
+
+A preview 6 elimina a confirmação baseada apenas em socket aberto: o início
+só confirma depois do handshake, descoberta e consulta MCP. Se a sonda inicial
+falhar, a sessão é encerrada. O teste manual fica disponível enquanto há
+contexto válido e a sessão não está pausada. Revogação não aguarda a sonda;
+resultado de uma geração antiga não confirma a sessão nova.
+
+O erro agora atravessa ResultReceiver e ponte WebView com mensagens fixas.
+Não serializar `exception.message`, stacktrace, contexto ou token para a UI.
+A tela informa versão da build e API Android para conferir o APK instalado.
+
+| Código | Significado |
+|---|---|
+| MCP-00 | Ação local não concluída; motivo não classificado |
+| MCP-01 | Android recusou iniciar o serviço |
+| MCP-02 | Contexto recusado antes de iniciar |
+| MCP-03 | Falha ao abrir a sessão/socket local |
+| MCP-04 | MCP não respondeu corretamente ao teste local |
+| MCP-05 | Confirmação não chegou no prazo; conferir estado |
+| MCP-06 | Sessão indisponível para teste |
+
+Se o canal nativo não existir no APK, a tela pede atualização do WebView/Chrome
+em vez de dizer apenas para instalar outro APK. Para investigar o relato no
+aparelho, solicitar código e build exibidos; nunca pedir token ou contexto.
 
 ## Fronteira de privacidade
 
@@ -106,8 +140,10 @@ chamada com contexto, além de recusa sem token. Testes também cobrem escopos,
 pausa, atualização antiga, invalidação, expiração, fechamento e renovação de
 token, rejeição de PII, Origin/Host, JSON inválido e limites HTTP.
 
-Build debug/release e QA de navegador não comprovam foreground/lifecycle real,
-notificação, clipboard ou consumo de bateria no Android. Validar no aparelho:
+O CI Android compila o APK de teste e executa `scripts/testar-mcp-android.py`: ponte WebView,
+serviço e socket reais, notificações inicialmente negadas e depois permitidas, retorno de erro seguro,
+consulta em background, ação Encerrar e reinício com outro token. Isso não
+comprova todos os fabricantes, clipboard ou consumo de bateria. Validar no aparelho:
 iniciar, mudar para outro app, retornar, pausar/revisar áreas, encerrar pela
 notificação, matar o processo e conferir que o acesso antigo deixa de funcionar.
 

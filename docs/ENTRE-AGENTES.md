@@ -1447,3 +1447,66 @@ atualização por tarefas/leitura, pausa sem retomada automática, reautorizaç�
 encerramento, preservação de registros e nenhum canary privado no contexto.
 O wrapper Android e clipboard foram simulados nesse QA: foreground, permissão,
 notificação, bateria e lifecycle precisam de avaliação em aparelho real.
+
+
+**15/10/2026 · Codex — regressão reportada no servidor Android**
+
+O usuário reportou que o servidor não funciona na preview 5. Não confundir os
+checks de JVM/Chromium anteriores com execução do foreground service Android.
+Branch `codex/android-mcp-diagnostico`, base `a463194`. Faixa: debug bridge,
+serviço, teste instrumentado e CI Android. Reproduzindo o APK publicado em
+Android 14 e adicionando cobertura pelo bridge WebView e socket sem wrappers
+substituídos. O motivo original ainda não foi isolado; não anunciar correção
+nem conexão das contas antes de validar o caminho real. O erro genérico atual
+perde a causa ao passar por ResultReceiver e precisa de diagnóstico seguro.
+
+
+**15/10/2026 · Codex — diagnóstico verificável da preview 6**
+
+A reprodução instrumentada da base `a463194` passou no CI Android 14/KVM
+(run 38713894344). Inicialização pelo WebMessageListener, foreground service e
+consulta real ao socket funcionaram; isso não reproduziu o relato do aparelho.
+O emulador local sem KVM falhou por timeout ao inicializar o WebView, antes de
+atingir o serviço. Não tratar essa lentidão da infraestrutura como causa do
+relato, nem anunciar “bug corrigido” sem evidência.
+
+Preview 6 passa a confirmar o início só após handshake, descoberta e consulta
+MCP pelo socket real; se falhar, encerra a sessão. Há botão Testar servidor,
+resultado na UI, build/API Android e códigos MCP-00…06 fixos. ResultReceiver
+antes descartava toda causa: agora preserva categoria segura, sem mensagens de
+exception, contexto ou token. Falta de suporte WebMessageListener passa a pedir
+atualização do WebView/Chrome, em vez de só pedir outro APK.
+
+A sonda ocorre fora do lock do consentimento: parar/revogar não espera rede, e
+resultado antigo não valida nova geração. Nenhuma permissão, envio remoto,
+regra de motor ou fonte de score nova. O transporte da sonda é exclusivamente
+127.0.0.1; não há teste a endpoint externo. Origem/armazenamento/certificado
+preservados; versionCode 6. O diagnóstico não conecta ChatGPT/Claude.
+
+Validação local: 248 Python, 144 JVM motor + 15 conector, 20 JS, 20 ouros,
+licenças, Actionlint, builds debug/release/test APK e verificador de assinatura,
+manifesto e assets. A nova rodada Android cobre também teste manual,
+notificações bloqueadas por AppOps (sem revogar permissão e matar o runner),
+background, ação Encerrar, novo token e erro de contexto sem eco do conteúdo.
+O teste da base já passou; verificar os checks do novo head antes de integrar.
+O próximo dado necessário do aparelho é resultado/código exibido, nunca token,
+JSON de contexto ou arquivos pessoais.
+
+A compilação do APK de instrumentação revelou um problema na auditoria de
+privacidade: o scanner incluía manifestos de testes e atribuía REORDER_TASKS
+ao app entregue. A seleção agora exclui árvores androidTest/unitTest, com
+regressão que também protege allowBackup. Não ampliar a allowlist do APK para
+permissões de testes. Com a regressão, a suíte Python passa a 249 testes.
+
+Conferi também os XMLs do JUnit: um teste legado de geração terminava em
+assertFails e inferia retorno Throwable, ficando fora da descoberta Jupiter.
+Os testes de expressão agora declaram Unit; a contagem de 15 do conector
+exige 15 casos executados no relatório, não só 15 anotações no fonte.
+
+A rodada 38715422850 passou no serviço/socket e no background/ação Encerrar,
+mas a preparação do teste de notificação falhou: AppOps não reproduziu a
+negativa runtime do Android 14. Não enfraquecer a asserção. O CI agora instala
+os APKs CI, revoga POST_NOTIFICATIONS antes de iniciar o runner e executa os
+três casos em ordem: negativa real, socket, notificação permitida/background.
+O script recusa pacote .ui e exige OK (3 tests), pois am instrument pode
+retornar zero com JUnit vermelho. Sem testes simulados de permissão.

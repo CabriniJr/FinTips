@@ -71,6 +71,15 @@ SEGURANCA_DOS_DADOS = {
 }
 
 
+def _manifestos_do_app(raiz: Path):
+    """O APK de instrumentação tem permissões próprias e não é o app entregue."""
+    for m in sorted((raiz / "kotlin").rglob("AndroidManifest.xml")):
+        partes = (parte.lower() for parte in m.relative_to(raiz / "kotlin").parts)
+        if any("androidtest" in parte or "unittest" in parte for parte in partes):
+            continue
+        yield m.read_text(encoding="utf-8")
+
+
 def _permissoes_do_manifesto(raiz: Path) -> list[str]:
     """As permissões que o APK realmente pede.
 
@@ -78,15 +87,14 @@ def _permissoes_do_manifesto(raiz: Path) -> list[str]:
     importa é o que o binário pede, não o que alguém lembrou de escrever.
     """
     achados: list[str] = []
-    for m in sorted((raiz / "kotlin").rglob("AndroidManifest.xml")):
-        texto = m.read_text(encoding="utf-8")
+    for texto in _manifestos_do_app(raiz):
         achados += re.findall(r'uses-permission[^>]*android:name="([^"]+)"', texto)
     return sorted(set(achados))
 
 
 def _flag_do_manifesto(raiz: Path, atributo: str) -> str | None:
-    for m in sorted((raiz / "kotlin").rglob("AndroidManifest.xml")):
-        achou = re.search(rf'{atributo}="([^"]+)"', m.read_text(encoding="utf-8"))
+    for texto in _manifestos_do_app(raiz):
+        achou = re.search(rf'{atributo}="([^"]+)"', texto)
         if achou:
             return achou.group(1)
     return None
