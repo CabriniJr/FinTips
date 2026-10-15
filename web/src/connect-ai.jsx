@@ -4,6 +4,7 @@ import { PageHeading } from "./life.jsx";
 import { hasNativeMotor, isAndroid, nativeMotor } from "./native-motor.js";
 import { projectContext } from "./ai-projection.js";
 import "./connect-ai.css";
+import { ConnectRemote } from "./connect-remote.jsx";
 
 const OPTIONS = [["rotina", "Rotina", "Evidência das metas escolhidas por você; sem nomes ou contagens."],
   ["planos", "Planos por área", "Somente o estado dos planos. Sem títulos, prazos ou motivos."],
@@ -76,8 +77,9 @@ export function ConnectAI({ life, toast, syncIssue }) {
     catch { setIssue("Não foi possível copiar. Confira se o servidor está ativo."); }
   };
   return <>
-    <PageHeading code="05.1" overline="Motor + MCP · no aparelho" title="IA local" description="Seu celular calcula. Seu celular responde."/>
-    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Servidor no seu celular</h2><p>O MCP roda em Kotlin neste aparelho. Só aceita conexões locais com o token desta sessão. Registros completos, títulos e valores financeiros continuam privados.</p></div></section>
+    <PageHeading code="05.1" overline="Motor local · conexão MCP" title="Conectar IA" description="Seu celular calcula. Você autoriza os chats."/>
+    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Servidor no seu celular</h2><p>O motor e os registros ficam neste aparelho. A conexão aos chats usa uma ponte HTTPS e somente os indicadores que você revisar e autorizar. Títulos e valores financeiros continuam privados.</p></div></section>
+    <button className="life-button primary full" onClick={() => document.getElementById("conectar-chats")?.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })}>Configurar ChatGPT e Claude<Icon name="arrow" size={18}/></button>
     <section className="life-card ai-connect"><div className="section-head"><h2>01 / Servidor local</h2><span className="manual-tag" role="status">{!ready ? isAndroid() ? "Atualize o WebView" : "APK Android necessário" : !server ? "Consultando…" : server.ativo ? server.pausado ? "Pausado para revisão" : server.teste_local === "ok" ? "MCP local verificado" : "Teste local pendente" : "Encerrado"}</span></div>
       <p>Inicie depois de escolher e revisar as áreas. Enquanto ativo, ele mantém uma notificação de controle e atualiza os indicadores autorizados ao usar o FinTips. Encerrar revoga o token e apaga o contexto da sessão.</p>
       {server?.ativo && <><pre className="ai-payload" aria-label="Endereço do servidor local">{server.endpoint}</pre><p className="motor-label">Somente 127.0.0.1 · sem acesso pela rede Wi-Fi · {server.contexto_disponivel ? "contexto disponível" : "contexto indisponível"}</p>
@@ -108,7 +110,7 @@ export function ConnectAI({ life, toast, syncIssue }) {
       <button className="life-button primary full" disabled={!ack || busy || !ready || life.blocked} onClick={() => command("servidor.iniciar", { context: snapshot }).then(() => { setAck(false); setSnapshot(null); toast("Servidor MCP ativo neste celular"); }).catch(() => {})}>{server?.ativo ? "Aplicar áreas e retomar servidor" : "Iniciar servidor neste celular"}<Icon name="arrow" size={18}/></button>
     </section>}
     {(issue || syncIssue) && <p role="alert" className="form-error">{issue || syncIssue}</p>}
-    <section className="life-card ai-connect"><div className="section-head"><h2>ChatGPT e Claude</h2><span className="manual-tag">Ponte pendente</span></div><p>Os conectores nativos fazem chamadas pela nuvem e não alcançam o endereço local do telefone. O servidor no celular já prepara essa base; a ligação aos chats ainda exige uma ponte HTTPS autenticada até ele.</p><p>Esta build não abre túnel, não envia o contexto a um servidor externo e não declara as contas conectadas. O Android pode encerrar o processo; não há promessa de disponibilidade contínua.</p></section>
+    <ConnectRemote life={life} server={server} toast={toast}/>
     <LegacyRevocations toast={toast}/>
   </>;
 }

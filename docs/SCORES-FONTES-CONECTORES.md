@@ -1,8 +1,8 @@
 # Scores, fontes automáticas e conexão com o chat
 
-> Atualização preview 5: o motor e o servidor MCP rodam no Android, em loopback.
-> C-01 ainda exige ponte autenticada para as contas ChatGPT/Claude;
-> [arquitetura e limites atuais](SERVIDOR-MCP-LOCAL.md). Nenhuma fonte de
+> Atualização preview 7: motor e MCP no Android; ponte HTTPS/OAuth + WSS
+> implementada para ambos. C-01 ainda exige hospedagem e autorização real
+> nas contas: [implantação](../integracoes/ponte/README.md). Nenhuma fonte de
 > UsageStats ou check-in foi ativada por essa mudança.
 
 

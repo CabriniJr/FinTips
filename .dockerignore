@@ -22,3 +22,14 @@ build/
 .git/
 .github/
 .env
+
+# A ponte não recebe artefatos de teste/build nem segredos de subdiretórios.
+**/node_modules/
+**/.env
+**/build/
+**/.gradle/
+**/.kotlin/
+**/*.keystore
+**/*.jks
+**/*.pem
+**/*.ofx

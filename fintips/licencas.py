@@ -59,6 +59,7 @@ LICENCAS_CONHECIDAS: dict[str, dict] = {
     "BSD-2-Clause": {"nome": "BSD 2-Clause", "exige_aviso": True, "copyleft": False},
     "BSD-3-Clause": {"nome": "BSD 3-Clause", "exige_aviso": True, "copyleft": False},
     "ISC": {"nome": "ISC License", "exige_aviso": True, "copyleft": False},
+    "MPL-2.0": {"nome": "Mozilla Public License 2.0", "exige_aviso": True, "copyleft": True},
     "OFL-1.1": {"nome": "SIL Open Font License 1.1", "exige_aviso": True, "copyleft": False},
     "Python-2.0": {"nome": "Python Software Foundation License", "exige_aviso": True, "copyleft": False},
     "0BSD": {"nome": "BSD Zero Clause", "exige_aviso": False, "copyleft": False},

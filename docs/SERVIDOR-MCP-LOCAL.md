@@ -1,6 +1,6 @@
 # Servidor MCP no próprio celular
 
-A direção do usuário é **servidor local no Android**. A preview 6 embarca
+A direção do usuário é **servidor local no Android**. A preview 7 embarca
 motor e transporte MCP Kotlin no APK; não exige hospedar o motor ou os
 registros num serviço externo. O piloto Node anterior permanece referência,
 não é dependência da sessão local.
@@ -11,7 +11,9 @@ flowchart LR
     motor --> contexto[Projeção mínima autorizada]
     contexto --> mcp[MCP em 127.0.0.1]
     cliente[Cliente MCP local com token] --> mcp
-    mcp -. ponte autenticada ainda pendente .-> nuvem[ChatGPT / Claude]
+    nuvem[ChatGPT / Claude] --> ponte[HTTPS / OAuth]
+    ponte --> canal[WSS de saída do Android]
+    canal --> mcp
 ```
 
 ## Como usar esta build
@@ -48,26 +50,24 @@ o processo; não é disponibilidade permanente.
 | Atualização local | ao mudar tarefas, leitura, retomar o app e periodicamente enquanto visível; só áreas aprovadas |
 | Troca de áreas | pausa e omite contexto até nova revisão explícita |
 | Fonte inválida ou contexto sem atualização há 1 h | ferramenta informa indisponibilidade, sem base inventada |
-| ChatGPT e Claude nas contas do usuário | ainda pendentes de ponte/túnel e consulta real |
-| Túnel ou envio automático a servidor externo | não implementados e não ativados |
+| Ponte HTTPS/OAuth e canal WSS | implementados; consulta ao mesmo socket, sem snapshot |
+| ChatGPT e Claude nas contas do usuário | hospedagem e autorizações reais a ativar |
 
 Os conectores remotos fazem chamadas pela infraestrutura dos provedores;
 abrir o app ChatGPT ou Claude no mesmo telefone não dá a eles acesso direto
 a `127.0.0.1` do Android. **Servidor no celular e caminho até a IA são partes
-separadas.** A futura ponte deve encaminhar chamadas ao aparelho, validar
-cliente/usuário e deixar a projeção filtrada antes da saída; não deve mover o
-workspace para um servidor público.
-
-OpenAI documenta **Secure MCP Tunnel**, com saída HTTPS e sem listener público,
-para superfícies suportadas. Exige configuração de organização/workspace,
-permissões e chave de runtime. Não foi validado como cliente embarcado Android
-e não demonstra suporte ao Claude. Como o objetivo é **um MCP para ambos**,
-a escolha da ponte continua pendente; não publicar URL local como se fosse
-um conector já utilizável dentro dos chats.
+separadas.** A [ponte nova](../integracoes/ponte/README.md) implementa esse
+caminho para ambos, mantendo o motor no aparelho. A UI permite informar o
+host, conectar por convite e confirmar o código de autorização de cada chat.
+Depois da aprovação no app é preciso voltar ao navegador da IA para concluir
+o OAuth. O estado mostra separadamente ponte online, OAuth concluído e consulta
+recebida. Sem instância HTTPS hospedada e autorização real, não há vínculo.
 
 ## Diagnóstico da preview 6
 
-O usuário reportou falha na preview 5. O teste instrumentado da base passou
+O relato foi inicialmente interpretado como falha na preview 5. O usuário
+esclareceu depois que faltava implementar a conexão MCP às IAs; os diagnósticos
+abaixo não entregavam esse vínculo. O teste instrumentado da base passou
 em um emulador Android 14 com KVM no Actions; isso não reproduz nem descarta
 a falha do aparelho do usuário. A tentativa local sem KVM atingiu timeout ao
 inicializar o WebView e não serve como comprovação do serviço.
@@ -113,7 +113,8 @@ Falha de fonte invalida o contexto; recuperação exige dados válidos, não zer
 A variante **debug** agora declara INTERNET, FOREGROUND_SERVICE,
 FOREGROUND_SERVICE_SPECIAL_USE e POST_NOTIFICATIONS. INTERNET também é exigida
 para sockets loopback: a permissão sozinha não restringe destinos. O código
-faz bind somente em `127.0.0.1`; não possui cliente HTTP de upload ou túnel.
+faz bind somente em `127.0.0.1`; a ponte opcional usa HTTPS/WSS nativo com
+consentimento próprio. O bearer local não é enviado à ponte.
 O WebView continua bloqueando requisições fora dos assets locais, inclusive
 para o listener. O Compose release não ganha o serviço nem essas permissões.
 

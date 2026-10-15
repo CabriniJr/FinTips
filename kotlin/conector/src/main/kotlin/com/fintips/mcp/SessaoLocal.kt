@@ -65,6 +65,34 @@ class SessaoLocal(
             estado()
         }
     }
+    /** A ponte usa o próprio MCP local; nunca lê registros ou confia em escopos
+     * que o relay pediu sem autorização guardada no cliente.
+     */
+    fun contextoPara(escopos: Set<String>): JsonObject {
+        val r = synchronized(this) {
+            val atual = running ?: error("servidor encerrado")
+            require(!atual.paused && escopos.isNotEmpty() && atual.scopes.containsAll(escopos))
+            atual
+        }
+        val data = r.server.consultarContexto()
+        return synchronized(this) {
+            val atual = running ?: error("servidor encerrado")
+            require(atual.id == r.id && !atual.paused && atual.scopes.containsAll(escopos))
+            val filtered = buildJsonObject {
+                put("schema_version", 1)
+                listOf("rotina", "planos", "leitura").filter { it in escopos }.forEach { put(it, data["contexto"]!!.jsonObject[it]!!) }
+            }
+            validarContextoIA(filtered)
+            buildJsonObject {
+                put("contexto", filtered); put("validade_restante_segundos", data["validade_restante_segundos"]!!)
+                put("sessao_local", atual.id)
+            }
+        }
+    }
+    @Synchronized fun podeEnviar(session: String, escopos: Set<String>): Boolean {
+        val r = running ?: return false
+        return r.id == session && !r.paused && r.scopes.containsAll(escopos) && r.server.estado()["contexto_disponivel"] == JsonPrimitive(true)
+    }
     @Synchronized fun credencial() = running?.server?.credencial() ?: error("servidor encerrado")
     @Synchronized fun encerrar(): JsonObject {
         running?.server?.close(); running = null

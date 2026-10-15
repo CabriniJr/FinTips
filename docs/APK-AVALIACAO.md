@@ -1,5 +1,13 @@
 # APK para avaliar a UI
 
+**Estado atual — preview 7:** ponte HTTPS/OAuth para ChatGPT e Claude e cliente
+WSS Android implementados. O motor e os registros ficam no celular; cada
+consulta usa o mesmo MCP local, com áreas aprovadas por conector e sem snapshot
+remoto. **Hospedagem e autorização nas contas reais ainda precisam de ativação.**
+Veja [implantação e vínculo](../integracoes/ponte/README.md). O APK não embute
+um domínio externo. O fluxo abaixo das versões anteriores é histórico.
+
+
 **Estado atual — preview 6:** teste MCP real no início, botão de teste local,
 códigos MCP-00 a MCP-06 e versão/API Android na tela. O servidor MCP Kotlin no próprio celular, loopback
 com token e controle por notificação. Sem túnel ou contas conectadas.

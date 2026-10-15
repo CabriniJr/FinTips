@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.*
 import com.fintips.mcp.SessaoLocal
+import com.fintips.mcp.PonteRemota
+import com.fintips.mcp.FalhaPonte
 import kotlinx.serialization.json.*
 import org.json.JSONObject
 import java.util.concurrent.Executors
@@ -14,6 +16,8 @@ class McpLocalService : Service() {
     private val host = SessaoLocal(SystemClock::elapsedRealtimeNanos)
     private val io = Executors.newSingleThreadExecutor()
     @Volatile private var destroyed = false
+    private var ponte: PonteRemota? = null
+    private var ponteGeneration = 0L
 
     override fun onCreate() {
         super.onCreate()
@@ -67,6 +71,7 @@ class McpLocalService : Service() {
         // Fecha a geração imediatamente: um início já enfileirado não pode
         // reabrir o socket entre stopSelf() e onDestroy().
         host.close()
+        closePonte()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
@@ -74,7 +79,7 @@ class McpLocalService : Service() {
     @Synchronized private fun notifyRunning() {
         val manager = getSystemService(NotificationManager::class.java)
         if (!destroyed && host.ativo() && manager.areNotificationsEnabled())
-            manager.notify(NOTIFICATION, notification("MCP ativo somente neste aparelho"))
+            manager.notify(NOTIFICATION, notification(if (ponte != null) "Servidor local · ponte IA ativada" else "MCP ativo somente neste aparelho"))
     }
 
     private fun notification(text: String): Notification {
@@ -92,9 +97,48 @@ class McpLocalService : Service() {
     @Synchronized override fun onDestroy() {
         destroyed = true
         host.close()
+        closePonte()
         if (current === this) current = null
         io.shutdownNow()
         super.onDestroy()
+    }
+
+    @Synchronized private fun closePonte() {
+        ponteGeneration++
+        ponte?.close(); ponte = null
+    }
+    @Synchronized private fun ponteState(): JSONObject = JSONObject(ponte?.estado()?.toString() ?: "{\"ativo\":false,\"estado\":\"encerrado\",\"autorizacoes\":[]}")
+    private fun startPonte(origin: String, invite: String): JSONObject {
+        val generation = synchronized(this) {
+            check(!destroyed && host.ativo() && ponte == null)
+            ++ponteGeneration
+        }
+        val client = PonteRemota.criar(origin, invite, host::contextoPara, host::podeEnviar)
+        synchronized(this) {
+            if (destroyed || current !== this || !host.ativo() || generation != ponteGeneration) {
+                client.close(); throw FalhaPonte("SESSAO_ENCERRADA")
+            }
+            ponte = client
+        }
+        notifyRunning()
+        return ponteState()
+    }
+    private fun bridge(): PonteRemota = synchronized(this) { ponte ?: throw FalhaPonte("PONTE_INDISPONIVEL") }
+    private fun bridgeOperation(op: String, input: JSONObject): JSONObject = when (op) {
+        "ponte.status" -> ponteState()
+        "ponte.iniciar" -> startPonte(input.getString("origem"), input.getString("convite"))
+        "ponte.encerrar" -> { closePonte(); notifyRunning(); ponteState() }
+        "ponte.consultar" -> JSONObject(bridge().consultarCodigo(input.getString("codigo")).toString())
+        "ponte.autorizar" -> {
+            val context = Json.parseToJsonElement(MotorBridge.validateContext(input.getJSONObject("context").toString())).jsonObject
+            val scopes = context.keys - "schema_version"
+            // Exige fonte e consentimento locais válidos; não envia o JSON revisado.
+            host.contextoPara(scopes)
+            JSONObject(bridge().autorizar(input.getString("codigo"), scopes, input.getString("provedor")).toString())
+        }
+        "ponte.negar" -> JSONObject(bridge().negar(input.getString("codigo")).toString())
+        "ponte.revogar" -> JSONObject(bridge().revogar(input.getString("id")).toString())
+        else -> throw FalhaPonte("ACAO_INVALIDA")
     }
 
     companion object {
@@ -105,6 +149,11 @@ class McpLocalService : Service() {
         @Volatile private var current: McpLocalService? = null
         private fun stopped() = JSONObject().put("ativo", false).put("contexto_disponivel", false)
         fun status(): JSONObject = current?.state() ?: stopped()
+        fun ponteOperation(op: String, input: JSONObject): JSONObject {
+            val service = current
+            if (service == null && op == "ponte.status") return JSONObject("{\"ativo\":false,\"estado\":\"encerrado\",\"autorizacoes\":[]}")
+            return (service ?: throw FalhaPonte("SESSAO_ENCERRADA")).bridgeOperation(op, input)
+        }
         fun refreshNotification() { current?.notifyRunning() }
         fun pausar(session: String): JSONObject = JSONObject((current?.host?.pausar(session) ?: error("servidor encerrado")).toString())
         fun atualizar(session: String, raw: String?): JSONObject = JSONObject((current?.host?.atualizar(session,

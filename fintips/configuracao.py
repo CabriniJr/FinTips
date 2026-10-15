@@ -28,8 +28,8 @@ sem proveniência —, aplicada ao próprio app em vez de aos dados da pessoa.
 
 Não há conta central. O APK de avaliação mantém um servidor MCP loopback
 iniciado pela pessoa, com contexto mínimo e token por sessão. Clientes MCP
-podem usar esse contexto; uma ponte para as nuvens não está embarcada.
-Telemetria continua ausente. Revogações do piloto remoto anterior usam navegador.
+podem usar esse contexto; a ponte opcional HTTPS/WSS encaminha consultas dos
+chats depois de autorização por áreas. Telemetria continua ausente. Revogações do piloto remoto anterior usam navegador.
 """
 
 from __future__ import annotations
@@ -44,16 +44,17 @@ CONFIG_SCHEMA = 2
 # Rascunho de transparência, não ficha submetida à Play Store. null recusa
 # afirmar "nenhuma coleta" enquanto a hospedagem do conector não está definida.
 DADOS_COLETADOS: list[dict] = [{"tipo": "indicadores_reduzidos", "opcional": True,
-                               "quando": "contexto mínimo autorizado para clientes MCP locais"}]
+                               "quando": "consulta MCP local ou da IA após autorizar a ponte e as áreas"}]
 
 SEGURANCA_DOS_DADOS = {
     "coleta_dados": None,
     "coleta_automatica": False,
     "compartilha_com_terceiros": True,
     "compartilhamento_opcional": True,
-    "declaracao_play_store": "pendente de revisão dos clientes MCP e eventual ponte",
-    "dados_em_transito_criptografados": False,  # HTTP somente em loopback
-    "transporte_atual": "HTTP loopback com bearer; sem túnel ou envio externo automático",
+    "declaracao_play_store": "pendente da hospedagem concreta da ponte e dos clientes MCP",
+    "dados_em_transito_criptografados": False,  # o listener loopback não usa TLS
+    "ponte_externa_criptografada": True,  # HTTPS/WSS sem downgrade ou redirect
+    "transporte_atual": "HTTP loopback com bearer; ponte opcional HTTPS/WSS com consulta autorizada",
     "permite_excluir_dados": True,
     "como_excluir": (
         "cada registro local é apagável; desinstalar apaga os dados do app. "
@@ -63,8 +64,9 @@ SEGURANCA_DOS_DADOS = {
     ),
     "por_que_nao_coleta": (
         "a variante debug usa `android.permission.INTERNET` para escutar "
-        "somente em 127.0.0.1; não há cliente de upload ou túnel automático. "
-        "Um cliente MCP autorizado pode ler os indicadores reduzidos; "
+        "somente em 127.0.0.1 e para uma ponte HTTPS/WSS opcional. "
+        "Cada chat exige autorização por áreas; a consulta recebe indicadores "
+        "reduzidos, sem cópia no relay, arquivos ou registros completos. "
         "o navegador externo ainda atende revogações do piloto anterior. "
         "Isso não torna os indicadores anônimos"
     ),
@@ -186,15 +188,17 @@ def montar(ws, raiz: str | Path = ".", executavel: str = "") -> dict:
             "backup_automatico": _flag_do_manifesto(raiz, "android:allowBackup"),
             "resumo": (
                 "o servidor MCP da variante debug aceita só loopback e token "
-                "da sessão. Permissão de rede é necessária para o socket "
-                "local; WebView continua restrito aos assets do aparelho. "
+                "da sessão. Uma ponte HTTPS/WSS opcional encaminha consultas "
+                "autorizadas dos chats. WebView continua restrito aos assets. "
                 "Registros completos permanecem no client"
             ),
             "seguranca_dos_dados": SEGURANCA_DOS_DADOS,
         },
         "dados": {
             "arquivos": onde_os_dados_moram(ws),
-            "nada_sincroniza": True,
+            "nada_sincroniza": False,
+            "registros_sincronizados": False,
+            "contexto_sob_demanda": True,
             "aviso": (
                 "o workspace é local e independente da instalação do programa. "
                 "Cópias e mensagens já recebidas pela IA são independentes; "

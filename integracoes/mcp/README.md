@@ -1,5 +1,9 @@
 # FinTips MCP · contexto revisado
 
+> Histórico: este serviço usa snapshots. O caminho atual consulta o celular
+> via HTTPS/OAuth e WSS: [ponte viva](../ponte/README.md). Não usar este entrypoint
+> para anunciar que o Android está conectado.
+
 **Piloto remoto anterior (preview 4).** A partir da preview 5, o produto usa
 [servidor Kotlin no celular](../../docs/SERVIDOR-MCP-LOCAL.md). Este serviço
 Node fica como referência testada; não é dependência nem destino automático
