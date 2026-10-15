@@ -140,7 +140,7 @@ fun resolverAgente(bundle: JsonObject, drafts: JsonArray, hoje: String, response
     val autofilled=mutableSetOf<Pair<Int,String>>()
     for(index in out.indices) {
         val d=out[index];val title=(d.obj("campos")["titulo"] ?: d.obj("campos")["rotulo"])?.jsonPrimitive?.content ?: ""
-        val matches=assets(bundle).filter { x->x["tipo"]==d["tipo"] && (d.str("tipo")!="medida" || x.obj("campos")["dia"]==d.obj("campos")["dia"]) && normalAgente((x.obj("campos")["titulo"] ?: x.obj("campos")["rotulo"] ?: JsonPrimitive("")).jsonPrimitive.content).trim()==normalAgente(title).trim() }
+        val matches=assets(bundle).filter { x->x["tipo"]==d["tipo"] && (d.str("tipo")!="medida" || x.obj("campos")["dia"]==d.obj("campos")["dia"]) && (x.obj("campos")["titulo"] ?: x.obj("campos")["rotulo"] ?: JsonPrimitive("")).jsonPrimitive.content.lowercase().trim()==title.lowercase().trim() }
         if(d.str("acao")=="criar" && d.str("porque")!="Registro separado por escolha explícita da pessoa na conversa." && title.isNotEmpty() && matches.size==1) {
             val old=matches.single();require(out.indices.none { it!=index && out[it]["id"]==old["id"] && out[it]["tipo"]==old["tipo"] })
             val f=d.obj("campos").toMutableMap()

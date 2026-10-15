@@ -51,6 +51,10 @@ def gerar():
     add('intenção de progresso não é uma observação','triagem.agente_contexto',future)
     quoted_money=copy.deepcopy(base);quoted_money['rascunhos'][0]['campos']['titulo']='Quero comprar “GOAL_CANARY”'
     add('título entre aspas não inventa uma ação de leitura em outro domínio','triagem.agente_contexto',quoted_money)
+    accented=copy.deepcopy(ds[0]);accented['campos']['titulo']='Projeto avó CANARY'
+    accent_base=t.aplicar(b,t.preparar(b,[accented],[],'accent-base'),True,hoje,1792065600000)['bundle']
+    other_accent=copy.deepcopy(accented);other_accent['id']='new-accent';other_accent['campos']['titulo']='Projeto avô CANARY'
+    add('deduplicação exata preserva distinções de acento no título','triagem.agente_aplicar',{'bundle':accent_base,'rascunhos':[other_accent],'hoje':hoje,'resposta':{'registros':[],'relacoes':[],'pergunta':None}})
     invalid=[]
     def bad(name,r):invalid.append({'nome':name,'operacao':'triagem.agente_aplicar','entrada':{**base,'resposta':r}})
     for name,record in [('referência inventada',{'ref':'rascunho_1','tipo':'livro','campos':[{'campo':'titulo','valor':'texto_privado_inventado'}]}),

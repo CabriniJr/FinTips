@@ -71,6 +71,10 @@ async def main():
     await page.get_by_text('SÓ MAIS UMA COISA',exact=True).wait_for()
     await page.locator('.triage-current').get_by_role('button',name='Estudos',exact=True).click()
     await page.get_by_text('DEIXEI ORGANIZADO',exact=True).wait_for()
+    await page.wait_for_timeout(150)
+    cta=await page.get_by_role('button',name='Está certo, salvar',exact=True).bounding_box();nav=await page.locator('.bottom-nav').bounding_box()
+    assert cta and nav and cta['y']+cta['height']<=nav['y'],(cta,nav)
+    await page.locator('.triage-ready').screenshot(path=str(OUT/'resumo-inline.png'))
     await page.get_by_text('Ver o que será guardado',exact=False).click()
     # A IA preenche dias, restaura o título privado e relaciona sem aprovações por campo.
     pending=json.loads(await page.evaluate("localStorage.getItem('fintips.triagem.chat.v1')"))
@@ -89,7 +93,7 @@ async def main():
     await page.get_by_role('button',name='Confirmar 4 registro(s)',exact=True).wait_for();assert not await page.get_by_role('button',name='Confirmar 4 registro(s)',exact=True).is_disabled()
     for width in [320,390,768]:
      await page.set_viewport_size({'width':width,'height':844});assert await page.evaluate('document.body.scrollWidth<=innerWidth+1'),width
-    await page.set_viewport_size({'width':390,'height':844});await page.screenshot(path=str(OUT/'triagem-revisao.png'),full_page=True);await page.locator('.triage-ready').screenshot(path=str(OUT/'resumo-inline.png'))
+    await page.set_viewport_size({'width':390,'height':844});await page.screenshot(path=str(OUT/'triagem-revisao.png'),full_page=True)
     await page.get_by_role('button',name='Está certo, salvar',exact=True).click();await page.get_by_text('4 registro(s) salvo(s) no aparelho',exact=True).wait_for()
     state=json.loads(await page.evaluate("localStorage.getItem('fintips.client.v1')"));assert len(state['vida']['tarefas'])==len(LIFE['tarefas'])+1;assert len(state['vida']['planos'])==len(LIFE['planos'])+1;assert len(state['leitura']['livros'])==len(READING['livros'])+1
     book=next(b for b in state['leitura']['livros'] if b['titulo']=='LOCAL_BOOK_CANARY');assert book['observacoes']==[] and book['dias_semana']==4

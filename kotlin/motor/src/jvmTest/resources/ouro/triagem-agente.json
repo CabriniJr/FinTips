@@ -5501,6 +5501,89 @@
           }
         }
       }
+    },
+    {
+      "nome": "deduplicação exata preserva distinções de acento no título",
+      "operacao": "triagem.agente_aplicar",
+      "entrada": {
+        "bundle": {
+          "schema_version": 1,
+          "vida": {
+            "schema_version": 1,
+            "tarefas": [],
+            "registros": [],
+            "planos": [
+              {
+                "porque": "",
+                "proximoPasso": "",
+                "prazo": "",
+                "concluido": false,
+                "id": "plan-local",
+                "titulo": "Projeto avó CANARY",
+                "atributo": "INT",
+                "proveniencia": {
+                  "origem": "usuario",
+                  "porque": "Pedido sintético",
+                  "quando": "2026-10-15",
+                  "por_quem": "triagem_confirmada",
+                  "proposta": "accent-base"
+                }
+              }
+            ],
+            "medidas": []
+          },
+          "leitura": {
+            "schema_version": 1,
+            "livros": []
+          },
+          "caderno": {
+            "schema_version": 1,
+            "assets": [],
+            "relacoes": [],
+            "aplicacoes": [
+              {
+                "id": "accent-base",
+                "hash": "d778efde19caee189bf2aefc5f94692bb12a4962b30be27281b8a830d5bf8d46"
+              }
+            ]
+          }
+        },
+        "rascunhos": [
+          {
+            "id": "new-accent",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Projeto avô CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "hoje": "2026-10-15",
+        "resposta": {
+          "registros": [],
+          "relacoes": [],
+          "pergunta": null
+        }
+      },
+      "resultado": {
+        "rascunhos": [
+          {
+            "id": "new-accent",
+            "tipo": "plano",
+            "campos": {
+              "titulo": "Projeto avô CANARY",
+              "atributo": "INT"
+            },
+            "acao": "criar",
+            "porque": "Pedido sintético"
+          }
+        ],
+        "relacoes": [],
+        "pergunta": null,
+        "origem": "openai"
+      }
     }
   ],
   "recusados": [

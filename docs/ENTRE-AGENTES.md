@@ -1695,3 +1695,8 @@ vínculos, pergunta inline, correção de ritmo, persistência, backup, duplicat
 importação, remoção e nenhuma chamada externa pelo WebView. A instrumentação
 CI mantém seis casos; o caso HTTPS Android agora inclui três campos e um
 vínculo do agente. Conferir o head e os runs do PR antes de integrar/publicar.
+
+Revisão visual: o chat passa a acompanhar o resultado do agente reservando
+espaço para o compositor e a navegação inferior. QA exige que o botão inline
+esteja acima da barra fixa. Deduplicação exige título igual com acentos
+preservados, além de tipo/ocorrência única; ouro distingue “avó” de “avô”.

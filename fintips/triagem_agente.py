@@ -137,7 +137,7 @@ def resolver(bundle,drafts,hoje,response):
     autofilled=set()
     for index,d in enumerate(out):
         title=d['campos'].get('titulo',d['campos'].get('rotulo',''))
-        matches=[x for x in t.assets(bundle) if x['tipo']==d['tipo'] and (d['tipo']!='medida' or x['campos'].get('dia')==d['campos'].get('dia')) and normal(x['campos'].get('titulo',x['campos'].get('rotulo',''))).strip()==normal(title).strip()]
+        matches=[x for x in t.assets(bundle) if x['tipo']==d['tipo'] and (d['tipo']!='medida' or x['campos'].get('dia')==d['campos'].get('dia')) and x['campos'].get('titulo',x['campos'].get('rotulo','')).lower().strip()==title.lower().strip()]
         if d['acao']=='criar' and d['porque']!='Registro separado por escolha explícita da pessoa na conversa.' and title and len(matches)==1:
             old=matches[0]
             t.exigir(not any(x is not d and x['id']==old['id'] and x['tipo']==old['tipo'] for x in out))

@@ -88,7 +88,7 @@ export function TriageChat({ toast }) {
     finally { if (mounted.current) setAiBusy(false); }
   }, [projection, native, key.configurada, aiBusy]);
   useEffect(() => { askAPI(); }, [projection, chat.cloudConsent, key.configurada, aiBusy]);
-  useEffect(() => { end.current?.scrollIntoView({ block: "nearest", behavior: "auto" }); }, [chat.messages.length]);
+  useEffect(() => { end.current?.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }, [chat.messages.length, aiBusy, projection, agentDone]);
   useEffect(() => () => { mounted.current = false; generation.current++; if (native) nativeMotor("triagem.cancelar").catch(() => {}); }, []);
 
   const option = projection?.publico.opcoes.find((o) => o.acao === "perguntar");
@@ -200,7 +200,7 @@ export function TriageChat({ toast }) {
           <p>Está de acordo? Você também pode ajustar me contando abaixo.</p>
           <button className="life-button primary" disabled={busy || blocked || unresolvedDuplicate} onClick={save}>{busy ? "Guardando…" : "Está certo, salvar"}<Icon name="check" size={18}/></button>
         </div>}
-        <div ref={end}/>
+        <div ref={end} className="triage-scroll-anchor"/>
       </section>
       <form className="triage-composer" onSubmit={(e) => { e.preventDefault(); respond(); }}><label className="sr-only" htmlFor="triagem-mensagem">Mensagem de triagem</label>
         <textarea ref={input} id="triagem-mensagem" maxLength={4000} rows={3} inputMode={spec?.tipo === "inteiro" ? "decimal" : "text"} disabled={busy || blocked || !catalog} value={text} onChange={(e) => setText(e.target.value)} placeholder={spec ? "Responda do seu jeito…" : chat.drafts.length ? "Acrescente algo ou diga o que quer ajustar…" : "Quero organizar…"}/>
