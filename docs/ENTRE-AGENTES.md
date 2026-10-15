@@ -1497,3 +1497,16 @@ privacidade: o scanner incluía manifestos de testes e atribuía REORDER_TASKS
 ao app entregue. A seleção agora exclui árvores androidTest/unitTest, com
 regressão que também protege allowBackup. Não ampliar a allowlist do APK para
 permissões de testes. Com a regressão, a suíte Python passa a 249 testes.
+
+Conferi também os XMLs do JUnit: um teste legado de geração terminava em
+assertFails e inferia retorno Throwable, ficando fora da descoberta Jupiter.
+Os testes de expressão agora declaram Unit; a contagem de 15 do conector
+exige 15 casos executados no relatório, não só 15 anotações no fonte.
+
+A rodada 38715422850 passou no serviço/socket e no background/ação Encerrar,
+mas a preparação do teste de notificação falhou: AppOps não reproduziu a
+negativa runtime do Android 14. Não enfraquecer a asserção. O CI agora instala
+os APKs CI, revoga POST_NOTIFICATIONS antes de iniciar o runner e executa os
+três casos em ordem: negativa real, socket, notificação permitida/background.
+O script recusa pacote .ui e exige OK (3 tests), pois am instrument pode
+retornar zero com JUnit vermelho. Sem testes simulados de permissão.

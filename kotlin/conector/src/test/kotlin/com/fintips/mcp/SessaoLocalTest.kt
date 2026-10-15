@@ -8,13 +8,13 @@ class SessaoLocalTest {
     private val c = Json.parseToJsonElement("""{"schema_version":1,"leitura":{"estados":["estimado"],"fontes":["usuario"]}}""").jsonObject
     private fun id(s: JsonObject) = s["sessao"]!!.jsonPrimitive.content
 
-    @Test fun so_revisao_explicita_pode_ampliar_escopos() = SessaoLocal().use { s ->
+    @Test fun so_revisao_explicita_pode_ampliar_escopos(): Unit = SessaoLocal().use { s ->
         val a = s.iniciar(c)
         val other = Json.parseToJsonElement("""{"schema_version":1,"leitura":{"estados":[],"fontes":[]},"planos":[]}""").jsonObject
         assertFails { s.atualizar(id(a), other) }
         assertTrue(s.estado()["contexto_disponivel"]!!.jsonPrimitive.boolean)
     }
-    @Test fun pausar_impede_atualizacao_automatica_de_reativar_consulta() = SessaoLocal().use { s ->
+    @Test fun pausar_impede_atualizacao_automatica_de_reativar_consulta(): Unit = SessaoLocal().use { s ->
         val a = s.iniciar(c)
         s.pausar(id(a))
         assertTrue(s.estado()["pausado"]!!.jsonPrimitive.boolean)
@@ -25,20 +25,20 @@ class SessaoLocalTest {
         assertFails { s.atualizar(id(a), c) }
         assertFalse(b["pausado"]!!.jsonPrimitive.boolean)
     }
-    @Test fun atualizar_revisao_preserva_conexao_mas_encerra_geracao_anterior() = SessaoLocal().use { s ->
+    @Test fun atualizar_revisao_preserva_conexao_mas_encerra_geracao_anterior(): Unit = SessaoLocal().use { s ->
         val a = s.iniciar(c); val token = s.credencial()
         val b = s.iniciar(c)
         assertEquals(a["endpoint"], b["endpoint"]); assertTrue(token == s.credencial())
         assertTrue(id(a) != id(b)); assertFails { s.atualizar(id(a), null) }
     }
-    @Test fun falha_de_dados_omite_contexto_e_uma_atualizacao_valida_recupera() = SessaoLocal().use { s ->
+    @Test fun falha_de_dados_omite_contexto_e_uma_atualizacao_valida_recupera(): Unit = SessaoLocal().use { s ->
         val a = s.iniciar(c)
         s.atualizar(id(a), null)
         assertFalse(s.estado()["contexto_disponivel"]!!.jsonPrimitive.boolean)
         assertEquals(JsonArray(listOf(JsonPrimitive("leitura"))), s.estado()["escopos"]!!.jsonArray)
         s.atualizar(id(a), c); assertTrue(s.estado()["contexto_disponivel"]!!.jsonPrimitive.boolean)
     }
-    @Test fun teste_local_exige_resposta_mcp_e_contexto_disponivel() = SessaoLocal().use { s ->
+    @Test fun teste_local_exige_resposta_mcp_e_contexto_disponivel(): Unit = SessaoLocal().use { s ->
         val a = s.iniciar(c); val session = id(a)
         assertEquals(JsonPrimitive("pendente"), a["teste_local"])
         assertEquals(JsonPrimitive("ok"), s.verificar(session)["teste_local"])
@@ -51,7 +51,7 @@ class SessaoLocalTest {
         assertFails { s.verificar(session) }
         assertEquals(JsonPrimitive("pendente"), s.estado()["teste_local"])
     }
-    @Test fun teste_antigo_nao_verifica_uma_nova_autorizacao() = SessaoLocal().use { s ->
+    @Test fun teste_antigo_nao_verifica_uma_nova_autorizacao(): Unit = SessaoLocal().use { s ->
         val a = s.iniciar(c); s.iniciar(c)
         assertFails { s.verificar(id(a)) }
         assertEquals(JsonPrimitive("pendente"), s.estado()["teste_local"])

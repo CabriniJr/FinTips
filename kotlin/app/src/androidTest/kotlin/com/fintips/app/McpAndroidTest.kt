@@ -12,6 +12,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
 import org.junit.runner.RunWith
 import java.net.Socket
 import java.util.concurrent.CountDownLatch
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit
 
 /** Exercita o bridge e o foreground service no Android, sem substituir wrappers. */
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class McpAndroidTest {
     private fun eval(s: ActivityScenario<PreviewActivity>, script: String): String {
         val done = CountDownLatch(1); var result = "null"
@@ -66,14 +69,12 @@ class McpAndroidTest {
         val i = InstrumentationRegistry.getInstrumentation()
         val c = i.targetContext
         c.getSharedPreferences("mcp-local", 0).edit().putBoolean("notificacoes_solicitadas", true).commit()
-        // Revogar runtime permission pode matar o próprio processo de teste.
-        // AppOps reproduz notificações bloqueadas sem encerrar a instrumentação.
-        ParcelFileDescriptor.AutoCloseInputStream(i.uiAutomation.executeShellCommand("pm grant ${c.packageName} android.permission.POST_NOTIFICATIONS")).use { it.readBytes() }
-        val mode = if (grant) "allow" else "ignore"
-        ParcelFileDescriptor.AutoCloseInputStream(i.uiAutomation.executeShellCommand("appops set ${c.packageName} POST_NOTIFICATION $mode")).use { it.readBytes() }
+        // O CI revoga antes de iniciar a instrumentação; fazê-lo aqui
+        // encerraria o próprio processo que executa os testes.
+        if (grant) ParcelFileDescriptor.AutoCloseInputStream(i.uiAutomation.executeShellCommand("pm grant ${c.packageName} android.permission.POST_NOTIFICATIONS")).use { it.readBytes() }
         assertEquals(grant, c.getSystemService(NotificationManager::class.java).areNotificationsEnabled())
     }
-    @Test fun servidor_responde_pelo_socket_e_encerra_pelo_bridge_real() {
+    @Test fun b_servidor_responde_pelo_socket_e_encerra_pelo_bridge_real() {
         ActivityScenario.launch(PreviewActivity::class.java).use { s ->
             ready(s)
             assertFalse(command(s, "servidor.status").getBoolean("ativo"))
@@ -99,7 +100,7 @@ class McpAndroidTest {
             assertFalse(command(s, "servidor.status").getBoolean("ativo"))
         }
     }
-    @Test fun notificacoes_bloqueadas_nao_impedem_servidor_e_erro_nao_vaza_contexto() {
+    @Test fun a_notificacoes_bloqueadas_nao_impedem_servidor_e_erro_nao_vaza_contexto() {
         notifications(false)
         ActivityScenario.launch(PreviewActivity::class.java).use { s ->
             ready(s)
@@ -114,7 +115,7 @@ class McpAndroidTest {
             finally { command(s, "servidor.encerrar") }
         }
     }
-    @Test fun trocar_de_app_mantem_mcp_e_acao_da_notificacao_revoga_sessao() {
+    @Test fun c_trocar_de_app_mantem_mcp_e_acao_da_notificacao_revoga_sessao() {
         notifications(true)
         val c = InstrumentationRegistry.getInstrumentation().targetContext
         ActivityScenario.launch(PreviewActivity::class.java).use { s ->

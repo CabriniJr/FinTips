@@ -140,8 +140,8 @@ chamada com contexto, além de recusa sem token. Testes também cobrem escopos,
 pausa, atualização antiga, invalidação, expiração, fechamento e renovação de
 token, rejeição de PII, Origin/Host, JSON inválido e limites HTTP.
 
-O CI Android agora executa `:app:connectedDebugAndroidTest`: ponte WebView,
-serviço e socket reais, notificações habilitadas/bloqueadas por AppOps, retorno de erro seguro,
+O CI Android compila o APK de teste e executa `scripts/testar-mcp-android.py`: ponte WebView,
+serviço e socket reais, notificações inicialmente negadas e depois permitidas, retorno de erro seguro,
 consulta em background, ação Encerrar e reinício com outro token. Isso não
 comprova todos os fabricantes, clipboard ou consumo de bateria. Validar no aparelho:
 iniciar, mudar para outro app, retornar, pausar/revisar áreas, encerrar pela

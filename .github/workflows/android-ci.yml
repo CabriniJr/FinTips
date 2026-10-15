@@ -80,7 +80,9 @@ jobs:
           arch: x86_64
           working-directory: kotlin
           disable-animations: true
-          script: ./gradlew -Pfintips.android=true -Pfintips.ciPreview=true :app:connectedDebugAndroidTest --no-daemon
+          script: |
+            ./gradlew -Pfintips.android=true -Pfintips.ciPreview=true :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon
+            python3 ../scripts/testar-mcp-android.py
       - name: Guardar relatório Android
         if: always()
         uses: actions/upload-artifact@v4
