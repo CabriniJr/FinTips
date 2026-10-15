@@ -155,10 +155,14 @@ def test_manifesto_compilado_nao_esconde_permissao_de_rede(tmp_path):
     ]
 
 
-def test_a_ficha_da_loja_diz_que_nao_coleta_e_diz_por_que(ws):
+def test_a_declaracao_revela_saida_opcional_mesmo_sem_internet_no_apk(ws):
     s = cfg.montar(ws, RAIZ)["privacidade"]["seguranca_dos_dados"]
-    assert s["coleta_dados"] is False
-    assert s["compartilha_com_terceiros"] is False
+    assert s["coleta_dados"] is None  # Não publicar uma ficha "nenhuma coleta".
+    assert s["coleta_automatica"] is False
+    assert s["compartilha_com_terceiros"] is True
+    assert s["compartilhamento_opcional"] is True
+    assert "pendente" in s["declaracao_play_store"]
+    assert "navegador externo" in s["por_que_nao_coleta"]
     assert "INTERNET" in s["por_que_nao_coleta"]
 
 

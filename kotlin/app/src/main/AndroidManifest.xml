@@ -4,7 +4,9 @@
 
   O app lê e escreve só o armazenamento privado dele (`filesDir`), que no
   Android não exige permissão. Não há INTERNET: dado de hábito e de dinheiro
-  não sai do aparelho por este app. Quando os sensores entrarem (tempo de tela,
+  não é transmitido diretamente por este app. No debug, a pessoa pode abrir o
+  navegador externo com uma projeção mínima revisada para o conector MCP;
+  esse navegador tem sua própria rede. Quando os sensores entrarem (tempo de tela,
   passos), cada um trará a permissão dele, pedida na hora e explicada — não um
   bloco de permissões adiantadas "para depois".
 -->

@@ -1,5 +1,26 @@
 # Privacidade e PII
 
+## Android alpha 4 e MCP remoto
+
+Registros completos continuam no client. O fluxo Conectar IA permite escolher
+indicadores reduzidos de rotina, estado dos planos por área e estados do ritmo
+de leitura. O motor Kotlin aplica allowlist antes de abrir o navegador externo;
+a pessoa revisa o JSON integral. Não exporta títulos, nomes, IDs, datas, valores,
+lista de apps ou texto livre. Indicadores reduzidos ainda revelam aspectos da
+rotina e **não são anunciados como anônimos**.
+
+O navegador exige confirmação antes de enviar ao servidor escolhido. O piloto
+MCP remoto é somente leitura; snapshots expiram em uma hora e podem ser
+revogados. A revogação não apaga mensagens já recebidas pela IA. Credenciais
+de bancos e fontes ficam locais; tokens OAuth do conector ficam com o serviço
+e o cliente de IA, como parte da autorização. O APK não tem INTERNET, mas
+o navegador tem sua própria rede: isso é saída opcional de contexto.
+
+Hospedagem e contas ainda não estão configuradas/testadas. Contrato, retenção
+e limites: [motor embarcado](MOTOR-EMBARCADO-MCP.md) e
+[serviço MCP](../integracoes/mcp/README.md). As seções seguintes descrevem o
+workspace Python local, que não é publicado por este novo serviço.
+
 Extrato bancário é um dos conjuntos de dados pessoais mais reveladores que
 existem: identifica onde você esteve, com quem se relaciona, o que consome e
 quanto ganha. O projeto trata isso como requisito, não como recurso.

@@ -24,6 +24,22 @@ permissions:
   contents: read
 
 jobs:
+  mcp:
+    name: conector MCP comum
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test integracoes/mcp/*.test.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e ".[mcp]"
+      - run: python scripts/verificar-mcp-sdk.py
+
   motor:
     name: motor Python
     runs-on: ubuntu-latest

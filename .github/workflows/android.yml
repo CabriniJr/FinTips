@@ -264,8 +264,14 @@ jobs:
             echo "Não é a tela Compose nativa, e a compilação não prova fluidez,"
             echo "seletor de arquivos nem lifecycle no aparelho."
             echo
-            echo "Sem permissão \`INTERNET\`, sem analytics, sem upload."
-            echo "Seus dados ficam no aparelho."
+            echo "Motor Kotlin ligado à UI: frentes do dia, ritmo de leitura e conferência de saldo OFX."
+            echo "As finanças ainda não oferecem classificação, score ou histórico no APK."
+            echo
+            echo "Sem permissão \`INTERNET\` no APK, sem analytics."
+            echo "Registros completos ficam no aparelho. Contexto mínimo para MCP pode ser"
+            echo "autorizado no navegador, após revisão; servidor HTTPS precisa ser hospedado."
+            echo "Piloto comum para ChatGPT e Claude: somente leitura, snapshot de uma hora."
+            echo "Não há sincronização contínua nem conexão de conta validada nesta build."
             echo
             echo "Confira o download com \`sha256sum -c SHA256SUMS.txt\`."
           } > dist/NOTAS.md

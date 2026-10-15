@@ -6,6 +6,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .mobile-app { padding-bottom: calc(82px + env(safe-area-inset-bottom, 0px)); }
 .skip-link { position: fixed; top: -100px; left: 16px; z-index: 100; background: var(--ink); color: var(--paper); padding: 12px; }
 .skip-link:focus { top: 12px; }
+.skip-link:not(:focus) { clip-path: inset(50%); }
 .life-topbar { background: var(--paper); padding-top: env(safe-area-inset-top, 0px); border-bottom: 1px solid var(--line-2); }
 .life-topbar-in { max-width: 1040px; margin: auto; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .life-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.7px; line-height: 1.1; }

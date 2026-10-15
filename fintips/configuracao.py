@@ -26,10 +26,9 @@ sem proveniência —, aplicada ao próprio app em vez de aos dados da pessoa.
 
 ## O que esta tela deliberadamente não tem
 
-Não há login, não há conta, não há "sincronizar", não há exportar-para-nuvem e
-não há telemetria para desligar — **porque não há telemetria para existir**.
-Um interruptor de "enviar dados anônimos de uso", mesmo desligado por padrão,
-ensinaria que existe um caminho de saída. Não existe.
+Não há conta central nem sincronização contínua. O APK pode abrir o navegador
+para autorizar um snapshot mínimo no MCP remoto, após revisão. Isso é saída
+opcional de dados e precisa aparecer na declaração. Telemetria continua ausente.
 """
 
 from __future__ import annotations
@@ -39,26 +38,30 @@ from pathlib import Path
 
 from . import licencas as lic
 
-CONFIG_SCHEMA = 1
+CONFIG_SCHEMA = 2
 
-# O que a ficha de Segurança dos Dados da Play Store pergunta, e a resposta
-# deste app. Os valores são os da ficha, não paráfrases: "nenhum dado
-# coletado" é uma opção específica do formulário, e respondê-la em outras
-# palavras é respondê-la errado.
-DADOS_COLETADOS: list[dict] = []
+# Rascunho de transparência, não ficha submetida à Play Store. null recusa
+# afirmar "nenhuma coleta" enquanto a hospedagem do conector não está definida.
+DADOS_COLETADOS: list[dict] = [{"tipo": "indicadores_reduzidos", "opcional": True,
+                               "quando": "snapshot revisado e autorizado no navegador"}]
 
 SEGURANCA_DOS_DADOS = {
-    "coleta_dados": False,
-    "compartilha_com_terceiros": False,
-    "dados_em_transito_criptografados": None,   # não há trânsito
+    "coleta_dados": None,
+    "coleta_automatica": False,
+    "compartilha_com_terceiros": True,
+    "compartilhamento_opcional": True,
+    "declaracao_play_store": "pendente de revisão com a hospedagem definida",
+    "dados_em_transito_criptografados": True,  # fluxo remoto limitado a HTTPS
     "permite_excluir_dados": True,
     "como_excluir": (
-        "desinstalar o app apaga tudo, porque não há cópia em lugar nenhum. "
-        "Dentro do app, cada registro é apagável individualmente"
+        "cada registro local é apagável; desinstalar apaga os dados do app. "
+        "Revogue snapshots pelo navegador; eles expiram em uma hora. Cópias "
+        "em Downloads e mensagens já recebidas pela IA são independentes"
     ),
     "por_que_nao_coleta": (
-        "o app não tem permissão de rede. Não é política: é o manifesto — sem "
-        "`android.permission.INTERNET` não existe requisição a fazer"
+        "sem `android.permission.INTERNET`, o APK não transmite diretamente. "
+        "O navegador externo pode enviar o contexto mínimo após revisão e "
+        "confirmação. Isso não torna os indicadores anônimos"
     ),
 }
 
@@ -169,9 +172,9 @@ def montar(ws, raiz: str | Path = ".", executavel: str = "") -> dict:
             "sem_permissao_de_rede": "android.permission.INTERNET" not in permissoes,
             "backup_automatico": _flag_do_manifesto(raiz, "android:allowBackup"),
             "resumo": (
-                "o app não tem permissão de rede. Sem ela não há requisição a "
-                "fazer, então não há o que enviar — nem por engano, nem por "
-                "atualização futura que ninguém leu"
+                "o APK não tem permissão de rede. O vínculo MCP opcional abre "
+                "um navegador externo com indicadores mínimos revisados. "
+                "Registros completos permanecem no aparelho"
             ),
             "seguranca_dos_dados": SEGURANCA_DOS_DADOS,
         },
@@ -179,8 +182,9 @@ def montar(ws, raiz: str | Path = ".", executavel: str = "") -> dict:
             "arquivos": onde_os_dados_moram(ws),
             "nada_sincroniza": True,
             "aviso": (
-                "desinstalar apaga tudo, porque não existe cópia em lugar "
-                "nenhum. Se quiser guardar, copie a pasta do workspace"
+                "o workspace é local e independente da instalação do programa. "
+                "Cópias e mensagens já recebidas pela IA são independentes; "
+                "revogar um snapshot não apaga essas cópias"
             ),
         },
         "ia": ligacao_com_a_ia(ws, executavel),
@@ -195,10 +199,10 @@ def montar(ws, raiz: str | Path = ".", executavel: str = "") -> dict:
             ),
         },
         "o_que_nao_existe_aqui": [
-            "login e conta",
+            "conta central do FinTips",
             "sincronização entre aparelhos",
-            "exportar para a nuvem",
-            "telemetria — nem desligada, porque não há caminho de saída",
+            "sincronização contínua do contexto remoto",
+            "telemetria — nenhum coletor ou analytics",
         ],
     }
 

@@ -6,6 +6,11 @@ a linguagem Evangelion aprovada, alto contraste e movimento acessível.
 
 ## Estado real
 
+Alpha 4: a UI WebView já chama o motor Kotlin para frentes, pacing e conferência
+OFX, preservando os registros anteriores. Vínculo MCP é preparado no app e
+confirmado no navegador; servidor HTTPS e uso nas contas ainda pendentes.
+[Contrato e aceites](MOTOR-EMBARCADO-MCP.md). A nota sobre a v2 abaixo é histórica.
+
 O APK v2 de avaliação abre a UI web empacotada em WebView offline. O módulo
 Kotlin/Compose compila, mas oferece apenas a tela do dia no alvo release.
 Cinco abas no APK não comprovam cinco telas Compose. Não substituir o APK
