@@ -13,7 +13,7 @@ android {
         minSdk = 26
         targetSdk = 34
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 7
+        versionCode = 8
         versionName = "0.6.0"
     }
     buildFeatures { compose = true }
@@ -33,7 +33,7 @@ android {
         getByName("debug") {
             val ci = providers.gradleProperty("fintips.ciPreview").orNull == "true"
             applicationIdSuffix = if (ci) ".ci" else ".ui"
-            versionNameSuffix = if (ci) "-ci" else "-ui-preview.7"
+            versionNameSuffix = if (ci) "-ci" else "-ui-preview.8"
             manifestPlaceholders["previewLabel"] = if (ci) "FinTips CI" else "FinTips UI"
         }
     }

@@ -1,5 +1,10 @@
 # APK para avaliar a UI
 
+**Atualização preview 8:** chat de triagem embarcado, chave OpenAI em Keystore,
+valores com aliases e contratos universais. Confirmação aplica lotes nas abas
+ou no catálogo local. [Avaliação e limites](TRIAGEM-CONVERSACIONAL.md).
+
+
 **Estado atual — preview 7:** ponte HTTPS/OAuth para ChatGPT e Claude e cliente
 WSS Android implementados. O motor e os registros ficam no celular; cada
 consulta usa o mesmo MCP local, com áreas aprovadas por conector e sem snapshot

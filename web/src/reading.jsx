@@ -1,3 +1,4 @@
+import { CLIENT_STATE_KEY, writeSlice } from "./client-state.js";
 import React, { useCallback, useEffect, useState } from "react";
 import { Icon } from "./icons.jsx";
 import { Sheet, closeSheet } from "./life.jsx";
@@ -24,12 +25,12 @@ function useReading() {
     try {
       const next = transform(readReading(localStorage));
       if (!validateReading(next)) throw new Error("estado inválido");
-      localStorage.setItem(READING_KEY, JSON.stringify(next)); setState(next); setIssue(""); dispatchEvent(new Event("fintips:reading-changed")); return true;
+      writeSlice(localStorage, READING_KEY, "leitura", next); setState(next); setIssue(""); dispatchEvent(new Event("fintips:reading-changed")); return true;
     } catch { setIssue("Não foi possível salvar os registros de leitura no aparelho. A alteração não foi gravada."); return false; }
   }, [blocked]);
   useEffect(() => {
     const refresh = (e) => {
-      if (e.key !== READING_KEY && e.key !== null) return;
+      if (e.key !== READING_KEY && e.key !== CLIENT_STATE_KEY && e.key !== null) return;
       try { setState(readReading(localStorage)); setBlocked(false); setIssue(""); }
       catch { setBlocked(true); setIssue("Não foi possível ler os registros de leitura. A edição foi pausada para preservá-los."); }
     };
@@ -189,7 +190,7 @@ export function ReadingTracker({ toast }) {
   const close = () => setMode(null);
   const backup = () => {
     try {
-      const raw = localStorage.getItem(READING_KEY) || JSON.stringify(store.state);
+      const raw = JSON.stringify(store.state);
       const url = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
       const link = document.createElement("a"); link.href = url; link.download = `fintips-leitura-${localDay()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
       toast("Cópia local dos livros criada. Guarde-a com cuidado.");

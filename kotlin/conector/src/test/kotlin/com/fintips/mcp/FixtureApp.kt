@@ -16,6 +16,8 @@ fun main() {
     }
     val trust = HandshakeCertificates.Builder().addTrustedCertificate(cert).build()
     val client = OkHttpClient.Builder().sslSocketFactory(trust.sslSocketFactory(), trust.trustManager).build()
+    val ai=config["api_origin"]?.jsonPrimitive?.content?.let { OpenAITriagem(client,it+"/v1/responses") }
+    var configured=false
     var ponte: PonteRemota? = null
     fun ponteState() = ponte?.estado() ?: buildJsonObject { put("ativo", false) }
     SessaoLocal().use { local ->
@@ -28,6 +30,12 @@ fun main() {
                     val i = r["input"]!!.jsonObject
                     fun string(key: String) = i[key]!!.jsonPrimitive.content
                     when (op) {
+                        "triagem.chave_status" -> buildJsonObject { put("configurada",configured) }
+                        "triagem.configurar_chave" -> { configured=true; buildJsonObject { put("status","dialogo_solicitado") } }
+                        "triagem.apagar_chave" -> { configured=false; ai?.cancelar(); buildJsonObject { put("configurada",false) } }
+                        "triagem.cancelar" -> { ai?.cancelar(); buildJsonObject { put("status","cancelado") } }
+                        "triagem.sugerir" -> { check(configured); ai!!.sugerir(i["bundle"]!!.jsonObject,i["rascunhos"]!!.jsonArray,"sk-"+"T".repeat(40),i["autorizado"]==JsonPrimitive(true),string("hoje")) }
+
                         "servidor.status" -> local.estado()
                         "servidor.iniciar" -> { val s = local.iniciar(i["context"]!!.jsonObject); local.verificar(s["sessao"]!!.jsonPrimitive.content) }
                         "servidor.encerrar" -> { ponte?.close(); ponte = null; local.encerrar() }
@@ -45,10 +53,10 @@ fun main() {
                         "ponte.copiar_endpoint", "ponte.abrir_cliente" -> buildJsonObject { put("status", "ok") }
                         else -> executarMotorLocal(op, i)
                     }
-                } catch (_: Exception) { buildJsonObject { put("harness_error", true) } }
+                } catch (e: Exception) { buildJsonObject { put("harness_error", true);put("harness_class",e.javaClass.simpleName);if(e is FalhaTriagem) put("code",e.codigo) } }
                 println(result); System.out.flush()
             }
-        } finally { ponte?.close() }
+        } finally { ponte?.close(); ai?.cancelar() }
     }
     client.dispatcher.executorService.shutdown(); client.connectionPool.evictAll()
 }

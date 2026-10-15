@@ -1,5 +1,6 @@
 package com.fintips.motor
 
+import com.fintips.motor.triagem.executarTriagem
 import com.fintips.motor.ofx.lerOfx
 import com.fintips.motor.vida.*
 import kotlinx.datetime.LocalDate
@@ -65,7 +66,7 @@ fun executarMotorLocal(operacao: String, i: JsonObject): JsonObject = when (oper
             put("conciliado", c.bate); put("diferenca_centavos", c.diferenca.centavos)
         }
     }
-    else -> error("operação indisponível")
+    else -> if (operacao.startsWith("triagem.")) executarTriagem(operacao, i) else error("operação indisponível")
 }
 
 private fun JsonObject.array(k: String) = this[k]!!.jsonArray

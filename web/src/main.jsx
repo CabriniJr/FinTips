@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { api } from "./lib.js";
 import { ForecastView, LeversView, ProfileView } from "./profile.jsx";
+import { TriageChat } from "./triagem-chat.jsx";
 import { TriageView } from "./triage.jsx";
 import { Data, Fixed, Overview, Plans, Spending } from "./views.jsx";
 import { LifeAreas, LifePlans, PageHeading, PhoneContext, Today, useLocalLife } from "./life.jsx";
@@ -24,11 +25,11 @@ const NAV = [["hoje", "Hoje", "today"], ["vida", "Vida", "life"], ["visao", "Fin
   ["projetos", "Planos", "plans"], ["contexto", "Contexto", "context"]];
 function route() {
   const [page, area] = location.hash.slice(1).split("/");
-  const known = page === "ia" || [...NAV, ...FINANCE].some(([id]) => id === page);
+  const known = ["ia", "conversa"].includes(page) || [...NAV, ...FINANCE].some(([id]) => id === page);
   return { page: known ? page : "hoje", area: AREAS.some((a) => a.id === area) ? area : "FOR" };
 }
-const pageGroup = (page) => page === "ia" ? "contexto" : FINANCE.some(([id]) => id === page) ? "visao" : page;
-const motionGroup = (page) => page === "ia" ? "ia" : pageGroup(page);
+const pageGroup = (page) => ["ia", "conversa"].includes(page) ? "contexto" : FINANCE.some(([id]) => id === page) ? "visao" : page;
+const motionGroup = (page) => ["ia", "conversa"].includes(page) ? page : pageGroup(page);
 
 function FinanceEmpty({ erro, reload, toast }) {
   const [file, setFile] = useState(null);
@@ -100,6 +101,7 @@ function App() {
       {current.page === "vida" && <LifeAreas life={life} selectedDay={day} areaId={current.area} setArea={openArea} toast={toast} ir={ir}/>}
       {current.page === "projetos" && <LifePlans life={life} toast={toast} ir={ir}/>}
       {current.page === "contexto" && <PhoneContext life={life} toast={toast}/>}
+      {current.page === "conversa" && <TriageChat toast={toast}/>}
       {current.page === "ia" && <ConnectAI life={life} toast={toast} syncIssue={syncIssue}/>}
       {financeiro && isAndroid() && <NativeFinance/>}
       {financeiro && !isAndroid() && <div className="finance-content"><PageHeading code="03" overline="Reserva, escolhas e metas" title="Finanças" description="Entenda o presente. Abra espaço para seus planos."/>

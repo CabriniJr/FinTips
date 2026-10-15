@@ -25,4 +25,4 @@ build-backend = "setuptools.build_meta"
 include = ["fintips*"]
 
 [tool.setuptools.package-data]
-fintips = ["rules/*.yaml", "web/index.html", "web/assets/*"]
+fintips = ["rules/*.yaml", "rules/*.json", "web/NOTICE-ponte.txt", "web/index.html", "web/assets/*"]
