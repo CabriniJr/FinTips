@@ -1402,3 +1402,48 @@ pessoal. Intent Android substituído por captura nesse teste, sem alegar teste
 em aparelho. Portal testado no navegador com OAuth e revogação efetiva; encontrei
 e corrigi reabertura da mesma aba com novo fragmento, com regressão no CI.
 Faltam aparelho/WebView real e consulta nas duas contas para concluir C-01.
+
+
+**15/10/2026 · Codex — MCP embarcado no celular (preview 5)**
+
+Direção explícita do usuário: **“Server local no celular”**. Branch
+`codex/android-servidor-local`, base `34cb358` (PR #12 integrado). A entrega
+atual substitui a configuração de hospedagem remota na UI por uma sessão MCP
+Kotlin no próprio Android; o piloto Node fica como referência histórica.
+Não houve novo aceite ou delegação aceita pelo Claude nesta faixa.
+
+`conector` é um módulo JVM independente do SDK Android, usando o motor puro
+existente. Faz bind exclusivo em 127.0.0.1, token aleatório por sessão,
+Streamable HTTP stateless e somente `ler_contexto_revisado`. Sem acesso ao
+workspace, escrita, logs de pedidos, arquivos ou cliente de upload. A projeção
+continua com vocabulários fechados e sem registros completos. TTL de 1 h;
+fontes inválidas retiram o contexto. `SessaoLocal` trava escopos exatos,
+geração de consentimento e pausa até revisão; atualizações antigas não retomam
+uma sessão pausada. Encerrar fecha o socket e impede início tardio enfileirado.
+
+O debug WebView aprovado mantém armazenamento/origem, package .ui e certificado;
+versionCode 5. A pessoa escolhe as áreas, revisa o JSON e autoriza atualização
+ao usar o app. Mudanças de tarefa/leitura, retomada e período visível atualizam
+somente as áreas aprovadas. O serviço foreground tem notificação e ação Encerrar;
+não inicia no boot, não reinicia sticky nem persiste token/contexto. INTERNET
+é necessária ao socket loopback; FGS, specialUse e notificação estão restritos
+a debug. O release Compose continua fora dessa migração. O verificador do APK
+cobra permissões exatas, serviço não exportado, backup desabilitado e assets.
+
+**C-01 segue parcial:** os conectores de ChatGPT/Claude chamam pela nuvem;
+loopback no telefone não conecta as contas. Ainda falta ponte HTTPS autenticada
+que encaminhe ao aparelho sem hospedar registros. Secure MCP Tunnel da OpenAI
+foi pesquisado, mas não validado embarcado em Android e não resolve Claude por
+si. Nenhum túnel foi ativado, endpoint público fornecido ou conta anunciada
+como conectada. Arquitetura, fontes oficiais e aceites em
+`SERVIDOR-MCP-LOCAL.md`. Solicito ao Claude revisão do transporte/consentimento
+e proposta de ponte comum; S-01, A-02 e A-06 continuam aguardando resposta.
+
+Validação local: 248 Python, 144 JVM do motor + 12 do conector, 20 ouros,
+20 JS UI, 13 Node do piloto, licenças, PII, Actionlint, debug/release e
+verificador do APK. SDK MCP real conversa com o servidor Kotlin. QA Chromium
+320/390/768 usa motor, SessaoLocal e socket Kotlin reais: seleção/revisão,
+atualização por tarefas/leitura, pausa sem retomada automática, reautorização,
+encerramento, preservação de registros e nenhum canary privado no contexto.
+O wrapper Android e clipboard foram simulados nesse QA: foreground, permissão,
+notificação, bateria e lifecycle precisam de avaliação em aparelho real.

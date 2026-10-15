@@ -1,5 +1,10 @@
 # FinTips MCP · contexto revisado
 
+**Piloto remoto anterior (preview 4).** A partir da preview 5, o produto usa
+[servidor Kotlin no celular](../../docs/SERVIDOR-MCP-LOCAL.md). Este serviço
+Node fica como referência testada; não é dependência nem destino automático
+dos registros do APK atual. A ponte até os chats permanece pendente.
+
 Um endpoint **`/mcp`** para ChatGPT e Claude. O motor roda no Android; este
 serviço consulta somente um snapshot mínimo aprovado no aparelho. Não importa
 `fintips.mcp_server`, não monta um workspace e não recebe OFX, arquivos do

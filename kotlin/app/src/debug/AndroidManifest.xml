@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Socket somente em 127.0.0.1; INTERNET é necessária também para loopback. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application android:label="${previewLabel}" tools:replace="android:label">
+        <service android:name=".McpLocalService" android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="User-started loopback-only MCP server for approved local context, with ongoing notification and stop action. No remote interface or automatic boot start." />
+        </service>
         <activity android:name=".MainActivity" android:enabled="false">
             <intent-filter tools:node="removeAll" />
         </activity>

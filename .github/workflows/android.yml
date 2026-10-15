@@ -152,7 +152,7 @@ jobs:
 
       - name: compilar
         working-directory: kotlin
-        run: ./gradlew -Pfintips.android=true :motor:jvmTest :app:assembleDebug :app:assembleRelease --no-daemon
+        run: ./gradlew -Pfintips.android=true :motor:jvmTest :conector:test :app:assembleDebug :app:assembleRelease --no-daemon
 
       - name: verificar o APK e os assets embarcados
         env:
@@ -267,11 +267,13 @@ jobs:
             echo "Motor Kotlin ligado à UI: frentes do dia, ritmo de leitura e conferência de saldo OFX."
             echo "As finanças ainda não oferecem classificação, score ou histórico no APK."
             echo
-            echo "Sem permissão \`INTERNET\` no APK, sem analytics."
-            echo "Registros completos ficam no aparelho. Contexto mínimo para MCP pode ser"
-            echo "autorizado no navegador, após revisão; servidor HTTPS precisa ser hospedado."
-            echo "Piloto comum para ChatGPT e Claude: somente leitura, snapshot de uma hora."
-            echo "Não há sincronização contínua nem conexão de conta validada nesta build."
+            echo "Servidor MCP Kotlin embarcado no celular, somente em 127.0.0.1 e com token por sessão."
+            echo "Inicie/encerre em Contexto → Servidor IA local. Serviço com notificação de controle."
+            echo "INTERNET é usada para o socket local; não há túnel, upload automático ou analytics."
+            echo "Indicadores autorizados são recalculados ao usar o FinTips; registros completos ficam locais."
+            echo "Sem atualização por uma hora, a ferramenta informa indisponibilidade."
+            echo "ChatGPT e Claude na nuvem ainda precisam de uma ponte HTTPS/túnel autenticado."
+            echo "As contas não estão conectadas nesta build. A UI continua WebView com assets locais."
             echo
             echo "Confira o download com \`sha256sum -c SHA256SUMS.txt\`."
           } > dist/NOTAS.md

@@ -304,7 +304,7 @@ export function PhoneContext({ life, toast }) {
   return <>
     <PageHeading code="05" overline="Sinais da rotina" title="Contexto" description="O que seu celular pode contar, sob seu controle."/>
     <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros completos ficam no aparelho. A coleta automática ainda não está ativa. Você pode preparar um contexto mínimo para autorizar por MCP.</p></div></section>
-    <button className="context-prompt" onClick={() => { location.hash = "ia"; }}><span className="area-icon"><Icon name="context"/></span><span><strong>Conectar ChatGPT e Claude</strong><small>Mesmo MCP · revise o contexto · vínculo e revogação</small></span><Icon name="arrow" size={18}/></button>
+    <button className="context-prompt" onClick={() => { location.hash = "ia"; }}><span className="area-icon"><Icon name="context"/></span><span><strong>Servidor IA local</strong><small>Motor e MCP no celular · revisão e controle</small></span><Icon name="arrow" size={18}/></button>
     <section className="life-card"><div className="section-head"><h2>Seu tempo de tela</h2><span className="manual-tag">Registro manual</span></div>
       <label className="usage-date">Dia do registro<input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)}/></label>
       {!data.length ? <Empty icon="clock" title="Antes de concluir, observe">Registre o tempo que aparece nas configurações do celular. Não temos acesso automático aos seus apps nesta versão.</Empty>

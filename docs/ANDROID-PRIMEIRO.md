@@ -6,6 +6,11 @@ a linguagem Evangelion aprovada, alto contraste e movimento acessível.
 
 ## Estado real
 
+Preview 5: o APK embarca servidor MCP Kotlin em loopback, iniciado e encerrado
+pelo app/notificação, com atualização local das áreas autorizadas. Ponte até
+ChatGPT/Claude continua pendente. [Contrato](SERVIDOR-MCP-LOCAL.md).
+A descrição da alpha 4 a seguir é histórica.
+
 Alpha 4: a UI WebView já chama o motor Kotlin para frentes, pacing e conferência
 OFX, preservando os registros anteriores. Vínculo MCP é preparado no app e
 confirmado no navegador; servidor HTTPS e uso nas contas ainda pendentes.

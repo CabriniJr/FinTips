@@ -9,6 +9,7 @@ import { AREAS, localDay } from "./life-store.js";
 import { Icon } from "./icons.jsx";
 import { ConnectAI } from "./connect-ai.jsx";
 import { NativeFinance } from "./native-finance.jsx";
+import { useLocalMcpSync } from "./local-mcp-sync.js";
 import { isAndroid } from "./native-motor.js";
 import { useRouteMotion, useTouchFeedback } from "./motion.js";
 import "./styles.css";
@@ -27,6 +28,7 @@ function route() {
   return { page: known ? page : "hoje", area: AREAS.some((a) => a.id === area) ? area : "FOR" };
 }
 const pageGroup = (page) => page === "ia" ? "contexto" : FINANCE.some(([id]) => id === page) ? "visao" : page;
+const motionGroup = (page) => page === "ia" ? "ia" : pageGroup(page);
 
 function FinanceEmpty({ erro, reload, toast }) {
   const [file, setFile] = useState(null);
@@ -50,7 +52,8 @@ function FinanceEmpty({ erro, reload, toast }) {
 
 function App() {
   const life = useLocalLife();
-  const { current, target, phase } = useRouteMotion(route, pageGroup);
+  const syncIssue = useLocalMcpSync(life);
+  const { current, target, phase } = useRouteMotion(route, motionGroup);
   useTouchFeedback();
   const [day, setDay] = useState(localDay);
   const [ctx, setCtx] = useState(null);
@@ -97,7 +100,7 @@ function App() {
       {current.page === "vida" && <LifeAreas life={life} selectedDay={day} areaId={current.area} setArea={openArea} toast={toast} ir={ir}/>}
       {current.page === "projetos" && <LifePlans life={life} toast={toast} ir={ir}/>}
       {current.page === "contexto" && <PhoneContext life={life} toast={toast}/>}
-      {current.page === "ia" && <ConnectAI life={life} toast={toast}/>}
+      {current.page === "ia" && <ConnectAI life={life} toast={toast} syncIssue={syncIssue}/>}
       {financeiro && isAndroid() && <NativeFinance/>}
       {financeiro && !isAndroid() && <div className="finance-content"><PageHeading code="03" overline="Reserva, escolhas e metas" title="Finanças" description="Entenda o presente. Abra espaço para seus planos."/>
         <div className="finance-tabs" aria-label="Seções financeiras">{FINANCE.map(([id, label]) => <button key={id} aria-pressed={current.page === id} onClick={() => ir(id)}>{label}{id === "triagem" && ctx?.triagem?.resumo?.abertos > 0 && <span className="finance-count">{ctx.triagem.resumo.abertos}</span>}</button>)}</div>

@@ -26,9 +26,10 @@ sem proveniência —, aplicada ao próprio app em vez de aos dados da pessoa.
 
 ## O que esta tela deliberadamente não tem
 
-Não há conta central nem sincronização contínua. O APK pode abrir o navegador
-para autorizar um snapshot mínimo no MCP remoto, após revisão. Isso é saída
-opcional de dados e precisa aparecer na declaração. Telemetria continua ausente.
+Não há conta central. O APK de avaliação mantém um servidor MCP loopback
+iniciado pela pessoa, com contexto mínimo e token por sessão. Clientes MCP
+podem usar esse contexto; uma ponte para as nuvens não está embarcada.
+Telemetria continua ausente. Revogações do piloto remoto anterior usam navegador.
 """
 
 from __future__ import annotations
@@ -43,25 +44,29 @@ CONFIG_SCHEMA = 2
 # Rascunho de transparência, não ficha submetida à Play Store. null recusa
 # afirmar "nenhuma coleta" enquanto a hospedagem do conector não está definida.
 DADOS_COLETADOS: list[dict] = [{"tipo": "indicadores_reduzidos", "opcional": True,
-                               "quando": "snapshot revisado e autorizado no navegador"}]
+                               "quando": "contexto mínimo autorizado para clientes MCP locais"}]
 
 SEGURANCA_DOS_DADOS = {
     "coleta_dados": None,
     "coleta_automatica": False,
     "compartilha_com_terceiros": True,
     "compartilhamento_opcional": True,
-    "declaracao_play_store": "pendente de revisão com a hospedagem definida",
-    "dados_em_transito_criptografados": True,  # fluxo remoto limitado a HTTPS
+    "declaracao_play_store": "pendente de revisão dos clientes MCP e eventual ponte",
+    "dados_em_transito_criptografados": False,  # HTTP somente em loopback
+    "transporte_atual": "HTTP loopback com bearer; sem túnel ou envio externo automático",
     "permite_excluir_dados": True,
     "como_excluir": (
         "cada registro local é apagável; desinstalar apaga os dados do app. "
-        "Revogue snapshots pelo navegador; eles expiram em uma hora. Cópias "
-        "em Downloads e mensagens já recebidas pela IA são independentes"
+        "encerre o servidor local para apagar o contexto e revogar o token. "
+        "Snapshots do piloto remoto anterior podem ser revogados no navegador. "
+        "Cópias em Downloads e mensagens já recebidas pelos clientes são independentes"
     ),
     "por_que_nao_coleta": (
-        "sem `android.permission.INTERNET`, o APK não transmite diretamente. "
-        "O navegador externo pode enviar o contexto mínimo após revisão e "
-        "confirmação. Isso não torna os indicadores anônimos"
+        "a variante debug usa `android.permission.INTERNET` para escutar "
+        "somente em 127.0.0.1; não há cliente de upload ou túnel automático. "
+        "Um cliente MCP autorizado pode ler os indicadores reduzidos; "
+        "o navegador externo ainda atende revogações do piloto anterior. "
+        "Isso não torna os indicadores anônimos"
     ),
 }
 
@@ -172,9 +177,10 @@ def montar(ws, raiz: str | Path = ".", executavel: str = "") -> dict:
             "sem_permissao_de_rede": "android.permission.INTERNET" not in permissoes,
             "backup_automatico": _flag_do_manifesto(raiz, "android:allowBackup"),
             "resumo": (
-                "o APK não tem permissão de rede. O vínculo MCP opcional abre "
-                "um navegador externo com indicadores mínimos revisados. "
-                "Registros completos permanecem no aparelho"
+                "o servidor MCP da variante debug aceita só loopback e token "
+                "da sessão. Permissão de rede é necessária para o socket "
+                "local; WebView continua restrito aos assets do aparelho. "
+                "Registros completos permanecem no client"
             ),
             "seguranca_dos_dados": SEGURANCA_DOS_DADOS,
         },

@@ -1,5 +1,11 @@
 # Scores, fontes automáticas e conexão com o chat
 
+> Atualização preview 5: o motor e o servidor MCP rodam no Android, em loopback.
+> C-01 ainda exige ponte autenticada para as contas ChatGPT/Claude;
+> [arquitetura e limites atuais](SERVIDOR-MCP-LOCAL.md). Nenhuma fonte de
+> UsageStats ou check-in foi ativada por essa mudança.
+
+
 Pedido em 14/10/2026: vários scores e um agregado com gauges dinâmicos,
 leitura/tempo de celular/academia automáticos e conector dentro de Claude ou
 ChatGPT. O usuário confirmou: comprometimento é **cumprimento das metas que
