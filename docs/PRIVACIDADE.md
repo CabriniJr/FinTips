@@ -1,5 +1,18 @@
 # Privacidade e PII
 
+## Android preview 8: triagem com valores e labels abstratas
+
+O usuário autorizou números, relações e componentes de cálculo com aliases;
+manteve nomes e origem/destino reais no client. A triagem reconstrói o contexto
+por schema, em Kotlin, sem encaminhar conversa, títulos, descrições, IDs ou
+datas exatas. A correspondência dos aliases fica no aparelho. A API só sugere
+opções e números válidos; gravar exige confirmação local do lote.
+
+A conexão OpenAI é direta pelo Android, opcional e separada do MCP. Chave cifrada
+com Android Keystore, digitada em janela nativa, fora do WebView, backups e
+relay. `store: false` não equivale a retenção zero; valores abstratos ainda
+revelam rotina. [Fronteira, persistência e API](TRIAGEM-CONVERSACIONAL.md).
+
 ## Android preview 7: motor local, consulta remota autorizada
 
 O motor e o servidor MCP vivem no Android, em `127.0.0.1`, com bearer em

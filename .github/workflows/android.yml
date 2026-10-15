@@ -269,6 +269,16 @@ jobs:
             echo
             echo "Servidor MCP Kotlin embarcado no celular, somente em 127.0.0.1 e com token por sessão."
             echo "Inicie/encerre em Contexto → Servidor IA local. Serviço com notificação de controle."
+            echo "Preview 8: chat de triagem em Contexto → Vamos organizar seus planos?"
+            echo "14 contratos, perguntas curtas, rascunhos e confirmação de um lote no aparelho."
+            echo "Tarefas, planos, livros e tempo de uso entram nas abas existentes."
+            echo "Outros tipos ficam no catálogo local; ainda não alimentam o cálculo financeiro."
+            echo "OpenAI opcional: chave cifrada com Android Keystore e valores com aliases."
+            echo "A conversa, nomes e origem/destino reais ficam no client; não vão para a API."
+            echo "A cobrança usa a conta API da pessoa. Nenhuma chave de produção foi usada nos testes."
+            echo "As cópias locais incluem vida, leitura, catálogo e conversa, sem a chave."
+            echo "Contrato e API local: docs/TRIAGEM-CONVERSACIONAL.md."
+            echo
             echo "Preview 7: ponte HTTPS/OAuth comum para ChatGPT e Claude, com WSS de saída pelo Android."
             echo "Cada consulta chega ao mesmo MCP local; não há snapshot remoto reutilizado."
             echo "Aprovação e revogação por conector; somente indicadores revisados saem do telefone."

@@ -1,3 +1,4 @@
+import { readSlice } from "./client-state.js";
 // Estado exclusivamente no client. Não é enviado à API financeira ou ao MCP.
 export const STORAGE_KEY = "fintips.vida.v1";
 export const AREAS = [
@@ -43,7 +44,7 @@ export function validateLife(value) {
 }
 
 export function readLife(storage) {
-  const raw = storage.getItem(STORAGE_KEY);
+  const raw = readSlice(storage, STORAGE_KEY, "vida");
   if (!raw) return emptyLife();
   const parsed = JSON.parse(raw);
   if (!validateLife(parsed)) throw new Error("estado local inválido");

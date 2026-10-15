@@ -1,3 +1,5 @@
+import { CLIENT_STATE_KEY, writeSlice } from "./client-state.js";
+import { backupAll } from "./triagem-store.js";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AREAS, STORAGE_KEY, dailyProgress, emptyLife, isDone, localDay, newId,
   readLife, removeTask, shiftDay, tasksForDay, toggleTask, validateLife } from "./life-store.js";
@@ -20,7 +22,7 @@ export function useLocalLife() {
     try {
       const next = transform(readLife(localStorage));
       if (!validateLife(next)) throw new Error("estado inválido");
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      writeSlice(localStorage, STORAGE_KEY, "vida", next);
       setState(next); setIssue(""); return true;
     } catch {
       setIssue("Não foi possível salvar no aparelho. Sua alteração não foi gravada. Verifique o espaço e tente novamente.");
@@ -29,7 +31,7 @@ export function useLocalLife() {
   }, [blocked]);
   useEffect(() => {
     const refresh = (event) => {
-      if (event.key !== STORAGE_KEY && event.key !== null) return;
+      if (event.key !== STORAGE_KEY && event.key !== CLIENT_STATE_KEY && event.key !== null) return;
       try { setState(readLife(localStorage)); setBlocked(false); setIssue(""); }
       catch { setBlocked(true); setIssue("Os dados locais não puderam ser lidos. A edição foi pausada para preservar seus registros."); }
     };
@@ -164,7 +166,7 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
   const isToday = selectedDay === localDay();
   return <>
     <PageHeading overline={isToday ? "Rotina diária" : "Histórico da rotina"} title={isToday ? "Hoje" : "Seu dia"}
-      description="Seu dia, em seis áreas da vida."/>
+      description="Seu dia, em seis áreas da vida." action={<a className="life-button" href="#conversa"><Icon name="context" size={18}/>Conversar</a>}/>
     <div className="week-strip" aria-label="Selecionar dia da semana">{Array.from({ length: 7 }, (_, i) => {
       const d = shiftDay(start, i), date = new Date(`${d}T12:00:00`);
       return <button key={d} aria-pressed={d === selectedDay} aria-label={date.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
@@ -294,15 +296,16 @@ export function PhoneContext({ life, toast }) {
   const largest = Math.max(...data.map((m) => m.minutos), 1);
   const backup = () => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY) || JSON.stringify(life.state);
+      const raw = JSON.stringify(backupAll(localStorage));
       const url = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
-      const link = document.createElement("a"); link.href = url; link.download = `fintips-vida-${localDay()}.json`; link.click();
+      const link = document.createElement("a"); link.href = url; link.download = `fintips-local-${localDay()}.json`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       toast("Cópia local criada. Guarde-a com cuidado.");
     } catch { toast("Não foi possível criar a cópia local."); }
   };
   return <>
     <PageHeading code="05" overline="Sinais da rotina" title="Contexto" description="O que seu celular pode contar, sob seu controle."/>
+    <a className="life-card context-chat-entry" href="#conversa"><div><span className="manual-tag">CONVERSA / REGISTRO LOCAL</span><h2>Vamos organizar seus planos?</h2><p>Conte o que você quer fazer. Revise tarefas, livros, metas e vínculos em um lote.</p></div><Icon name="arrow" size={24}/></a>
     <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros completos ficam no aparelho. A coleta automática ainda não está ativa. Você pode preparar um contexto mínimo para autorizar por MCP.</p></div></section>
     <button className="context-prompt" onClick={() => { location.hash = "ia"; }}><span className="area-icon"><Icon name="context"/></span><span><strong>Servidor IA local</strong><small>Motor e MCP no celular · revisão e controle</small></span><Icon name="arrow" size={18}/></button>
     <section className="life-card"><div className="section-head"><h2>Seu tempo de tela</h2><span className="manual-tag">Registro manual</span></div>

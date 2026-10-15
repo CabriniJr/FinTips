@@ -50,7 +50,7 @@ test("estado inválido é recusado sem sobrescrever o armazenamento", () => {
   for (const raw of ["{broken", JSON.stringify({ ...emptyLife(), schema_version: 2 }),
     JSON.stringify({ ...sample(), tarefas: [daily, daily] }),
     JSON.stringify({ ...sample(), registros: [{ tarefaId: "missing", dia: "2026-10-14", origem: "usuario" }] })]) {
-    const storage = { getItem(key) { assert.equal(key, STORAGE_KEY); return raw; },
+    const storage = { getItem(key) { if (key === "fintips.client.v1") return null; assert.equal(key, STORAGE_KEY); return raw; },
       setItem() { assert.fail("dados inválidos não podem ser sobrescritos"); } };
     assert.throws(() => readLife(storage));
   }

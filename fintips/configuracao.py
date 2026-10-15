@@ -46,6 +46,9 @@ CONFIG_SCHEMA = 2
 DADOS_COLETADOS: list[dict] = [{"tipo": "indicadores_reduzidos", "opcional": True,
                                "quando": "consulta MCP local ou da IA após autorizar a ponte e as áreas"}]
 
+DADOS_COLETADOS.append({"tipo": "valores_com_aliases", "opcional": True,
+                       "quando": "assistência OpenAI da triagem, após revisar e autorizar a conversa"})
+
 SEGURANCA_DOS_DADOS = {
     "coleta_dados": None,
     "coleta_automatica": False,
@@ -54,7 +57,7 @@ SEGURANCA_DOS_DADOS = {
     "declaracao_play_store": "pendente da hospedagem concreta da ponte e dos clientes MCP",
     "dados_em_transito_criptografados": False,  # o listener loopback não usa TLS
     "ponte_externa_criptografada": True,  # HTTPS/WSS sem downgrade ou redirect
-    "transporte_atual": "HTTP loopback com bearer; ponte opcional HTTPS/WSS com consulta autorizada",
+    "transporte_atual": "HTTP loopback com bearer; ponte opcional HTTPS/WSS; triagem opcional OpenAI HTTPS",
     "permite_excluir_dados": True,
     "como_excluir": (
         "cada registro local é apagável; desinstalar apaga os dados do app. "
@@ -67,7 +70,9 @@ SEGURANCA_DOS_DADOS = {
         "somente em 127.0.0.1 e para uma ponte HTTPS/WSS opcional. "
         "Cada chat exige autorização por áreas; a consulta recebe indicadores "
         "reduzidos, sem cópia no relay, arquivos ou registros completos. "
-        "o navegador externo ainda atende revogações do piloto anterior. "
+        "Na triagem, números com aliases e cálculos podem ir à OpenAI; texto, nomes, "
+        "datas exatas e origem/destino reais ficam locais. A chave é cifrada no Android Keystore. "
+        "O navegador externo ainda atende revogações do piloto anterior. "
         "Isso não torna os indicadores anônimos"
     ),
 }

@@ -30,6 +30,16 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import androidx.webkit.WebMessageCompat
 import org.json.JSONObject
+import com.fintips.mcp.OpenAITriagem
+import com.fintips.mcp.FalhaTriagem
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonArray
+import android.app.AlertDialog
+import android.widget.EditText
+import android.text.InputType
+import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
 import com.fintips.mcp.FalhaPonte
 import java.io.ByteArrayInputStream
 import java.util.concurrent.Executors
@@ -43,6 +53,9 @@ class PreviewActivity : ComponentActivity() {
     private val io = Executors.newFixedThreadPool(3)
     private val motor = MotorBridge()
     private var closed = false
+    private val triagemAI = OpenAITriagem()
+    private val chaveTriagem by lazy { ChaveTriagem(this) }
+    private var keyDialog: AlertDialog? = null
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         McpLocalService.refreshNotification()
     }
@@ -96,6 +109,7 @@ class PreviewActivity : ComponentActivity() {
                         val op = request.getString("operation").also { operation = it }
                         val input = request.getJSONObject("input")
                         val result = when {
+                            op in setOf("triagem.chave_status", "triagem.configurar_chave", "triagem.apagar_chave", "triagem.sugerir", "triagem.cancelar") -> triagemOperation(op, input)
                             op == "ponte.copiar_endpoint" -> copyLocal(McpLocalService.ponteOperation("ponte.status", JSONObject()).getString("origem") + "/mcp", false)
                             op == "ponte.abrir_cliente" -> openAIClient(input.getString("provedor"))
                             op.startsWith("ponte.") -> McpLocalService.ponteOperation(op, input)
@@ -109,7 +123,8 @@ class PreviewActivity : ComponentActivity() {
                     } catch (e: Exception) {
                         val failure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaMcp>().firstOrNull()
                         val bridgeFailure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaPonte>().firstOrNull()
-                        val message = if (operation?.startsWith("ponte.") == true) mensagemPonte(bridgeFailure?.codigo) else failure?.codigo?.mensagem ?: if (operation?.startsWith("servidor.") == true)
+                        val triageFailure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaTriagem>().firstOrNull()
+                        val message = if (operation?.startsWith("triagem.") == true) mensagemTriagem(triageFailure?.codigo) else if (operation?.startsWith("ponte.") == true) mensagemPonte(bridgeFailure?.codigo) else failure?.codigo?.mensagem ?: if (operation?.startsWith("servidor.") == true)
                             CodigoMcp.DESCONHECIDO.mensagem else "O motor não aceitou este pedido. Confira os dados e tente novamente."
                         JSONObject().put("id", id ?: JSONObject.NULL).put("error", message)
                     }
@@ -186,6 +201,57 @@ class PreviewActivity : ComponentActivity() {
             catch (_: Exception) { notice("Abra o site da IA para configurar o conector MCP.") }
         }
         return JSONObject().put("status", "abertura_solicitada")
+    }
+
+    private fun triagemOperation(op: String, i: JSONObject): JSONObject = when(op) {
+        "triagem.chave_status" -> JSONObject().put("configurada",chaveTriagem.configurada()).put("modelo","gpt-4.1-mini")
+        "triagem.configurar_chave" -> { triagemAI.cancelar(); runOnUiThread { configurarChaveTriagem() }; JSONObject().put("status","dialogo_solicitado") }
+        "triagem.apagar_chave" -> { triagemAI.cancelar(); chaveTriagem.apagar(); JSONObject().put("configurada",false) }
+        "triagem.cancelar" -> { triagemAI.cancelar(); JSONObject().put("status","cancelado") }
+        "triagem.sugerir" -> {
+            val body=Json.parseToJsonElement(i.toString()).jsonObject
+            JSONObject(triagemAI.sugerir(body["bundle"]!!.jsonObject,body["rascunhos"]!!.jsonArray,
+                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje")).toString())
+        }
+        else -> error("operação indisponível")
+    }
+    private fun configurarChaveTriagem() {
+        if(closed || keyDialog?.isShowing==true) return
+        val alreadySecure=window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        val input=EditText(this).apply {
+            inputType=InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            importantForAutofill=android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+            imeOptions=EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+            hint="sk-…";setSingleLine();setPadding(32,24,32,24)
+        }
+        val dialog=AlertDialog.Builder(this,android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle("Chave OpenAI neste aparelho")
+            .setMessage("A chave fica cifrada com Android Keystore e não entra no chat, cópias locais ou MCP. A API recebe só valores e rótulos abstratos após sua autorização. Modelo: gpt-4.1-mini.")
+            .setView(input).setPositiveButton("Guardar",null).setNegativeButton("Cancelar",null).create()
+        keyDialog=dialog
+        dialog.setOnDismissListener {
+            input.text?.clear();keyDialog=null
+            if(!alreadySecure) window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            if(!closed) view.evaluateJavascript("dispatchEvent(new Event('fintips:chave-triagem'))",null)
+        }
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val raw=input.text.toString().trim()
+                try { chaveTriagem.salvar(raw);dialog.dismiss() }
+                catch(_:Exception) { input.error="Chave inválida ou armazenamento indisponível. Nada foi exibido ou enviado." }
+            }
+        }
+        dialog.show();dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+    }
+    private fun mensagemTriagem(code: String?): String = when(code) {
+        "CHAVE" -> "TRIAGEM-02: Configure ou substitua a chave OpenAI neste aparelho."
+        "LIMITE" -> "TRIAGEM-03: A API atingiu um limite. Você pode continuar a triagem local."
+        "CONSENTIMENTO" -> "TRIAGEM-04: Revise e autorize o contexto abstrato antes de usar a API."
+        "CANCELADO" -> "TRIAGEM-05: Consulta cancelada. Seus registros foram preservados."
+        "OCUPADO" -> "TRIAGEM-06: Aguarde a consulta atual ou cancele."
+        "REDE", "RESPOSTA" -> "TRIAGEM-07: A API não retornou uma sugestão válida. Você pode continuar localmente."
+        else -> "TRIAGEM-01: Contrato ou revisão recusados. Nenhum registro foi alterado; confira os campos e a versão da proposta."
     }
 
     private fun mensagemPonte(code: String?): String = when (code) {
@@ -317,6 +383,7 @@ class PreviewActivity : ComponentActivity() {
 
     override fun onDestroy() {
         closed = true
+        triagemAI.cancelar(); keyDialog?.dismiss(); keyDialog=null
         files?.onReceiveValue(null); files = null
         view.removeJavascriptInterface("FinTipsLocal")
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) WebViewCompat.removeWebMessageListener(view, "FinTipsMotor")

@@ -1569,3 +1569,68 @@ Na revisão final da UI, trocar o código OAuth passou a limpar também as área
 selecionadas. Um conector não deve herdar seleções de uma autorização anterior
 interrompida. O QA móvel conferiu esse reinício e os dois estados de consulta
 recebida, além da revogação. Nenhum fetch externo no navegador da UI.
+
+**15/10/2026 · Codex — chat embarcado e contratos universais de triagem (preview 8)**
+
+Pedido: chat Android que tire do usuário o trabalho de registrar/correlacionar,
+com uma API comum para todos os assets. Usuário manteve PII exclusivamente no
+client e esclareceu depois: valores, relações e explicação de cálculos com
+labels abstratas podem passar; nomes e origem/destino reais não. Chave API da
+OpenAI será configurada no próprio app, nunca solicitada na conversa do Codex.
+
+Branch `codex/android-triagem-conversa`, base `2618308`. Faixa nova de contratos
+`fintips/triagem_{universal,openai,api}.py`, `fintips/rules/triagem-catalogo.json`,
+`kotlin/motor/.../triagem/`, `OpenAITriagem.kt`, chat/storage web e chave nativa.
+Compartilhados: adição de router em api.py antes do fallback SPA; gerador de
+ouro (novo arquivo), README, configuração de privacidade, CI e package-data.
+Nenhuma fórmula financeira/score anterior foi alterada. Python continua fonte;
+novo ouro exige a paridade do contrato Kotlin, inclusive erros e hashes.
+
+Fonte única do catálogo gera constante Kotlin e JSON Schema. 14 tipos usam
+as mesmas operações: catalogar/contexto/preparar/validar/aplicar; criação,
+atualização e vínculos explícitos. A confirmação grava todo o bundle numa
+única chave atômica. Base SHA-256, ID/conteúdo e janela de 256 recibos impedem
+replay e confirmação de proposta antiga; janela não limita atualizações novas.
+Os editores de vida/leitura leem e escrevem o estado unificado após a primeira
+confirmação, preservando as chaves anteriores. Exclusão limpa vínculos órfãos.
+Cópia local inclui vida/leitura/catálogo/conversa, sem chave; corrupção exporta
+strings originais em formato de recuperação em vez de apagar a fonte.
+
+Destinos reais desta entrega: planos de vida, tarefas, livros e tempo de uso
+nas abas existentes; outros tipos no catálogo local. **Esses outros ainda não
+alimentam o cálculo financeiro ou sensores.** Não chamar os registros de
+`caderno` de custos/regras já aplicados ao motor financeiro. O usuário pode
+revisar, atualizar e remover esses registros, ou importar proposta de outro
+agente/API local e confirmar no app. Detalhes opcionais ficam recolhidos para
+não transformar a conversa em formulário.
+
+A extração de texto é **local, determinística e limitada**, com revisão. Não
+embutimos LLM local nem enviamos a conversa à OpenAI. O assistente remoto escolhe
+próximas perguntas, valores válidos e sugestões de relação usando projeção
+reconstruída no Kotlin, com números, enums e aliases. Mapa de títulos/IDs,
+texto, datas exatas e origem/destino reais não entram no corpo HTTP. A presença
+dos campos opcionais de origem/destino também é omitida. Pacing e estados de
+evidência reutilizam os motores existentes; ausência não vira zero.
+
+Chave digitada em janela nativa com senha/FLAG_SECURE, cifrada AES-GCM com
+Android Keystore, fora do WebView e backups. HTTPS direto api.openai.com,
+modelo gpt-4.1-mini, Structured Outputs, store=false, sem redirects ou retries
+automáticos. Até 20 consultas por conversa; cancelamento e retomada local.
+Nenhuma chave real foi usada. Store=false não é promessa de retenção zero e
+números abstratos não são anunciados como anônimos. MCP/relay/grants existentes
+permanecem com sua allowlist própria; a triagem não conecta contas nem abre um
+novo endpoint público de escrita.
+
+Validações locais até aqui: 261 Python, 147 motor JVM, 22 conector, 25 JS,
+21 ouros, catálogo/schema gerados, builds Android debug/release/instrumentação.
+Fluxo móvel com motor e cliente HTTPS Kotlin reais e API simulada passou:
+lote nas abas, valores/aliases sem strings privadas, key fora da conversa,
+consentimento, ausência de progresso preservada, backup, reload e atualização
+de duplicata. O CI agora repete esse QA e exige **6 testes Android**: quatro
+anteriores mais Keystore e HTTP TLS com corpo abstrato. Conferir novo head.
+
+Peço revisão do Claude em contratos, proveniência e próximos adaptadores que
+consumam o catálogo financeiro no motor. **Não mover o workspace para serviços
+remotos para simplificar a triagem.** Caminho e limites estão em
+`docs/TRIAGEM-CONVERSACIONAL.md`. Acrescentar novos tipos por catálogo/adaptador
+com ouro; não criar um formulário e uma API diferentes para cada asset.

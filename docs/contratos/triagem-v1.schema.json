@@ -1,0 +1,1361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/CabriniJr/FinTips/main/docs/contratos/triagem-v1.schema.json",
+  "title": "FinTips triagem v1 — proposta local revisável",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "base_hash",
+    "operacoes",
+    "relacoes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "base_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "operacoes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "plano"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "atributo": {
+                    "type": "string",
+                    "enum": [
+                      "FOR",
+                      "AGI",
+                      "VIT",
+                      "INT",
+                      "FOC",
+                      "OURO"
+                    ]
+                  },
+                  "porque": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "proximoPasso": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "prazo": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "atributo"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "tarefa"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "atributo": {
+                    "type": "string",
+                    "enum": [
+                      "FOR",
+                      "AGI",
+                      "VIT",
+                      "INT",
+                      "FOC",
+                      "OURO"
+                    ]
+                  },
+                  "inicio": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "repetir": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "atributo",
+                  "inicio",
+                  "repetir"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "livro"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "progresso_bp": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "dias_semana": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 7
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "prazo": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "medida"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "rotulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "dia": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "minutos": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1440
+                  }
+                },
+                "required": [
+                  "rotulo",
+                  "dia",
+                  "minutos"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "objetivo"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "atributo": {
+                    "type": "string",
+                    "enum": [
+                      "FOR",
+                      "AGI",
+                      "VIT",
+                      "INT",
+                      "FOC",
+                      "OURO"
+                    ]
+                  },
+                  "meta": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "atual": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "unidade": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "prazo": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "porque": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "atributo"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "fato"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "valor_centavos": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9000000000000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "revisar_em": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "descricao"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "decisao"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "pergunta": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "alternativa": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "valor_centavos": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9000000000000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "porque": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "prazo": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "pergunta"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "causa"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "porque": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "atitude": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "aceitar",
+                          "mudar",
+                          "investigar"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "revisar_em": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "porque"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "compromisso"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "valor_centavos": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000000
+                  },
+                  "porque": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "origem_real": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "destino_real": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "valor_centavos"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "plano_financeiro"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "meta_centavos": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000000
+                  },
+                  "guardado_centavos": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "aporte_centavos": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "prazo": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "porque": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "meta_centavos"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "categoria"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "descricao": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "essencial": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "regra"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "condicao": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "efeito": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "porque": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "condicao",
+                  "efeito",
+                  "porque"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "perfil"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "atributo": {
+                    "type": "string",
+                    "enum": [
+                      "FOR",
+                      "AGI",
+                      "VIT",
+                      "INT",
+                      "FOC",
+                      "OURO"
+                    ]
+                  },
+                  "porque": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "revisar_em": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "atributo",
+                  "porque"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "campos",
+              "porque",
+              "acao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "tipo": {
+                "const": "patrimonio"
+              },
+              "acao": {
+                "enum": [
+                  "criar",
+                  "atualizar"
+                ]
+              },
+              "porque": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "campos": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "valor_centavos": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000000
+                  },
+                  "origem_real": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "porque": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "valor_centavos"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "relacoes": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "de",
+          "para",
+          "tipo",
+          "porque"
+        ],
+        "properties": {
+          "de": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tipo",
+              "id"
+            ],
+            "properties": {
+              "tipo": {
+                "enum": [
+                  "plano",
+                  "tarefa",
+                  "livro",
+                  "medida",
+                  "objetivo",
+                  "fato",
+                  "decisao",
+                  "causa",
+                  "compromisso",
+                  "plano_financeiro",
+                  "categoria",
+                  "regra",
+                  "perfil",
+                  "patrimonio"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            }
+          },
+          "para": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tipo",
+              "id"
+            ],
+            "properties": {
+              "tipo": {
+                "enum": [
+                  "plano",
+                  "tarefa",
+                  "livro",
+                  "medida",
+                  "objetivo",
+                  "fato",
+                  "decisao",
+                  "causa",
+                  "compromisso",
+                  "plano_financeiro",
+                  "categoria",
+                  "regra",
+                  "perfil",
+                  "patrimonio"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            }
+          },
+          "tipo": {
+            "enum": [
+              "apoia",
+              "depende_de",
+              "relacionado"
+            ]
+          },
+          "porque": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        }
+      }
+    }
+  }
+}

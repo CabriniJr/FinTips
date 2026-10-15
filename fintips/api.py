@@ -632,6 +632,11 @@ async def importar(arquivo: UploadFile = File(...)) -> dict:
     }
 
 
+# Contratos de triagem: validar/aplicar em memória; o client persiste atomicamente.
+from .triagem_api import router as triagem_router
+app.include_router(triagem_router)
+
+
 # --------------------------------------------------------------------------
 # frontend
 # --------------------------------------------------------------------------
