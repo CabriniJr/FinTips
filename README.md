@@ -101,6 +101,8 @@ continua com assets locais. Não há túnel, upload automático, analytics ou
 backup automático. Registros completos ficam no aparelho. **Desinstalar
 apaga os dados**. Faça uma cópia local antes de
 remover o app. Baixe APKs pelas releases e confira `SHA256SUMS.txt`.
+A preview 6 confirma o início por consulta MCP ao socket real e oferece
+**Testar servidor neste celular**, com códigos de erro e versão da build.
 
 [Todas as releases](https://github.com/CabriniJr/FinTips/releases) ·
 [Guia de avaliação](docs/APK-AVALIACAO.md) ·

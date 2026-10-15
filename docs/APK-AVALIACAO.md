@@ -1,6 +1,7 @@
 # APK para avaliar a UI
 
-**Estado atual — preview 5:** servidor MCP Kotlin no próprio celular, loopback
+**Estado atual — preview 6:** teste MCP real no início, botão de teste local,
+códigos MCP-00 a MCP-06 e versão/API Android na tela. O servidor MCP Kotlin no próprio celular, loopback
 com token e controle por notificação. Sem túnel ou contas conectadas.
 [Funcionamento e avaliação atuais](SERVIDOR-MCP-LOCAL.md). As notas da
 preview 4 abaixo são históricas.

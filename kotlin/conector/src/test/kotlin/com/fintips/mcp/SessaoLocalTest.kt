@@ -38,6 +38,37 @@ class SessaoLocalTest {
         assertEquals(JsonArray(listOf(JsonPrimitive("leitura"))), s.estado()["escopos"]!!.jsonArray)
         s.atualizar(id(a), c); assertTrue(s.estado()["contexto_disponivel"]!!.jsonPrimitive.boolean)
     }
+    @Test fun teste_local_exige_resposta_mcp_e_contexto_disponivel() = SessaoLocal().use { s ->
+        val a = s.iniciar(c); val session = id(a)
+        assertEquals(JsonPrimitive("pendente"), a["teste_local"])
+        assertEquals(JsonPrimitive("ok"), s.verificar(session)["teste_local"])
+        s.atualizar(session, null)
+        assertFails { s.verificar(session) }
+        assertEquals(JsonPrimitive("pendente"), s.estado()["teste_local"])
+        s.atualizar(session, c)
+        s.verificar(session)
+        s.pausar(session)
+        assertFails { s.verificar(session) }
+        assertEquals(JsonPrimitive("pendente"), s.estado()["teste_local"])
+    }
+    @Test fun teste_antigo_nao_verifica_uma_nova_autorizacao() = SessaoLocal().use { s ->
+        val a = s.iniciar(c); s.iniciar(c)
+        assertFails { s.verificar(id(a)) }
+        assertEquals(JsonPrimitive("pendente"), s.estado()["teste_local"])
+    }
+    @Test fun encerrar_nao_espera_sonda_e_sonda_antiga_nao_confirma_nova_sessao() {
+        val entrou = java.util.concurrent.CountDownLatch(1)
+        val liberar = java.util.concurrent.CountDownLatch(1)
+        SessaoLocal(sonda = { entrou.countDown(); check(liberar.await(5, java.util.concurrent.TimeUnit.SECONDS)) }).use { s ->
+            val a = s.iniciar(c)
+            val falhou = java.util.concurrent.atomic.AtomicBoolean(false)
+            val t = kotlin.concurrent.thread { falhou.set(runCatching { s.verificar(id(a)) }.isFailure) }
+            check(entrou.await(2, java.util.concurrent.TimeUnit.SECONDS))
+            try { s.encerrar(); s.iniciar(c) } finally { liberar.countDown() }
+            t.join(3000); assertFalse(t.isAlive); assertTrue(falhou.get())
+            assertEquals(JsonPrimitive("pendente"), s.estado()["teste_local"])
+        }
+    }
     @Test fun encerrar_revoga_e_fechar_nao_permite_reinicio_tardio() {
         val s = SessaoLocal(); val a = s.iniciar(c)
         s.encerrar(); assertFalse(s.ativo()); assertFails { s.atualizar(id(a), c) }; assertFails { s.credencial() }

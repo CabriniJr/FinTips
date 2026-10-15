@@ -1459,3 +1459,35 @@ Android 14 e adicionando cobertura pelo bridge WebView e socket sem wrappers
 substituídos. O motivo original ainda não foi isolado; não anunciar correção
 nem conexão das contas antes de validar o caminho real. O erro genérico atual
 perde a causa ao passar por ResultReceiver e precisa de diagnóstico seguro.
+
+
+**15/10/2026 · Codex — diagnóstico verificável da preview 6**
+
+A reprodução instrumentada da base `a463194` passou no CI Android 14/KVM
+(run 38713894344). Inicialização pelo WebMessageListener, foreground service e
+consulta real ao socket funcionaram; isso não reproduziu o relato do aparelho.
+O emulador local sem KVM falhou por timeout ao inicializar o WebView, antes de
+atingir o serviço. Não tratar essa lentidão da infraestrutura como causa do
+relato, nem anunciar “bug corrigido” sem evidência.
+
+Preview 6 passa a confirmar o início só após handshake, descoberta e consulta
+MCP pelo socket real; se falhar, encerra a sessão. Há botão Testar servidor,
+resultado na UI, build/API Android e códigos MCP-00…06 fixos. ResultReceiver
+antes descartava toda causa: agora preserva categoria segura, sem mensagens de
+exception, contexto ou token. Falta de suporte WebMessageListener passa a pedir
+atualização do WebView/Chrome, em vez de só pedir outro APK.
+
+A sonda ocorre fora do lock do consentimento: parar/revogar não espera rede, e
+resultado antigo não valida nova geração. Nenhuma permissão, envio remoto,
+regra de motor ou fonte de score nova. O transporte da sonda é exclusivamente
+127.0.0.1; não há teste a endpoint externo. Origem/armazenamento/certificado
+preservados; versionCode 6. O diagnóstico não conecta ChatGPT/Claude.
+
+Validação local: 248 Python, 144 JVM motor + 15 conector, 20 JS, 20 ouros,
+licenças, Actionlint, builds debug/release/test APK e verificador de assinatura,
+manifesto e assets. A nova rodada Android cobre também teste manual,
+notificações bloqueadas por AppOps (sem revogar permissão e matar o runner),
+background, ação Encerrar, novo token e erro de contexto sem eco do conteúdo.
+O teste da base já passou; verificar os checks do novo head antes de integrar.
+O próximo dado necessário do aparelho é resultado/código exibido, nunca token,
+JSON de contexto ou arquivos pessoais.

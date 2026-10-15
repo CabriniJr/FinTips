@@ -88,19 +88,25 @@ class PreviewActivity : ComponentActivity() {
                 if (raw.toByteArray(Charsets.UTF_8).size > 1536 * 1024) return@addWebMessageListener
                 io.execute {
                     var id: String? = null
+                    var operation: String? = null
                     val response = try {
                         val request = JSONObject(raw)
                         id = request.getString("id").also { require(it.length <= 100) }
-                        val op = request.getString("operation")
+                        val op = request.getString("operation").also { operation = it }
                         val input = request.getJSONObject("input")
                         val result = when {
                             op.startsWith("servidor.") -> localServer(op, input)
+                                .put("versao_app", packageManager.getPackageInfo(packageName, 0).versionName)
+                                .put("android_sdk", Build.VERSION.SDK_INT)
                             op == "ia.abrir" -> openConnector(input)
                             else -> motor.execute(op, input)
                         }
                         JSONObject().put("id", id).put("result", result)
-                    } catch (_: Exception) {
-                        JSONObject().put("id", id ?: JSONObject.NULL).put("error", "O motor não aceitou este pedido. Confira os dados e tente novamente.")
+                    } catch (e: Exception) {
+                        val failure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaMcp>().firstOrNull()
+                        val message = failure?.codigo?.mensagem ?: if (operation?.startsWith("servidor.") == true)
+                            CodigoMcp.DESCONHECIDO.mensagem else "O motor não aceitou este pedido. Confira os dados e tente novamente."
+                        JSONObject().put("id", id ?: JSONObject.NULL).put("error", message)
                     }
                     runOnUiThread { if (!closed) reply.postMessage(response.toString()) }
                 }
@@ -170,6 +176,7 @@ class PreviewActivity : ComponentActivity() {
 
     private fun localServer(operation: String, i: JSONObject): JSONObject = when (operation) {
         "servidor.status" -> McpLocalService.status()
+        "servidor.verificar" -> McpLocalService.verificar(i.getString("sessao"))
         "servidor.atualizar" -> McpLocalService.atualizar(i.getString("sessao"), i.getJSONObject("context").toString())
         "servidor.invalidar" -> McpLocalService.atualizar(i.getString("sessao"), null)
         "servidor.pausar" -> McpLocalService.pausar(i.getString("sessao"))
@@ -182,13 +189,16 @@ class PreviewActivity : ComponentActivity() {
         "servidor.iniciar", "servidor.encerrar" -> {
             if (operation == "servidor.encerrar" && !McpLocalService.status().optBoolean("ativo")) McpLocalService.status()
             else {
-                val context = if (operation == "servidor.iniciar") MotorBridge.validateContext(i.getJSONObject("context").toString()) else null
+                val context = if (operation == "servidor.iniciar") {
+                    try { MotorBridge.validateContext(i.getJSONObject("context").toString()) }
+                    catch (_: Exception) { throw FalhaMcp(CodigoMcp.CONTEXTO) }
+                } else null
                 val future = CompletableFuture<JSONObject>()
                 val receiver = object : ResultReceiver(Handler(Looper.getMainLooper())) {
                     override fun onReceiveResult(code: Int, data: Bundle?) {
                         if (code == 0) runCatching { JSONObject(data?.getString("json") ?: error("resposta ausente")) }
                             .onSuccess { future.complete(it) }.onFailure { future.completeExceptionally(it) }
-                        else future.completeExceptionally(IllegalStateException("servidor indisponível"))
+                        else future.completeExceptionally(FalhaMcp(CodigoMcp.de(data?.getString("erro"))))
                     }
                 }
                 runOnUiThread {
@@ -200,9 +210,10 @@ class PreviewActivity : ComponentActivity() {
                             command.action = McpLocalService.START; command.putExtra("context", context)
                             startForegroundService(command)
                         } else { command.action = McpLocalService.STOP; startService(command) }
-                    } catch (e: Exception) { future.completeExceptionally(e) }
+                    } catch (_: Exception) { future.completeExceptionally(FalhaMcp(CodigoMcp.ANDROID)) }
                 }
-                future.get(10, TimeUnit.SECONDS)
+                try { future.get(10, TimeUnit.SECONDS) }
+                catch (_: java.util.concurrent.TimeoutException) { throw FalhaMcp(CodigoMcp.TEMPO) }
             }
         }
         else -> error("operação indisponível")

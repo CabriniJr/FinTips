@@ -38,19 +38,26 @@ class McpLocalService : Service() {
             val raw = intent.getStringExtra("context") ?: error("contexto ausente")
             require(raw.toByteArray(Charsets.UTF_8).size <= 4096)
             io.execute {
+                var etapa = CodigoMcp.CONTEXTO
                 try {
                     val c = Json.parseToJsonElement(MotorBridge.validateContext(raw)).jsonObject
                     check(!destroyed)
-                    host.iniciar(c)
+                    etapa = CodigoMcp.SOCKET
+                    val started = host.iniciar(c)
+                    etapa = CodigoMcp.TESTE
+                    host.verificar(started["sessao"]!!.jsonPrimitive.content)
                     notifyRunning()
                     reply?.send(0, Bundle().apply { putString("json", state().toString()) })
                 } catch (_: Exception) {
-                    reply?.send(1, Bundle())
-                    if (!host.ativo()) stopServer()
+                    reply?.send(1, Bundle().apply { putString("erro", etapa.name) })
+                    if (etapa == CodigoMcp.TESTE || !host.ativo()) stopServer()
                     else notifyRunning()
                 }
             }
-        } catch (_: Exception) { reply?.send(1, Bundle()); if (!host.ativo()) stopServer() }
+        } catch (_: Exception) {
+            reply?.send(1, Bundle().apply { putString("erro", CodigoMcp.ANDROID.name) })
+            if (!host.ativo()) stopServer()
+        }
         return START_NOT_STICKY
     }
 
@@ -102,6 +109,11 @@ class McpLocalService : Service() {
         fun pausar(session: String): JSONObject = JSONObject((current?.host?.pausar(session) ?: error("servidor encerrado")).toString())
         fun atualizar(session: String, raw: String?): JSONObject = JSONObject((current?.host?.atualizar(session,
             raw?.let { Json.parseToJsonElement(MotorBridge.validateContext(it)).jsonObject }) ?: error("servidor encerrado")).toString())
+        fun verificar(session: String): JSONObject {
+            val service = current ?: throw FalhaMcp(CodigoMcp.INDISPONIVEL)
+            return try { JSONObject(service.host.verificar(session).toString()) }
+            catch (_: Exception) { throw FalhaMcp(CodigoMcp.TESTE) }
+        }
         fun credencial(): String = current?.host?.credencial() ?: error("servidor encerrado")
     }
 }

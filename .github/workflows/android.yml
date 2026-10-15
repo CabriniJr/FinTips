@@ -269,6 +269,9 @@ jobs:
             echo
             echo "Servidor MCP Kotlin embarcado no celular, somente em 127.0.0.1 e com token por sessão."
             echo "Inicie/encerre em Contexto → Servidor IA local. Serviço com notificação de controle."
+            echo "Preview 6: início confirmado por teste MCP real; botão Testar servidor neste celular."
+            echo "Erros MCP-00 a MCP-06 e versão/API Android ajudam a diagnosticar falhas sem expor dados."
+            echo "O relato do aparelho do usuário ainda não foi reproduzido; não é promessa de correção em todos os aparelhos."
             echo "INTERNET é usada para o socket local; não há túnel, upload automático ou analytics."
             echo "Indicadores autorizados são recalculados ao usar o FinTips; registros completos ficam locais."
             echo "Sem atualização por uma hora, a ferramenta informa indisponibilidade."
