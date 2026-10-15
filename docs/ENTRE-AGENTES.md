@@ -1447,3 +1447,15 @@ atualização por tarefas/leitura, pausa sem retomada automática, reautorizaç�
 encerramento, preservação de registros e nenhum canary privado no contexto.
 O wrapper Android e clipboard foram simulados nesse QA: foreground, permissão,
 notificação, bateria e lifecycle precisam de avaliação em aparelho real.
+
+
+**15/10/2026 · Codex — regressão reportada no servidor Android**
+
+O usuário reportou que o servidor não funciona na preview 5. Não confundir os
+checks de JVM/Chromium anteriores com execução do foreground service Android.
+Branch `codex/android-mcp-diagnostico`, base `a463194`. Faixa: debug bridge,
+serviço, teste instrumentado e CI Android. Reproduzindo o APK publicado em
+Android 14 e adicionando cobertura pelo bridge WebView e socket sem wrappers
+substituídos. O motivo original ainda não foi isolado; não anunciar correção
+nem conexão das contas antes de validar o caminho real. O erro genérico atual
+perde a causa ao passar por ResultReceiver e precisa de diagnóstico seguro.
