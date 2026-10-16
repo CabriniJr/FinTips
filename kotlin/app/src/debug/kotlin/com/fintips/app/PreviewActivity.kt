@@ -55,6 +55,7 @@ class PreviewActivity : ComponentActivity() {
     private var closed = false
     private val triagemAI = OpenAITriagem()
     private val chaveTriagem by lazy { ChaveTriagem(this) }
+    private val extratos by lazy { ExtratosLocais(this) }
     private var keyDialog: AlertDialog? = null
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         McpLocalService.refreshNotification()
@@ -110,6 +111,7 @@ class PreviewActivity : ComponentActivity() {
                         val input = request.getJSONObject("input")
                         val result = when {
                             op in setOf("triagem.chave_status", "triagem.configurar_chave", "triagem.apagar_chave", "triagem.sugerir", "triagem.organizar", "triagem.cancelar") -> triagemOperation(op, input)
+                            op.startsWith("extrato.") && op != "extrato.conferir" -> extratoOperation(op,input)
                             op == "ponte.copiar_endpoint" -> copyLocal(McpLocalService.ponteOperation("ponte.status", JSONObject()).getString("origem") + "/mcp", false)
                             op == "ponte.abrir_cliente" -> openAIClient(input.getString("provedor"))
                             op.startsWith("ponte.") -> McpLocalService.ponteOperation(op, input)
@@ -156,14 +158,18 @@ class PreviewActivity : ComponentActivity() {
     /** Exportação para Downloads local; não oferece provedor remoto de destino. */
     inner class LocalBackup {
         @JavascriptInterface
-        fun saveCopy(json: String) {
-            if (json.length > 2 * 1024 * 1024 || Build.VERSION.SDK_INT < 29) {
-                notice("Cópias em Downloads exigem Android 10 ou mais recente e arquivo de até 2 MB.")
+        fun saveCopy(json: String) = savePrivateCopy(json, 2 * 1024 * 1024)
+
+        fun saveStatements(json: String) = savePrivateCopy(json, 24 * 1024 * 1024)
+
+        private fun savePrivateCopy(json: String, maxBytes: Int) {
+            if (json.length > maxBytes || Build.VERSION.SDK_INT < 29) {
+                notice("Cópias em Downloads exigem Android 10 ou mais recente e espaço disponível no aparelho.")
                 return
             }
             val bytes = json.toByteArray(Charsets.UTF_8)
-            if (bytes.size > 2 * 1024 * 1024) {
-                notice("A cópia local excede o limite de 2 MB.")
+            if (bytes.size > maxBytes) {
+                notice("A cópia local excede o limite permitido.")
                 return
             }
             io.execute {
@@ -203,6 +209,17 @@ class PreviewActivity : ComponentActivity() {
         return JSONObject().put("status", "abertura_solicitada")
     }
 
+    private fun extratoOperation(op: String, i: JSONObject): JSONObject = when(op) {
+        "extrato.estado", "extrato.contexto" -> { require(i.length()==0);JSONObject((if(op=="extrato.estado") extratos.estado() else extratos.contexto()).toString()) }
+        "extrato.importar" -> {
+            require(i.keys().asSequence().toSet().all { it in setOf("ofx","saldo_inicial") })
+            JSONObject(extratos.importar(i.getString("ofx"),if(i.isNull("saldo_inicial")) null else i.getString("saldo_inicial")).toString())
+        }
+        "extrato.remover" -> { require(i.keys().asSequence().toSet()==setOf("ref"));JSONObject(extratos.remover(i.getString("ref")).toString()) }
+        "extrato.exportar" -> { require(i.length()==0);LocalBackup().saveStatements(extratos.copia());JSONObject().put("status","copia_solicitada") }
+        else -> error("operação indisponível")
+    }
+
     private fun triagemOperation(op: String, i: JSONObject): JSONObject = when(op) {
         "triagem.chave_status" -> JSONObject().put("configurada",chaveTriagem.configurada()).put("modelo","gpt-4.1-mini")
         "triagem.configurar_chave" -> { triagemAI.cancelar(); runOnUiThread { configurarChaveTriagem() }; JSONObject().put("status","dialogo_solicitado") }
@@ -211,7 +228,7 @@ class PreviewActivity : ComponentActivity() {
         "triagem.sugerir", "triagem.organizar" -> {
             val body=Json.parseToJsonElement(i.toString()).jsonObject
             JSONObject(triagemAI.sugerir(body["bundle"]!!.jsonObject,body["rascunhos"]!!.jsonArray,
-                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje"),agente=op=="triagem.organizar").toString())
+                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje"),agente=op=="triagem.organizar",financeiro=extratos.contexto()).toString())
         }
         else -> error("operação indisponível")
     }

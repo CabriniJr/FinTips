@@ -22,6 +22,10 @@ O usuário manteve PII exclusivamente no client e esclareceu que **valores,
 relações e cálculos com labels abstratas podem ser enviados**, mas origem e
 destino reais não. Essa é a fronteira implementada, também para agentes futuros.
 
+A preview 10 adiciona [contexto financeiro de extratos importados](EXTRATOS-ANDROID.md)
+à API, gerado da guarda nativa. Mantém os limites de interpretação/planejamento
+descritos aqui; não implementa ainda o agente completo do plano de substituição.
+
 ## O que funciona
 
 - O agente recebe os contratos dos 14 tipos e uma tabela de referências locais.

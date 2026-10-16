@@ -78,6 +78,11 @@ def _fields(block: str) -> dict[str, str]:
 
 def parse_ofx(path: str | Path, *, salt: str = "") -> Statement:
     text = Path(path).read_text(encoding="utf-8", errors="replace")
+    return parse_ofx_text(text, salt=salt)
+
+
+def parse_ofx_text(text: str, *, salt: str = "", original_ids: dict[str, str] | None = None) -> Statement:
+    """Mesmo parser em memória; IDs originais opcionais ficam exclusivamente locais."""
     body = text.split("<OFX>", 1)[-1]
 
     head = _fields(body.split("<BANKTRANLIST>", 1)[0])
@@ -110,6 +115,8 @@ def parse_ofx(path: str | Path, *, salt: str = "") -> Statement:
             n += 1
             uid = f"{fitid}#{n}"
         used_ids.add(uid)
+        if original_ids is not None:
+            original_ids[uid] = fitid
         txs.append(
             Transaction(
                 id=uid,

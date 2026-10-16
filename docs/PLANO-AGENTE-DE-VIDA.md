@@ -2,9 +2,10 @@
 
 Status: plano de execução proposto em 16/10/2026, a partir da main `2d6981b`.
 Fronteira de privacidade revisada no mesmo dia após esclarecimento do usuário.
-Este documento especifica o destino; **não declara essas capacidades disponíveis
-na preview 9**. Os schemas/exemplos anexos são contratos de projeto, ainda sem
-endpoint anunciado. Substitui a direção da triagem por rascunhos de mensagens.
+Este documento especifica o destino; **não declara o agente completo disponível
+na preview 10**. A preview 10 já persiste extratos e oferece um resumo observado,
+mas ainda não integra o motor financeiro completo nesta experiência. Os
+schemas/exemplos anexos são contratos de projeto, ainda sem endpoint anunciado. Substitui a direção da triagem por rascunhos de mensagens.
 
 ## Resultado que define o produto
 
@@ -33,7 +34,7 @@ acoplável a agentes diferentes. Eles não produzem compreensão sozinhos.
 | Operações do agente | protocolo `fintips_agente_v2` | preenche referências e vínculos, mas não oferece o ciclo consultar → decompor → simular → agendar → revisar |
 | Vida e agenda | `life-store.js`: `inicio` e `repetir` booleano | tarefa diária/pontual; não há sessões com duração, dias alternados e orçamento semanal |
 | Leitura | `reading.py`, `vida/Leitura.kt` e importador web | pacing existe; importação pontual, sem fonte persistente/worker |
-| Guarda | `client-state.js`, `triagem-store.js` | `localStorage` do WebView é autoridade; um worker nativo não pode manter outra cópia independente |
+| Guarda | `client-state.js`, `triagem-store.js`; preview 10: `ExtratosLocais` | vida/leitura/catálogo continuam no WebView; extratos têm guarda nativa própria; P2 unifica interfaces/migração sem criar cópias concorrentes |
 | Finanças | `plans.py`, `projection.py`, `profile.py`, `score.py` e portes | regras existem, mas o dispatcher Android expõe apenas parte; cadastro genérico no caderno não alimenta projeção financeira |
 | MCP Android/ponte | `ServidorLocal.kt`, `integracoes/ponte/` | consulta readonly reduzida; não expõe propostas/agenda/cenários deste plano |
 | Visualização | UI móvel e renderer Compose de gauges | bons componentes, mas faltam os dados/contratos integrados para alimentar o painel pretendido |
@@ -41,6 +42,76 @@ acoplável a agentes diferentes. Eles não produzem compreensão sozinhos.
 Os testes anteriores provaram transporte, limites e transações. Uma API
 simulada que devolve os campos esperados **não prova** que um agente entende
 um parágrafo real. O aceite passa a incluir qualidade semântica e uso contínuo.
+
+## Pilar prioritário: extrato, registros e motor financeiro existente
+
+Reforço do usuário em 16/10/2026: essas informações sustentam a avaliação do
+passado e do que cabe fazer no futuro. Registrar o OFX e mostrar somas mensais
+é a entrada. O perfil, os scores e as projeções precisam vir da cadeia
+financeira já funcional em Python, dos registros e das escolhas declaradas.
+**A integração dessa base passa à frente da jornada completa de certificação.**
+
+Fluxo: fontes locais → canônico → classificação/decisões → enriquecimento →
+motor financeiro/perfil/objetivos → projeção de contexto protegida → agente e UI.
+O cálculo local funciona sem uma conta de IA. O agente interpreta os números,
+investiga lacunas, correlaciona, compara alternativas e propõe decisões; ele
+não substitui as fórmulas por uma nota calculada em texto livre.
+
+A fonte de referência é [`report.analyze`](../fintips/report.py). A composição
+reutiliza sua sequência, contratos e portes existentes, em vez de transformar
+`statement_context.py` num segundo motor. O parser isolado deixa fluxo/categoria
+com defaults; chamar `baseline`/`calcularScore` nesse extrato ainda não
+classificado daria aparência de análise a dados semanticamente incorretos.
+
+Mapeamento auditado nesta revisão, **não um registro runtime paralelo**:
+
+| Resultado existente | Referência e porte disponível | Uso no app/agente |
+|---|---|---|
+| Base mensal e capacidade financeira | `analysis.py` / `Analise.kt` | renda/despesa/sobra já classificadas, meses considerados e estabilidade |
+| Score financeiro e componentes | `score.py` / `Score.kt` | explicar resultado, dimensões e próximos pontos usando a mesma fórmula |
+| Perfil e retrato | `profile.py` / `Perfil.kt` | separar o observado, o sugerido e o que a pessoa declarou; visão integrada antes de aconselhar |
+| Execução e viabilidade de planos | `plans.py` / `Planos.kt` | quanto falta, aportes e competição entre objetivos |
+| Projeção e reserva | `projection.py` / `Projecao.kt` | cenário com premissas, horizonte e impacto nos demais planos |
+| Causas, decisões e objetivos | `causes.py`, `decisions.py`, `objetivos.py` e portes correspondentes | motivos/alternativas registrados, compromisso, checks e evidências de progresso |
+| Contexto curto com acesso ao detalhe | `report.para_agente`, `DETALHE_EM` | aproveitar o mecanismo existente de resumo com ponteiro, não inventar outro contexto desconectado |
+
+A existência desses portes **não prova** que a cadeia inteira está ligada no
+Android. Classificação, regras, entidades, compromissos, lojas e composição do
+relatório precisam de auditoria de entrada a saída. Trecho ainda sem porte ou
+adaptador é lacuna de integração a fechar com ouro, não uma heurística na UI.
+O catálogo definitivo deriva dos descritores canônicos; esta tabela só orienta
+a revisão atual e não alimenta capacidades anunciadas.
+
+O resumo da preview 10 (`financas_importadas`) não permite inferir salário,
+despesa real, reserva disponível ou perfil. A fonte completa fica preservada
+para alimentar os adaptadores. Importações de meses/contas diferentes exigem
+períodos e saldos coerentes; não somar saldos de extratos sobrepostos nem fazer
+média dos scores de cada conta. Qualquer agregação nova tem referência e ouro
+próprios nos dois motores. Começar com o caso já coberto e declarar a cobertura.
+
+### O que prova essa integração
+
+- Mesma base sintética classificada, regras, patrimônio, perfil/compromissos,
+  planos, objetivos e data de avaliação → mesmos resultados na referência
+  Python e na composição Kotlin. Ouro de cada módulo continua obrigatório;
+  acrescentar um caso da **cadeia integrada**, com o arredondamento contratado.
+- Alterar um registro/regra/metas dispara novo cálculo local e nova revisão de
+  contexto. Painel, agente por API e MCP consultam os mesmos resultados, com
+  proteção da identidade financeira na saída, sem contas pessoais no relay.
+- Perfil estatístico/sugerido não vira personalidade declarada. Causas e
+  decisões vêm dos registros/pessoa/agente, não são deduzidas do extrato.
+- Score existente mantém fórmula, pesos e arredondamentos já testados. Campos
+  de cobertura explicam zeros/defaults do contrato legado; não mudar a fórmula
+  para fingir ausência nem apresentar uma lacuna como fracasso da pessoa.
+- Histórico apresenta observações e retratos calculados locais com período,
+  revisão da base e versão da regra. Comparar passado e presente distingue
+  mudança de comportamento, novo dado e nova fórmula. Não inventar score de
+  uma data sem insumos suficientes para reconstruí-lo.
+- Projeção identifica premissas/limitações e considera metas concorrentes;
+  reserva não é simplesmente saldo bancário. O agente explica trade-offs, e
+  a pessoa escolhe prioridades e autoriza alterações.
+- Lacuna relevante vira pergunta inline que aproveita os dados existentes;
+  não exigir cadastrar novamente o que o extrato e os registros já fornecem.
 
 ## Experiência alvo: três jornadas
 
@@ -421,7 +492,9 @@ dados. O agregado usa metas/pesos escolhidos pela pessoa, não um julgamento
 sobre sua vida. A recomendação do agente não cria uma fórmula de score.
 
 Cada indicador carrega janela, versão da regra, origem, frescor, cobertura e
-componentes incluídos/omitidos. Sem base → `null`/“Sem dados”, não zero.
+componentes incluídos/omitidos. Novos indicadores sem base usam
+`null`/“Sem dados”. Fórmulas legadas preservam seus zeros/defaults com cobertura
+explícita; não reinterpretá-los como avaliação completa da pessoa.
 Planejado, estimado e observado aparecem separadamente. Não somar percentual,
 minutos e reais nem contar livro + sessão + objetivo pai três vezes.
 
@@ -443,17 +516,19 @@ cor, TalkBack e movimento reduzido. Gráfico de projeção é identificado como 
 | P1 | Catálogo global, contexto, comandos e estado de diálogo/proposta | P0 | todos os tipos/áreas descobríveis, panorama e consulta paginada/histórico/relações; exemplos passam em schemas; noop legítimo; capacidades pendentes explícitas |
 | P2 | Guarda nativa e migração | P1 | UI/executor/worker compartilham revisão/transação; legacy/backup/quota/crash/concorrência exercitados; instalação por cima preserva registros |
 | P3 | Projeção financeira e contexto de planejamento | em paralelo a P1/P2 | texto de estudo/compra chega inteligível à IA; valores preservados; identidade da origem/destino e dados bancários brutos não saem, inclusive em mensagens mistas e tool results |
+| F-base | Integrar a cadeia financeira existente ao Android/contexto | P1/P2/P3 e adaptadores; prioridade antes de P6 | classificação/regras/enriquecimento → relatório/perfil/scores/projeção com ouro integrado; UI e agente leem a mesma revisão |
 | P4 | Librera persistente | P2 | uma seleção, atualização sem reimportar com app fechado/reaberto/reiniciado; timestamp/dedup/revogação comprovados |
 | P5 | Agente por tools e perguntas inline | P1, P2, P3 (sem dependência de modelo local) | sessão carrega visão geral, aprofunda contexto de qualquer artefato e cruza domínios; entende intenção/correção; não copia conversa para títulos nem repete perguntas |
-| P6 | Certificação + livro + agenda | P4, P5 | objetivo → etapas → sessões sem sobrecarga → metas por leitura → observação atualiza o mesmo plano; teste completo na UI Android |
+| P6 | Certificação + livro + agenda | P4, P5; F-base prioritária | objetivo → etapas → sessões sem sobrecarga → metas por leitura → observação atualiza o mesmo plano; teste completo na UI Android |
 | P7 | Propostas pelos dois transportes | P1, P2; ampliar junto a P5/P6 | mesma chamada via API/MCP dá o mesmo resultado; scopes/proposta/aprovação/recibo funcionam; conector real comprovado após hospedagem/autorização |
-| P8 | Carro + projeção de todos os planos | P2, P5 + adaptadores financeiros | cenários com mesma base, reserva/custos e efeito nos demais planos; notas do catálogo não são tratadas como cálculo |
+| P8 | Carro + comparação de alternativas financeiras | F-base, P5 | cenários com mesma base, reserva/custos e efeito nos demais planos; notas do catálogo não são tratadas como cálculo |
 | P9 | Painéis, scores e refinamento visual | P6, P8 + fórmulas com ouro | gauges/gráficos usam dados reais/versionados; incógnitas/cobertura visíveis; avaliação prolongada sem transcrição diária |
 
 O catálogo e a conformidade API/MCP nascem em P1; P7 entrega a extensão real
 do transporte remoto. Não deixar “MCP comum” como uma adaptação posterior do
-prompt. P8 pode avançar em paralelo ao estudo depois da guarda/executor; não
-precisa interromper a entrega do primeiro fluxo completo P6.
+prompt. **F-base é fundação prioritária**, não deve esperar P8 ou P9: é o
+motor do retrato financeiro e do contexto. P8 entrega a experiência conversacional
+de alternativas de compra sobre essa base; o estudo avança sem empurrá-la para o fim.
 
 Faixa Codex: diálogo, UI, agenda e integração Android/guarda/fontes. Claude
 aceitou domínio/contratos, registro/projeção de saída, contexto do motor e
@@ -484,9 +559,9 @@ em Python/Kotlin no mesmo commit, com ouro, conforme `CLAUDE.md`.
    Medir localmente transcrições, perguntas repetidas e intervenção exigida.
 
 Não publicar outra “triagem inteligente” apenas porque compila ou porque um
-stub devolve três registros. O primeiro aceite de produto é a jornada P6; o
-financeiro precisa do aceite P8 próprio. Os passos podem ser entregues em PRs
-menores, com capacidade/estado honestos em cada build. P0 não se resolve apenas
+stub devolve três registros. O primeiro aceite financeiro é F-base, com
+paridade da cadeia integrada; P6 valida a jornada de estudo e P8 a decisão
+financeira conversacional. Os passos podem ser entregues em PRs menores, com capacidade/estado honestos em cada build. P0 não se resolve apenas
 desligando a triagem: o corte precisa preservar mensagens e legado, e a build
 não pode anunciar o agente completo enquanto P3/P5/P6 não estiverem provados.
 
