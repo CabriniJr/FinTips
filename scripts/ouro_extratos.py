@@ -16,6 +16,7 @@ def gerar():
         ('conferido',[{'ofx':base,'saldo_inicial':'0'}]),
         ('divergente',[{'ofx':base,'saldo_inicial':'1'}]),
         ('sem_saldo_declarado',[{'ofx':base.replace('<BALAMT>750.00',''),'saldo_inicial':'0'}]),
+        ('conciliacao_canonica_centavos',[{'ofx':ofx([('s',1,'1.005')]).replace('<BALAMT>750.00','<BALAMT>1.00'),'saldo_inicial':'0'}]),
         ('mesmo_arquivo',[{'ofx':base},{'ofx':base}]),
         ('sobreposicao_estorno_id_literal',[{'ofx':repeated},{'ofx':ofx([('x',3,'200.00'),('x#2',3,'3.00')])}]),
         ('contas_bancos_distintos',[{'ofx':base},{'ofx':ofx([('a',1,'1000.00'),('b',2,'-250.00')],bank='002')}]),

@@ -295,6 +295,44 @@
       }
     },
     {
+      "nome": "conciliacao_canonica_centavos",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1.005<FITID>s<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>1.00<DTASOF>20261031</LEDGERBAL></OFX>",
+          "saldo_inicial": "0"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 1,
+        "contas": 1,
+        "transacoes": 1,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-01",
+        "entradas_centavos": 100,
+        "saidas_centavos": 0,
+        "liquido_centavos": 100,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 1,
+            "entradas_centavos": 100,
+            "saidas_centavos": 0,
+            "liquido_centavos": 100
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 1,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
       "nome": "mesmo_arquivo",
       "arquivos": [
         {

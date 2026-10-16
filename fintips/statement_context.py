@@ -46,7 +46,8 @@ def statement_context(files: list[dict], salt: str) -> dict:
         else:
             if not re.fullmatch(r'-?\d{1,12}([.,]\d{1,2})?', opening):
                 raise ValueError('saldo inicial inválido')
-            same, _ = stmt.reconciles(parse_amount(opening))
+            # O contrato Android é o canônico em centavos, inclusive HALF_EVEN.
+            same = cents(parse_amount(opening)) + sum(cents(t.amount) for t in stmt.transactions) == cents(stmt.ledger_balance)
             checked += int(same); divergent += int(not same)
         for tx in stmt.transactions:
             value = cents(tx.amount)
