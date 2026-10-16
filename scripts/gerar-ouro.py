@@ -2462,6 +2462,111 @@ from ouro_contexto_ia import ouro_contexto_ia
 from ouro_triagem import gerar as ouro_triagem_universal
 from ouro_agente import gerar as ouro_agente
 
+def ouro_fronteira() -> dict:
+    """A fronteira de saída: o registro inteiro, e as funções que ele governa.
+
+    Dois motores com a mesma política escrita duas vezes divergem, e a
+    divergência aqui não é um número errado numa tela — é um campo que sai do
+    aparelho num motor e não sai no outro. Então o ouro carrega o **registro
+    completo**, campo por campo, com política, unidade e os dois conjuntos de
+    fechamento. Abrir um campo no Python sem abrir no Kotlin quebra o teste,
+    que é o único jeito de isso não passar.
+
+    Os casos de alias incluem acento, caixa e sufixo de razão social, porque é
+    assim que o extrato traz o nome e assim que a pessoa escreve o mapa. E
+    incluem o caso sem mapa e sem sal, onde a resposta correta é vazio — o
+    campo fica retido, não sai um pseudônimo inventado.
+    """
+    from fintips.contracts import (
+        POLITICAS_DE_SAIDA,
+        TIPOS_DA_FRONTEIRA,
+        alias_financeiro,
+        politica_do_campo,
+    )
+    from fintips.contracts import _texto_sem_identidades as sem_ids
+
+    mapa = {"Loja do Zé Ltda": "estab-7", "Padaria Avó Maria": "padaria-1"}
+
+    casos_alias = [
+        # (valor, usa_mapa, sal)
+        ("LOJA DO ZE LTDA", True, ""),
+        ("Loja do Zé Ltda", True, ""),
+        ("PADARIA AVO MARIA", True, ""),
+        ("LOJA QUE NINGUEM CADASTROU", True, SAL_DO_OURO),
+        ("LOJA QUE NINGUEM CADASTROU", False, SAL_DO_OURO),
+        ("LOJA QUE NINGUEM CADASTROU", True, ""),
+        ("", True, SAL_DO_OURO),
+    ]
+
+    casos_texto = [
+        "Parar de pedir na Loja do Ze",
+        "Parar de pedir na Loja do Zé Ltda",
+        "Comprar na PADARIA AVO MARIA e na loja do zé ltda",
+        "Tirar a certificação de observabilidade",
+        "",
+    ]
+
+    perguntas = [
+        ("transacao", "counterparty"),
+        ("transacao", "memo_raw"),
+        ("transacao", "amount"),
+        ("transacao", "campo_que_alguem_acrescentou"),
+        ("etapa", "custo"),
+        ("etapa", "titulo"),
+        ("objetivo", "etapas"),
+        ("causa", "enunciado"),
+        ("causa", "natureza"),
+        ("decisao", "situacao"),
+        ("proveniencia", "evidencia"),
+        ("tipo_que_nao_existe", "titulo"),
+    ]
+
+    return {
+        "o_que_e": "política de saída por campo, e as funções que a aplicam",
+        "gerado_por": "fintips.contracts.TIPOS_DA_FRONTEIRA / alias_financeiro",
+        "sal": SAL_DO_OURO,
+        "politicas": sorted(POLITICAS_DE_SAIDA),
+        "mapa_de_identidades": mapa,
+        "registro": [
+            {
+                "tipo": t.nome,
+                "classe": t.classe,
+                "abre": [
+                    {"campo": c.campo, "politica": c.politica, "unidade": c.unidade}
+                    for c in t.abre
+                ],
+                "fecha": list(t.fecha),
+                "projeta_a_parte": list(t.projeta_a_parte),
+            }
+            for t in TIPOS_DA_FRONTEIRA
+        ],
+        "politica_do_campo": [
+            {"tipo": tipo, "campo": campo, "politica": politica_do_campo(tipo, campo)}
+            for tipo, campo in perguntas
+        ],
+        "alias": [
+            {
+                "valor": valor,
+                "usa_mapa": usa_mapa,
+                "sal": sal,
+                "alias": alias_financeiro(
+                    valor, identidades=(mapa if usa_mapa else {}), salt=sal
+                ),
+            }
+            for valor, usa_mapa, sal in casos_alias
+        ],
+        "texto_sem_identidades": [
+            {"texto": texto, "saida": sem_ids(texto, mapa)[0],
+             "trocou": sem_ids(texto, mapa)[1]}
+            for texto in casos_texto
+        ],
+        "centavos": [
+            {"reais": r, "centavos": centavos(Decimal(r))}
+            for r in ("1899.90", "-128.45", "10.005", "10.015", "0", "0.001")
+        ],
+    }
+
+
 GERADORES = {
     "triagem-universal.json": ouro_triagem_universal,
     "triagem-agente.json": ouro_agente,
@@ -2488,6 +2593,7 @@ GERADORES = {
     "objetivos.json": ouro_objetivos,
     "perfil-tempo.json": ouro_perfil_tempo,
     "leitura.json": ouro_leitura,
+    "fronteira.json": ouro_fronteira,
 }
 
 

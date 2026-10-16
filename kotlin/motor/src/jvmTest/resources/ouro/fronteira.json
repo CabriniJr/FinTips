@@ -1,0 +1,689 @@
+{
+  "o_que_e": "política de saída por campo, e as funções que a aplicam",
+  "gerado_por": "fintips.contracts.TIPOS_DA_FRONTEIRA / alias_financeiro",
+  "sal": "ouro-do-harness",
+  "politicas": [
+    "identidade_financeira_local",
+    "rotulo_tecnico",
+    "segredo_local",
+    "texto_planejamento",
+    "valor_financeiro"
+  ],
+  "mapa_de_identidades": {
+    "Loja do Zé Ltda": "estab-7",
+    "Padaria Avó Maria": "padaria-1"
+  },
+  "registro": [
+    {
+      "tipo": "transacao",
+      "classe": "fintips.models:Transaction",
+      "abre": [
+        {
+          "campo": "amount",
+          "politica": "valor_financeiro",
+          "unidade": "centavos_brl"
+        },
+        {
+          "campo": "ts",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "flow",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "category",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "channel",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "counterparty_kind",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "counterparty",
+          "politica": "identidade_financeira_local",
+          "unidade": ""
+        },
+        {
+          "campo": "category_source",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        }
+      ],
+      "fecha": [
+        "id",
+        "memo_raw",
+        "city",
+        "tags",
+        "account_id",
+        "category_confidence",
+        "rule_id"
+      ],
+      "projeta_a_parte": []
+    },
+    {
+      "tipo": "objetivo",
+      "classe": "fintips.objetivos:Objetivo",
+      "abre": [
+        {
+          "campo": "id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "titulo",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "porque",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "comecou_em",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "data_alvo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "origem",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "porque_da_origem",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "assinado_em",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "arquivado",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "plano_id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "missoes",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        }
+      ],
+      "fecha": [],
+      "projeta_a_parte": [
+        "etapas"
+      ]
+    },
+    {
+      "tipo": "etapa",
+      "classe": "fintips.objetivos:Etapa",
+      "abre": [
+        {
+          "campo": "id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "titulo",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "tipo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "prazo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "prazo_original",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "adiamentos",
+          "politica": "rotulo_tecnico",
+          "unidade": "numero"
+        },
+        {
+          "campo": "custo",
+          "politica": "valor_financeiro",
+          "unidade": "centavos_brl"
+        },
+        {
+          "campo": "depende_de",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "obrigatoria",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "porque",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        }
+      ],
+      "fecha": [],
+      "projeta_a_parte": []
+    },
+    {
+      "tipo": "check",
+      "classe": "fintips.objetivos:Check",
+      "abre": [
+        {
+          "campo": "objetivo_id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "etapa_id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "dia",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "origem",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "nota",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        }
+      ],
+      "fecha": [],
+      "projeta_a_parte": []
+    },
+    {
+      "tipo": "alternativa",
+      "classe": "fintips.contracts:Alternativa",
+      "abre": [
+        {
+          "campo": "nome",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "custo",
+          "politica": "valor_financeiro",
+          "unidade": "centavos_brl"
+        },
+        {
+          "campo": "custo_mensal",
+          "politica": "valor_financeiro",
+          "unidade": "centavos_brl"
+        },
+        {
+          "campo": "horizonte_meses",
+          "politica": "valor_financeiro",
+          "unidade": "numero"
+        },
+        {
+          "campo": "consequencia",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "risco",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "descartada_porque",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        }
+      ],
+      "fecha": [],
+      "projeta_a_parte": []
+    },
+    {
+      "tipo": "traco_de_perfil",
+      "classe": "fintips.profile:TracoDePerfil",
+      "abre": [
+        {
+          "campo": "eixo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "arquetipo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "nome",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "descricao",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "substituiu",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        }
+      ],
+      "fecha": [],
+      "projeta_a_parte": [
+        "proveniencia"
+      ]
+    },
+    {
+      "tipo": "missao",
+      "classe": "fintips.life:Missao",
+      "abre": [
+        {
+          "campo": "id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "titulo",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "atributo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "cadencia",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "como_medir",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "sensor_possivel",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "porque",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "ativa",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "valor_mensal",
+          "politica": "valor_financeiro",
+          "unidade": "centavos_brl"
+        },
+        {
+          "campo": "colide_com",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        }
+      ],
+      "fecha": [],
+      "projeta_a_parte": []
+    },
+    {
+      "tipo": "proveniencia",
+      "classe": "fintips.contracts:Proveniencia",
+      "abre": [
+        {
+          "campo": "origem",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "confianca",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "porque",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "quando",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "por_quem",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        }
+      ],
+      "fecha": [
+        "evidencia"
+      ],
+      "projeta_a_parte": []
+    },
+    {
+      "tipo": "decisao",
+      "classe": "fintips.contracts:Decisao",
+      "abre": [
+        {
+          "campo": "id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "titulo",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "situacao",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "pergunta",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "tipo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "escolhida",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "porque",
+          "politica": "texto_planejamento",
+          "unidade": ""
+        },
+        {
+          "campo": "status",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "ligacoes",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "revisar_em",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "substitui",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "substituida_por",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "criado_em",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "decidido_em",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        }
+      ],
+      "fecha": [
+        "instantaneo",
+        "desfecho"
+      ],
+      "projeta_a_parte": [
+        "alternativas",
+        "proveniencia"
+      ]
+    },
+    {
+      "tipo": "causa",
+      "classe": "fintips.contracts:Causa",
+      "abre": [
+        {
+          "campo": "id",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "efeito_tipo",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "natureza",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "atitude",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "revisar_em",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        },
+        {
+          "campo": "criado_em",
+          "politica": "rotulo_tecnico",
+          "unidade": ""
+        }
+      ],
+      "fecha": [
+        "efeito_ref",
+        "enunciado",
+        "atitude_nota",
+        "evidencia"
+      ],
+      "projeta_a_parte": [
+        "proveniencia"
+      ]
+    }
+  ],
+  "politica_do_campo": [
+    {
+      "tipo": "transacao",
+      "campo": "counterparty",
+      "politica": "identidade_financeira_local"
+    },
+    {
+      "tipo": "transacao",
+      "campo": "memo_raw",
+      "politica": "fechado"
+    },
+    {
+      "tipo": "transacao",
+      "campo": "amount",
+      "politica": "valor_financeiro"
+    },
+    {
+      "tipo": "transacao",
+      "campo": "campo_que_alguem_acrescentou",
+      "politica": "fechado"
+    },
+    {
+      "tipo": "etapa",
+      "campo": "custo",
+      "politica": "valor_financeiro"
+    },
+    {
+      "tipo": "etapa",
+      "campo": "titulo",
+      "politica": "texto_planejamento"
+    },
+    {
+      "tipo": "objetivo",
+      "campo": "etapas",
+      "politica": "fechado"
+    },
+    {
+      "tipo": "causa",
+      "campo": "enunciado",
+      "politica": "fechado"
+    },
+    {
+      "tipo": "causa",
+      "campo": "natureza",
+      "politica": "rotulo_tecnico"
+    },
+    {
+      "tipo": "decisao",
+      "campo": "situacao",
+      "politica": "texto_planejamento"
+    },
+    {
+      "tipo": "proveniencia",
+      "campo": "evidencia",
+      "politica": "fechado"
+    },
+    {
+      "tipo": "tipo_que_nao_existe",
+      "campo": "titulo",
+      "politica": "fechado"
+    }
+  ],
+  "alias": [
+    {
+      "valor": "LOJA DO ZE LTDA",
+      "usa_mapa": true,
+      "sal": "",
+      "alias": "estab-7"
+    },
+    {
+      "valor": "Loja do Zé Ltda",
+      "usa_mapa": true,
+      "sal": "",
+      "alias": "estab-7"
+    },
+    {
+      "valor": "PADARIA AVO MARIA",
+      "usa_mapa": true,
+      "sal": "",
+      "alias": "padaria-1"
+    },
+    {
+      "valor": "LOJA QUE NINGUEM CADASTROU",
+      "usa_mapa": true,
+      "sal": "ouro-do-harness",
+      "alias": "PF:8996a9"
+    },
+    {
+      "valor": "LOJA QUE NINGUEM CADASTROU",
+      "usa_mapa": false,
+      "sal": "ouro-do-harness",
+      "alias": "PF:8996a9"
+    },
+    {
+      "valor": "LOJA QUE NINGUEM CADASTROU",
+      "usa_mapa": true,
+      "sal": "",
+      "alias": ""
+    },
+    {
+      "valor": "",
+      "usa_mapa": true,
+      "sal": "ouro-do-harness",
+      "alias": ""
+    }
+  ],
+  "texto_sem_identidades": [
+    {
+      "texto": "Parar de pedir na Loja do Ze",
+      "saida": "Parar de pedir na Loja do Ze",
+      "trocou": false
+    },
+    {
+      "texto": "Parar de pedir na Loja do Zé Ltda",
+      "saida": "Parar de pedir na estab-7",
+      "trocou": true
+    },
+    {
+      "texto": "Comprar na PADARIA AVO MARIA e na loja do zé ltda",
+      "saida": "Comprar na padaria-1 e na estab-7",
+      "trocou": true
+    },
+    {
+      "texto": "Tirar a certificação de observabilidade",
+      "saida": "Tirar a certificação de observabilidade",
+      "trocou": false
+    },
+    {
+      "texto": "",
+      "saida": "",
+      "trocou": false
+    }
+  ],
+  "centavos": [
+    {
+      "reais": "1899.90",
+      "centavos": 189990
+    },
+    {
+      "reais": "-128.45",
+      "centavos": -12845
+    },
+    {
+      "reais": "10.005",
+      "centavos": 1000
+    },
+    {
+      "reais": "10.015",
+      "centavos": 1002
+    },
+    {
+      "reais": "0",
+      "centavos": 0
+    },
+    {
+      "reais": "0.001",
+      "centavos": 0
+    }
+  ]
+}
