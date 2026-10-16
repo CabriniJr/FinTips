@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fintips:design:agente-contexto:v1",
+  "title": "Contexto global proposto para agentes FinTips",
+  "description": "DESIGN, sem endpoint. Catálogo e panorama globais acompanham página de artefatos. Forma não comprova cobertura do repositório, autorização ou remoção de identidade financeira.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "fintips_contexto_proposto_v1"
+    },
+    "contexto_ref": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,95}$"
+    },
+    "base_revisao": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "grant_ref": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,95}$"
+    },
+    "politica": {
+      "const": "identidade_financeira_local_v1"
+    },
+    "catalogo_completo_no_escopo": {
+      "type": "boolean"
+    },
+    "restricoes_de_escopo": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "maxItems": 30
+    },
+    "catalogo": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,95}$"
+          },
+          "estado": {
+            "enum": [
+              "disponivel",
+              "nao_implementado",
+              "nao_autorizado",
+              "fonte_indisponivel"
+            ]
+          },
+          "total_visiveis": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consultas": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "listar",
+                "buscar",
+                "detalhar",
+                "historico",
+                "relacoes"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "limitacoes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "tipo",
+          "estado",
+          "total_visiveis",
+          "consultas",
+          "limitacoes"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 1000
+    },
+    "panorama": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,95}$"
+          },
+          "sintese": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1600
+          },
+          "artefatos_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            },
+            "maxItems": 1000
+          },
+          "indicadores_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            },
+            "maxItems": 1000
+          },
+          "cobertura": {
+            "enum": [
+              "completa",
+              "parcial",
+              "sem_dados",
+              "indisponivel"
+            ]
+          },
+          "lacunas": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 30
+          }
+        },
+        "required": [
+          "area",
+          "sintese",
+          "artefatos_refs",
+          "indicadores_refs",
+          "cobertura",
+          "lacunas"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 1000
+    },
+    "pagina": {
+      "type": "object",
+      "properties": {
+        "escopo": {
+          "enum": [
+            "global",
+            "filtrado"
+          ]
+        },
+        "consulta_ref": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,95}$"
+        },
+        "estado": {
+          "enum": [
+            "completa",
+            "parcial"
+          ]
+        },
+        "total_visiveis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "itens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "tipo": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "versao": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "campos": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,95}$"
+                },
+                "maxProperties": 100,
+                "additionalProperties": {
+                  "$ref": "urn:fintips:design:agente-turno:v1#/$defs/valor"
+                }
+              },
+              "fonte_ref": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "frescor": {
+                "enum": [
+                  "atual",
+                  "atrasado",
+                  "desconhecido"
+                ]
+              },
+              "lacunas": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "maxItems": 30
+              }
+            },
+            "required": [
+              "ref",
+              "tipo",
+              "versao",
+              "campos",
+              "fonte_ref",
+              "frescor",
+              "lacunas"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "relacoes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "de_ref": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "para_ref": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "relacao": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "evidencia_ref": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              }
+            },
+            "required": [
+              "de_ref",
+              "para_ref",
+              "relacao",
+              "evidencia_ref"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 500
+        },
+        "proximo_cursor": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "escopo",
+        "consulta_ref",
+        "estado",
+        "total_visiveis",
+        "itens",
+        "relacoes",
+        "proximo_cursor"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "estado": {
+              "const": "completa"
+            },
+            "proximo_cursor": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "properties": {
+            "estado": {
+              "const": "parcial"
+            },
+            "proximo_cursor": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "contexto_ref",
+    "base_revisao",
+    "grant_ref",
+    "politica",
+    "catalogo_completo_no_escopo",
+    "restricoes_de_escopo",
+    "catalogo",
+    "panorama",
+    "pagina"
+  ],
+  "additionalProperties": false
+}

@@ -165,11 +165,71 @@ Os 14 tipos atuais são ponto de partida. Novos tipos e campos entram pelo
 catálogo, com schema, operações, unidades, privacidade e adaptador real. O
 manifesto anuncia somente capacidades implementadas/autorizadas. “Conhecer os
 artefatos” significa poder descobrir e consultar esses contratos; não despejar
-todo o banco num prompt nem criar um formulário por tipo.
+todo o banco num prompt nem criar um formulário por tipo. **Todo artefato do
+app precisa estar disponível como contexto**, com a projeção financeira já
+definida; não restringir a visão ao formulário, rascunho ou aba em foco.
 
 Cada relação tem semântica: `parte_de`, `depende_de`, `usa_recurso`, `apoia`,
 `agenda` ou `mede`. Progresso dos filhos não é somado em duplicidade no pai.
 O ID do livro é reutilizado no estudo e no objetivo de leitura.
+
+### 2.1. Visão geral e contexto de todos os artefatos
+
+Requisito do usuário: os agentes precisam enxergar o conjunto da vida registrado
+no FinTips, suas relações e consequências. O app não escolhe silenciosamente
+um subconjunto de tipos para deixar visível à IA. A restrição financeira
+abstrai campos protegidos e mantém valores/contexto; não esconde uma área inteira.
+
+O contrato de contexto tem três níveis, disponíveis no mesmo executor API/MCP:
+
+1. **Panorama inicial global:** objetivos/prioridades, planos em andamento,
+   orçamento de tempo e dinheiro, próximos compromissos/prazos, livros e ritmo,
+   perfil/regras declaradas, indicadores, conflitos e decisões pendentes.
+   Acompanha catálogo de todos os tipos, contagens, revisão, fontes e lacunas.
+   Consultá-lo ao abrir/retomar uma sessão de planejamento, mesmo que a pessoa
+   esteja em uma tela específica. Não depende de já existir um rascunho.
+2. **Consulta completa dos artefatos:** listar, buscar, obter detalhes, percorrer
+   relações e consultar histórico/observações por tipo, área, estado, período
+   ou referência. Inclui concluídos/pausados e conversas/decisões anteriores
+   pertinentes; não apenas itens ativos ou resultados de busca textual.
+3. **Atualizações:** consultar mudanças desde uma revisão, inclusive remoções,
+   fontes atrasadas e decisões alteradas. Invalidar resumos/resultados derivados
+   afetados; o agente atualiza o contexto antes de recomendar ou propor.
+
+Paginação e orçamento de tokens organizam a leitura, sem tornar o restante
+inacessível. Toda página declara contagem, escopo, cobertura e cursor. Panorama
+pode resumir detalhes, mas mantém todos os domínios visíveis e informa o que
+não foi carregado. Não devolver uma lista truncada como se fosse o banco todo,
+nem interpretar artefato fora da página como inexistente. Fontes sem acesso,
+adaptadores pendentes e áreas sem dados têm estados distintos.
+
+O [contrato proposto do contexto](contratos/agente-contexto-v1.schema.json)
+e seu [exemplo sintético](contratos/exemplos-contexto/01-panorama-paginado.json)
+explicitam essa separação. São desenho de interface, ainda sem endpoint.
+Detalhes usam os mesmos valores tipados do contrato de turno. Campos textuais
+de planejamento permanecem legíveis; identidade financeira usa referências.
+
+Todo tipo persistido precisa de adaptador de consulta/projeção e política por
+campo. Catálogo/cobertura derivam do registro canônico (`contracts.DEPOSITOS`
+e descritores de domínio), sem lista paralela na UI. A composição reutiliza
+`report.analyze`/`contexto_de_perfil` e seus equivalentes portados; não criar
+outro cálculo financeiro dentro do agregador de contexto. Criar um artefato novo inclui registrá-lo no catálogo e no contexto no
+mesmo PR. O portão de implementação compara registro canônico e catálogo:
+tipos/campos esquecidos são falha de cobertura, não silêncio no prompt. Os
+schemas de design ainda não implementam esse portão semântico.
+
+Referências, páginas, relações e simulações pertencem à mesma revisão/grant.
+Se a base mudou, renovar snapshot ou recusar explicitamente; não juntar uma
+agenda antiga com a projeção financeira atual. É possível começar uma nova
+sessão sem perder a visão dos registros e decisões persistidos. O histórico
+é dado para o agente, nunca instrução para ampliar permissão ou executar comandos.
+
+Exemplos de aceite: ao propor mais estudo, consultar os outros objetivos e a
+carga já reservada; ao propor um carro, considerar todos os planos financeiros,
+não só o plano aberto; ao encontrar um livro concluído fora da primeira página,
+reutilizá-lo como recurso sem duplicá-lo. Um conector pode ter escopo reduzido,
+mas o contexto precisa declarar essa limitação; não alegar visão global nesse caso.
+A leitura global autorizada não concede escrita automática.
 
 ### 3. Diálogo e propostas separados dos registros
 
@@ -204,8 +264,10 @@ O schema valida forma; não substitui validação do catálogo, semântica ou PI
 | Serviço comum proposto | API local | Ferramenta MCP proposta |
 |---|---|---|
 | Catálogo, versões e capacidades | `catalogo.obter` | `fintips_catalogo` |
-| Contexto/revisão e fontes relevantes | `contexto.obter` | `fintips_contexto` |
-| Buscar/consultar artefatos relacionados | `artefatos.consultar` | `fintips_artefatos` |
+| Panorama global, revisão, catálogo e cobertura | `contexto.obter` | `fintips_contexto` |
+| Listar/buscar/detalhar todos os tipos e históricos | `artefatos.consultar` | `fintips_artefatos` |
+| Percorrer relações entre domínios | `artefatos.relacoes` | `fintips_relacoes` |
+| Mudanças/remoções desde a revisão | `contexto.alteracoes` | `fintips_alteracoes` |
 | Registrar turno/resposta | `dialogo.responder` | texto de planejamento permitido; identidade financeira substituída localmente |
 | Preparar/revisar proposta | `propostas.preparar` | `fintips_propor` |
 | Simular capacidade e agenda | `agenda.simular` | `fintips_simular_agenda` |
@@ -378,11 +440,11 @@ cor, TalkBack e movimento reduzido. Gráfico de projeção é identificado como 
 | PR/ID | Entrega | Dependência | Pronto quando |
 |---|---|---|---|
 | P0 | Separar mensagem de artefato e recuperação do legado | nenhuma | saudações/correções/respostas não viram planos; falta de agente mantém mensagem, não inventa cadastro; reorganização do legado é proposta reversível |
-| P1 | Catálogo, comandos e estado de diálogo/proposta | P0 | exemplos de certificação, livro e carro passam em schemas; noop é legítimo; capacidades não implementadas não são anunciadas |
+| P1 | Catálogo global, contexto, comandos e estado de diálogo/proposta | P0 | todos os tipos/áreas descobríveis, panorama e consulta paginada/histórico/relações; exemplos passam em schemas; noop legítimo; capacidades pendentes explícitas |
 | P2 | Guarda nativa e migração | P1 | UI/executor/worker compartilham revisão/transação; legacy/backup/quota/crash/concorrência exercitados; instalação por cima preserva registros |
 | P3 | Projeção financeira e contexto de planejamento | em paralelo a P1/P2 | texto de estudo/compra chega inteligível à IA; valores preservados; identidade da origem/destino e dados bancários brutos não saem, inclusive em mensagens mistas e tool results |
 | P4 | Librera persistente | P2 | uma seleção, atualização sem reimportar com app fechado/reaberto/reiniciado; timestamp/dedup/revogação comprovados |
-| P5 | Agente por tools e perguntas inline | P1, P2, P3 (sem dependência de modelo local) | sessão entende intenção/correção, consulta artefatos e chama o executor; não copia conversa para títulos nem repete perguntas respondidas |
+| P5 | Agente por tools e perguntas inline | P1, P2, P3 (sem dependência de modelo local) | sessão carrega visão geral, aprofunda contexto de qualquer artefato e cruza domínios; entende intenção/correção; não copia conversa para títulos nem repete perguntas |
 | P6 | Certificação + livro + agenda | P4, P5 | objetivo → etapas → sessões sem sobrecarga → metas por leitura → observação atualiza o mesmo plano; teste completo na UI Android |
 | P7 | Propostas pelos dois transportes | P1, P2; ampliar junto a P5/P6 | mesma chamada via API/MCP dá o mesmo resultado; scopes/proposta/aprovação/recibo funcionam; conector real comprovado após hospedagem/autorização |
 | P8 | Carro + projeção de todos os planos | P2, P5 + adaptadores financeiros | cenários com mesma base, reserva/custos e efeito nos demais planos; notas do catálogo não são tratadas como cálculo |
@@ -393,9 +455,9 @@ do transporte remoto. Não deixar “MCP comum” como uma adaptação posterior
 prompt. P8 pode avançar em paralelo ao estudo depois da guarda/executor; não
 precisa interromper a entrega do primeiro fluxo completo P6.
 
-Faixa Codex: diálogo, UI, agenda e integração Android/guarda/fontes. Solicitação
-ao Claude via docs: revisar domínio/contratos e assumir adaptadores de perfil,
-planos, projeção e scores portados. Pedido não equivale a aceite do outro agente.
+Faixa Codex: diálogo, UI, agenda e integração Android/guarda/fontes. Claude
+aceitou domínio/contratos, registro/projeção de saída, contexto do motor e
+adaptadores de perfil, planos, projeção e scores, conforme `ENTRE-AGENTES.md`.
 Compartilhados têm escopo registrado antes de edição. Cada regra nova nasce
 em Python/Kotlin no mesmo commit, com ouro, conforme `CLAUDE.md`.
 
@@ -413,7 +475,11 @@ em Python/Kotlin no mesmo commit, com ouro, conforme `CLAUDE.md`.
    aprovar no aparelho e consultar recibo. Negativos de escopo/replay/stale/offline.
 5. Android real/emulador: migração sem perda, SAF/reboot, worker sem WebView,
    fonte parada/revogada, economia de bateria e apresentação móvel/acessível.
-6. Uso prolongado: objetivo escolhido e fonte conectada; dias seguintes usam
+6. Cobertura global: todos os tipos/campos canônicos têm política/adaptador;
+   percorrer páginas recupera todos os registros autorizados, com relações e
+   histórico. Exercitar concluído fora da página, domínio sem fonte, novo tipo,
+   mudança concorrente e restrição de grant. API/MCP dão a mesma visão.
+7. Uso prolongado: objetivo escolhido e fonte conectada; dias seguintes usam
    leitura/agenda normalmente, sem cadastrar tarefas e percentuais de novo.
    Medir localmente transcrições, perguntas repetidas e intervenção exigida.
 

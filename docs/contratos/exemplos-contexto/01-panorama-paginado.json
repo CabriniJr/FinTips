@@ -1,0 +1,330 @@
+{
+  "schema": "fintips_contexto_proposto_v1",
+  "contexto_ref": "contexto_42",
+  "base_revisao": 42,
+  "grant_ref": "grant_planejamento_global",
+  "politica": "identidade_financeira_local_v1",
+  "catalogo_completo_no_escopo": true,
+  "restricoes_de_escopo": [],
+  "catalogo": [
+    {
+      "tipo": "objetivo",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "plano",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "etapa",
+      "estado": "disponivel",
+      "total_visiveis": 0,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "atividade",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "sessao",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "recurso",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "observacao",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "perfil_regra",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "plano_financeiro",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "cenario_decisao",
+      "estado": "disponivel",
+      "total_visiveis": 0,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "politica_ajuste",
+      "estado": "disponivel",
+      "total_visiveis": 0,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "indicador",
+      "estado": "disponivel",
+      "total_visiveis": 0,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "fonte",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    },
+    {
+      "tipo": "conversa",
+      "estado": "disponivel",
+      "total_visiveis": 1,
+      "consultas": [
+        "listar",
+        "buscar",
+        "detalhar",
+        "historico",
+        "relacoes"
+      ],
+      "limitacoes": []
+    }
+  ],
+  "panorama": [
+    {
+      "area": "vida",
+      "sintese": "Um objetivo de estudo ativo, com orçamento declarado de duas horas semanais e uma sessão futura. Perfil, conversa anterior e etapas podem ser consultados.",
+      "artefatos_refs": [
+        "objetivo_01",
+        "plano_01",
+        "atividade_01",
+        "sessao_01",
+        "perfil_01",
+        "conversa_01"
+      ],
+      "indicadores_refs": [],
+      "cobertura": "parcial",
+      "lacunas": [
+        "Detalhes e histórico não carregados nesta página."
+      ]
+    },
+    {
+      "area": "leitura",
+      "sintese": "Um livro associado ao estudo, com posição observada de 40%. Fonte e histórico disponíveis para consulta.",
+      "artefatos_refs": [
+        "livro_01",
+        "observacao_01",
+        "fonte_leitura_01"
+      ],
+      "indicadores_refs": [],
+      "cobertura": "parcial",
+      "lacunas": [
+        "Ritmo requer consulta ao histórico e cálculo do motor."
+      ]
+    },
+    {
+      "area": "financas",
+      "sintese": "Há um plano de compra ativo. Valores e identidade financeira abstrata estão disponíveis; nenhuma simulação de carteira foi executada neste exemplo.",
+      "artefatos_refs": [
+        "financeiro_01"
+      ],
+      "indicadores_refs": [],
+      "cobertura": "parcial",
+      "lacunas": [
+        "Consultar perfil financeiro e simular impacto nos outros planos antes de recomendar."
+      ]
+    }
+  ],
+  "pagina": {
+    "escopo": "global",
+    "consulta_ref": "consulta_global_01",
+    "estado": "parcial",
+    "total_visiveis": 10,
+    "itens": [
+      {
+        "ref": "objetivo_01",
+        "tipo": "objetivo",
+        "versao": 1,
+        "campos": {
+          "titulo": {
+            "tipo": "texto_planejamento",
+            "valor": "Obter certificação de observabilidade"
+          },
+          "orcamento_semanal": {
+            "tipo": "quantidade",
+            "valor": 120,
+            "unidade": "minutos"
+          },
+          "estado": {
+            "tipo": "codigo",
+            "valor": "ativo"
+          }
+        },
+        "fonte_ref": "fonte_usuario",
+        "frescor": "atual",
+        "lacunas": []
+      },
+      {
+        "ref": "livro_01",
+        "tipo": "recurso",
+        "versao": 1,
+        "campos": {
+          "titulo": {
+            "tipo": "texto_planejamento",
+            "valor": "Fundamentos de observabilidade"
+          },
+          "classe": {
+            "tipo": "codigo",
+            "valor": "livro"
+          },
+          "progresso": {
+            "tipo": "quantidade",
+            "valor": 4000,
+            "unidade": "pontos_base"
+          }
+        },
+        "fonte_ref": "fonte_leitura_01",
+        "frescor": "atual",
+        "lacunas": []
+      },
+      {
+        "ref": "financeiro_01",
+        "tipo": "plano_financeiro",
+        "versao": 1,
+        "campos": {
+          "titulo": {
+            "tipo": "texto_planejamento",
+            "valor": "Comprar um veículo"
+          },
+          "alvo": {
+            "tipo": "quantidade",
+            "valor": 8000000,
+            "unidade": "centavos_brl"
+          },
+          "origem_reserva": {
+            "tipo": "referencia",
+            "ref": "contraparte_01"
+          }
+        },
+        "fonte_ref": "fonte_usuario",
+        "frescor": "atual",
+        "lacunas": []
+      }
+    ],
+    "relacoes": [
+      {
+        "de_ref": "plano_01",
+        "para_ref": "objetivo_01",
+        "relacao": "parte_de",
+        "evidencia_ref": "decisao_usuario_01"
+      },
+      {
+        "de_ref": "atividade_01",
+        "para_ref": "livro_01",
+        "relacao": "usa_recurso",
+        "evidencia_ref": "decisao_usuario_01"
+      }
+    ],
+    "proximo_cursor": "cursor_global_02"
+  }
+}
