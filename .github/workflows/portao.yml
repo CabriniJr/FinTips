@@ -142,11 +142,15 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install playwright==1.62.0
+      - name: Extrato registrado e contexto nas abas (bridge simulado)
+        run: python scripts/verificar-extrato-ui.py
       - name: Conversa até os registros, com Kotlin e HTTPS reais
         run: python scripts/verificar-triagem-ui.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: triagem-ui-${{ github.run_id }}-${{ github.run_attempt }}
-          path: kotlin/conector/build/reports/triagem-ui/
+          path: |
+            kotlin/conector/build/reports/triagem-ui/
+            kotlin/conector/build/reports/extrato-ui/
           if-no-files-found: warn

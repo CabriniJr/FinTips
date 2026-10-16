@@ -91,8 +91,11 @@ Dado ausente aparece como ausência, sem inventar progresso ou fracasso.
 A alpha é uma build de avaliação com a interface web embarcada em WebView.
 Você já pode testar tarefas, áreas da vida, planos e leitura. O **motor Kotlin
 está ligado à UI** para as frentes do dia, o ritmo dos livros e a conferência
-de saldo OFX. Classificação, score e histórico financeiro completos continuam
-no computador. A migração da tela para Compose está em andamento.
+de saldo OFX. A **preview 10 registra os extratos no aparelho**, mostra histórico
+e totais observados por mês e inclui esse resumo no contexto da API do assistente.
+Saldo inicial é opcional e importações repetidas não duplicam movimentações.
+[Guarda, privacidade e limites](docs/EXTRATOS-ANDROID.md). Classificação, score
+e cenários financeiros completos continuam no computador. A migração da tela para Compose está em andamento.
 
 A **preview 9 coloca o agente no trabalho de registro**: em Hoje → Conversar,
 você conta os planos e responde perguntas inline. A IA preenche vários campos,
@@ -224,7 +227,7 @@ Android; cada porte precisa manter a paridade.
 |---|---|
 | Testar no celular | [Avaliação Android](docs/APK-AVALIACAO.md) |
 | Entender o produto e os objetivos | [App de vida](docs/APP-DE-VIDA.md) · [Jornada](docs/JORNADA.md) |
-| Acompanhar o agente de planejamento | [Plano de execução: diálogo, artefatos, agenda e MCP](docs/PLANO-AGENTE-DE-VIDA.md) — proposto, ainda não disponível no APK |
+| Acompanhar o agente de planejamento | [Plano de execução: contexto global, artefatos, agenda e MCP](docs/PLANO-AGENTE-DE-VIDA.md) — proposto, ainda não disponível no APK |
 | Conhecer o modelo de dados e o agente | [Arquitetura](docs/ARQUITETURA.md) · [Guia técnico](docs/GUIA-TECNICO.md) |
 | Entender como meus dados são protegidos | [Privacidade](docs/PRIVACIDADE.md) |
 | Explorar automação e conectores | [Automação](docs/AUTOMACAO-SEM-TOIL.md) · [Librera](docs/LEITURA-LIBRERA.md) · [Open Finance](docs/OPEN-FINANCE.md) |
