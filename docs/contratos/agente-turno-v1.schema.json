@@ -1,0 +1,545 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposta de resultado de turno do agente FinTips",
+  "description": "DESIGN, sem endpoint implementado. Saída do executor após validar catálogo e escopo; não concede autoridade de escrita nem garante remoção de PII.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "fintips_turno_proposto_v1"
+    },
+    "sessao_ref": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,95}$"
+    },
+    "turno_ref": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,95}$"
+    },
+    "contexto_ref": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,95}$"
+    },
+    "base_revisao": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "request_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,95}$"
+    },
+    "resultado": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "sem_alteracao"
+            },
+            "motivo_codigo": {
+              "enum": [
+                "conversa",
+                "esclarecimento",
+                "cancelado",
+                "sem_nova_intencao"
+              ]
+            }
+          },
+          "required": [
+            "tipo",
+            "motivo_codigo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "perguntar"
+            },
+            "perguntas": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/pergunta"
+              },
+              "minItems": 1,
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "tipo",
+            "perguntas"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "propor"
+            },
+            "proposta_ref": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            },
+            "expira_em_segundos": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 86400
+            },
+            "simulacoes_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "minItems": 0,
+              "maxItems": 20
+            },
+            "comandos": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/comando"
+              },
+              "minItems": 1,
+              "maxItems": 80
+            },
+            "substitui_proposta_ref": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            }
+          },
+          "required": [
+            "tipo",
+            "proposta_ref",
+            "expira_em_segundos",
+            "simulacoes_refs",
+            "comandos"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "indisponivel"
+            },
+            "motivo_codigo": {
+              "enum": [
+                "interpretador_indisponivel",
+                "contexto_vencido",
+                "capacidade_ausente",
+                "fonte_indisponivel",
+                "agente_indisponivel",
+                "limite_sessao"
+              ]
+            },
+            "recuperavel": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "tipo",
+            "motivo_codigo",
+            "recuperavel"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "sessao_ref",
+    "turno_ref",
+    "contexto_ref",
+    "base_revisao",
+    "request_id",
+    "resultado"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "valor": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "referencia"
+            },
+            "ref": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            }
+          },
+          "required": [
+            "tipo",
+            "ref"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "quantidade"
+            },
+            "valor": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "unidade": {
+              "enum": [
+                "centavos_brl",
+                "minutos",
+                "pontos_base",
+                "dias",
+                "numero"
+              ]
+            }
+          },
+          "required": [
+            "tipo",
+            "valor",
+            "unidade"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "codigo"
+            },
+            "valor": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            }
+          },
+          "required": [
+            "tipo",
+            "valor"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "booleano"
+            },
+            "valor": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "tipo",
+            "valor"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "proveniencia": {
+      "type": "object",
+      "properties": {
+        "origem": {
+          "enum": [
+            "declarado_usuario",
+            "proposta_agente",
+            "derivado_motor",
+            "observado_fonte"
+          ]
+        },
+        "porque": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "evidencias_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,95}$"
+          },
+          "minItems": 1,
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "origem",
+        "porque",
+        "evidencias_refs"
+      ],
+      "additionalProperties": false
+    },
+    "comando": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "criar"
+            },
+            "local_ref": {
+              "type": "string",
+              "pattern": "^novo_[a-z0-9_]{1,80}$"
+            },
+            "tipo_artefato": {
+              "enum": [
+                "objetivo",
+                "plano",
+                "etapa",
+                "atividade",
+                "sessao",
+                "recurso",
+                "observacao",
+                "perfil_regra",
+                "plano_financeiro",
+                "cenario_decisao",
+                "politica_ajuste"
+              ]
+            },
+            "campos": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 30,
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/valor"
+              }
+            },
+            "proveniencia": {
+              "$ref": "#/$defs/proveniencia"
+            }
+          },
+          "required": [
+            "op",
+            "local_ref",
+            "tipo_artefato",
+            "campos",
+            "proveniencia"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "atualizar"
+            },
+            "alvo_ref": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            },
+            "versao_esperada": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            },
+            "campos": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 30,
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,95}$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/valor"
+              }
+            },
+            "proveniencia": {
+              "$ref": "#/$defs/proveniencia"
+            }
+          },
+          "required": [
+            "op",
+            "alvo_ref",
+            "versao_esperada",
+            "campos",
+            "proveniencia"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "relacionar"
+            },
+            "de_ref": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            },
+            "para_ref": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,95}$"
+            },
+            "relacao": {
+              "enum": [
+                "parte_de",
+                "depende_de",
+                "usa_recurso",
+                "apoia",
+                "agenda",
+                "mede"
+              ]
+            },
+            "proveniencia": {
+              "$ref": "#/$defs/proveniencia"
+            }
+          },
+          "required": [
+            "op",
+            "de_ref",
+            "para_ref",
+            "relacao",
+            "proveniencia"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "pergunta": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,95}$"
+        },
+        "decisao_codigo": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,95}$"
+        },
+        "enunciado": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "motivo": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "adiavel": {
+          "type": "boolean"
+        },
+        "resposta": {
+          "$ref": "#/$defs/resposta"
+        }
+      },
+      "required": [
+        "id",
+        "decisao_codigo",
+        "enunciado",
+        "motivo",
+        "adiavel",
+        "resposta"
+      ],
+      "additionalProperties": false
+    },
+    "resposta": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "opcao"
+            },
+            "opcoes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "codigo": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,95}$"
+                  },
+                  "rotulo": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "codigo",
+                  "rotulo"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 2,
+              "maxItems": 6
+            }
+          },
+          "required": [
+            "tipo",
+            "opcoes"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "inteiro"
+            },
+            "unidade": {
+              "enum": [
+                "minutos_semana",
+                "dias_semana",
+                "pontos_base",
+                "centavos_brl"
+              ]
+            },
+            "minimo": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "maximo": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          },
+          "required": [
+            "tipo",
+            "unidade",
+            "minimo",
+            "maximo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "data_local"
+            }
+          },
+          "required": [
+            "tipo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "texto_privado"
+            }
+          },
+          "required": [
+            "tipo"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

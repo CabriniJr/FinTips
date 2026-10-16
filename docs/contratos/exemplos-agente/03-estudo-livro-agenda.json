@@ -1,0 +1,258 @@
+{
+  "schema": "fintips_turno_proposto_v1",
+  "sessao_ref": "sessao_sintetica",
+  "turno_ref": "turno_01",
+  "contexto_ref": "contexto_42",
+  "base_revisao": 42,
+  "request_id": "request_01",
+  "resultado": {
+    "tipo": "propor",
+    "proposta_ref": "proposta_estudo_01",
+    "expira_em_segundos": 900,
+    "simulacoes_refs": [
+      "simulacao_agenda_01",
+      "simulacao_leitura_01"
+    ],
+    "comandos": [
+      {
+        "op": "criar",
+        "local_ref": "novo_objetivo",
+        "tipo_artefato": "objetivo",
+        "campos": {
+          "titulo": {
+            "tipo": "referencia",
+            "ref": "texto_objetivo_curto"
+          },
+          "prazo": {
+            "tipo": "referencia",
+            "ref": "prazo_01"
+          }
+        },
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "criar",
+        "local_ref": "novo_plano",
+        "tipo_artefato": "plano",
+        "campos": {
+          "titulo": {
+            "tipo": "referencia",
+            "ref": "texto_plano_curto"
+          }
+        },
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "relacionar",
+        "de_ref": "novo_plano",
+        "para_ref": "novo_objetivo",
+        "relacao": "parte_de",
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "criar",
+        "local_ref": "novo_etapa_estudo",
+        "tipo_artefato": "etapa",
+        "campos": {
+          "titulo": {
+            "tipo": "referencia",
+            "ref": "texto_etapa_estudo"
+          }
+        },
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "criar",
+        "local_ref": "novo_etapa_simulado",
+        "tipo_artefato": "etapa",
+        "campos": {
+          "titulo": {
+            "tipo": "referencia",
+            "ref": "texto_etapa_simulado"
+          }
+        },
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "relacionar",
+        "de_ref": "novo_etapa_estudo",
+        "para_ref": "novo_plano",
+        "relacao": "parte_de",
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "relacionar",
+        "de_ref": "novo_etapa_simulado",
+        "para_ref": "novo_plano",
+        "relacao": "parte_de",
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "relacionar",
+        "de_ref": "novo_etapa_simulado",
+        "para_ref": "novo_etapa_estudo",
+        "relacao": "depende_de",
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "criar",
+        "local_ref": "novo_atividade",
+        "tipo_artefato": "atividade",
+        "campos": {
+          "titulo": {
+            "tipo": "referencia",
+            "ref": "texto_atividade_leitura"
+          },
+          "duracao_estimada": {
+            "tipo": "quantidade",
+            "valor": 30,
+            "unidade": "minutos"
+          }
+        },
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "relacionar",
+        "de_ref": "novo_atividade",
+        "para_ref": "novo_etapa_estudo",
+        "relacao": "parte_de",
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "relacionar",
+        "de_ref": "novo_atividade",
+        "para_ref": "livro_existente_01",
+        "relacao": "usa_recurso",
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "criar",
+        "local_ref": "novo_sessao",
+        "tipo_artefato": "sessao",
+        "campos": {
+          "dia": {
+            "tipo": "referencia",
+            "ref": "dia_planejado_01"
+          },
+          "inicio": {
+            "tipo": "referencia",
+            "ref": "janela_01"
+          },
+          "duracao": {
+            "tipo": "quantidade",
+            "valor": 30,
+            "unidade": "minutos"
+          },
+          "meta_leitura": {
+            "tipo": "quantidade",
+            "valor": 1000,
+            "unidade": "pontos_base"
+          },
+          "estado": {
+            "tipo": "codigo",
+            "valor": "proposta"
+          }
+        },
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      },
+      {
+        "op": "relacionar",
+        "de_ref": "novo_sessao",
+        "para_ref": "novo_atividade",
+        "relacao": "agenda",
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      }
+    ]
+  }
+}

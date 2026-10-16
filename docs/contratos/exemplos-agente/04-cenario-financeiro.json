@@ -1,0 +1,50 @@
+{
+  "schema": "fintips_turno_proposto_v1",
+  "sessao_ref": "sessao_sintetica",
+  "turno_ref": "turno_01",
+  "contexto_ref": "contexto_42",
+  "base_revisao": 42,
+  "request_id": "request_01",
+  "resultado": {
+    "tipo": "propor",
+    "proposta_ref": "proposta_cenario_01",
+    "expira_em_segundos": 900,
+    "simulacoes_refs": [
+      "simulacao_carteira_base",
+      "simulacao_carteira_alternativa"
+    ],
+    "comandos": [
+      {
+        "op": "criar",
+        "local_ref": "novo_cenario",
+        "tipo_artefato": "cenario_decisao",
+        "campos": {
+          "titulo": {
+            "tipo": "referencia",
+            "ref": "texto_cenario_curto"
+          },
+          "base": {
+            "tipo": "referencia",
+            "ref": "simulacao_carteira_base"
+          },
+          "alternativa": {
+            "tipo": "referencia",
+            "ref": "simulacao_carteira_alternativa"
+          },
+          "estado": {
+            "tipo": "codigo",
+            "valor": "proposta"
+          }
+        },
+        "proveniencia": {
+          "origem": "proposta_agente",
+          "porque": "Organização proposta a partir da intenção e dos limites declarados.",
+          "evidencias_refs": [
+            "intencao_01",
+            "resposta_orcamento"
+          ]
+        }
+      }
+    ]
+  }
+}

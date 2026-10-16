@@ -1,5 +1,9 @@
 # Leitura: Librera e pacing local
 
+> **Execução da fonte persistente:** [plano do agente, P2/P4](PLANO-AGENTE-DE-VIDA.md).
+> Worker e UI precisam compartilhar o repositório nativo; conectar um job a
+> outra cópia de dados não atualiza o tracker. Ainda não implementado.
+
 O tracker está em **Vida → Estudos**. Aceita livro/posição manual ou importação
 de uma cópia local de `app-Progress.json`. A seleção é lida em memória no
 client, sem upload. A sincronização automática com a nuvem ainda não existe.

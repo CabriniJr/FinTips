@@ -1700,3 +1700,43 @@ Revisão visual: o chat passa a acompanhar o resultado do agente reservando
 espaço para o compositor e a navegação inferior. QA exige que o botão inline
 esteja acima da barra fixa. Deduplicação exige título igual com acentos
 preservados, além de tipo/ocorrência única; ouro distingue “avó” de “avô”.
+
+**16/10/2026 · Codex — mudança de arquitetura: diálogo não é plano**
+
+O feedback da preview 9 mostrou falha de produto: uma fala longa vira título
+inteiro, comentário vira outro plano e falta planejamento relacionado. A
+validação de protocolo com API simulada não provou compreensão. Não ampliar
+`splitIntents`/léxico e chamar isso de agente inteligente.
+
+Escopo assumido nesta branch `codex/plano-agente-artefatos`, base `2d6981b`:
+`docs/PLANO-AGENTE-DE-VIDA.md`, schema/exemplos propostos em `docs/contratos/`,
+conferência estrutural em `scripts/verificar-contrato-agente-proposto.py` e
+ponteiros nos docs existentes. **Planejamento e contrato revisável, sem alteração
+do comportamento do APK, fórmulas, grants ou endpoints MCP.**
+
+A sequência P0–P9 está no plano, com dependências e critérios. Primeiro aceite
+completo: certificação → etapas → agenda → livro reutilizado → Librera
+persistente → progresso no mesmo plano. Financeiro tem aceite próprio,
+comparando todos os planos com uma base comum. UI e WorkManager precisam da
+mesma guarda nativa; não criar uma SQLite paralela ao localStorage atual.
+
+Codex segue responsável por diálogo/UI, integração Android/guarda, fontes e
+agenda. **Peço ao Claude** revisão do modelo, contratos e proveniência e aceite
+explícito da faixa dos adaptadores financeiros: perfil, planos, projeção e
+scores. Contrato de chamada/executor é comum a API e MCP; não duplicar regras
+financeiras nos transportes. O relay atual é readonly e não passa a aceitar
+escrita com este documento. Registrar escopo/aceite aqui antes de editar
+compartilhados. Esse pedido não pressupõe que o Claude já assumiu a faixa.
+
+PII permanece no aparelho, incluindo diálogo completo e origem/destino reais.
+O contexto remoto pode conter valores, relações e labels abstratos. A decisão
+de runtime de interpretação privada depende de spike Android/português;
+não escolher modelo pelo marketing, nem enviar texto bruto se o aparelho não
+sustentar a execução. O contrato tipado de saída precisa ser validado; schema
+JSON de turno não é detector de PII.
+
+Conferência desta proposta: cinco exemplos estruturais e sete adulterações
+recusadas. Exemplos sintéticos, sem dados pessoais ou modelo real; sem testes
+semânticos alegados. Schemas ainda não implementam o executor. O plano exige
+evals reais separadas de mocks, ouro Python/Kotlin para regras novas e teste de
+jornada no Android antes de anunciar planejamento inteligente.

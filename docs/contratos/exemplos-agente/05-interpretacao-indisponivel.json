@@ -1,0 +1,13 @@
+{
+  "schema": "fintips_turno_proposto_v1",
+  "sessao_ref": "sessao_sintetica",
+  "turno_ref": "turno_01",
+  "contexto_ref": "contexto_42",
+  "base_revisao": 42,
+  "request_id": "request_01",
+  "resultado": {
+    "tipo": "indisponivel",
+    "motivo_codigo": "interpretador_indisponivel",
+    "recuperavel": true
+  }
+}
