@@ -24,10 +24,10 @@ subprocess.run([adb, "shell", "pm", "revoke", PACKAGE, "android.permission.POST_
 report = ROOT / "kotlin/app/build/reports/androidTests/mcp/resultado.txt"
 report.parent.mkdir(parents=True, exist_ok=True)
 result = subprocess.run([adb, "shell", "am", "instrument", "-w", "-e", "class",
-                         "com.fintips.app.McpAndroidTest,com.fintips.app.PonteAndroidTest,com.fintips.app.TriagemAndroidTest", PACKAGE + ".test/androidx.test.runner.AndroidJUnitRunner"],
+                         "com.fintips.app.McpAndroidTest,com.fintips.app.PonteAndroidTest,com.fintips.app.TriagemAndroidTest,com.fintips.app.LibreraAndroidTest", PACKAGE + ".test/androidx.test.runner.AndroidJUnitRunner"],
                         text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=300)
 report.write_text(result.stdout)
 print(result.stdout)
-# am instrument pode retornar zero mesmo com falha JUnit. Exigir os 7 casos.
-if result.returncode or not re.search(r"^OK \(7 tests\)$", result.stdout, re.M):
-    raise SystemExit("Instrumentação Android não confirmou os 7 testes")
+# am instrument pode retornar zero mesmo com falha JUnit. Exigir os 10 casos.
+if result.returncode or not re.search(r"^OK \(10 tests\)$", result.stdout, re.M):
+    raise SystemExit("Instrumentação Android não confirmou os 10 testes")

@@ -30,6 +30,11 @@ O foco é **Android**. A interface tem a linguagem de instrumentos de *Neon
 Genesis Evangelion*: preto, alto contraste, tipografia condensada, painéis
 chanfrados e movimento que responde ao toque. Os dados pessoais ficam no client.
 
+A **preview 12** adiciona fonte persistente do Librera: conectar o JSON uma
+vez permite atualizar livros e pacing por job Android. Planos, leitura,
+anotações e conversa passam a compartilhar guarda nativa com migração do
+WebView. [Uso, limites e estado do agente](docs/LIBRERA-AUTOMATICO.md).
+
 ## Veja em ação
 
 <table>

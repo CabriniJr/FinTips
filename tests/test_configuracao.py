@@ -138,7 +138,8 @@ def test_as_permissoes_vem_do_manifesto_compilado(ws):
     internas = {f"{pacote}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" for pacote in (
         "com.fintips.app", "com.fintips.app.ui", "com.fintips.app.ci")}
     locais = {"android.permission.INTERNET", "android.permission.FOREGROUND_SERVICE",
-              "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.POST_NOTIFICATIONS"}
+              "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.POST_NOTIFICATIONS",
+              "android.permission.RECEIVE_BOOT_COMPLETED"}
     assert locais <= set(d["privacidade"]["permissoes_do_app"]) <= internas | locais
     assert d["privacidade"]["sem_permissao_de_rede"] is False
     assert d["privacidade"]["backup_automatico"] == "false"

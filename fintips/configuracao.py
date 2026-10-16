@@ -35,6 +35,7 @@ chats depois de autorização por áreas. Telemetria continua ausente. Revogaç�
 from __future__ import annotations
 
 import re
+import json
 from pathlib import Path
 
 from . import licencas as lic
@@ -265,6 +266,7 @@ def exportar_para_aparelho(ws, raiz: str | Path = ".") -> dict:
         "schema_version": CONFIG_SCHEMA,
         "privacidade": tudo["privacidade"],
         "licencas": lic.exportar_para_aparelho(raiz),
+        "guardas_android": json.loads((Path(__file__).parent / "rules/guardas-android.json").read_text())["guardas"],
         "o_que_nao_existe_aqui": tudo["o_que_nao_existe_aqui"],
         "nota": (
             "os caminhos de arquivo não viajam: eles são de outra máquina. O "

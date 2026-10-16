@@ -1,3 +1,4 @@
+import { clientStorage } from "./native-storage.js";
 import { FinancialContextCard } from "./financial-context.jsx";
 import { CLIENT_STATE_KEY, writeSlice } from "./client-state.js";
 import { backupAll } from "./triagem-store.js";
@@ -12,7 +13,7 @@ import { reducedMotion } from "./motion.js";
 
 export function useLocalLife() {
   const [initial] = useState(() => {
-    try { return { data: readLife(localStorage), blocked: false }; }
+    try { return { data: readLife(clientStorage), blocked: false }; }
     catch { return { data: emptyLife(), blocked: true }; }
   });
   const [state, setState] = useState(initial.data);
@@ -21,9 +22,9 @@ export function useLocalLife() {
   const update = useCallback((transform) => {
     if (blocked) return false;
     try {
-      const next = transform(readLife(localStorage));
+      const next = transform(readLife(clientStorage));
       if (!validateLife(next)) throw new Error("estado inválido");
-      writeSlice(localStorage, STORAGE_KEY, "vida", next);
+      writeSlice(clientStorage, STORAGE_KEY, "vida", next);
       setState(next); setIssue(""); return true;
     } catch {
       setIssue("Não foi possível salvar no aparelho. Sua alteração não foi gravada. Verifique o espaço e tente novamente.");
@@ -33,7 +34,7 @@ export function useLocalLife() {
   useEffect(() => {
     const refresh = (event) => {
       if (event.key !== STORAGE_KEY && event.key !== CLIENT_STATE_KEY && event.key !== null) return;
-      try { setState(readLife(localStorage)); setBlocked(false); setIssue(""); }
+      try { setState(readLife(clientStorage)); setBlocked(false); setIssue(""); }
       catch { setBlocked(true); setIssue("Os dados locais não puderam ser lidos. A edição foi pausada para preservar seus registros."); }
     };
     addEventListener("storage", refresh);
@@ -297,7 +298,7 @@ export function PhoneContext({ life, toast }) {
   const largest = Math.max(...data.map((m) => m.minutos), 1);
   const backup = () => {
     try {
-      const raw = JSON.stringify(backupAll(localStorage));
+      const raw = JSON.stringify(backupAll(clientStorage));
       const url = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
       const link = document.createElement("a"); link.href = url; link.download = `fintips-local-${localDay()}.json`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -319,7 +320,7 @@ export function PhoneContext({ life, toast }) {
     <div className="section-head outside"><h2>Fontes que podemos conectar</h2><span className="small-note">Em estudo</span></div>
     <div className="segmented platform-switch">{[["android", "Android"], ["ios", "iPhone"]].map(([id, label]) => <button key={id} aria-pressed={platform === id} onClick={() => setPlatform(id)}>{label}</button>)}</div>
     <div className="source-grid">{SOURCES.map((s) => <article key={s.id} className="life-card source-card"><div className="section-head"><span className="area-icon"><Icon name={s.icon}/></span><span className="manual-tag">Ainda não conectado</span></div><h3>{s.title}</h3><p>{s.detail}</p><div className="source-detail">{s[platform]}</div></article>)}</div>
-    <section className="life-card backup-card"><div><h2>Uma cópia dos seus registros</h2><p>O arquivo contém seus dados pessoais. Guarde-o no aparelho. Limpar os dados do navegador pode apagar seus registros.</p></div><button className="life-button" onClick={backup}>Baixar cópia local</button>{isAndroid() && <p className="form-hint">Extratos importados têm cópia própria em Finanças.</p>}</section>
+    <section className="life-card backup-card"><div><h2>Uma cópia dos seus registros</h2><p>O arquivo contém seus dados pessoais. Guarde-o no aparelho. No Android, os registros ficam na guarda nativa; desinstalar ou limpar os dados do app pode apagá-los.</p></div><button className="life-button" onClick={backup}>Baixar cópia local</button>{isAndroid() && <p className="form-hint">Extratos importados têm cópia própria em Finanças.</p>}</section>
     {form && <UsageForm life={life} close={() => setForm(false)} toast={toast}/>}
   </>;
 }

@@ -1,3 +1,6 @@
+import { bootstrapStorage } from "./storage-bootstrap.js";
+import { hasNativeStorage, stateRequest } from "./native-storage.js";
+import { backupAll } from "./triagem-store.js";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { api } from "./lib.js";
@@ -56,6 +59,22 @@ function App() {
   const syncIssue = useLocalMcpSync(life);
   const { current, target, phase } = useRouteMotion(route, motionGroup);
   useTouchFeedback();
+  useEffect(() => {
+    if (!hasNativeStorage()) return;
+    let revision = null, bundleRevision = null;
+    const refresh = () => {
+      try {
+        const s=stateRequest("status");
+        if (bundleRevision !== null && bundleRevision !== s.revisao_bundle) dispatchEvent(new StorageEvent("storage", { key: null }));
+        if (revision !== s.revisao) dispatchEvent(new Event("fintips:librera-state"));
+        revision=s.revisao;bundleRevision=s.revisao_bundle;
+      } catch { dispatchEvent(new StorageEvent("storage", { key: null })); }
+    };
+    const events=["focus","fintips:resume","fintips:librera-updated"];
+    events.forEach((e)=>addEventListener(e,refresh));
+    const id=setInterval(refresh,30000);refresh();
+    return () => { clearInterval(id);events.forEach((e)=>removeEventListener(e,refresh)); };
+  }, []);
   const [day, setDay] = useState(localDay);
   const [ctx, setCtx] = useState(null);
   const [financeError, setFinanceError] = useState("");
@@ -121,4 +140,12 @@ function App() {
   </div>;
 }
 
-createRoot(document.getElementById("root")).render(<App/>);
+const root=createRoot(document.getElementById("root"));
+try { bootstrapStorage(); root.render(<App/>); }
+catch (error) {
+  root.render(<main className="life-main"><section className="life-card" role="alert"><h1>Seus registros foram preservados</h1><p>{error.message}</p><p>A migração não foi concluída. Nenhuma fonte foi reiniciada.</p>
+    <button className="life-button" onClick={() => { try { globalThis.FinTipsLocal.saveStateCopy(stateRequest("copia")); } catch {} }}>Salvar cópia nativa</button>
+    <button className="life-button" onClick={() => globalThis.FinTipsLocal?.saveCopy(JSON.stringify(backupAll(localStorage)))}>Salvar cópia do legado</button>
+    <button className="life-button" onClick={() => location.reload()}>Tentar novamente</button>
+  </section></main>);
+}

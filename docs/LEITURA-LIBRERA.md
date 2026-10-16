@@ -1,15 +1,10 @@
 # Leitura: Librera e pacing local
 
-> **Execução da fonte persistente:** [plano do agente, P2/P4](PLANO-AGENTE-DE-VIDA.md).
-> Worker e UI precisam compartilhar o repositório nativo; conectar um job a
-> outra cópia de dados não atualiza o tracker. Ainda não implementado.
-
-O tracker está em **Vida → Estudos**. Aceita livro/posição manual ou importação
-de uma cópia local de `app-Progress.json`. A seleção é lida em memória no
-client, sem upload. A sincronização automática com a nuvem ainda não existe.
-
-A prioridade agora é conexão única com fonte persistente e atualização local,
-para dispensar reimportações diárias. [Plano e contrato de automação](AUTOMACAO-SEM-TOIL.md).
+**Preview 12:** conexão persistente pelo seletor Android, coleta por job e
+atualização direta na mesma guarda da UI. Veja [uso e limites](LIBRERA-AUTOMATICO.md).
+O tracker continua em **Vida → Estudos**, com importação pontual e registro
+manual disponíveis. Não há OAuth próprio para a nuvem do Librera: o documento
+precisa estar acessível/atualizado pelo provedor escolhido.
 
 ## Discovery realizado
 
@@ -87,6 +82,5 @@ o prazo/frequência e exibe a base da estimativa.
 
 `fintips/reading.py` define a referência; `vida/Leitura.kt` replica o pacing e
 `web/src/reading-model.js` atende o protótipo local. `ouro/leitura.json` tem
-casos de ritmo e importação, consumidos pelos testes Kotlin/JS. O parser
-Librera Kotlin fica para o adaptador nativo; o ouro de importação já descreve
-sua entrada/saída mínima. O painel não chama API para persistir leitura.
+casos de ritmo e importação, consumidos pelos testes Kotlin/JS. O adaptador Kotlin `vida/Librera.kt` lê a projeção mínima e faz a importação
+na guarda nativa, com referência em `fintips/librera.py` e ouro próprio. O painel não chama API para persistir leitura.

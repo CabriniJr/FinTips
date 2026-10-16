@@ -35,6 +35,8 @@ import com.fintips.mcp.FalhaTriagem
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonPrimitive
 import android.app.AlertDialog
 import android.widget.EditText
 import android.text.InputType
@@ -55,6 +57,24 @@ class PreviewActivity : ComponentActivity() {
     private var closed = false
     private val triagemAI = OpenAITriagem()
     private val chaveTriagem by lazy { ChaveTriagem(this) }
+    private val estadoCliente by lazy { EstadoCliente(this) }
+    private val librera by lazy { LibreraFonte(this,estadoCliente) }
+    private var libreraProfile="principal"
+    private var libreraPicking=false
+    private val libreraPicker=registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        libreraPicking=false
+        if(uri!=null) io.execute {
+            var granted=false
+            try {
+                val hadGrant=contentResolver.persistedUriPermissions.any { it.uri==uri && it.isReadPermission }
+                contentResolver.takePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION);granted=!hadGrant
+                librera.conectar(uri,libreraProfile)
+            } catch(_:Exception) {
+                if(granted && runCatching { estadoCliente.fonte()?.get("uri")?.jsonPrimitive?.content }.getOrNull()!=uri.toString()) runCatching { contentResolver.releasePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                runOnUiThread { if(!closed) view.evaluateJavascript("dispatchEvent(new CustomEvent('fintips:librera-error',{detail:'Não foi possível conectar. Escolha o app-Progress.json que o Librera atualiza, com acesso persistente; a fonte anterior foi preservada.'}))",null) }
+            } finally { atualizarEstadoWeb() }
+        } else atualizarEstadoWeb()
+    }
     private val extratos by lazy { ExtratosLocais(this) }
     private var keyDialog: AlertDialog? = null
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -96,6 +116,7 @@ class PreviewActivity : ComponentActivity() {
             }
         }
         view.addJavascriptInterface(LocalBackup(), "FinTipsLocal")
+        view.addJavascriptInterface(EstadoWebBridge(estadoCliente), "FinTipsState")
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             WebViewCompat.addWebMessageListener(view, "FinTipsMotor", setOf("https://$HOST")) { _, message, origin, mainFrame, reply ->
                 if (!mainFrame || origin.scheme != "https" || origin.host != HOST || origin.port !in listOf(-1, 443) || message.type != WebMessageCompat.TYPE_STRING) return@addWebMessageListener
@@ -111,6 +132,10 @@ class PreviewActivity : ComponentActivity() {
                         val input = request.getJSONObject("input")
                         val result = when {
                             op in setOf("triagem.chave_status", "triagem.configurar_chave", "triagem.apagar_chave", "triagem.sugerir", "triagem.organizar", "triagem.cancelar") -> triagemOperation(op, input)
+                            op=="estado.contexto" -> { require(input.keys().asSequence().toSet()==setOf("scopes"));JSONObject(com.fintips.motor.projetarBundleIA(estadoCliente.bundle(),input.getJSONArray("scopes").let { a -> (0 until a.length()).map { a.getString(it) } },java.time.LocalDate.now().toString()).toString()) }
+                            op=="estado.exportar" -> { require(input.length()==0);LocalBackup().saveStateCopy(estadoCliente.copia());JSONObject().put("status","copia_solicitada") }
+                            op=="guarda.descritores" -> { require(input.length()==0);JSONObject(guardasAndroid.toString()) }
+                            op.startsWith("librera.") -> libreraOperation(op,input)
                             op.startsWith("extrato.") && op != "extrato.conferir" -> extratoOperation(op,input)
                             op == "ponte.copiar_endpoint" -> copyLocal(McpLocalService.ponteOperation("ponte.status", JSONObject()).getString("origem") + "/mcp", false)
                             op == "ponte.abrir_cliente" -> openAIClient(input.getString("provedor"))
@@ -150,6 +175,7 @@ class PreviewActivity : ComponentActivity() {
             }
         })
         setContentView(view)
+        io.execute { runCatching { if(estadoCliente.existe()) librera.agendar() } }
         if (savedInstanceState == null || view.restoreState(savedInstanceState) == null) {
             view.loadUrl("https://$HOST/index.html" + if (intent.getBooleanExtra("abrir_ia", false)) "#ia" else "")
         }
@@ -157,6 +183,9 @@ class PreviewActivity : ComponentActivity() {
 
     /** Exportação para Downloads local; não oferece provedor remoto de destino. */
     inner class LocalBackup {
+        @JavascriptInterface
+        fun saveStateCopy(json: String) = savePrivateCopy(json,16*1024*1024)
+
         @JavascriptInterface
         fun saveCopy(json: String) = savePrivateCopy(json, 2 * 1024 * 1024)
 
@@ -198,6 +227,25 @@ class PreviewActivity : ComponentActivity() {
         }
     }
 
+    private fun atualizarEstadoWeb() = runOnUiThread {
+        if(!closed) view.evaluateJavascript("dispatchEvent(new Event('fintips:librera-updated'))",null)
+    }
+    private fun libreraOperation(op: String,i: JSONObject): JSONObject = when(op) {
+        "librera.status" -> { require(i.length()==0);JSONObject(librera.status().toString()) }
+        "librera.conectar" -> {
+            require(i.keys().asSequence().toSet() in listOf(emptySet<String>(),setOf("perfil")))
+            val p=i.optString("perfil","principal").trim();require(p.isNotBlank() && p.length<=100)
+            runOnUiThread { if(!closed && !libreraPicking) { libreraPicking=true;libreraProfile=p
+                try { libreraPicker.launch(arrayOf("application/json","text/plain","application/octet-stream")) }
+                catch(_:Exception) { libreraPicking=false;notice("Não foi possível abrir o seletor de documentos.");atualizarEstadoWeb() }
+            } }
+            JSONObject().put("status","selecao_solicitada")
+        }
+        "librera.sincronizar" -> { require(i.length()==0);val result=librera.sincronizar();atualizarEstadoWeb();JSONObject(result.toString()) }
+        "librera.desconectar" -> { require(i.length()==0);val result=librera.desconectar();atualizarEstadoWeb();JSONObject(result.toString()) }
+        else -> error("operação indisponível")
+    }
+
     private fun notice(message: String) = runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
 
     private fun openAIClient(provider: String): JSONObject {
@@ -229,7 +277,8 @@ class PreviewActivity : ComponentActivity() {
         "triagem.sugerir", "triagem.organizar" -> {
             val body=Json.parseToJsonElement(i.toString()).jsonObject
             val (financeiro,fluxos) = extratos.contextos()
-            JSONObject(triagemAI.sugerir(body["bundle"]!!.jsonObject,body["rascunhos"]!!.jsonArray,
+            val authoritativeBundle=estadoCliente.bundle()
+            JSONObject(triagemAI.sugerir(authoritativeBundle,body["rascunhos"]!!.jsonArray,
                 chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje"),agente=op=="triagem.organizar",financeiro=financeiro,fluxosFinanceiros=fluxos).toString())
         }
         else -> error("operação indisponível")
@@ -283,6 +332,7 @@ class PreviewActivity : ComponentActivity() {
     private fun localServer(operation: String, i: JSONObject): JSONObject = when (operation) {
         "servidor.status" -> McpLocalService.status()
         "servidor.verificar" -> McpLocalService.verificar(i.getString("sessao"))
+        "servidor.atualizar_nativo" -> { require(i.keys().asSequence().toSet()==setOf("sessao"));McpLocalService.atualizarDaGuarda(this,i.getString("sessao")) }
         "servidor.atualizar" -> McpLocalService.atualizar(i.getString("sessao"), i.getJSONObject("context").toString())
         "servidor.invalidar" -> McpLocalService.atualizar(i.getString("sessao"), null)
         "servidor.pausar" -> McpLocalService.pausar(i.getString("sessao"))
@@ -358,6 +408,7 @@ class PreviewActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        io.execute { runCatching { if(estadoCliente.existe() && estadoCliente.fonte()?.get("ativa")==JsonPrimitive(true)) { librera.agendar();librera.sincronizar();atualizarEstadoWeb() } } }
         if (::view.isInitialized) { view.onResume(); view.evaluateJavascript("dispatchEvent(new Event('fintips:resume'))", null) }
     }
 

@@ -2459,12 +2459,14 @@ def ouro_perfil_tempo() -> dict:
 
 from ouro_contexto_ia import ouro_contexto_ia
 
+from ouro_librera import gerar as ouro_librera_auto
 from ouro_fluxos import gerar as ouro_fluxos_importados
 from ouro_triagem import gerar as ouro_triagem_universal
 from ouro_agente import gerar as ouro_agente
 from ouro_extratos import gerar as ouro_extratos
 
 GERADORES = {
+    "librera-auto.json": ouro_librera_auto,
     "extratos-contexto.json": ouro_extratos,
     "fluxos-importados.json": ouro_fluxos_importados,
     "triagem-universal.json": ouro_triagem_universal,

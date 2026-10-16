@@ -83,3 +83,22 @@ fun validarContextoIA(c: JsonObject): JsonObject {
     }
     return c
 }
+
+/** Mesmo contrato reduzido v1; a seleção de áreas continua sendo da sessão. */
+fun projetarBundleIA(bundle: JsonObject, scopes: List<String>, today: String): JsonObject {
+    com.fintips.motor.triagem.validarBundle(bundle)
+    val date=kotlinx.datetime.LocalDate.parse(today)
+    val life=bundle["vida"]!!.jsonObject
+    val tasks=life["tarefas"]!!.jsonArray.map { it.jsonObject }.filter { t -> t["inicio"]!!.jsonPrimitive.content<=today && (t["repetir"]==JsonPrimitive(true) || t["inicio"]==JsonPrimitive(today)) }
+    val done=life["registros"]!!.jsonArray.map { it.jsonObject }.filter { it["dia"]==JsonPrimitive(today) }.map { it["tarefaId"] }.toSet()
+    val fronts=areasIA.map { a -> val ts=tasks.filter { it["atributo"]==JsonPrimitive(a) };FrenteParaIA(a,ts.size,ts.count { it["id"] in done }) }
+    val plans=life["planos"]!!.jsonArray.map { val p=it.jsonObject;PlanoParaIA(p["atributo"]!!.jsonPrimitive.content,p["concluido"]!!.jsonPrimitive.boolean) }
+    val reading=if("leitura" !in scopes) emptyList() else bundle["leitura"]!!.jsonObject["livros"]!!.jsonArray.map {
+        val b=it.jsonObject;val obs=b["observacoes"]!!.jsonArray.map { it.jsonObject }
+        val pace=com.fintips.motor.vida.ritmoDeLeitura(obs.map { p -> com.fintips.motor.vida.PosicaoDeLeitura(kotlinx.datetime.LocalDate.parse(p["dia"]!!.jsonPrimitive.content),p["progresso_bp"]!!.jsonPrimitive.int) },date,
+            b["prazo"]?.jsonPrimitive?.content?.takeIf { it.isNotEmpty() }?.let { kotlinx.datetime.LocalDate.parse(it) },b["dias_semana"]?.takeUnless { it==JsonNull }?.jsonPrimitive?.int)
+        val source=obs.maxByOrNull { p -> p["dia"]!!.jsonPrimitive.content }?.get("origem") ?: b["fonte"]!!
+        LeituraParaIA(pace.estado,source.jsonPrimitive.content)
+    }
+    return projetarContextoIA(fronts,plans,reading,scopes)
+}

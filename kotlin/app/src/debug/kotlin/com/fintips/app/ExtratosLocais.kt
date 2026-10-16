@@ -44,7 +44,7 @@ internal class ExtratosLocais(context: Context, nome: String = NOME_ARQUIVO) {
     private fun estado(b: JsonObject): JsonObject = buildJsonObject {
         val (contexto, fluxos) = contextosExtratos(b["arquivos"]!!.jsonArray,b["sal"]!!.jsonPrimitive.content)
         put("fluxos", fluxos)
-        putJsonObject("deposito") { put("arquivo",file.baseFile.name);put("schema_version",1);put("sensivel",true);put("guarda","privada_nativa_sem_backup_nuvem") };put("contexto",contexto);putJsonArray("fontes") { b["arquivos"]!!.jsonArray.forEach { entry ->
+        put("deposito",guardaAndroid("extratos"));put("contexto",contexto);putJsonArray("fontes") { b["arquivos"]!!.jsonArray.forEach { entry ->
             val f=entry.jsonObject;val e=lerOfx(f["ofx"]!!.jsonPrimitive.content,b["sal"]!!.jsonPrimitive.content)
             val abertura=f["saldo_inicial"]?.takeUnless { it==JsonNull }?.jsonPrimitive?.content
             val temSaldo=temSaldoDeclarado(f["ofx"]!!.jsonPrimitive.content)
@@ -93,5 +93,5 @@ internal class ExtratosLocais(context: Context, nome: String = NOME_ARQUIVO) {
             buildJsonObject { put("tipo","fintips_extratos_recuperacao");put("schema_version",1);put("arquivo_base64",android.util.Base64.encodeToString(bytes,android.util.Base64.NO_WRAP)) }.toString()
         }
     }
-    companion object { const val NOME_ARQUIVO="extratos-v1.json";private val LOCK=Any();private const val MAX_BYTES=16*1024*1024 }
+    companion object { val NOME_ARQUIVO get()=guardaAndroid("extratos")["arquivo"]!!.jsonPrimitive.content;private val LOCK=Any();private const val MAX_BYTES=16*1024*1024 }
 }
