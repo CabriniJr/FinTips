@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS = ROOT / "docs" / "contratos"
@@ -51,4 +52,29 @@ mutations.append(("proveniência ausente", value))
 for name, value in mutations:
     assert not validator.is_valid(value), f"Adulteração aceita: {name}"
 print(f"Contrato proposto: {len(examples)} exemplos válidos; {len(mutations)} adulterações recusadas.")
-print("Conferência de forma apenas; interpretação, escopo e efeitos ainda não implementados.")
+
+# O contexto reutiliza o mesmo contrato de valores do turno, sem buscar schemas
+# na rede. Isto valida somente forma/paginação; não prova a cobertura do app.
+context_schema = json.loads((CONTRACTS / "agente-contexto-v1.schema.json").read_text())
+Draft202012Validator.check_schema(context_schema)
+registry = Registry().with_resource(schema["$id"], Resource.from_contents(schema))
+context_validator = Draft202012Validator(context_schema, registry=registry)
+context = json.loads((CONTRACTS / "exemplos-contexto" / "01-panorama-paginado.json").read_text())
+context_validator.validate(context)
+context_mutations = []
+value = deepcopy(context)
+value["pagina"]["proximo_cursor"] = None
+context_mutations.append(("página parcial sem cursor", value))
+value = deepcopy(context)
+value["pagina"]["estado"] = "completa"
+context_mutations.append(("página completa com continuação", value))
+value = deepcopy(context)
+del value["base_revisao"]
+context_mutations.append(("snapshot sem revisão", value))
+value = deepcopy(context)
+value["pagina"]["itens"][0]["campos"]["titulo"] = {"tipo": "texto_livre_desconhecido", "valor": "texto"}
+context_mutations.append(("valor fora do contrato comum", value))
+for name, value in context_mutations:
+    assert not context_validator.is_valid(value), f"Adulteração aceita: {name}"
+print(f"Contexto proposto: 1 exemplo válido; {len(context_mutations)} adulterações recusadas.")
+print("Conferência de forma apenas; interpretação, cobertura, escopo e efeitos ainda não implementados.")

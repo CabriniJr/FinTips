@@ -227,7 +227,7 @@ Android; cada porte precisa manter a paridade.
 |---|---|
 | Testar no celular | [Avaliação Android](docs/APK-AVALIACAO.md) |
 | Entender o produto e os objetivos | [App de vida](docs/APP-DE-VIDA.md) · [Jornada](docs/JORNADA.md) |
-| Acompanhar o agente de planejamento | [Plano de execução: diálogo, artefatos, agenda e MCP](docs/PLANO-AGENTE-DE-VIDA.md) — proposto, ainda não disponível no APK |
+| Acompanhar o agente de planejamento | [Plano de execução: contexto global, artefatos, agenda e MCP](docs/PLANO-AGENTE-DE-VIDA.md) — proposto, ainda não disponível no APK |
 | Conhecer o modelo de dados e o agente | [Arquitetura](docs/ARQUITETURA.md) · [Guia técnico](docs/GUIA-TECNICO.md) |
 | Entender como meus dados são protegidos | [Privacidade](docs/PRIVACIDADE.md) |
 | Explorar automação e conectores | [Automação](docs/AUTOMACAO-SEM-TOIL.md) · [Librera](docs/LEITURA-LIBRERA.md) · [Open Finance](docs/OPEN-FINANCE.md) |

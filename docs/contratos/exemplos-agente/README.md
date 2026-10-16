@@ -8,7 +8,9 @@ esta proposta dos protocolos de triagem existentes.
 
 O [plano de execução](../../PLANO-AGENTE-DE-VIDA.md) define responsabilidades,
 privacidade, dependências e critérios de produto. O [schema](../agente-turno-v1.schema.json)
-não anuncia ferramentas nem cria tabelas, modelos Kotlin ou rotas.
+não anuncia ferramentas nem cria tabelas, modelos Kotlin ou rotas. O
+[contrato proposto de contexto global](../exemplos-contexto/README.md) complementa
+o turno: todos os artefatos descobríveis, panorama e detalhes paginados.
 
 | Exemplo | Situação sintética | Efeito esperado |
 |---|---|---|
@@ -92,7 +94,8 @@ python scripts/verificar-contrato-agente-proposto.py
 ```
 
 O job `motor Python` do portão executa esta conferência no CI.
-A conferência valida os cinco exemplos e rejeita adulterações: campos extras,
+A conferência valida os cinco exemplos de turno e o contexto global proposto.
+No turno, rejeita adulterações: campos extras,
 comandos em noop, aprovação pelo agente, quantidade fracionária, unidade
 inválida, texto livre em referência e proveniência ausente. Não chama modelos,
 não resolve aliases e não modifica os motores atuais. P1 deve integrar os
