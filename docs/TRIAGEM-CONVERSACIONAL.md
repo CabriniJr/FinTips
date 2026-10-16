@@ -4,6 +4,9 @@
 > e ainda cria rascunhos a partir das mensagens. Não atende à experiência de
 > planejamento com contexto, etapas e agenda. O [plano de substituição](PLANO-AGENTE-DE-VIDA.md)
 > separa diálogo de artefatos e define os contratos comuns para API/MCP.
+> Após esclarecimento do usuário, o destino permite texto de estudo/compra
+> e valores, protegendo a identidade financeira; modelo local é opcional.
+> Os parágrafos abaixo descrevem a implementação anterior, ainda não migrada.
 
 A preview 9 reformula **Hoje → Conversar** e **Contexto → Vamos organizar seus planos?**. O agente preenche vários campos, prepara novos registros e propõe vínculos durante a conversa.
 Perguntas e escolhas aparecem inline. Um resumo com **Está certo, salvar**

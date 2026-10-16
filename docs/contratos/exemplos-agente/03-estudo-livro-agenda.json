@@ -20,8 +20,8 @@
         "tipo_artefato": "objetivo",
         "campos": {
           "titulo": {
-            "tipo": "referencia",
-            "ref": "texto_objetivo_curto"
+            "tipo": "texto_planejamento",
+            "valor": "Obter certificação de observabilidade"
           },
           "prazo": {
             "tipo": "referencia",
@@ -43,8 +43,8 @@
         "tipo_artefato": "plano",
         "campos": {
           "titulo": {
-            "tipo": "referencia",
-            "ref": "texto_plano_curto"
+            "tipo": "texto_planejamento",
+            "valor": "Preparação para a certificação"
           }
         },
         "proveniencia": {
@@ -76,8 +76,8 @@
         "tipo_artefato": "etapa",
         "campos": {
           "titulo": {
-            "tipo": "referencia",
-            "ref": "texto_etapa_estudo"
+            "tipo": "texto_planejamento",
+            "valor": "Estudar os fundamentos"
           }
         },
         "proveniencia": {
@@ -95,8 +95,8 @@
         "tipo_artefato": "etapa",
         "campos": {
           "titulo": {
-            "tipo": "referencia",
-            "ref": "texto_etapa_simulado"
+            "tipo": "texto_planejamento",
+            "valor": "Praticar com simulados"
           }
         },
         "proveniencia": {
@@ -156,8 +156,8 @@
         "tipo_artefato": "atividade",
         "campos": {
           "titulo": {
-            "tipo": "referencia",
-            "ref": "texto_atividade_leitura"
+            "tipo": "texto_planejamento",
+            "valor": "Ler o material associado"
           },
           "duracao_estimada": {
             "tipo": "quantidade",

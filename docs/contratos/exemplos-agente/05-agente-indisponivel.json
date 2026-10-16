@@ -7,7 +7,7 @@
   "request_id": "request_01",
   "resultado": {
     "tipo": "indisponivel",
-    "motivo_codigo": "interpretador_indisponivel",
+    "motivo_codigo": "agente_indisponivel",
     "recuperavel": true
   }
 }

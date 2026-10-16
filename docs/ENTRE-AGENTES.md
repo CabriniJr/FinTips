@@ -1740,3 +1740,32 @@ recusadas. Exemplos sintéticos, sem dados pessoais ou modelo real; sem testes
 semânticos alegados. Schemas ainda não implementam o executor. O plano exige
 evals reais separadas de mocks, ouro Python/Kotlin para regras novas e teste de
 jornada no Android antes de anunciar planejamento inteligente.
+
+
+**16/10/2026 · Codex — esclarecimento da fronteira de privacidade**
+
+O usuário precisou que os principais dados a abstrair são a identidade da
+origem/destino do extrato. Valores podem passar; texto de estudo e intenção de
+compra pode ser processado pela IA com seu significado. Isso revisa a decisão
+mais ampla do bloco anterior desta mesma data: **modelo local não é requisito
+para o chat**, e não há motivo para opacificar cursos, livros e objetivos.
+
+Atualizado o PR #18: plano, docs de privacidade/triagem/automação e contrato
+proposto. O tipo `texto_planejamento` permite ao agente sintetizar títulos e
+etapas. Referências continuam necessárias para identidade de artefatos,
+evidências e campos protegidos. A indisponibilidade do exemplo 05 passa a ser
+do agente, sem pressupor interpretador local. P3 agora entrega a projeção
+financeira por campo/proveniência e o contexto de planejamento inteligível,
+com proteção de mensagens mistas e resultados de ferramentas.
+
+O extrato bruto, memo original, contas, contraparte real, documentos,
+credenciais e mapa de aliases continuam locais. Ligar um campo vindo do extrato
+a um plano não muda sua sensibilidade. Não generalizar essa autorização para
+publicar registros pessoais no Git. API e MCP devem usar a mesma política,
+sem ampliar grants readonly existentes por efeito desta revisão documental.
+
+Escopo continua de arquitetura/contratos; a preview 9 ainda não envia o texto
+de planejamento neste formato. Próxima implementação pode usar a API com
+histórico relevante, sem spike/download de LLM como bloqueio. A projeção
+financeira terá testes de transporte próprios; os exemplos de schema ainda
+validam somente a forma, não provam proteção de dados no aplicativo.

@@ -16,7 +16,7 @@ não anuncia ferramentas nem cria tabelas, modelos Kotlin ou rotas.
 | `02-pergunta-capacidade.json` | Intenção compreendida, mas orçamento de tempo ausente | pergunta estruturada vinculada à decisão; zero registros |
 | `03-estudo-livro-agenda.json` | Objetivo confirmado na conversa, recurso existente, prazo e tempo escolhidos | proposta de grafo, reutilizando livro; ainda sem escrita |
 | `04-cenario-financeiro.json` | Duas simulações da mesma carteira e horizonte já foram calculadas | proposta de cenário/decisão; não efetiva compra, crédito ou aporte |
-| `05-interpretacao-indisponivel.json` | Interpretação privada não disponível | preservar mensagem; zero registros e nenhum envio de texto bruto |
+| `05-agente-indisponivel.json` | Agente indisponível | preservar mensagem e zero registros; não fabricar plano como fallback |
 
 O exemplo 03 é um **recorte de contrato**, com uma atividade e uma sessão.
 Não demonstra um currículo completo, distribuição de várias semanas nem uma
@@ -29,9 +29,16 @@ correções, negação e várias intenções; ver P3/P5/P6 no plano.
 - `contexto_42` vincula aliases ao snapshot de revisão 42 e ao grant da sessão.
   É um identificador sintético. A implementação emite referências opacas,
   imprevisíveis, não derivadas de títulos/IDs pessoais.
-- `texto_*`, `prazo_01`, `dia_planejado_01`, `janela_01`, `intencao_01` e
-  `resposta_orcamento` representam valores/evidências emitidos localmente,
-  relacionados ao contexto. O mapa e seus textos não acompanham o transporte.
+- `prazo_01`, `dia_planejado_01`, `janela_01`, `intencao_01` e
+  `resposta_orcamento` representam valores/evidências emitidos pelo executor,
+  relacionados ao contexto. Mapas de identidades financeiras ficam locais.
+- `texto_planejamento` permite ao agente gerar títulos/etapas em linguagem
+  natural, como nos exemplos 03 e 04. Não depende de extrair um título por regra
+  local nem de uma referência para cada palavra. O contexto de estudo/compra
+  também pode chegar ao agente com seu significado.
+- Esse tipo textual só é aceito nos campos permitidos pelo catálogo. Não libera
+  memo bancário, identidade financeira, documentos ou credenciais e não elimina
+  a projeção por proveniência antes de enviar contexto/API/MCP.
 - `livro_existente_01` é um recurso já consultado, não um livro novo. Os
   `novo_*` têm escopo da proposta; não são IDs de registros persistidos.
 - `simulacao_*` representa resultados do motor associados à mesma base. O
@@ -50,7 +57,8 @@ Validação JSON é apenas o primeiro portão. O executor comum de P1/P2 deve:
    contexto vencido, referência desconhecida/reordenada ou revisão concorrente.
 2. Consultar o catálogo implementado: tipo/campo, unidade, operações permitidas,
    limites, proveniência e política de privacidade. `campos` flexível no schema
-   não é autorização para inventar campos/capacidades.
+   não é autorização para inventar campos/capacidades. `texto_planejamento`
+   não pode preencher campo classificado como identidade financeira local.
 3. Recusar IDs locais duplicados, relações penduradas, ciclos de dependência,
    trocas de unidade e referências de texto usadas como dinheiro ou vice-versa.
 4. Exigir simulações válidas, frescas e da mesma base para sessões e cenários.
@@ -68,10 +76,11 @@ sessão. Não exclui registro aceito. Hash, validade absoluta, autorização e
 recibo pertencem ao executor; `expira_em_segundos` representa a duração de
 validade emitida por ele, nunca um TTL escolhido livremente pelo modelo.
 
-A saída do agente pode conter perguntas e justificativas; isso não autoriza
-reenviar essas strings junto com informações privadas. O schema de turno não
-é o schema de contexto de saída nem um detector de PII. A fronteira tipada de
-saída e seus testes são entregas explícitas de P1/P3.
+O agente pode receber e escrever texto de planejamento autorizado. Isso não
+libera identidades financeiras em perguntas, títulos ou justificativas. O
+schema de turno não é o schema de contexto de saída nem um detector de PII.
+A projeção financeira por campo/proveniência e seus testes são entregas
+explícitas de P1/P3, sem dependência de modelo local.
 
 ## Conferência estrutural
 

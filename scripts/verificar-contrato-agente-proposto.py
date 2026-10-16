@@ -21,9 +21,11 @@ assert len(examples) == 5, "Conferir a lista de exemplos ao alterar o contrato."
 mutations = []
 noop = examples["01-conversa-sem-cadastro.json"]
 study = examples["03-estudo-livro-agenda.json"]
+assert study["resultado"]["comandos"][0]["campos"]["titulo"]["tipo"] == "texto_planejamento", \
+    "O agente pode redigir títulos de planejamento sem depender de texto pré-extraído."
 
 value = deepcopy(noop)
-value["mensagem_privada"] = "texto que não pertence ao envelope"
+value["extrato_bruto"] = "campo que não pertence ao envelope"
 mutations.append(("campo extra", value))
 value = deepcopy(noop)
 value["resultado"]["comandos"] = study["resultado"]["comandos"]

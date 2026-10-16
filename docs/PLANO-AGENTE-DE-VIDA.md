@@ -1,6 +1,7 @@
 # Agente de vida: conversa, planejamento e execução
 
 Status: plano de execução proposto em 16/10/2026, a partir da main `2d6981b`.
+Fronteira de privacidade revisada no mesmo dia após esclarecimento do usuário.
 Este documento especifica o destino; **não declara essas capacidades disponíveis
 na preview 9**. Os schemas/exemplos anexos são contratos de projeto, ainda sem
 endpoint anunciado. Substitui a direção da triagem por rascunhos de mensagens.
@@ -109,8 +110,8 @@ financiamento, faz compra nem movimenta conta.
 
 ```mermaid
 flowchart TD
-    U[Conversa no FinTips] --> D[Diálogo local e interpretação privada]
-    D --> X[Contexto tipado com referências locais]
+    U[Conversa no FinTips] --> D[Histórico de planejamento e filtro financeiro local]
+    D --> X[Texto de planejamento e dados financeiros abstratos]
     X --> A[Agente por API ou conector MCP]
     A --> T[Catálogo e executor comum de ferramentas]
     T --> R[Repositório nativo versionado]
@@ -205,7 +206,7 @@ O schema valida forma; não substitui validação do catálogo, semântica ou PI
 | Catálogo, versões e capacidades | `catalogo.obter` | `fintips_catalogo` |
 | Contexto/revisão e fontes relevantes | `contexto.obter` | `fintips_contexto` |
 | Buscar/consultar artefatos relacionados | `artefatos.consultar` | `fintips_artefatos` |
-| Registrar turno/resposta privada | `dialogo.responder` | somente respostas abstratas autorizadas; texto privado fica no app |
+| Registrar turno/resposta | `dialogo.responder` | texto de planejamento permitido; identidade financeira substituída localmente |
 | Preparar/revisar proposta | `propostas.preparar` | `fintips_propor` |
 | Simular capacidade e agenda | `agenda.simular` | `fintips_simular_agenda` |
 | Calcular ritmo/restante | `leitura.ritmo` + distribuição por sessões | `fintips_ritmo_leitura` |
@@ -228,38 +229,60 @@ Orçamento de chamadas/tempo/tokens, cancelamento, tool results tipados e
 recuperação de erro pertencem à sessão. Worker de arquivo não faz chamadas
 pagas por polling; mudanças simples recalculam indicadores localmente.
 
-### 5. Fronteira de privacidade e interpretação
+### 5. Fronteira de privacidade: identidade financeira, contexto preservado
 
-Permanecem locais: mensagens completas, nomes, origem/destino reais, caminhos,
-credenciais e mapas de referências. Números, relações, unidades e contexto
-abstrato podem sair, conforme autorização já dada pelo usuário.
+Esclarecimento de 16/10/2026: a abstração desejada se concentra no extrato,
+especialmente na **origem e no destino exatos**. Valores podem ser enviados.
+Planos de estudo e intenções de compra podem chegar ao agente com seu texto e
+significado. A proposta anterior de abstrair toda conversa foi ampla demais.
 
-O léxico da preview 9 perde sentido e não é a base para a compreensão geral.
-Substituí-lo por mais regexes ou por um prompt dizendo “não envie PII” não
-resolve a fronteira. Detecção automática de nomes também não garante que todo
-texto pessoal foi removido.
+| Conteúdo | Fronteira de saída para a IA |
+|---|---|
+| Objetivos, planos de estudo, cursos, livros, produtos e intenções de compra | texto significativo permitido no contexto pertinente ao planejamento |
+| Perguntas/respostas de planejamento, prazos e orçamento de tempo | permitido; histórico relevante acompanha a sessão |
+| Valores financeiros, categorias e relações | permitido, com unidade e referências quando necessário |
+| Identidade da origem/destino financeiro: contraparte, favorecido, pagador, estabelecimento real e dados de conta | apenas alias emitido no aparelho; mapa fica local |
+| OFX/CSV bruto, memo bancário original, comprovantes e identificadores de transação | locais; projetar somente os campos autorizados |
+| Credenciais, chaves, documentos pessoais e caminhos privados | locais; não são liberados pela permissão para planos |
 
-**Decisão proposta:** interpretação semântica privada no aparelho produz
-intenções, títulos locais e referências; o agente remoto trabalha com esse
-contexto tipado e ferramentas. O filtro de saída aceita somente schemas e
-referências emitidos pelo aparelho, não texto livre do interpretador. A parte
-remota não precisa receber nomes para distribuir tempo ou calcular cenários.
+Com o assistente ativo, o agente por API pode receber o histórico relevante de
+planejamento e artefatos como títulos de objetivos/livros/cursos. Isso permite
+interpretar intenções, criar títulos curtos, decompor etapas e fazer perguntas
+contextuais. Não exigir que a pessoa classifique ou autorize cada frase, nem
+converter nomes de cursos/livros/produtos em palavras opacas.
 
-Antes de escolher runtime/modelo, fazer um spike em português no Android
-real: qualidade, RAM, ABI, aquecimento, latência e licença/tamanho do modelo.
-Modelo de sistema não existe em todos os aparelhos; download de pesos exige
-uma ativação informada, sem telas técnicas por objetivo. O runtime local pode
-executar o agente inteiro ou só a interpretação; o executor é o mesmo.
+A fronteira financeira é aplicada **antes** do transporte, no executor comum:
+projetar campos por proveniência e sensibilidade; substituir identidades por
+aliases vinculados ao contexto; manter valores/unidades/categorias. Um nome
+protegido não pode sair escondido em `titulo`, `descricao`, `porque`, erro ou
+resultado de ferramenta. Marcar a tela inteira como “planos” não libera um
+campo copiado do extrato. A proteção acompanha a origem do campo, inclusive
+quando ele é relacionado a um objetivo ou reapresentado na conversa.
 
-Se o aparelho não sustentar uma interpretação privada adequada, essa parte
-fica explicitamente bloqueada até uma alternativa compatível. Não voltar a
-converter frases em planos, alegar compreensão ou enviar texto bruto para
-compensar. As fontes e cálculos locais podem funcionar independentemente.
+Texto misto com dados bancários precisa passar pela mesma proteção. Importação
+de extrato/comprovante continua pelo caminho local; não usar o chat como upload
+bruto. Identidades financeiras conhecidas, inclusive citadas na conversa,
+usam o mapa local. Trecho bancário sem projeção confiável fica local para
+resolução, sem bloquear a parte de estudo/compra já autorizada. Não alegar que
+regex ou um prompt de redação detectam qualquer identidade desconhecida.
 
-No conector, FinTips protege o que **ele** envia. Texto que a pessoa digita no
-próprio ChatGPT/Claude já foi entregue à plataforma; o app não consegue
-privatizá-lo depois. Perguntas com resposta privada podem ser concluídas no
-FinTips por referência; conectores recebem apenas o resultado autorizado.
+O catálogo informa a política por campo: `texto_planejamento`,
+`valor_financeiro`, `identidade_financeira_local` ou `segredo_local`, por
+exemplo. Campo financeiro desconhecido é fechado por padrão. Resultados do
+agente podem gerar texto de planejamento, mas não reclassificar campos
+protegidos ou mudar a proveniência para escapar da fronteira.
+
+**Modelo local é opcional.** Pode ser uma evolução para uso offline ou para
+quem escolher um modo mais privado. Não é pré-requisito para a triagem por API,
+não bloqueia o ThinkPhone e não exige download de pesos para criar um plano.
+A compreensão passa a usar o contexto autorizado no agente escolhido, com
+contratos e ferramentas; não o léxico limitado da preview 9.
+
+API e MCP usam essa mesma política no executor. No conector, FinTips controla o
+que ele próprio envia; texto digitado diretamente no ChatGPT/Claude já está
+nessa plataforma. O banco canônico e mapas ficam no aparelho. Envio autorizado
+à API é processamento externo; não implica publicar registros no Git, criar
+um banco pessoal no relay ou prometer retenção zero no provedor.
 
 ### 6. Autoridade e revisão
 
@@ -357,9 +380,9 @@ cor, TalkBack e movimento reduzido. Gráfico de projeção é identificado como 
 | P0 | Separar mensagem de artefato e recuperação do legado | nenhuma | saudações/correções/respostas não viram planos; falta de agente mantém mensagem, não inventa cadastro; reorganização do legado é proposta reversível |
 | P1 | Catálogo, comandos e estado de diálogo/proposta | P0 | exemplos de certificação, livro e carro passam em schemas; noop é legítimo; capacidades não implementadas não são anunciadas |
 | P2 | Guarda nativa e migração | P1 | UI/executor/worker compartilham revisão/transação; legacy/backup/quota/crash/concorrência exercitados; instalação por cima preserva registros |
-| P3 | Spike do interpretador privado | em paralelo a P1/P2 | avaliação semântica no hardware real e teste de não saída de PII; decisão documentada de runtime/modelo ou bloqueio real |
+| P3 | Projeção financeira e contexto de planejamento | em paralelo a P1/P2 | texto de estudo/compra chega inteligível à IA; valores preservados; identidade da origem/destino e dados bancários brutos não saem, inclusive em mensagens mistas e tool results |
 | P4 | Librera persistente | P2 | uma seleção, atualização sem reimportar com app fechado/reaberto/reiniciado; timestamp/dedup/revogação comprovados |
-| P5 | Agente por tools e perguntas inline | P1, P2, P3 | sessão entende intenção/correção, consulta artefatos e chama o executor; não copia conversa para títulos nem repete perguntas respondidas |
+| P5 | Agente por tools e perguntas inline | P1, P2, P3 (sem dependência de modelo local) | sessão entende intenção/correção, consulta artefatos e chama o executor; não copia conversa para títulos nem repete perguntas respondidas |
 | P6 | Certificação + livro + agenda | P4, P5 | objetivo → etapas → sessões sem sobrecarga → metas por leitura → observação atualiza o mesmo plano; teste completo na UI Android |
 | P7 | Propostas pelos dois transportes | P1, P2; ampliar junto a P5/P6 | mesma chamada via API/MCP dá o mesmo resultado; scopes/proposta/aprovação/recibo funcionam; conector real comprovado após hospedagem/autorização |
 | P8 | Carro + projeção de todos os planos | P2, P5 + adaptadores financeiros | cenários com mesma base, reserva/custos e efeito nos demais planos; notas do catálogo não são tratadas como cálculo |
@@ -407,9 +430,10 @@ A decisão de produto está definida: agente que preenche artefatos e reduz toil
 As escolhas técnicas abaixo exigem evidência de execução; não são configurações
 que cada pessoa precisa resolver para criar uma meta:
 
-- P3: runtime/modelo privado, tamanho do download, memória, português e tempo
-  de resposta no aparelho alvo. A variante e versão Android devem ser lidas na
-  build de diagnóstico; nome comercial sozinho não prova compatibilidade.
+- P3: projeção por campo/proveniência, aliases estáveis no contexto e proteção
+  de mensagens mistas. Conferir os corpos HTTP/MCP reais com dados sintéticos:
+  títulos de estudo/compra e valores presentes; identidades financeiras ausentes.
+  Benchmark de modelo local deixa de ser dependência desta entrega.
 - P2: biblioteca/versão de guarda e migração dos quatro stores, incluindo
   catálogo, conversa e recibos. Validar restauração antes de remover a autoridade antiga.
 - P4: provedor e localização acessíveis do JSON Librera, sobrevivência do grant

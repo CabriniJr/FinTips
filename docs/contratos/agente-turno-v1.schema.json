@@ -126,7 +126,6 @@
             },
             "motivo_codigo": {
               "enum": [
-                "interpretador_indisponivel",
                 "contexto_vencido",
                 "capacidade_ausente",
                 "fonte_indisponivel",
@@ -231,6 +230,24 @@
             },
             "valor": {
               "type": "boolean"
+            }
+          },
+          "required": [
+            "tipo",
+            "valor"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "const": "texto_planejamento"
+            },
+            "valor": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
             }
           },
           "required": [

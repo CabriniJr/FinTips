@@ -20,8 +20,8 @@
         "tipo_artefato": "cenario_decisao",
         "campos": {
           "titulo": {
-            "tipo": "referencia",
-            "ref": "texto_cenario_curto"
+            "tipo": "texto_planejamento",
+            "valor": "Comparar compra de veículo e manutenção dos planos atuais"
           },
           "base": {
             "tipo": "referencia",
