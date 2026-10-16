@@ -1,0 +1,459 @@
+# Agente de vida: conversa, planejamento e execução
+
+Status: plano de execução proposto em 16/10/2026, a partir da main `2d6981b`.
+Fronteira de privacidade revisada no mesmo dia após esclarecimento do usuário.
+Este documento especifica o destino; **não declara essas capacidades disponíveis
+na preview 9**. Os schemas/exemplos anexos são contratos de projeto, ainda sem
+endpoint anunciado. Substitui a direção da triagem por rascunhos de mensagens.
+
+## Resultado que define o produto
+
+A pessoa descreve uma intenção. O agente entende o objetivo, consulta o que já
+existe, pergunta apenas por decisões relevantes, decompõe o trabalho, simula
+capacidade e propõe um conjunto coerente. Ao aceitar, objetivos, etapas,
+atividades, agenda e recursos são preenchidos de uma vez. Novas evidências
+alimentam o progresso e o replanejamento, dentro dos limites escolhidos.
+
+**Mensagem não é plano. Resposta a uma pergunta não é outro objetivo.**
+“Vamos organizar isso”, uma saudação, uma correção e um cancelamento podem
+produzir zero alterações. Um parágrafo com três intenções pode produzir três
+objetivos relacionados, com títulos próprios, sem copiar o parágrafo para eles.
+O histórico completo continua local e separado dos artefatos.
+
+A inteligência tem duas partes: o agente interpreta, decide o que perguntar e
+propõe; o motor local calcula e valida. Contratos tornam esse trabalho
+acoplável a agentes diferentes. Eles não produzem compreensão sozinhos.
+
+## Diagnóstico do que existe
+
+| Camada | Evidência na main | Lacuna para esta experiência |
+|---|---|---|
+| Entrada do chat | `web/src/triagem-chat.jsx`, `respond` | chama `makeDraft`/`splitIntents` antes da IA; uma mensagem comum já recebe tipo e título |
+| Interpretação | `triagem-model.js`, `triagem_agente.py`, `AgenteTriagem.kt` | regras e léxico fechado; API recebe rascunhos/projeção, sem uma sessão semântica completa |
+| Operações do agente | protocolo `fintips_agente_v2` | preenche referências e vínculos, mas não oferece o ciclo consultar → decompor → simular → agendar → revisar |
+| Vida e agenda | `life-store.js`: `inicio` e `repetir` booleano | tarefa diária/pontual; não há sessões com duração, dias alternados e orçamento semanal |
+| Leitura | `reading.py`, `vida/Leitura.kt` e importador web | pacing existe; importação pontual, sem fonte persistente/worker |
+| Guarda | `client-state.js`, `triagem-store.js` | `localStorage` do WebView é autoridade; um worker nativo não pode manter outra cópia independente |
+| Finanças | `plans.py`, `projection.py`, `profile.py`, `score.py` e portes | regras existem, mas o dispatcher Android expõe apenas parte; cadastro genérico no caderno não alimenta projeção financeira |
+| MCP Android/ponte | `ServidorLocal.kt`, `integracoes/ponte/` | consulta readonly reduzida; não expõe propostas/agenda/cenários deste plano |
+| Visualização | UI móvel e renderer Compose de gauges | bons componentes, mas faltam os dados/contratos integrados para alimentar o painel pretendido |
+
+Os testes anteriores provaram transporte, limites e transações. Uma API
+simulada que devolve os campos esperados **não prova** que um agente entende
+um parágrafo real. O aceite passa a incluir qualidade semântica e uso contínuo.
+
+## Experiência alvo: três jornadas
+
+Os exemplos abaixo são sintéticos; não são cópias de registros pessoais.
+
+### Certificação e estudo
+
+Entrada: “Quero uma certificação de observabilidade. Preciso fazer o curso,
+praticar e ler dois livros. Quero uma rotina que caiba na semana.”
+
+1. Consultar perfil declarado, objetivos ativos, livros/progresso, recursos
+   relacionados e capacidade de tempo já escolhida. Reutilizar os registros.
+2. Identificar um objetivo de certificação e seus recursos. Se não houver
+   currículo confiável, pedir uma referência ou marcar a decomposição como
+   proposta genérica; não inventar módulos oficiais, requisitos ou exame.
+3. Perguntar o que muda o planejamento: por exemplo, prazo ou tempo semanal.
+   Se já estiver definido, não perguntar novamente. Oferecer alternativas
+   inline; uma janela livre não significa vontade de estudar nela.
+4. Propor etapas de estudo, prática, simulados e revisão, com pré-requisitos,
+   esforço estimado e critério de conclusão. Estimativa do agente é hipótese.
+5. Distribuir sessões na agenda, sem sobrepor compromissos ou outros objetivos.
+   Exibir o total semanal e as trocas: mais tempo, prazo maior ou menor escopo.
+6. Um aceite autoriza o conjunto. Hoje apresenta a próxima sessão; Planos
+   apresenta etapas, recursos e projeção; o calendário mostra as sessões.
+7. Conclusão do curso não prova aprovação na certificação. Simulados, presença,
+   posição do livro e domínio do conteúdo têm evidências distintas.
+
+### Terminar livros e ajustar o ritmo
+
+O agente consulta a biblioteca antes de pedir título/porcentagem. Um livro já
+conectado vira recurso do objetivo; não cria outro por estar citado no chat.
+
+- Progresso observado vem da fonte, com timestamp original e frescor.
+- Restante em pontos-base é distribuído pelas **datas de sessões efetivamente
+  planejadas**, inclusive em dias alternados, até o prazo escolhido.
+- Exemplo sintético: 40% lido, 6 sessões restantes → 10 pontos percentuais por
+  sessão. Essa meta é uma proposta; não significa 10 páginas ou 10 minutos.
+- Sem velocidade medida, percentual não vira minutos. O tempo pode ser um
+  orçamento escolhido; a relação percentual/minuto fica em calibração.
+- O pacing existente continua sendo o cálculo observado. A distribuição por
+  sessões concretas é uma operação nova, com versão e ouro próprios; não
+  alterar silenciosamente a fórmula antiga baseada em dias de calendário.
+- Se o prazo não couber, o agente explica e oferece alternativas. Não agenda
+  esforço impossível nem muda a meta para esconder atraso.
+- A posição do Librera pode recalcular metas futuras dentro de política
+  aceita. Não cria sessões concluídas, compreensão ou dias lidos por inferência.
+
+### Comprar um carro sem ignorar os outros planos
+
+O agente consulta capacidade financeira, reserva, compromissos, perfil
+**declarado**, objetivos concorrentes e qualidade/frescor dessas informações.
+
+Simula manter o plano atual e alternativas de compra/prazo/entrada/parcelas,
+incluindo custos de posse conhecidos. Seguro, impostos, manutenção e uso
+faltantes são lacunas ou hipóteses explícitas, nunca custo zero silencioso.
+
+A simulação usa o mesmo motor local e horizonte para todos os planos: compara
+reserva, fluxo mensal, aportes e datas previstas. Não atribui a mesma sobra
+integral a cada objetivo nem conta dinheiro reservado duas vezes. O agente
+explica impactos e preferências declaradas; não deduz personalidade pelo extrato.
+
+A recomendação qualitativa pertence ao agente e cita números/premissas do
+motor. A escolha continua sendo da pessoa. Guardar um plano não contrata
+financiamento, faz compra nem movimenta conta.
+
+## Arquitetura comum a API e MCP
+
+```mermaid
+flowchart TD
+    U[Conversa no FinTips] --> D[Histórico de planejamento e filtro financeiro local]
+    D --> X[Texto de planejamento e dados financeiros abstratos]
+    X --> A[Agente por API ou conector MCP]
+    A --> T[Catálogo e executor comum de ferramentas]
+    T --> R[Repositório nativo versionado]
+    T --> M[Motor Kotlin: agenda, leitura e finanças]
+    T --> Q[Perguntas estruturadas inline]
+    Q --> D
+    M --> P[Proposta com impactos e lacunas]
+    P --> C[Aceite ou política escolhida no aparelho]
+    C --> R
+    F[Librera e outras fontes autorizadas] --> R
+    R --> V[Hoje, agenda, planos, scores e gauges]
+    R --> X
+```
+
+### 1. Repositório local único
+
+Migrar a autoridade dos registros para um repositório nativo transacional.
+Escolha proposta: Room/SQLite no Android, atrás de uma interface Kotlin;
+regras e DTOs continuam no motor comum, sem dependência Android. Fixar a versão
+compatível com Kotlin/AGP/SDK no PR da guarda, não adotar um major por suposição.
+
+A UI e workers usam o mesmo repositório. O WebView conserva apenas cache de
+apresentação. O bridge oferece consultas/commands tipados e invalidação por
+revisão, sem expor SQL ou caminhos ao JavaScript. O executor verifica a origem
+local confiável; navegação/link externo não ganha acesso ao bridge. A primeira migração valida uma cópia completa, grava numa
+transação, marca versão e permite exportar/recuperar o legado. Depois do corte,
+todos os editores passam pelo executor; não há dual-write com `localStorage`.
+
+Guardar documentos de domínio, observações imutáveis, relações, sessões,
+versões, propostas, recibos e outbox de integrações. Alterações de estado e
+outbox são atômicas; exportar para agenda externa usa retry idempotente.
+Chaves e grants de arquivos ficam nos adaptadores, fora de backups comuns.
+
+### 2. Modelo de domínio consultável
+
+| Artefato | Papel e relações |
+|---|---|
+| Objetivo | resultado escolhido, prioridade, prazo e critério de sucesso |
+| Plano | estratégia/revisão que organiza etapas para um objetivo |
+| Etapa | parte do plano, pré-requisitos e critério verificável |
+| Atividade | trabalho executável, estimativa, frequência e evidência esperada |
+| Sessão | ocorrência concreta com duração, fuso, data e estado |
+| Recurso | livro/curso/material; identidade local reutilizável |
+| Observação | medida da fonte/pessoa, instante/período, unidade e frescor |
+| Perfil/regra | preferência ou restrição declarada, proveniência e validade |
+| Plano financeiro | adaptador real do motor de planos, não apenas nota no catálogo |
+| Cenário/decisão | hipótese, resultados, alternativas e escolha com justificativa |
+| Política de ajuste | limites aceitos para reorganização automática e seu histórico |
+
+Os 14 tipos atuais são ponto de partida. Novos tipos e campos entram pelo
+catálogo, com schema, operações, unidades, privacidade e adaptador real. O
+manifesto anuncia somente capacidades implementadas/autorizadas. “Conhecer os
+artefatos” significa poder descobrir e consultar esses contratos; não despejar
+todo o banco num prompt nem criar um formulário por tipo.
+
+Cada relação tem semântica: `parte_de`, `depende_de`, `usa_recurso`, `apoia`,
+`agenda` ou `mede`. Progresso dos filhos não é somado em duplicidade no pai.
+O ID do livro é reutilizado no estudo e no objetivo de leitura.
+
+### 3. Diálogo e propostas separados dos registros
+
+Uma sessão guarda mensagens, respostas estruturadas, decisões pendentes,
+resumo privado e referências às fontes. Não guarda cada fala como rascunho.
+
+Resultados de um turno: `sem_alteracao`, `perguntar`, `propor` ou
+`indisponivel`. Uma proposta é um conjunto revisável de comandos; só o executor
+aplica aos artefatos. O agente pode substituir/cancelar propostas pendentes,
+sem apagar registros confirmados ou histórico. Correções voltam à mesma sessão.
+
+Perguntas têm ID, texto contextual, motivo, campo/decisão afetada, tipo de
+resposta e opções quando úteis. Perguntar somente o que muda a decisão; de uma
+a três perguntas relacionadas por interação, permitindo adiar. Uma resposta
+curta é interpretada no contexto da pergunta, não como novo plano.
+
+O resumo mostra títulos curtos, etapas, horas semanais, sessões e impactos.
+Ajustes são conversados. Detalhes técnicos são inspecionáveis, sem configurar
+contratos, pesos ou conectores a cada objetivo.
+
+A recuperação dos planos já criados na preview 9 também é uma proposta: o
+agente identifica candidatos a unir, dividir e renomear, preserva conclusão,
+prazos, vínculos e proveniência, mostra o antes/depois e permite desfazer.
+Nunca apagar automaticamente o legado porque parece uma fala longa.
+
+### 4. Executor e catálogo de capacidades
+
+[Contrato proposto do turno](contratos/agente-turno-v1.schema.json) e
+[exemplos sintéticos](contratos/exemplos-agente/) tornam o desenho revisável.
+O schema valida forma; não substitui validação do catálogo, semântica ou PII.
+
+| Serviço comum proposto | API local | Ferramenta MCP proposta |
+|---|---|---|
+| Catálogo, versões e capacidades | `catalogo.obter` | `fintips_catalogo` |
+| Contexto/revisão e fontes relevantes | `contexto.obter` | `fintips_contexto` |
+| Buscar/consultar artefatos relacionados | `artefatos.consultar` | `fintips_artefatos` |
+| Registrar turno/resposta | `dialogo.responder` | texto de planejamento permitido; identidade financeira substituída localmente |
+| Preparar/revisar proposta | `propostas.preparar` | `fintips_propor` |
+| Simular capacidade e agenda | `agenda.simular` | `fintips_simular_agenda` |
+| Calcular ritmo/restante | `leitura.ritmo` + distribuição por sessões | `fintips_ritmo_leitura` |
+| Comparar cenários financeiros | `financas.simular` | `fintips_simular_financas` |
+| Consultar métricas e cobertura | `indicadores.consultar` | `fintips_indicadores` |
+| Validar e consultar proposta/recibo | `propostas.validar/status` | `fintips_proposta` |
+| Aplicar com autoridade do aparelho | `propostas.aplicar` interno | aprovação local; não recebe `confirmado=true` como prova |
+
+Esses nomes são proposta de interface, não rotas existentes. API de modelos
+usa tool/function calling e um adaptador de mensagens; MCP usa `tools/list` e
+`tools/call`. Ambos delegam ao mesmo executor e schema, sem regras financeiras
+ou de agenda duplicadas em prompts/adaptadores.
+
+Cada chamada traz versão, contexto/revisão, request ID e grant/capacidade. O
+aparelho emite aliases e associa ao snapshot e escopo. Uma referência antiga
+não pode ser reinterpretada para outro item após reordenar a lista. Contexto
+vencido, alteração concorrente ou ampliação de escopo exigem atualização.
+
+Orçamento de chamadas/tempo/tokens, cancelamento, tool results tipados e
+recuperação de erro pertencem à sessão. Worker de arquivo não faz chamadas
+pagas por polling; mudanças simples recalculam indicadores localmente.
+
+### 5. Fronteira de privacidade: identidade financeira, contexto preservado
+
+Esclarecimento de 16/10/2026: a abstração desejada se concentra no extrato,
+especialmente na **origem e no destino exatos**. Valores podem ser enviados.
+Planos de estudo e intenções de compra podem chegar ao agente com seu texto e
+significado. A proposta anterior de abstrair toda conversa foi ampla demais.
+
+| Conteúdo | Fronteira de saída para a IA |
+|---|---|
+| Objetivos, planos de estudo, cursos, livros, produtos e intenções de compra | texto significativo permitido no contexto pertinente ao planejamento |
+| Perguntas/respostas de planejamento, prazos e orçamento de tempo | permitido; histórico relevante acompanha a sessão |
+| Valores financeiros, categorias e relações | permitido, com unidade e referências quando necessário |
+| Identidade da origem/destino financeiro: contraparte, favorecido, pagador, estabelecimento real e dados de conta | apenas alias emitido no aparelho; mapa fica local |
+| OFX/CSV bruto, memo bancário original, comprovantes e identificadores de transação | locais; projetar somente os campos autorizados |
+| Credenciais, chaves, documentos pessoais e caminhos privados | locais; não são liberados pela permissão para planos |
+
+Com o assistente ativo, o agente por API pode receber o histórico relevante de
+planejamento e artefatos como títulos de objetivos/livros/cursos. Isso permite
+interpretar intenções, criar títulos curtos, decompor etapas e fazer perguntas
+contextuais. Não exigir que a pessoa classifique ou autorize cada frase, nem
+converter nomes de cursos/livros/produtos em palavras opacas.
+
+A fronteira financeira é aplicada **antes** do transporte, no executor comum:
+projetar campos por proveniência e sensibilidade; substituir identidades por
+aliases vinculados ao contexto; manter valores/unidades/categorias. Um nome
+protegido não pode sair escondido em `titulo`, `descricao`, `porque`, erro ou
+resultado de ferramenta. Marcar a tela inteira como “planos” não libera um
+campo copiado do extrato. A proteção acompanha a origem do campo, inclusive
+quando ele é relacionado a um objetivo ou reapresentado na conversa.
+
+Texto misto com dados bancários precisa passar pela mesma proteção. Importação
+de extrato/comprovante continua pelo caminho local; não usar o chat como upload
+bruto. Identidades financeiras conhecidas, inclusive citadas na conversa,
+usam o mapa local. Trecho bancário sem projeção confiável fica local para
+resolução, sem bloquear a parte de estudo/compra já autorizada. Não alegar que
+regex ou um prompt de redação detectam qualquer identidade desconhecida.
+
+O catálogo informa a política por campo: `texto_planejamento`,
+`valor_financeiro`, `identidade_financeira_local` ou `segredo_local`, por
+exemplo. Campo financeiro desconhecido é fechado por padrão. Resultados do
+agente podem gerar texto de planejamento, mas não reclassificar campos
+protegidos ou mudar a proveniência para escapar da fronteira.
+
+**Modelo local é opcional.** Pode ser uma evolução para uso offline ou para
+quem escolher um modo mais privado. Não é pré-requisito para a triagem por API,
+não bloqueia o ThinkPhone e não exige download de pesos para criar um plano.
+A compreensão passa a usar o contexto autorizado no agente escolhido, com
+contratos e ferramentas; não o léxico limitado da preview 9.
+
+API e MCP usam essa mesma política no executor. No conector, FinTips controla o
+que ele próprio envia; texto digitado diretamente no ChatGPT/Claude já está
+nessa plataforma. O banco canônico e mapas ficam no aparelho. Envio autorizado
+à API é processamento externo; não implica publicar registros no Git, criar
+um banco pessoal no relay ou prometer retenção zero no provedor.
+
+### 6. Autoridade e revisão
+
+Um aceite do plano autoriza criar o conjunto de artefatos e sessões. A pessoa
+pode escolher uma política para ajustes futuros: redistribuir sessões na
+semana, preservar prazo/prioridade e respeitar teto de esforço. Ajustes dentro
+desses limites podem ser automáticos, visíveis e reversíveis; exceções voltam
+como uma decisão inline, sem confirmação diária de dados observados.
+
+MCP remoto ganha uma capacidade nova de **propor**, separada da consulta atual.
+Não ampliar grants readonly existentes em silêncio. A aprovação ocorre no
+aparelho, vinculada ao hash da proposta, escopo e revisão; um modelo não pode
+se autoaprovar passando um booleano. Conferir permissão em cada chamada,
+independentemente das annotations MCP. Propostas têm TTL, IDs idempotentes e
+recibos; retry não duplica tarefas ou sessões.
+
+O relay atual precisa de allowlist/protocolo versionados para essas operações.
+Não é apenas trocar o prompt ou publicar as ferramentas Python completas.
+Continuar sem banco pessoal/snapshot no relay. Testar API e MCP com o SDK,
+inclusive cliente sem capacidade, replay, offline, cancelamento e revogação.
+
+## Librera: um agendamento Android sobre a fonte escolhida
+
+O equivalente ao “cron lendo o path” é **WorkManager + URI persistente**, com
+seleção única pelo Storage Access Framework. Não exige digitar um path nem
+permissão para todos os arquivos. Preferir a pasta sincronizada acessível,
+resolvendo `app-Progress.json` a cada execução; sincronizadores podem substituir
+o arquivo e invalidar uma URI de arquivo antiga. Provedor precisa oferecer e
+manter o grant; pasta privada de outro app não fica acessível por suposição.
+
+- Atualizar ao retomar, após conectar e em trabalho periódico único por fonte.
+  Proposta inicial: 30 min com flex; Android exige pelo menos 15 min e pode
+  atrasar por Doze/bateria. Não usar polling permanente ou alarme exato.
+- Abrir somente o arquivo esperado na árvore escolhida, com limite de tamanho,
+  timeout e parser compartilhado. Não varrer documentos pessoais.
+- Persistir apenas projeção mínima do parser: identidade local do livro,
+  perfil, `p`, `t` e proveniência. Descartar `pt` e outros extras.
+- Deduplicar pela identidade e timestamp/conteúdo da fonte. Repetir o mesmo
+  JSON amanhã não cria outra observação nem prova que a pessoa leu amanhã.
+- Falha/revogação/arquivo parcial preserva histórico, marca fonte atrasada e
+  permite reconectar uma vez. Última tentativa/sucesso e data do dado são distintos.
+- Primeiro plano e worker usam a mesma transação/repositório. Pausa/desconexão
+  cancelam trabalho e impedem novas gravações, inclusive job que já estava lendo.
+- Diretório local sincronizado funciona sem API cloud do FinTips. Um documento
+  de provedor cloud depende do provedor/rede; não assumir autorização Drive de
+  outro app nem prometer que conceder URI sincroniza o conteúdo por si só.
+
+Aceite em Android: escolher a fonte uma vez, fechar app, mudar o arquivo,
+executar worker/retomar e ver o progresso real nas telas. Repetir após reinício,
+com snapshot igual, acesso revogado, JSON truncado, dado antigo e dois coletores.
+
+## Agenda e replanejamento
+
+Começar com agenda interna: orçamento semanal, janelas, duração, frequência,
+pré-requisitos, datas concretas, fuso e bloqueios. “Dia sim, dia não” precisa de
+âncora contínua; não reiniciar a alternância toda segunda-feira.
+
+Calendário Android é uma fonte/saída opcional: ler disponibilidade local sem
+exportar títulos; escrever somente em calendário escolhido/gerido pelo app,
+com permissão explícita e IDs idempotentes. Uma proposta interna não deve
+aparecer como evento externo antes de ser aceita.
+
+O planejador local detecta conflitos, excesso de carga, prazo inviável,
+dependências circulares e falta de evidência. O agente explica alternativas;
+o motor não ajusta horários/dinheiro por uma opinião escondida no prompt.
+Datas locais e instantes usam fuso explícito, inclusive DST e mudanças de fuso.
+Passado e sessões concluídas não são reescritos em um replanejamento.
+
+## Scores, gráficos e gauges alimentados pelo motor
+
+Indicadores separados: progresso do objetivo, constância/comprometimento,
+viabilidade da agenda, ritmo de leitura, situação financeira e cobertura dos
+dados. O agregado usa metas/pesos escolhidos pela pessoa, não um julgamento
+sobre sua vida. A recomendação do agente não cria uma fórmula de score.
+
+Cada indicador carrega janela, versão da regra, origem, frescor, cobertura e
+componentes incluídos/omitidos. Sem base → `null`/“Sem dados”, não zero.
+Planejado, estimado e observado aparecem separadamente. Não somar percentual,
+minutos e reais nem contar livro + sessão + objetivo pai três vezes.
+
+A definição de fórmulas novas é um PR próprio com referência Python, porte
+Kotlin e ouro. Scores financeiros existentes são reutilizados sem alteração
+silenciosa. Mudança de pesos/metas vale com nova revisão e não melhora o passado.
+
+UI: Hoje com próximas sessões e progresso real; agenda semanal de carga;
+objetivo com etapas/recursos; livro com posição, meta por sessão e previsão;
+cenário financeiro comparativo mostrando efeito nos outros planos. Gauges e
+transições respondem a snapshots reais, com alto contraste, legenda além da
+cor, TalkBack e movimento reduzido. Gráfico de projeção é identificado como tal.
+
+## Execução por PRs, com dependências e saída verificável
+
+| PR/ID | Entrega | Dependência | Pronto quando |
+|---|---|---|---|
+| P0 | Separar mensagem de artefato e recuperação do legado | nenhuma | saudações/correções/respostas não viram planos; falta de agente mantém mensagem, não inventa cadastro; reorganização do legado é proposta reversível |
+| P1 | Catálogo, comandos e estado de diálogo/proposta | P0 | exemplos de certificação, livro e carro passam em schemas; noop é legítimo; capacidades não implementadas não são anunciadas |
+| P2 | Guarda nativa e migração | P1 | UI/executor/worker compartilham revisão/transação; legacy/backup/quota/crash/concorrência exercitados; instalação por cima preserva registros |
+| P3 | Projeção financeira e contexto de planejamento | em paralelo a P1/P2 | texto de estudo/compra chega inteligível à IA; valores preservados; identidade da origem/destino e dados bancários brutos não saem, inclusive em mensagens mistas e tool results |
+| P4 | Librera persistente | P2 | uma seleção, atualização sem reimportar com app fechado/reaberto/reiniciado; timestamp/dedup/revogação comprovados |
+| P5 | Agente por tools e perguntas inline | P1, P2, P3 (sem dependência de modelo local) | sessão entende intenção/correção, consulta artefatos e chama o executor; não copia conversa para títulos nem repete perguntas respondidas |
+| P6 | Certificação + livro + agenda | P4, P5 | objetivo → etapas → sessões sem sobrecarga → metas por leitura → observação atualiza o mesmo plano; teste completo na UI Android |
+| P7 | Propostas pelos dois transportes | P1, P2; ampliar junto a P5/P6 | mesma chamada via API/MCP dá o mesmo resultado; scopes/proposta/aprovação/recibo funcionam; conector real comprovado após hospedagem/autorização |
+| P8 | Carro + projeção de todos os planos | P2, P5 + adaptadores financeiros | cenários com mesma base, reserva/custos e efeito nos demais planos; notas do catálogo não são tratadas como cálculo |
+| P9 | Painéis, scores e refinamento visual | P6, P8 + fórmulas com ouro | gauges/gráficos usam dados reais/versionados; incógnitas/cobertura visíveis; avaliação prolongada sem transcrição diária |
+
+O catálogo e a conformidade API/MCP nascem em P1; P7 entrega a extensão real
+do transporte remoto. Não deixar “MCP comum” como uma adaptação posterior do
+prompt. P8 pode avançar em paralelo ao estudo depois da guarda/executor; não
+precisa interromper a entrega do primeiro fluxo completo P6.
+
+Faixa Codex: diálogo, UI, agenda e integração Android/guarda/fontes. Solicitação
+ao Claude via docs: revisar domínio/contratos e assumir adaptadores de perfil,
+planos, projeção e scores portados. Pedido não equivale a aceite do outro agente.
+Compartilhados têm escopo registrado antes de edição. Cada regra nova nasce
+em Python/Kotlin no mesmo commit, com ouro, conforme `CLAUDE.md`.
+
+## Portões de qualidade e demonstração
+
+1. Casos sintéticos com parágrafos, várias intenções, saudação, pergunta,
+   correção, cancelamento, negação, prazo relativo, recurso existente e lacuna.
+   Comparar **grafo esperado e efeitos**, não apenas validade JSON ou título literal.
+2. Evals com agente real e orçamento controlado, separadas de mocks. Registrar
+   modelo/versão, resultado e fonte sintética; não solicitar chave na conversa
+   nem usar registros pessoais no CI. Mock testa protocolo, não inteligência.
+3. Ouro Python/Kotlin de agenda, pacing, cenários e indicadores. Contrato
+   financeiro antigo continua idêntico até PR explícito de mudança de regra.
+4. Mesmo executor via adaptador API e MCP/SDK: consultar, simular, propor,
+   aprovar no aparelho e consultar recibo. Negativos de escopo/replay/stale/offline.
+5. Android real/emulador: migração sem perda, SAF/reboot, worker sem WebView,
+   fonte parada/revogada, economia de bateria e apresentação móvel/acessível.
+6. Uso prolongado: objetivo escolhido e fonte conectada; dias seguintes usam
+   leitura/agenda normalmente, sem cadastrar tarefas e percentuais de novo.
+   Medir localmente transcrições, perguntas repetidas e intervenção exigida.
+
+Não publicar outra “triagem inteligente” apenas porque compila ou porque um
+stub devolve três registros. O primeiro aceite de produto é a jornada P6; o
+financeiro precisa do aceite P8 próprio. Os passos podem ser entregues em PRs
+menores, com capacidade/estado honestos em cada build. P0 não se resolve apenas
+desligando a triagem: o corte precisa preservar mensagens e legado, e a build
+não pode anunciar o agente completo enquanto P3/P5/P6 não estiverem provados.
+
+## Próxima revisão e evidências exigidas
+
+A decisão de produto está definida: agente que preenche artefatos e reduz toil.
+As escolhas técnicas abaixo exigem evidência de execução; não são configurações
+que cada pessoa precisa resolver para criar uma meta:
+
+- P3: projeção por campo/proveniência, aliases estáveis no contexto e proteção
+  de mensagens mistas. Conferir os corpos HTTP/MCP reais com dados sintéticos:
+  títulos de estudo/compra e valores presentes; identidades financeiras ausentes.
+  Benchmark de modelo local deixa de ser dependência desta entrega.
+- P2: biblioteca/versão de guarda e migração dos quatro stores, incluindo
+  catálogo, conversa e recibos. Validar restauração antes de remover a autoridade antiga.
+- P4: provedor e localização acessíveis do JSON Librera, sobrevivência do grant
+  e substituição do arquivo pelo sincronizador. Um caminho de exemplo não prova acesso real.
+- P5/P7: modelo remoto configurável, contratos de ferramentas admitidos,
+  autenticação/hospedagem do conector e limites de execução. Só declarar
+  ChatGPT/Claude conectado depois do teste nas contas reais autorizadas.
+
+Cada PR registra o resultado dessas decisões e suas limitações. Os exemplos
+estruturais anexos podem avançar sem resolver hardware/hospedagem; não são
+motivo para anunciar o agente pronto.
+
+## Fontes e documentos relacionados
+
+- [Automação sem toil](AUTOMACAO-SEM-TOIL.md) e [Librera](LEITURA-LIBRERA.md).
+- [Scores e fontes](SCORES-FONTES-CONECTORES.md), [porte](PORTE-KOTLIN.md),
+  [ponte MCP atual](../integracoes/ponte/README.md).
+- Android: [SAF e grants persistentes](https://developer.android.com/training/data-storage/shared/documents-files),
+  [WorkManager periódico](https://developer.android.com/reference/androidx/work/PeriodicWorkRequest),
+  [guarda Room](https://developer.android.com/training/data-storage/room).
+- [MCP: ferramentas, schemas e annotations](https://modelcontextprotocol.io/specification/2025-06-18/server/tools).
+  Referência de protocolo consultada em 16/10/2026; escolher/revalidar a versão
+  efetivamente negociada pelos clientes no PR do transporte.

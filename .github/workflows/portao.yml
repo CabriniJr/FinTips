@@ -54,11 +54,13 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: instalar
-        run: pip install -e ".[tudo]" pytest
+        run: pip install -e ".[tudo]" pytest "jsonschema>=4.18,<5"
       - name: testes
         run: python -m pytest tests/ -q
       - name: contratos de triagem gerados conferem
         run: python scripts/gerar-contratos-triagem.py --conferir
+      - name: contrato proposto do agente permanece estruturalmente válido
+        run: python scripts/verificar-contrato-agente-proposto.py
       - name: ouro em paridade com o Python
         run: python scripts/gerar-ouro.py --conferir
       - name: nenhum dado pessoal nos arquivos versionados

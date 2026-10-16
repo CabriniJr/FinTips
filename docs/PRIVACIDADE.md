@@ -1,5 +1,22 @@
 # Privacidade e PII
 
+## Direção atual: identidade financeira local, planos com contexto
+
+Esclarecimento do usuário em 16/10/2026: valores não precisam de abstração;
+o foco é proteger a identidade da origem/destino do extrato. Texto de planos,
+estudos, livros/cursos e intenções de compra pode ser processado pelo agente
+configurado, com o histórico pertinente. Não exigir modelo local ou substituir
+esses significados por um vocabulário fechado.
+
+Origem/destino financeiro real, contas, documentos, credenciais, extrato/memo
+bruto e mapas de aliases continuam locais. A projeção por campo/proveniência
+vale também em texto misto e resultados de ferramentas. O agente não pode
+liberar esses campos reclassificando-os como plano. A regra de não publicar
+registros pessoais no repositório continua integralmente válida.
+
+Esta seção define o **destino da implementação**; as previews descritas abaixo
+ainda têm seus limites anteriores. [Arquitetura, fronteira e sequência P3/P5](PLANO-AGENTE-DE-VIDA.md#5-fronteira-de-privacidade-identidade-financeira-contexto-preservado).
+
 ## Android preview 8: triagem com valores e labels abstratas
 
 O usuário autorizou números, relações e componentes de cálculo com aliases;

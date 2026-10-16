@@ -1,0 +1,37 @@
+{
+  "schema": "fintips_turno_proposto_v1",
+  "sessao_ref": "sessao_sintetica",
+  "turno_ref": "turno_01",
+  "contexto_ref": "contexto_42",
+  "base_revisao": 42,
+  "request_id": "request_01",
+  "resultado": {
+    "tipo": "perguntar",
+    "perguntas": [
+      {
+        "id": "pergunta_orcamento",
+        "decisao_codigo": "orcamento_semanal_estudo",
+        "enunciado": "Quanto tempo por semana você quer reservar para esse objetivo?",
+        "motivo": "Distribuir as sessões sem ocupar todo o tempo livre.",
+        "adiavel": true,
+        "resposta": {
+          "tipo": "opcao",
+          "opcoes": [
+            {
+              "codigo": "duas_horas",
+              "rotulo": "2 horas"
+            },
+            {
+              "codigo": "quatro_horas",
+              "rotulo": "4 horas"
+            },
+            {
+              "codigo": "outro_valor",
+              "rotulo": "Escolher outro tempo"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
