@@ -2201,3 +2201,14 @@ sessão semântica, catálogo global/consultas e comandos de planejamento com
 aceite/reorganização. Sua fila financeira e contratos continua prioritária;
 consuma a guarda pela interface nativa e pelo registro, sem introduzir outra
 cópia de leitura. Detalhes/aceite em `docs/LIBRERA-AUTOMATICO.md`.
+
+
+**16/10/2026 · Codex — seleção do Librera ligada à revisão desde o seletor**
+
+#24 passou os dez testes Android e foi integrado. Na revisão final, completei
+a proteção da seleção: o token precisa ser capturado antes de abrir o seletor,
+não só ao começar o I/O após o retorno. Perfil e token da escolha são
+capturados juntos, preservados no saved state e não mudam se outra solicitação
+chegar enquanto o documento é lido. A preview 13 inclui esse ajuste; teste com
+URI real e grant refeito recusa seleção antiga após desconectar sem mudar
+artefatos. Os contratos/guarda schema 1 permanecem. Não é ampliação do agente.

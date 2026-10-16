@@ -77,7 +77,13 @@ class LibreraAndroidTest {
             assertEquals(canonical,repo.bundle());assertEquals(JsonPrimitive("arquivo_invalido"),source.status()["estado"])
             c.contentResolver.releasePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION);source.sincronizar()
             assertEquals(canonical,repo.bundle());assertEquals(JsonPrimitive("permissao_revogada"),source.status()["estado"])
+            val staleSelection=repo.tokenFonte()
             source.desconectar();assertNull(scheduler.getPendingJob(LibreraFonte.JOB_ID));assertEquals(canonical,repo.bundle())
+            c.contentResolver.call(uri,"set",raw(.6,now).toString(),null)
+            c.contentResolver.call(uri,"grant",null,null)
+            c.contentResolver.takePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            try { source.conectar(uri,"outro_perfil",expectedToken=staleSelection);fail("reativou seleção obsoleta") } catch(_:IllegalStateException) {}
+            assertEquals(JsonPrimitive(false),source.status()["conectada"]);assertEquals(canonical,repo.bundle())
         } finally {
             scheduler.cancel(LibreraFonte.JOB_ID)
             runCatching { EstadoCliente(c).desconectar() }

@@ -30,8 +30,7 @@ internal class LibreraFonte(private val context: Context, private val estado: Es
         } ?: error("documento indisponível")
         return Json.parseToJsonElement(bytes.decodeToString())
     }
-    fun conectar(uri: Uri, profile: String, signal: CancellationSignal = CancellationSignal()): JsonObject {
-        val expectedToken=estado.tokenFonte()
+    fun conectar(uri: Uri, profile: String, signal: CancellationSignal = CancellationSignal(), expectedToken: Long = estado.tokenFonte()): JsonObject {
         val previous=estado.fonte()?.get("uri")?.jsonPrimitive?.content
         val raw=ler(uri,signal)
         signal.throwIfCanceled()
