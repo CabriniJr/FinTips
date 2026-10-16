@@ -1,3 +1,4 @@
+import { FinancialContextCard } from "./financial-context.jsx";
 import { CLIENT_STATE_KEY, writeSlice } from "./client-state.js";
 import { backupAll } from "./triagem-store.js";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -306,6 +307,7 @@ export function PhoneContext({ life, toast }) {
   return <>
     <PageHeading code="05" overline="Sinais da rotina" title="Contexto" description="O que seu celular pode contar, sob seu controle."/>
     <a className="life-card context-chat-entry" href="#conversa"><div><span className="manual-tag">CONVERSA / REGISTRO LOCAL</span><h2>Vamos organizar seus planos?</h2><p>Conte o que você quer fazer. Revise tarefas, livros, metas e vínculos em um lote.</p></div><Icon name="arrow" size={24}/></a>
+    <FinancialContextCard/>
     <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros completos ficam no aparelho. A coleta automática ainda não está ativa. Você pode preparar um contexto mínimo para autorizar por MCP.</p></div></section>
     <button className="context-prompt" onClick={() => { location.hash = "ia"; }}><span className="area-icon"><Icon name="context"/></span><span><strong>Servidor IA local</strong><small>Motor e MCP no celular · revisão e controle</small></span><Icon name="arrow" size={18}/></button>
     <section className="life-card"><div className="section-head"><h2>Seu tempo de tela</h2><span className="manual-tag">Registro manual</span></div>
@@ -317,7 +319,7 @@ export function PhoneContext({ life, toast }) {
     <div className="section-head outside"><h2>Fontes que podemos conectar</h2><span className="small-note">Em estudo</span></div>
     <div className="segmented platform-switch">{[["android", "Android"], ["ios", "iPhone"]].map(([id, label]) => <button key={id} aria-pressed={platform === id} onClick={() => setPlatform(id)}>{label}</button>)}</div>
     <div className="source-grid">{SOURCES.map((s) => <article key={s.id} className="life-card source-card"><div className="section-head"><span className="area-icon"><Icon name={s.icon}/></span><span className="manual-tag">Ainda não conectado</span></div><h3>{s.title}</h3><p>{s.detail}</p><div className="source-detail">{s[platform]}</div></article>)}</div>
-    <section className="life-card backup-card"><div><h2>Uma cópia dos seus registros</h2><p>O arquivo contém seus dados pessoais. Guarde-o no aparelho. Limpar os dados do navegador pode apagar seus registros.</p></div><button className="life-button" onClick={backup}>Baixar cópia local</button></section>
+    <section className="life-card backup-card"><div><h2>Uma cópia dos seus registros</h2><p>O arquivo contém seus dados pessoais. Guarde-o no aparelho. Limpar os dados do navegador pode apagar seus registros.</p></div><button className="life-button" onClick={backup}>Baixar cópia local</button>{isAndroid() && <p className="form-hint">Extratos importados têm cópia própria em Finanças.</p>}</section>
     {form && <UsageForm life={life} close={() => setForm(false)} toast={toast}/>}
   </>;
 }

@@ -91,8 +91,11 @@ Dado ausente aparece como ausência, sem inventar progresso ou fracasso.
 A alpha é uma build de avaliação com a interface web embarcada em WebView.
 Você já pode testar tarefas, áreas da vida, planos e leitura. O **motor Kotlin
 está ligado à UI** para as frentes do dia, o ritmo dos livros e a conferência
-de saldo OFX. Classificação, score e histórico financeiro completos continuam
-no computador. A migração da tela para Compose está em andamento.
+de saldo OFX. A **preview 10 registra os extratos no aparelho**, mostra histórico
+e totais observados por mês e inclui esse resumo no contexto da API do assistente.
+Saldo inicial é opcional e importações repetidas não duplicam movimentações.
+[Guarda, privacidade e limites](docs/EXTRATOS-ANDROID.md). Classificação, score
+e cenários financeiros completos continuam no computador. A migração da tela para Compose está em andamento.
 
 A **preview 9 coloca o agente no trabalho de registro**: em Hoje → Conversar,
 você conta os planos e responde perguntas inline. A IA preenche vários campos,

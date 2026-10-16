@@ -1,5 +1,11 @@
 # APK para avaliar a UI
 
+**Atualização preview 10:** importação OFX persistente, recibo, histórico e
+contexto financeiro disponível nas abas e na API do assistente. Saldo anterior
+é opcional. A preview 9 só conferia em memória; importe o OFX novamente.
+[Funcionamento, cópia local e limites](EXTRATOS-ANDROID.md). As notas abaixo
+descrevem versões anteriores.
+
 **Atualização preview 8:** chat de triagem embarcado, chave OpenAI em Keystore,
 valores com aliases e contratos universais. Confirmação aplica lotes nas abas
 ou no catálogo local. [Avaliação e limites](TRIAGEM-CONVERSACIONAL.md).

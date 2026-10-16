@@ -264,8 +264,12 @@ jobs:
             echo "Não é a tela Compose nativa, e a compilação não prova fluidez,"
             echo "seletor de arquivos nem lifecycle no aparelho."
             echo
-            echo "Motor Kotlin ligado à UI: frentes do dia, ritmo de leitura e conferência de saldo OFX."
-            echo "As finanças ainda não oferecem classificação, score ou histórico no APK."
+            echo "Motor Kotlin ligado à UI: frentes do dia, ritmo de leitura e importação persistente de extratos OFX."
+            echo "Preview 10: extratos ficam registrados no aparelho, com recibo, histórico e movimentação por mês."
+            echo "Saldo inicial opcional; repetição e períodos sobrepostos não duplicam movimentações com a mesma identidade."
+            echo "O resumo financeiro entra na API autorizada do assistente; origem/destino reais, banco, conta e OFX ficam locais."
+            echo "A conferência antiga não salvava o arquivo: reimporte o OFX uma vez nesta versão."
+            echo "Classificação, score financeiro e cenários completos ainda não estão integrados no APK."
             echo
             echo "Servidor MCP Kotlin embarcado no celular, somente em 127.0.0.1 e com token por sessão."
             echo "Inicie/encerre em Contexto → Servidor IA local. Serviço com notificação de controle."
@@ -277,7 +281,8 @@ jobs:
             echo "OpenAI opcional: chave cifrada com Android Keystore e valores com aliases."
             echo "A conversa, nomes e origem/destino reais ficam no client; não vão para a API."
             echo "A cobrança usa a conta API da pessoa. Nenhuma chave de produção foi usada nos testes."
-            echo "As cópias locais incluem vida, leitura, catálogo e conversa, sem a chave."
+            echo "As cópias locais incluem vida, leitura, catálogo e conversa, sem a chave. Extratos têm cópia própria em Finanças."
+            echo "Detalhes da importação: docs/EXTRATOS-ANDROID.md. O MCP legado ainda não inclui esse contexto financeiro."
             echo "Contrato e API local: docs/TRIAGEM-CONVERSACIONAL.md."
             echo
             echo "Preview 7: ponte HTTPS/OAuth comum para ChatGPT e Claude, com WSS de saída pelo Android."

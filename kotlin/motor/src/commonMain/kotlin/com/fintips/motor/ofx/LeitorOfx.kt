@@ -89,7 +89,7 @@ private fun campos(bloco: String): Map<String, String> {
     return saida
 }
 
-fun lerOfx(texto: String, sal: String = ""): Extrato {
+fun lerOfx(texto: String, sal: String = "", idsOriginais: MutableMap<String, String>? = null): Extrato {
     val corpo = texto.substringAfter("<OFX>", texto)
 
     val cabecalho = campos(corpo.substringBefore("<BANKTRANLIST>"))
@@ -123,6 +123,7 @@ fun lerOfx(texto: String, sal: String = ""): Extrato {
             uid = "$fitid#$n"
         }
         idsUsados.add(uid)
+        idsOriginais?.put(uid, fitid)
 
         val dtposted = f["DTPOSTED"] ?: throw ErroOfx("transação sem DTPOSTED: $fitid")
         val trnamt = f["TRNAMT"] ?: throw ErroOfx("transação sem TRNAMT: $fitid")

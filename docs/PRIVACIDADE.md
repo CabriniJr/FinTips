@@ -1,5 +1,12 @@
 # Privacidade e PII
 
+## Android preview 10: extratos persistidos no aparelho
+
+A importação salva a fonte no armazenamento privado nativo, fora de backups
+Android e do localStorage. A API autorizada recebe resumo por período e valores,
+sem identidade bancária; o MCP legado ainda não inclui finanças. Cópia sensível
+separada em Downloads, acionada pela pessoa. [Guarda, fronteira e limites](EXTRATOS-ANDROID.md).
+
 ## Direção atual: identidade financeira local, planos com contexto
 
 Esclarecimento do usuário em 16/10/2026: valores não precisam de abstração;

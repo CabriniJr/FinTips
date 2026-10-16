@@ -2461,8 +2461,10 @@ from ouro_contexto_ia import ouro_contexto_ia
 
 from ouro_triagem import gerar as ouro_triagem_universal
 from ouro_agente import gerar as ouro_agente
+from ouro_extratos import gerar as ouro_extratos
 
 GERADORES = {
+    "extratos-contexto.json": ouro_extratos,
     "triagem-universal.json": ouro_triagem_universal,
     "triagem-agente.json": ouro_agente,
     "contexto-ia.json": ouro_contexto_ia,

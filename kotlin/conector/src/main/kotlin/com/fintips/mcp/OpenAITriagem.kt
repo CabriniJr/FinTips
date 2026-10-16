@@ -1,5 +1,6 @@
 package com.fintips.mcp
 
+import com.fintips.motor.importacao.validarContextoExtratos
 import com.fintips.motor.triagem.pedidoOpenAITriagem
 import com.fintips.motor.triagem.validarSugestaoTriagem
 import com.fintips.motor.triagem.pedidoAgente
@@ -24,12 +25,19 @@ class OpenAITriagem(
     private val url=endpoint.toHttpUrl().also { require(it.isHttps && it.username.isEmpty() && it.password.isEmpty() && it.query==null && it.fragment==null) }
     private val current=AtomicReference<Call?>(null)
     fun cancelar() { current.getAndSet(null)?.cancel() }
-    fun sugerir(bundle: JsonObject, drafts: JsonArray, key: String, autorizado: Boolean, hoje: String = java.time.LocalDate.now().toString(), agente: Boolean = false): JsonObject {
+    fun sugerir(bundle: JsonObject, drafts: JsonArray, key: String, autorizado: Boolean, hoje: String = java.time.LocalDate.now().toString(), agente: Boolean = false, financeiro: JsonObject? = null): JsonObject {
         if(!autorizado) throw FalhaTriagem("CONSENTIMENTO")
         if(!key.startsWith("sk-") || key.length !in 20..512 || key.any { it.isWhitespace() || it.code < 32 }) throw FalhaTriagem("CHAVE")
         val prepared=if(agente) pedidoAgente(bundle,drafts,hoje) else pedidoOpenAITriagem(bundle,drafts,hoje)
+        val base=if(agente) prepared else prepared["pedido"]!!.jsonObject
+        val requestBody=if(financeiro==null) base else {
+            val safe=validarContextoExtratos(financeiro)
+            val data=Json.parseToJsonElement(base["input"]!!.jsonPrimitive.content).jsonObject
+            val instructions=base["instructions"]!!.jsonPrimitive.content+"\nContexto financeiro observado no aparelho, com identidades removidas: entradas/saídas são movimentações por sinal, não receita/despesa classificada. Não deduza renda, reserva disponível ou score. Respeite conciliação e classificação pendente."
+            JsonObject(base+mapOf("input" to JsonPrimitive(JsonObject(data+("financas_importadas" to safe)).toString()),"instructions" to JsonPrimitive(instructions)))
+        }
         val req=Request.Builder().url(url).header("Authorization","Bearer $key")
-            .post((if(agente) prepared else prepared["pedido"]!!).toString().toRequestBody("application/json; charset=utf-8".toMediaType())).build()
+            .post(requestBody.toString().toRequestBody("application/json; charset=utf-8".toMediaType())).build()
         val call=http.newCall(req)
         if(!current.compareAndSet(null,call)) throw FalhaTriagem("OCUPADO")
         try {
