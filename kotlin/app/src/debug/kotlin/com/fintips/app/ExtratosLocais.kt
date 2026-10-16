@@ -5,6 +5,7 @@ import android.util.AtomicFile
 import com.fintips.motor.Dinheiro
 import com.fintips.motor.ofx.lerOfx
 import com.fintips.motor.importacao.contextoExtratos
+import com.fintips.motor.importacao.contextosExtratos
 import com.fintips.motor.importacao.temSaldoDeclarado
 import kotlinx.serialization.json.*
 import java.io.File
@@ -41,7 +42,9 @@ internal class ExtratosLocais(context: Context, nome: String = NOME_ARQUIVO) {
         try { stream.write(bytes);file.finishWrite(stream) } catch(e:Exception) { file.failWrite(stream);throw e }
     }
     private fun estado(b: JsonObject): JsonObject = buildJsonObject {
-        putJsonObject("deposito") { put("arquivo",file.baseFile.name);put("schema_version",1);put("sensivel",true);put("guarda","privada_nativa_sem_backup_nuvem") };put("contexto",resumo(b));putJsonArray("fontes") { b["arquivos"]!!.jsonArray.forEach { entry ->
+        val (contexto, fluxos) = contextosExtratos(b["arquivos"]!!.jsonArray,b["sal"]!!.jsonPrimitive.content)
+        put("fluxos", fluxos)
+        putJsonObject("deposito") { put("arquivo",file.baseFile.name);put("schema_version",1);put("sensivel",true);put("guarda","privada_nativa_sem_backup_nuvem") };put("contexto",contexto);putJsonArray("fontes") { b["arquivos"]!!.jsonArray.forEach { entry ->
             val f=entry.jsonObject;val e=lerOfx(f["ofx"]!!.jsonPrimitive.content,b["sal"]!!.jsonPrimitive.content)
             val abertura=f["saldo_inicial"]?.takeUnless { it==JsonNull }?.jsonPrimitive?.content
             val temSaldo=temSaldoDeclarado(f["ofx"]!!.jsonPrimitive.content)
@@ -56,6 +59,8 @@ internal class ExtratosLocais(context: Context, nome: String = NOME_ARQUIVO) {
         } }
     }
     fun estado(): JsonObject = synchronized(LOCK) { estado(ler()) }
+    fun contextos(): Pair<JsonObject,JsonObject> = synchronized(LOCK) { val b=ler();contextosExtratos(b["arquivos"]!!.jsonArray,b["sal"]!!.jsonPrimitive.content) }
+    fun fluxos(): JsonObject = contextos().second
     fun contexto(): JsonObject = synchronized(LOCK) { resumo(ler()) }
     fun importar(raw: String, abertura: String?): JsonObject = synchronized(LOCK) {
         require(raw.encodeToByteArray().size<=1024*1024)

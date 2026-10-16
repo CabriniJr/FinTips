@@ -1,0 +1,1622 @@
+{
+  "validacoes": [
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": true
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ],
+        "memo": "PII_CANARY"
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "usuario",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": true,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "NAME_CANARY",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "arbitrario",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": "200300",
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 1
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 0,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0,
+            "memo": "PII_CANARY"
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          },
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          },
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200301,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "aceito": false
+    }
+  ],
+  "casos": [
+    {
+      "nome": "vazio",
+      "arquivos": [],
+      "sal": "synthetic-flow-salt",
+      "esperado": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 0,
+        "grupos": [],
+        "meses": []
+      }
+    },
+    {
+      "nome": "separa_giro_investimentos_pix_e_estorno",
+      "arquivos": [
+        {
+          "ofx": "<OFX><ORG>BANK_CANARY<BANKID>999<ACCTID>FLOW_ACCOUNT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20260901120000[-3:BRT]<TRNAMT>2000<FITID>salary<MEMO>Salário/Remuneração - ORIGIN_CANARY</STMTTRN><STMTTRN><DTPOSTED>20260902120000[-3:BRT]<TRNAMT>3<FITID>yield<MEMO>Rendimento da conta</STMTTRN><STMTTRN><DTPOSTED>20260903120000[-3:BRT]<TRNAMT>-150<FITID>expense<MEMO>Cartão de Débito - DESTINATION_CANARY</STMTTRN><STMTTRN><DTPOSTED>20260904120000[-3:BRT]<TRNAMT>-1200<FITID>deposit<MEMO>Renda Fixa - Aplicação CDB</STMTTRN><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>600<FITID>withdraw<MEMO>Renda Fixa - Resgate CDB</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>300<FITID>pix-in<MEMO>Pix recebido - SOURCE_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>-80<FITID>pix-out<MEMO>QR Code Pix enviado - DEST_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261004120000[-3:BRT]<TRNAMT>12<FITID>refund<MEMO>Estorno - DEST_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261005120000[-3:BRT]<TRNAMT>10<FITID>unknown-in<MEMO>UNKNOWN_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261005120000[-3:BRT]<TRNAMT>-20<FITID>unknown-out<MEMO>UNKNOWN_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261006120000[-3:BRT]<TRNAMT>20<FITID>wrong-sign<MEMO>Renda Fixa - Aplicação CDB</STMTTRN><STMTTRN><DTPOSTED>20261006120000[-3:BRT]<TRNAMT>0<FITID>zero<MEMO>Salário/Remuneração</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>0<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "synthetic-flow-salt",
+      "esperado": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "nome": "repeticao_sobreposicao",
+      "arquivos": [
+        {
+          "ofx": "<OFX><ORG>BANK_CANARY<BANKID>999<ACCTID>FLOW_ACCOUNT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20260901120000[-3:BRT]<TRNAMT>2000<FITID>salary<MEMO>Salário/Remuneração - ORIGIN_CANARY</STMTTRN><STMTTRN><DTPOSTED>20260902120000[-3:BRT]<TRNAMT>3<FITID>yield<MEMO>Rendimento da conta</STMTTRN><STMTTRN><DTPOSTED>20260903120000[-3:BRT]<TRNAMT>-150<FITID>expense<MEMO>Cartão de Débito - DESTINATION_CANARY</STMTTRN><STMTTRN><DTPOSTED>20260904120000[-3:BRT]<TRNAMT>-1200<FITID>deposit<MEMO>Renda Fixa - Aplicação CDB</STMTTRN><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>600<FITID>withdraw<MEMO>Renda Fixa - Resgate CDB</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>300<FITID>pix-in<MEMO>Pix recebido - SOURCE_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>-80<FITID>pix-out<MEMO>QR Code Pix enviado - DEST_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261004120000[-3:BRT]<TRNAMT>12<FITID>refund<MEMO>Estorno - DEST_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261005120000[-3:BRT]<TRNAMT>10<FITID>unknown-in<MEMO>UNKNOWN_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261005120000[-3:BRT]<TRNAMT>-20<FITID>unknown-out<MEMO>UNKNOWN_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261006120000[-3:BRT]<TRNAMT>20<FITID>wrong-sign<MEMO>Renda Fixa - Aplicação CDB</STMTTRN><STMTTRN><DTPOSTED>20261006120000[-3:BRT]<TRNAMT>0<FITID>zero<MEMO>Salário/Remuneração</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>0<DTASOF>20261031</LEDGERBAL></OFX>"
+        },
+        {
+          "ofx": "<OFX><ORG>BANK_CANARY<BANKID>999<ACCTID>FLOW_ACCOUNT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20260904120000[-3:BRT]<TRNAMT>-1200<FITID>deposit<MEMO>Renda Fixa - Aplicação CDB</STMTTRN><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>600<FITID>withdraw<MEMO>Renda Fixa - Resgate CDB</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>300<FITID>pix-in<MEMO>Pix recebido - SOURCE_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>-80<FITID>pix-out<MEMO>QR Code Pix enviado - DEST_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261004120000[-3:BRT]<TRNAMT>12<FITID>refund<MEMO>Estorno - DEST_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>0<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "synthetic-flow-salt",
+      "esperado": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 12,
+        "grupos": [
+          {
+            "fluxo": "income",
+            "transacoes": 2,
+            "entradas_centavos": 200300,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 15000
+          },
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 120000
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 60000,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 1200,
+            "saidas_centavos": 0
+          },
+          {
+            "fluxo": "pendente",
+            "transacoes": 6,
+            "entradas_centavos": 33000,
+            "saidas_centavos": 10000
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-09",
+            "grupos": [
+              {
+                "fluxo": "income",
+                "transacoes": 2,
+                "entradas_centavos": 200300,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 15000
+              },
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 120000
+              }
+            ]
+          },
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 60000,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 1200,
+                "saidas_centavos": 0
+              },
+              {
+                "fluxo": "pendente",
+                "transacoes": 6,
+                "entradas_centavos": 33000,
+                "saidas_centavos": 10000
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "nome": "canal_normalizado",
+      "arquivos": [
+        {
+          "ofx": "<OFX><ORG>BANK_CANARY<BANKID>999<ACCTID>FLOW_ACCOUNT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>-71.45<FITID>a<MEMO>  RENDA   FIXA - APLICACAO CDB</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>70<FITID>b<MEMO>renda fixa - resgate cdb</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>0<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "synthetic-flow-salt",
+      "esperado": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 2,
+        "grupos": [
+          {
+            "fluxo": "savings_out",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 7145
+          },
+          {
+            "fluxo": "savings_in",
+            "transacoes": 1,
+            "entradas_centavos": 7000,
+            "saidas_centavos": 0
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "savings_out",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 7145
+              },
+              {
+                "fluxo": "savings_in",
+                "transacoes": 1,
+                "entradas_centavos": 7000,
+                "saidas_centavos": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "nome": "sinais_incompativeis",
+      "arquivos": [
+        {
+          "ofx": "<OFX><ORG>BANK_CANARY<BANKID>999<ACCTID>FLOW_ACCOUNT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>-40<FITID>a<MEMO>Rendimento da conta</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>40<FITID>b<MEMO>Cartão de Débito</STMTTRN><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>-12<FITID>c<MEMO>Estorno</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>0<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "synthetic-flow-salt",
+      "esperado": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 3,
+        "grupos": [
+          {
+            "fluxo": "pendente",
+            "transacoes": 3,
+            "entradas_centavos": 4000,
+            "saidas_centavos": 5200
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "pendente",
+                "transacoes": 3,
+                "entradas_centavos": 4000,
+                "saidas_centavos": 5200
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "nome": "mesmo_fitid_estorno",
+      "arquivos": [
+        {
+          "ofx": "<OFX><ORG>BANK_CANARY<BANKID>999<ACCTID>FLOW_ACCOUNT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>-44<FITID>a<MEMO>Cartão de Débito</STMTTRN><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>44<FITID>a<MEMO>Estorno</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>0<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "synthetic-flow-salt",
+      "esperado": {
+        "schema_version": 1,
+        "origem": "heuristica",
+        "revisao_regras": "72fd02e6cf8a1238f3c6f03ba42af9e9e11675c7a9e7f207b5bb100b195237e8",
+        "transacoes": 2,
+        "grupos": [
+          {
+            "fluxo": "expense",
+            "transacoes": 1,
+            "entradas_centavos": 0,
+            "saidas_centavos": 4400
+          },
+          {
+            "fluxo": "refund",
+            "transacoes": 1,
+            "entradas_centavos": 4400,
+            "saidas_centavos": 0
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-10",
+            "grupos": [
+              {
+                "fluxo": "expense",
+                "transacoes": 1,
+                "entradas_centavos": 0,
+                "saidas_centavos": 4400
+              },
+              {
+                "fluxo": "refund",
+                "transacoes": 1,
+                "entradas_centavos": 4400,
+                "saidas_centavos": 0
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

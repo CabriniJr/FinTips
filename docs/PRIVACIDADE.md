@@ -1,6 +1,11 @@
 # Privacidade e PII
 
-## Android preview 10: extratos persistidos no aparelho
+## Android preview 11: extratos e separação de fluxos no aparelho
+
+A API recebe também `fluxos_importados`: grupos de canal, origem heurística,
+revisão das regras públicas, contagens e centavos por mês. A fronteira fecha
+campos extras e confere totais/sinais; memo, identidades e conta continuam
+locais. Pix não é classificado por nome no transporte.
 
 A importação salva a fonte no armazenamento privado nativo, fora de backups
 Android e do localStorage. A API autorizada recebe resumo por período e valores,

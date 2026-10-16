@@ -12,7 +12,8 @@ from urllib.parse import urlparse
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from fintips.statement_context import statement_context
+from fintips.statement_context import statement_context, statement_views
+from ouro_fluxos import ofx_flows, rows
 from fintips.parsers.ofx import parse_ofx_text
 from ouro_extratos import ofx
 from playwright.async_api import async_playwright, expect
@@ -25,7 +26,8 @@ async def main():
         for width in [320,390,768]:
             files=[];calls=[];errors=[];hosts=set()
             def state():
-                result={'contexto':statement_context(files,'test'),'fontes':[]}
+                observed, flows = statement_views(files,'test')
+                result={'contexto':observed,'fluxos':flows,'fontes':[]}
                 for f in files:
                     stmt=parse_ofx_text(f['ofx'],salt='test')
                     result['fontes'].append({'ref':f['ref'],'inicio':stmt.period_start.isoformat(),'fim':stmt.period_end.isoformat(),'transacoes':len(stmt.transactions),'saldo_centavos':int(stmt.ledger_balance*100),'conciliacao':'nao_conferido','diferenca_centavos':None,'importado_em':1})
@@ -82,6 +84,26 @@ async def main():
             await expect(page.get_by_role('heading',name='2 movimentações disponíveis')).to_be_visible()
             await page.locator('.bottom-nav a[href="#visao"]').click()
             await expect(page.get_by_role('heading',name='2 movimentações no contexto')).to_be_visible()
+            # O giro do investimento não pode ocupar os KPIs de recebimento/pagamento.
+            flow_raw=ofx_flows(rows()).encode()
+            await page.get_by_label('Extrato OFX no aparelho').set_input_files({'name':'flow-synthetic.ofx','mimeType':'application/x-ofx','buffer':flow_raw})
+            await page.get_by_role('button',name='Importar e registrar contexto').click()
+            await expect(page.get_by_role('heading',name='14 movimentações no contexto')).to_be_visible()
+            flow_panel=page.get_by_label('Separação dos fluxos financeiros')
+            await expect(flow_panel).to_contain_text('Recebimentos identificados')
+            # synthetic.ofx has unknown memos: those 2 rows join the 6 pending.
+            await expect(flow_panel.get_by_role('heading',name='8 movimentações a revisar')).to_be_visible()
+            await expect(flow_panel.locator('.finance-primary')).to_contain_text('2.003,00')
+            await expect(flow_panel.locator('.finance-primary')).to_contain_text('150,00')
+            await expect(flow_panel).to_contain_text('1.200,00')
+            gross=page.locator('.finance-gross')
+            await expect(gross.locator('dl')).not_to_be_visible()
+            await gross.locator('summary').click()
+            await expect(gross).to_contain_text('Créditos brutos')
+            await expect(gross.locator('dl')).to_be_visible()
+            await gross.locator('summary').click()
+            await page.reload()
+            await expect(page.get_by_label('Separação dos fluxos financeiros').locator('.finance-primary')).to_contain_text('2.003,00')
             assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
             await page.screenshot(path=str(output/f'financas-{width}.png'),full_page=True)
             assert not errors,errors

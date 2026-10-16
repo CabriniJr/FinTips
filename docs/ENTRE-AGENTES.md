@@ -2085,3 +2085,27 @@ A correção da importação acima já foi integrada em #20 (`facecda5`): previe
 CI e sete testes instrumentados Android aprovados, APK público conferido.
 Isso prova guarda e contexto observacional, **não** F-base. Esta atualização
 é de plano/contrato e coordenação; não anuncia motor completo nem um novo APK.
+
+
+**16/10/2026 · Codex — correção do giro bruto na tela financeira Android**
+
+Feedback com OFX anexado confirmou que a tela destaca aplicações/resgates
+junto de entradas/saídas, confundindo o giro da conta com leitura financeira.
+O arquivo foi analisado somente fora do repositório; fixture/ouro/testes usam
+casos inteiramente sintéticos, sem valores, datas ou identidades pessoais.
+
+Correção em `codex/android-fluxos-investimentos`: projeção separada por canal,
+com `import_flows.py` / `importacao/FluxosImportados.kt`. Canais derivados de
+`categories.yaml` por gerador conferido no CI; não é cópia de heurística no
+JavaScript. Aplicações/resgates/estornos têm grupos próprios. Pix, canal não
+reconhecido ou sinal incompatível ficam pendentes. Não chama todos os Pix de
+renda/consumo, não porta a classificação completa de contraparte/categoria e
+não calcula reserva/score sobre o parser bruto.
+
+O contexto observado v1 e a guarda nativa schema 1 mantêm contratos; a nova
+projeção `fluxos_importados` é derivada, não um depósito. O parser/dedup são
+compartilhados entre as duas saídas. A preview 11 recalcula fontes da preview
+10 sem reimportação. UI destaca os grupos e põe o bruto em detalhe; API recebe
+ambos com allowlist/totais validados, sem alargar grants MCP antigos. Isso é
+correção pontual de leitura, não conclusão da F-base; Claude deve consumir o
+mesmo canal canônico ao integrar o classificador/adaptadores completos.

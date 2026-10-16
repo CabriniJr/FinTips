@@ -97,6 +97,12 @@ Saldo inicial é opcional e importações repetidas não duplicam movimentaçõe
 [Guarda, privacidade e limites](docs/EXTRATOS-ANDROID.md). Classificação, score
 e cenários financeiros completos continuam no computador. A migração da tela para Compose está em andamento.
 
+A **preview 11 separa o giro financeiro**: aplicações, resgates e estornos
+ficam à parte dos recebimentos/pagamentos identificados pelo canal; Pix sem
+contexto fica a revisar. O bruto fica em detalhe de conferência. Extratos já
+salvos são recalculados sem reimportar, e a API recebe a mesma separação.
+Ainda não é a integração completa de perfil, reserva e score no Android.
+
 A **preview 9 coloca o agente no trabalho de registro**: em Hoje → Conversar,
 você conta os planos e responde perguntas inline. A IA preenche vários campos,
 prepara vínculos e mostra um resumo para salvar de uma vez. Formulários e

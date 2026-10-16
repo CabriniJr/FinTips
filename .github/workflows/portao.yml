@@ -59,6 +59,8 @@ jobs:
         run: python -m pytest tests/ -q
       - name: contratos de triagem gerados conferem
         run: python scripts/gerar-contratos-triagem.py --conferir
+      - name: canais de importação derivados do Python conferem
+        run: python scripts/gerar-canais-importacao.py --conferir
       - name: contrato proposto do agente permanece estruturalmente válido
         run: python scripts/verificar-contrato-agente-proposto.py
       - name: ouro em paridade com o Python

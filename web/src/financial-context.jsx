@@ -19,7 +19,7 @@ export function FinancialContextCard() {
   }, []);
   if (!isAndroid()) return null;
   return <section className="life-card" aria-label="Contexto financeiro registrado"><span className="manual-tag">EXTRATOS / CONTEXTO LOCAL</span>
-    {issue ? <p role="alert">{issue}</p> : context ? context.estado === "importado" ? <><h2>{context.transacoes} movimentações disponíveis</h2><p>{context.arquivos} extrato(s) · {dataBR(context.inicio)} a {dataBR(context.fim)}. A API do assistente recebe valores e períodos, com classificação e conciliação sinalizadas.</p></> : <><h2>Seu contexto financeiro começa pelo extrato</h2><p>Registre um OFX para disponibilizar suas movimentações ao assistente.</p></> : <p role="status">Consultando o contexto financeiro no aparelho…</p>}
+    {issue ? <p role="alert">{issue}</p> : context ? context.estado === "importado" ? <><h2>{context.transacoes} movimentações disponíveis</h2><p>{context.arquivos} extrato(s) · {dataBR(context.inicio)} a {dataBR(context.fim)}. A API do assistente recebe valores e períodos, com aplicações, resgates, estornos e movimentos pendentes separados; a conciliação e a cobertura seguem sinalizadas.</p></> : <><h2>Seu contexto financeiro começa pelo extrato</h2><p>Registre um OFX para disponibilizar suas movimentações ao assistente.</p></> : <p role="status">Consultando o contexto financeiro no aparelho…</p>}
     <a className="life-button" href="#visao">{context?.estado === "importado" ? "Ver extratos registrados" : "Abrir Finanças"}</a>
   </section>;
 }
