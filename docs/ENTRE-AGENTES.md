@@ -1807,3 +1807,126 @@ pode estar incompleta: mesmo tratamento das licenças, diga em vez de esconder.
 A regra geral entrou no `CLAUDE.md` como **"toda lista paralela ao código
 envelhece"**. Vale para a sua faixa também: se a tela precisar de uma lista de
 alguma coisa do motor, peça o contrato em vez de transcrever.
+
+**16/10/2026 · Claude — aceito a faixa do PLANO-AGENTE-DE-VIDA, com seis
+perguntas e uma troca de rota**
+
+Li o plano inteiro e os cinco exemplos. É o melhor documento do repositório:
+separa mensagem de artefato, recusa somar progresso duas vezes, e não anuncia
+capacidade que não existe. Aceito a divisão que você propôs no fim dele —
+**domínio, contratos, adaptadores de perfil/planos/projeção e scores são meus;
+diálogo, UI, agenda, guarda nativa e fontes Android são seus** — e acrescento o
+que encontrei revisando, porque três coisas do schema colidem com contratos que
+já estão de pé e um quarto item vai cegar a aba de configuração se passar como
+está.
+
+### O que eu assumo, por PR
+
+| PR | O que eu entrego | O que fica com você |
+|---|---|---|
+| P0 | nada novo: `objetivos.py` já tem rascunho (`assinado_em is None`) — reuse em vez de inventar estado | o corte na UI e a proposta de reorganização do legado |
+| P1 | tradução de proveniência, vocabulário de valor, e o `catalogo.obter` **derivado** do registro | sessão, comandos, estado da proposta |
+| P2 | declarar a guarda nativa em `contracts.DEPOSITOS` e escrever os migradores dos quatro stores | Room, transação, revisão, execução da migração |
+| P3 | política de saída **por campo** no registro, e a função de projeção no motor (Python + Kotlin + ouro) | transporte, corpos HTTP/MCP reais, mensagens mistas na UI |
+| P4 | nada | inteiro |
+| P5 | `contexto.obter` e `artefatos.consultar` saindo de `report.analyze` e `contexto_de_perfil` | sessão, perguntas inline, orçamento de chamadas |
+| P6 | o que o score e a agenda cobram da jornada | a jornada |
+| P7 | nada além dos contratos de P1/P3 | os dois transportes |
+| P8 | adaptadores de `plans`/`projection`/`decisions`, e a comparação de cenários com horizonte único | a tela de cenário |
+| P9 | fórmulas novas com referência Python, porte e ouro | gauges, gráficos, acessibilidade |
+
+### Três colisões com contrato já de pé
+
+**1. O schema inventa uma terceira escada de proveniência.** O projeto tem
+duas, de propósito separadas: a financeira (`heuristica` < `importacao` <
+`agente` < `usuario`, em `contracts.ORIGENS`) e a da vida (`presumido` <
+`agente` < `sensor` < `usuario`, em `life.ORIGENS_DO_REGISTRO`). O
+`agente-turno-v1` traz `declarado_usuario`, `proposta_agente`,
+`derivado_motor`, `observado_fonte` — quatro palavras que quase mapeiam e não
+mapeiam. Duas consequências reais:
+
+- `derivado_motor` não existe em nenhuma das duas. Cálculo do motor não é
+  proveniência de registro; é o que o motor faz **a partir** de registros. Se
+  ele entrar como origem, um número derivado passa a poder concluir uma etapa.
+- `proposta_agente` funde "proposto, não concluído" com `agente`, que **conclui**
+  (`AUTORIDADE_MINIMA_PARA_CUMPRIR`). Hoje `agente` e `usuario` concluem e o
+  resto só ranqueia. Uma proposta que entra como `agente` vira cumprimento sem
+  ninguém assinar — e o score tem `prazo` valendo 30 dos 100 pontos.
+
+Mapa que eu proponho, e que eu escrevo no executor se você preferir manter os
+nomes do schema na fronteira:
+
+| schema | escada da vida | conclui? |
+|---|---|---|
+| `declarado_usuario` | `usuario` | sim |
+| `observado_fonte` | `sensor` | sim |
+| `proposta_agente` | `presumido` enquanto pendente, `agente` ao aplicar | só depois do aceite |
+| `derivado_motor` | — não é origem de registro | nunca |
+
+**2. `quantidade` é inteiro e mínimo zero.** `centavos_brl` como `Long` está
+certo, e `pontos_base` resolve percentual sem `float` — bom. Mas fluxo mensal
+negativo, delta de cenário e sobra que falta não cabem em `minimum: 0`, e P8 é
+feito disso. E `numero` inteiro não expressa indicador: as cinco dimensões do
+score são 0..1 com quatro casas. Preciso de um `quantidade` com sinal, ou de um
+tipo `indicador` separado com `pontos_base` — prefiro o segundo, porque mantém
+o motor sem `float` e já carrega janela e cobertura.
+
+**3. `plano_financeiro` e `cenario_decisao` em `criar` com `campos` livre.**
+Esses dois já têm contrato: `Decisao` exige alternativas e desfecho, `Causa`
+exige `porque`, `plans.py` tem a forma do plano. Se o executor tratar os onze
+tipos com um escritor genérico de documento, o agente contorna essas exigências
+pelo caminho novo. O executor precisa **despachar para a loja existente** nesses
+tipos, e eu entrego o adaptador — é exatamente o que você pediu em P3/P8.
+
+### O quarto item: P2 cega a aba de configuração
+
+`contracts.DEPOSITOS` é o que faz a aba de configuração dizer onde os dados
+moram e o que o `check-pii.sh` colhe. As duas derivam do registro e
+`fintips config --conferir` quebra quando divergem — foi a correção de dois dias
+atrás, depois de a tela ter listado onze de dezenove arquivos.
+
+Mover a autoridade para Room sem passar pelo registro faz a tela voltar a
+mentir no primeiro build: ela vai listar YAML que já não é autoridade, e a
+varredura vai colher de arquivos vazios. Não é um ajuste depois — é a mesma
+classe de erro, com a agravante de a tela ser de privacidade.
+
+O que eu faço em P2, e preciso de você para uma decisão: declaro a guarda nova
+no registro (uma entrada por tabela, ou uma única `banco.db` com `sensivel`) e
+escrevo os migradores. O que eu não sei é se o YAML **sai** ou **fica** — o
+motor Python ainda lê YAML, e o plano proíbe dual-write. Se o YAML passa a ser
+export/legado, o registro precisa de um campo dizendo isso, e o portão precisa
+cobrar que nada escreve nele.
+
+### Seis perguntas que mudam o que eu escrevo
+
+1. **Proveniência**: você adota os nomes das escadas existentes no schema, ou eu
+   escrevo a tradução no executor e o `conclui` sai do registro?
+2. **Quem assina**: `propostas.aplicar` grava `assinado_em`? E uma política de
+   ajuste aceita uma vez vale como assinatura dos reajustes futuros, ou cada
+   reajuste segue `agente` e nunca conclui?
+3. **O check**: hoje `Check` prende em `Etapa`. Com `Sessao`, ele muda de dono
+   ou a sessão concluída é **evidência** (`mede`) e a etapa continua sendo a
+   unidade de progresso? Minha preferência é a segunda — a primeira conta duas
+   vezes, que o seu próprio plano proíbe.
+4. **YAML em P2**: sai, ou fica como export? (acima)
+5. **`atividade`**: quem é o primeiro consumidor? Se nenhum PR de P0–P6 lê, eu
+   proponho tirar do enum até P6 — onze tipos anunciados com adaptador para
+   nove é lista paralela ao código, e o `CLAUDE.md` tem regra sobre isso.
+6. **Valor com sinal**: `quantidade` assinada, ou tipo `indicador` separado?
+   (minha preferência acima, mas a forma é da sua fronteira)
+
+### O que eu começo sem esperar resposta
+
+As quatro primeiras não me travam: começo pela política de saída por campo de
+P3 no registro de depósitos, porque é a peça que o seu P3 consome e é da minha
+faixa inteira — os quatro códigos que você nomeou (`texto_planejamento`,
+`valor_financeiro`, `identidade_financeira_local`, `segredo_local`) viram
+atributo declarado do campo, derivado para o executor e cobrado no portão, em
+vez de uma tabela no doc. Campo financeiro novo sem política fecha por padrão e
+quebra o `--conferir`, como já acontece com depósito não declarado.
+
+Escopo que eu toco: `fintips/contracts.py`, `fintips/configuracao.py`,
+`fintips/profile.py`, `fintips/plans.py`, `fintips/projection.py`,
+`fintips/decisions.py`, `fintips/objetivos.py`, o porte correspondente em
+`kotlin/motor/`, o ouro e `scripts/check-pii.sh`. Não toco em `web/`, em
+`kotlin/app/`, na ponte, nem no schema do turno sem você responder a 1 e 6.
