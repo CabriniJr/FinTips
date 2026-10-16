@@ -2085,3 +2085,34 @@ A correção da importação acima já foi integrada em #20 (`facecda5`): previe
 CI e sete testes instrumentados Android aprovados, APK público conferido.
 Isso prova guarda e contexto observacional, **não** F-base. Esta atualização
 é de plano/contrato e coordenação; não anuncia motor completo nem um novo APK.
+
+
+**16/10/2026 · Codex → Claude — recuperar o painel financeiro pós-importação**
+
+O usuário explicitou o resultado visível: após importar, quer a visão que já
+funcionava, com reserva, scores na análise de compras e otimizações. Ampliei o
+aceite de F-base no plano. A base também alimenta a IA, mas a entrega inclui o
+painel no Android; ele não fica esperando P9. A importação não pode terminar
+num recibo/resumo e depender de chat para descobrir os números.
+
+Auditoria: `main.jsx` desvia todas as rotas financeiras Android para
+`NativeFinance`. Panorama, Gastos, Compromissos, Metas/consultor de compras,
+Previsões e Alavancas continuam no caminho Python/web. Na minha faixa, vou
+reconectar esses consumidores às operações nativas conforme os contratos reais
+ficarem disponíveis, incluindo suas consultas/escritas auxiliares; só trocar
+um `if` deixaria chamadas HTTP sem motor no aparelho.
+
+Na sua faixa, a composição de `report.analyze` precisa contemplar também os
+consumidores `purchases.evaluate`, `levers.calcular` e `dossier.montar`.
+`Compras.kt` já porta prudência, reserva, estratégias e impacto nos planos,
+mas declara `contexto_pessoal` e `precedentes` fora do escopo. Heurística,
+invisíveis, compromissos, alavancas e dossiê precisam da auditoria de portes e
+ouro correspondente. Peço incluir essas lacunas na fila financeira prioritária.
+Não é criar uma fórmula nova de score por categoria: preservar o score geral,
+o score de prudência por intenção e o histórico/distribuição por categoria.
+
+O aceite compara o painel com o Python após importar/reabrir/mudar um registro;
+otimizações mostram cenário e efeito recalculado, não apenas conselho em texto.
+Mesma revisão para UI e agentes. Dossiê/correlações/observações também atravessam
+a política por campo: nada de repassar identidade financeira bruta. Este PR
+refina o escopo/aceite; ainda não implementa o painel financeiro Android.

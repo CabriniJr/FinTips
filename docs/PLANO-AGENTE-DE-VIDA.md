@@ -5,7 +5,8 @@ Fronteira de privacidade revisada no mesmo dia após esclarecimento do usuário.
 Este documento especifica o destino; **não declara o agente completo disponível
 na preview 10**. A preview 10 já persiste extratos e oferece um resumo observado,
 mas ainda não integra o motor financeiro completo nesta experiência. Os
-schemas/exemplos anexos são contratos de projeto, ainda sem endpoint anunciado. Substitui a direção da triagem por rascunhos de mensagens.
+schemas/exemplos anexos são contratos de projeto, ainda sem endpoint anunciado.
+Substitui a direção da triagem por rascunhos de mensagens.
 
 ## Resultado que define o produto
 
@@ -72,7 +73,7 @@ Mapeamento auditado nesta revisão, **não um registro runtime paralelo**:
 | Perfil e retrato | `profile.py` / `Perfil.kt` | separar o observado, o sugerido e o que a pessoa declarou; visão integrada antes de aconselhar |
 | Execução e viabilidade de planos | `plans.py` / `Planos.kt` | quanto falta, aportes e competição entre objetivos |
 | Projeção e reserva | `projection.py` / `Projecao.kt` | cenário com premissas, horizonte e impacto nos demais planos |
-| Causas, decisões e objetivos | `causes.py`, `decisions.py`, `objetivos.py` e portes correspondentes | motivos/alternativas registrados, compromisso, checks e evidências de progresso |
+| Causas, decisões e objetivos | `causes.py`, `decisions.py`, `objetivos.py`; `Causas.kt`, `vida/Objetivos.kt`; auditar decisões e adaptadores faltantes | motivos/alternativas registrados, compromisso, checks e evidências de progresso |
 | Contexto curto com acesso ao detalhe | `report.para_agente`, `DETALHE_EM` | aproveitar o mecanismo existente de resumo com ponteiro, não inventar outro contexto desconectado |
 
 A existência desses portes **não prova** que a cadeia inteira está ligada no
@@ -88,6 +89,59 @@ para alimentar os adaptadores. Importações de meses/contas diferentes exigem
 períodos e saldos coerentes; não somar saldos de extratos sobrepostos nem fazer
 média dos scores de cada conta. Qualquer agregação nova tem referência e ouro
 próprios nos dois motores. Começar com o caso já coberto e declarar a cobertura.
+
+### A importação precisa abrir a visão financeira que já funcionava
+
+Esclarecimento do usuário: depois de importar, o app deve oferecer reserva,
+scores, análise dos tipos de compra e otimizações. **O recibo da importação e
+o contexto para a IA não substituem a experiência financeira visível.** O
+painel básico entra com F-base, sem esperar o refinamento de P9; compras e
+alavancas fazem parte da recuperação, não de uma futura funcionalidade opcional.
+
+No código atual, `web/src/main.jsx` abre `NativeFinance` para qualquer rota
+financeira no Android e restringe os componentes antigos ao caminho não Android.
+Portanto há duas lacunas: compor/expor o motor e reconectar os consumidores
+visuais e suas ações ao transporte nativo. Não basta remover o desvio: os
+componentes antigos chamam a API HTTP Python em consultas e escritas; cada
+operação precisa do adaptador Android correspondente, sem fallback de rede
+silencioso e sem fórmulas de domínio no React.
+
+Estas são referências auditadas para o aceite, não uma nova lista de
+capacidades runtime; capacidades reais continuam derivadas dos contratos:
+
+| Visão após importar | Comportamento a recuperar | Referência existente e lacuna Android |
+|---|---|---|
+| Panorama | score financeiro com suas cinco dimensões e maior ganho; reserva em meses, poupança, sobra, despesa, comprometimento e fluxo mensal | `Overview` em `views.jsx`; `report.analyze`, `Score`, `Analise`; depende da cadeia classificada e patrimônio/contexto |
+| Reserva e previsões | alvo, quanto falta, quando fecha no cenário, evolução e planos consumindo a mesma sobra | `ForecastView`, `projection.project` / `Projecao`; manter horizonte, patrimônio e premissas coerentes |
+| Tipos de gasto e compras realizadas | categorias da pessoa, distribuição/recorrência, histórico consultável e gastos invisíveis | `Spending`, `Data`, `analysis.invisible_spending`, `taxonomy`; heurística/invisíveis e consultas ainda exigem integração/porte |
+| Intenção de compra | prudência, sinais de risco, custo em meses de sobra, efeito na reserva e em cada plano, estratégias de pagamento/espera | `Plans`/`avaliar_compra`, `purchases.evaluate` / `Compras`; o porte declara `contexto_pessoal` e `precedentes` fora do escopo atual, a recuperar com referência/ouro |
+| Compromissos e oportunidades | definido separado de candidato; alavancas com valor mensal, score antes/depois e efeito no prazo da reserva/metas | `Fixed`, `LeversView`, `commitments.py`, `levers.calcular`; composição/portes ainda faltantes, não substituir por frases genéricas |
+| Visão integrada do agente | números, cobertura, relações, perfil assinado/sugerido e acesso ao detalhe de qualquer bloco | `report.para_agente`, `dossier.montar`, ferramentas MCP Python; portar/compor o que falta e aplicar a projeção de saída também a correlações/observações |
+
+O score geral e o `score_prudencia` de uma intenção são resultados diferentes.
+A distribuição por categoria é valor/frequência/histórico; não existe motivo
+para inventar uma nota universal por categoria e chamá-la de regra antiga.
+Uma intenção de compra exige item/preço (e condições relevantes), que podem
+vir da conversa ou de um artefato existente. Não fabricar intenções a partir
+de cada lançamento nem inferir arrependimento confirmado de sinais heurísticos.
+A triagem prioriza lacunas que mudam a análise, com perguntas inline.
+
+Uma otimização é um cenário recalculado: mostrar o valor da mudança, premissas,
+resultado anterior e resultado simulado. A pessoa/agente avalia se faz sentido;
+consultar o cenário não altera compromissos ou planos. Preservar unidades
+(reais, pontos, meses), horizonte e cobertura. Valores ainda indisponíveis
+mostram a dependência exata e reaproveitam os registros já importados.
+
+Aceite visível: importar uma base sintética com classificação e registros
+suficientes → abrir Panorama sem reiniciar ou importar de novo → navegar pelos
+blocos acima → fechar/reabrir sem perder fontes → mudar uma classificação ou
+premissa e ver revisão/resultado atualizados. Comparar reserva, score e
+compra com a referência Python, e conferir que uma alavanca produz os mesmos
+efeitos ao recalcular o motor. Fazer isso no Android, não só na API Python ou
+em bridge simulado. Consultas de contexto do agente refletem a mesma revisão
+com identidade financeira protegida; não enviar o dossiê bruto ao transporte.
+Entregas parciais podem chegar antes, identificadas como tal; F-base não está
+completa enquanto essa visão continuar substituída pelo resumo de importação.
 
 ### O que prova essa integração
 
@@ -516,13 +570,13 @@ cor, TalkBack e movimento reduzido. Gráfico de projeção é identificado como 
 | P1 | Catálogo global, contexto, comandos e estado de diálogo/proposta | P0 | todos os tipos/áreas descobríveis, panorama e consulta paginada/histórico/relações; exemplos passam em schemas; noop legítimo; capacidades pendentes explícitas |
 | P2 | Guarda nativa e migração | P1 | UI/executor/worker compartilham revisão/transação; legacy/backup/quota/crash/concorrência exercitados; instalação por cima preserva registros |
 | P3 | Projeção financeira e contexto de planejamento | em paralelo a P1/P2 | texto de estudo/compra chega inteligível à IA; valores preservados; identidade da origem/destino e dados bancários brutos não saem, inclusive em mensagens mistas e tool results |
-| F-base | Integrar a cadeia financeira existente ao Android/contexto | P1/P2/P3 e adaptadores; prioridade antes de P6 | classificação/regras/enriquecimento → relatório/perfil/scores/projeção com ouro integrado; UI e agente leem a mesma revisão |
+| F-base | Integrar a cadeia financeira existente ao Android/contexto | P1/P2/P3 e adaptadores; prioridade antes de P6 | classificação/regras/enriquecimento → relatório/perfil/scores/projeção, compras e alavancas com ouro; painel pós-importação e agente leem a mesma revisão |
 | P4 | Librera persistente | P2 | uma seleção, atualização sem reimportar com app fechado/reaberto/reiniciado; timestamp/dedup/revogação comprovados |
 | P5 | Agente por tools e perguntas inline | P1, P2, P3 (sem dependência de modelo local) | sessão carrega visão geral, aprofunda contexto de qualquer artefato e cruza domínios; entende intenção/correção; não copia conversa para títulos nem repete perguntas |
 | P6 | Certificação + livro + agenda | P4, P5; F-base prioritária | objetivo → etapas → sessões sem sobrecarga → metas por leitura → observação atualiza o mesmo plano; teste completo na UI Android |
 | P7 | Propostas pelos dois transportes | P1, P2; ampliar junto a P5/P6 | mesma chamada via API/MCP dá o mesmo resultado; scopes/proposta/aprovação/recibo funcionam; conector real comprovado após hospedagem/autorização |
 | P8 | Carro + comparação de alternativas financeiras | F-base, P5 | cenários com mesma base, reserva/custos e efeito nos demais planos; notas do catálogo não são tratadas como cálculo |
-| P9 | Painéis, scores e refinamento visual | P6, P8 + fórmulas com ouro | gauges/gráficos usam dados reais/versionados; incógnitas/cobertura visíveis; avaliação prolongada sem transcrição diária |
+| P9 | Painéis, scores e refinamento visual | P6, P8 + fórmulas com ouro | refina painéis financeiros já entregues em F-base; gauges/gráficos de vida usam dados reais/versionados; cobertura visível e avaliação sem transcrição diária |
 
 O catálogo e a conformidade API/MCP nascem em P1; P7 entrega a extensão real
 do transporte remoto. Não deixar “MCP comum” como uma adaptação posterior do
