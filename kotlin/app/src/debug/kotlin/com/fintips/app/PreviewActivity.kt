@@ -61,6 +61,16 @@ class PreviewActivity : ComponentActivity() {
     private val librera by lazy { LibreraFonte(this,estadoCliente) }
     private var libreraProfile="principal"
     private var libreraPicking=false
+    private val extratos by lazy { ExtratosLocais(this) }
+    private var keyDialog: AlertDialog? = null
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        McpLocalService.refreshNotification()
+    }
+    private val picker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        files?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
+        files = null
+    }
+
     private val libreraPicker=registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         libreraPicking=false
         if(uri!=null) io.execute {
@@ -74,15 +84,6 @@ class PreviewActivity : ComponentActivity() {
                 runOnUiThread { if(!closed) view.evaluateJavascript("dispatchEvent(new CustomEvent('fintips:librera-error',{detail:'Não foi possível conectar. Escolha o app-Progress.json que o Librera atualiza, com acesso persistente; a fonte anterior foi preservada.'}))",null) }
             } finally { atualizarEstadoWeb() }
         } else atualizarEstadoWeb()
-    }
-    private val extratos by lazy { ExtratosLocais(this) }
-    private var keyDialog: AlertDialog? = null
-    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        McpLocalService.refreshNotification()
-    }
-    private val picker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        files?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
-        files = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
