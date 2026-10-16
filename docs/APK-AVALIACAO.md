@@ -1,5 +1,12 @@
 # APK para avaliar a UI
 
+**Atualização preview 11:** aplicações e resgates separados dos recebimentos e
+pagamentos identificados; estornos separados e Pix/fluxos desconhecidos a
+revisar. Movimento bruto fica em detalhe de conferência. A separação também
+entra no contexto da API, com os mesmos limites de privacidade. Atualizar
+sobre a preview 10 recalcula os extratos salvos sem reimportação.
+[Comportamento e limites](EXTRATOS-ANDROID.md).
+
 **Atualização preview 10:** importação OFX persistente, recibo, histórico e
 contexto financeiro disponível nas abas e na API do assistente. Saldo anterior
 é opcional. A preview 9 só conferia em memória; importe o OFX novamente.

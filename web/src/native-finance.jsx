@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { nativeMotor, hasNativeMotor } from "./native-motor.js";
 import { brl, dataBR } from "./lib.js";
+import { FinancialFlows } from "./financial-flows.jsx";
 import { Icon } from "./icons.jsx";
 import { PageHeading } from "./life.jsx";
 import "./native-finance.css";
@@ -25,15 +26,18 @@ export function NativeFinance({ toast }) {
     {ctx?.estado === "importado" && <section className="life-card finance-snapshot" aria-label="Contexto dos extratos registrados">
       <span className="manual-tag">EXTRATOS REGISTRADOS</span><h2>{ctx.transacoes} movimentações no contexto</h2>
       <p>{ctx.contas} conta(s) · {ctx.arquivos} arquivo(s) · {dataBR(ctx.inicio)} a {dataBR(ctx.fim)}</p>
-      <dl className="finance-totals"><div><dt>Entradas observadas</dt><dd>{brl(ctx.entradas_centavos / 100)}</dd></div><div><dt>Saídas observadas</dt><dd>{brl(ctx.saidas_centavos / 100)}</dd></div><div><dt>Movimento líquido</dt><dd>{brl(ctx.liquido_centavos / 100)}</dd></div></dl>
-      <p className="form-hint">Movimentação por sinal, ainda sem classificação: transferência pode ser entrada ou saída. Estes totais não são renda, despesas confirmadas ou dinheiro disponível.</p>
+      <FinancialFlows data={state.fluxos}/>
+      <details className="finance-gross"><summary>Conferir movimento bruto da conta</summary><p className="form-hint">Soma de todos os créditos e débitos, incluindo investimentos, Pix e estornos. Serve para conferir o arquivo; não é renda, consumo ou saldo disponível.</p>
+        <dl className="finance-totals"><div><dt>Créditos brutos</dt><dd>{brl(ctx.entradas_centavos / 100)}</dd></div><div><dt>Débitos brutos</dt><dd>{brl(ctx.saidas_centavos / 100)}</dd></div><div><dt>Variação no período</dt><dd>{brl(ctx.liquido_centavos / 100)}</dd></div></dl>
+        <div className="finance-months">{ctx.meses.map((m) => <div key={m.mes}><strong>{m.mes}</strong><span>{m.transacoes} movimentações</span><span>Créditos {brl(m.entradas_centavos / 100)}</span><span>Débitos {brl(m.saidas_centavos / 100)}</span></div>)}</div>
+      </details>
       {!!ctx.conciliacao.nao_conferidos && <p className="finance-evidence">{ctx.conciliacao.nao_conferidos} extrato(s) sem conferência do saldo inicial.</p>}
       {!!ctx.conciliacao.divergentes && <p className="form-error">{ctx.conciliacao.divergentes} extrato(s) com diferença na conciliação. A fonte foi preservada com essa ressalva.</p>}
       <a className="life-button" href="#conversa">Conversar sobre meus planos <Icon name="arrow" size={18}/></a>
-      <details><summary>Movimentação por mês</summary><div className="finance-months">{ctx.meses.map((m) => <div key={m.mes}><strong>{m.mes}</strong><span>{m.transacoes} movimentações</span><span>Entradas {brl(m.entradas_centavos / 100)}</span><span>Saídas {brl(m.saidas_centavos / 100)}</span></div>)}</div></details>
+
     </section>}
     <section className="life-card ai-connect"><div className="section-head"><h2>{ctx?.arquivos ? "Adicionar extrato" : "Registrar meu primeiro extrato"}</h2><Icon name="wallet"/></div>
-      <p>Escolha um OFX. O arquivo fica no armazenamento privado do app e continua registrado depois de fechar ou atualizar. Ao usar o assistente pela API, ele recebe um resumo de valores e períodos, sem banco, conta, memo ou contraparte real.</p>
+      <p>Escolha um OFX. O arquivo fica no armazenamento privado do app e continua registrado depois de fechar ou atualizar. Ao usar o assistente pela API, ele recebe valores e períodos com investimentos, estornos e movimentos pendentes separados, sem banco, conta, memo ou contraparte real.</p>
       <form onSubmit={async (e) => {
         e.preventDefault(); if (!file || busy) return;
         setBusy(true); setIssue(""); setReceipt(null); const ticket = ++seq.current;

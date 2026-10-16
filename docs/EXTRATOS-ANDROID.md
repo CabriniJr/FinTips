@@ -1,4 +1,4 @@
-# Extratos registrados no Android — preview 10
+# Extratos registrados no Android — preview 11
 
 A preview 9 apenas conferia o saldo em memória. Não salvava o arquivo nem
 criava histórico financeiro; sair da tela perdia o resultado. Esses arquivos
@@ -10,6 +10,36 @@ A importação salva a fonte, mostra recibo, lista o histórico e atualiza o
 resumo por mês. Contexto e Conversa mostram quantas movimentações estão
 registradas. Reabrir/atualizar o APK preserva as fontes; desinstalar ou limpar
 os dados do app apaga a guarda privada.
+
+## Separação de fluxos na preview 11
+
+A tela anterior destacava o total bruto de créditos/débitos como entradas e
+saídas observadas. Esse giro incluía aplicações e resgates e tornava a leitura
+financeira enganosa. Agora a tela destaca **recebimentos e pagamentos
+identificados pelo canal**, e separa aplicações, resgates e estornos/devoluções.
+Pix, canal desconhecido, valor zero ou sinal incompatível ficam **a revisar**;
+não são promovidos a renda/consumo nem escondidos da contagem. Não é ainda a
+classificação financeira completa, o score ou a reserva.
+
+A fonte de regras continua `rules/categories.yaml`. O gerador
+`scripts/gerar-canais-importacao.py` deriva a constante Kotlin; `--conferir`
+roda no portão. Esse porte aplica apenas a leitura inicial do canal e o sinal
+esperado, sem classificar a identidade de contrapartes. Um Pix recebido não
+vira salário por ser positivo; não remover pendentes do panorama. O restante
+do classificador, decisões do usuário/agente e adaptadores são a integração
+financeira prioritária descrita no plano.
+
+Os totais brutos e a variação no período ficam no detalhe **Conferir movimento
+bruto da conta**; continuam servindo à conferência do arquivo. **Fluxos por
+mês** usa a mesma separação do motor. Todos os lançamentos pertencem a um grupo,
+sem mudar o OFX ou a deduplicação. Grupos e meses precisam fechar com o bruto.
+
+A fonte salva na preview 10 já contém os memos necessários: atualizar o APK
+recalcula os grupos, sem reimportar ou mudar o schema 1 da guarda. A nova
+projeção derivada tem contrato próprio (`fluxos_importados`, schema 1), fechado,
+com origem heurística, revisão das regras públicas, contagens e centavos por
+grupo/mês. Não é outra cópia persistida. A API do assistente recebe essa
+separação na mesma chamada autorizada, com validação de forma, sinal e totais.
 
 ## Guarda e contexto
 
@@ -47,7 +77,8 @@ conciliação/classificação. Não envia banco, conta, nome, memo, FITID, sal,
 referência do arquivo ou contraparte real.
 
 Ao usar a **API do assistente**, o Android lê esse depósito novamente e inclui
-o bloco `financas_importadas` no contexto da chamada autorizada. O WebView não
+os blocos `financas_importadas` (bruto/conciliação) e `fluxos_importados`
+(separação inicial) no contexto da chamada autorizada. O WebView não
 fornece esse bloco nem controla sua sensibilidade. Importar não faz uma chamada
 paga e não exige reconfigurar a chave. O cálculo não vem de uma resposta da IA.
 
@@ -78,3 +109,10 @@ os OFX originais podem ser reimportados normalmente.
 - UI em 320/390/768: importação, recibo, repetição, reload, erro com histórico
   preservado e contexto em outras abas. Bridge simulado nesse teste; não é
   prova de I/O Android nem avaliação de inteligência do modelo.
+
+Ouro de fluxos: giro de investimento, Pix pendente, estornos, sinal
+incompatível, canal normalizado e sobreposição. A saída fechada recusa nomes,
+campos extras, unidades erradas, grupos duplicados e meses que não fecham com
+os totais. A instrumentação exercita reabertura da guarda e envio da
+separação por HTTPS, com canários ausentes. O teste de UI confere os KPIs e
+o bruto recolhido, com dados sintéticos e bridge simulado.

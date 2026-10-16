@@ -12,7 +12,8 @@ private fun soma(values: Iterable<Long>) = values.fold(0L) { a,b -> safe(a+b) }
 fun temSaldoDeclarado(raw: String)=Regex("<BALAMT>\\s*[^<\\s]",RegexOption.IGNORE_CASE).containsMatchIn(raw)
 
 /** Projeção por lista fechada. Memo, conta, banco, FITID e nome do arquivo não saem. */
-fun contextoExtratos(arquivos: JsonArray, sal: String): JsonObject {
+fun contextosExtratos(arquivos: JsonArray, sal: String): Pair<JsonObject, JsonObject> {
+    val movimentos = mutableListOf<MovimentoImportado>()
     require(arquivos.size <= 20)
     val vistos=mutableSetOf<List<String>>(); val contas=mutableSetOf<List<String>>()
     val meses=mutableMapOf<String,MutableList<Long>>(); val inicios=mutableListOf<String>();val fins=mutableListOf<String>()
@@ -37,7 +38,10 @@ fun contextoExtratos(arquivos: JsonArray, sal: String): JsonObject {
         for(tx in extrato.transacoes) {
             val valor=safe(tx.valor.centavos)
             val chave=conta+listOf(originais.getValue(tx.id),tx.momento.instante.toString(),valor.toString())
-            if(vistos.add(chave)) meses.getOrPut(tx.mes) { mutableListOf() }.add(valor)
+            if(vistos.add(chave)) {
+                meses.getOrPut(tx.mes) { mutableListOf() }.add(valor)
+                movimentos.add(MovimentoImportado(tx.mes, valor, grupoImportado(tx.memoBruto, valor)))
+            }
         }
         require(vistos.size<=50000)
     }
@@ -45,7 +49,7 @@ fun contextoExtratos(arquivos: JsonArray, sal: String): JsonObject {
         val entradas=soma(vs.filter { it>0 });val saidas=soma(vs.filter { it<0 }.map { -it })
         put("mes",mes);put("transacoes",vs.size);put("entradas_centavos",entradas);put("saidas_centavos",saidas);put("liquido_centavos",safe(entradas-saidas))
     } }
-    return buildJsonObject {
+    val context = buildJsonObject {
         put("schema_version",1);put("estado",if(arquivos.isEmpty()) "sem_extrato" else "importado")
         put("arquivos",arquivos.size);put("contas",contas.size);put("transacoes",vistos.size)
         put("inicio",inicios.minOrNull()?.let { JsonPrimitive(it) } ?: JsonNull);put("fim",fins.maxOrNull()?.let { JsonPrimitive(it) } ?: JsonNull)
@@ -53,7 +57,11 @@ fun contextoExtratos(arquivos: JsonArray, sal: String): JsonObject {
         put("meses",JsonArray(linhas));putJsonObject("conciliacao") { put("conferidos",conferidos);put("divergentes",divergentes);put("nao_conferidos",naoConferidos) }
         put("classificacao","pendente");put("saldo_disponivel_centavos",JsonNull)
     }
+    return context to resumoFluxos(movimentos)
 }
+
+fun contextoExtratos(arquivos: JsonArray, sal: String) = contextosExtratos(arquivos, sal).first
+fun fluxosExtratos(arquivos: JsonArray, sal: String) = contextosExtratos(arquivos, sal).second
 
 /** Valida novamente o bloco antes do HTTP; não aceita texto arbitrário do WebView. */
 fun validarContextoExtratos(c: JsonObject): JsonObject {

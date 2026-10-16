@@ -19,7 +19,9 @@ def cents(value):
     return safe(int((value * 100).quantize(Decimal('1'))))
 
 
-def statement_context(files: list[dict], salt: str) -> dict:
+def statement_views(files: list[dict], salt: str) -> tuple[dict, dict]:
+    from .import_flows import import_group, flow_summary
+    flow_rows = []
     if len(files) > 20:
         raise ValueError('limite de arquivos')
     seen, accounts, months, starts, ends = set(), set(), defaultdict(list), [], []
@@ -54,17 +56,23 @@ def statement_context(files: list[dict], salt: str) -> dict:
             key = (account, originals[tx.id], tx.ts, value)
             if key not in seen:
                 seen.add(key); months[tx.month].append(value)
+                flow_rows.append((tx.month, value, import_group(tx.memo_raw, value)))
         if len(seen) > 50000:
             raise ValueError('limite de transações')
     rows = []
     for month, values in sorted(months.items()):
         incoming = safe(sum(v for v in values if v > 0)); outgoing = safe(-sum(v for v in values if v < 0))
         rows.append(dict(mes=month, transacoes=len(values), entradas_centavos=incoming, saidas_centavos=outgoing, liquido_centavos=safe(incoming-outgoing)))
-    return dict(schema_version=1, estado='importado' if files else 'sem_extrato', arquivos=len(files), contas=len(accounts), transacoes=len(seen),
+    context = dict(schema_version=1, estado='importado' if files else 'sem_extrato', arquivos=len(files), contas=len(accounts), transacoes=len(seen),
         inicio=min(starts) if starts else None, fim=max(ends) if ends else None,
         entradas_centavos=safe(sum(r['entradas_centavos'] for r in rows)), saidas_centavos=safe(sum(r['saidas_centavos'] for r in rows)),
         liquido_centavos=safe(sum(r['liquido_centavos'] for r in rows)), meses=rows,
         conciliacao=dict(conferidos=checked, divergentes=divergent, nao_conferidos=unchecked), classificacao='pendente', saldo_disponivel_centavos=None)
+    return context, flow_summary(flow_rows)
+
+
+def statement_context(files: list[dict], salt: str) -> dict:
+    return statement_views(files, salt)[0]
 
 
 def validate_statement_context(c: dict) -> dict:

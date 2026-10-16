@@ -265,7 +265,8 @@ jobs:
             echo "seletor de arquivos nem lifecycle no aparelho."
             echo
             echo "Motor Kotlin ligado à UI: frentes do dia, ritmo de leitura e importação persistente de extratos OFX."
-            echo "Preview 10: extratos ficam registrados no aparelho, com recibo, histórico e movimentação por mês."
+            echo "Preview 11: aplicações, resgates e estornos separados; Pix e fluxos não resolvidos ficam a revisar."
+            echo "Recebimentos/pagamentos identificados por canal, com bruto em detalhe de conferência. Fontes da preview 10 são recalculadas sem reimportação."
             echo "Saldo inicial opcional; repetição e períodos sobrepostos não duplicam movimentações com a mesma identidade."
             echo "O resumo financeiro entra na API autorizada do assistente; origem/destino reais, banco, conta e OFX ficam locais."
             echo "A conferência antiga não salvava o arquivo: reimporte o OFX uma vez nesta versão."

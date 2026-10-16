@@ -34,6 +34,23 @@ class OpenAITriagemTest {
             assertEquals(JsonPrimitive(false),Json.parseToJsonElement(body).jsonObject["store"])
         }
     }
+    @Test fun fluxos_identificados_viajam_separados_e_contexto_adulterado_nao_sai() {
+        Fixture().use { f ->
+            val raw="<OFX><ORG>BANK_CANARY<BANKID>999<ACCTID>ACCOUNT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000<TRNAMT>700<FITID>ID_CANARY<MEMO>Renda Fixa - Resgate CDB</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>700</LEDGERBAL></OFX>"
+            val files=buildJsonArray { addJsonObject { put("ofx",raw) } }
+            val (observed,flows)=com.fintips.motor.importacao.contextosExtratos(files,"synthetic-test")
+            f.server.enqueue(response("""{"escolha":"opcao_0","valor":null,"motivo":"revisar_em_lote"}"""))
+            f.ai.sugerir(bundle,drafts,"sk-"+"T".repeat(40),true,"2026-10-15",financeiro=observed,fluxosFinanceiros=flows)
+            val sent=Json.parseToJsonElement(f.server.takeRequest(2,TimeUnit.SECONDS)!!.body.readUtf8()).jsonObject
+            val data=Json.parseToJsonElement(sent["input"]!!.jsonPrimitive.content).jsonObject
+            assertEquals(flows,data["fluxos_importados"])
+            assertTrue(data["fluxos_importados"].toString().contains("savings_in"))
+            assertFalse(sent.toString().contains("CANARY"))
+            assertFails { f.ai.sugerir(bundle,drafts,"sk-"+"T".repeat(40),true,"2026-10-15",financeiro=observed,fluxosFinanceiros=JsonObject(flows+("memo" to JsonPrimitive("CANARY")))) }
+            assertFails { f.ai.sugerir(bundle,drafts,"sk-"+"T".repeat(40),true,"2026-10-15",financeiro=JsonObject(observed+("entradas_centavos" to JsonPrimitive(1))),fluxosFinanceiros=flows) }
+            assertNull(f.server.takeRequest(100,TimeUnit.MILLISECONDS))
+        }
+    }
     @Test fun nao_envia_sem_consentimento_e_recusa_resposta_fora_do_contrato() {
         Fixture().use { f ->
             assertFails { f.ai.sugerir(bundle,drafts,"sk-"+"T".repeat(40),false,"2026-10-15") }

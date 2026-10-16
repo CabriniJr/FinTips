@@ -211,6 +211,7 @@ class PreviewActivity : ComponentActivity() {
 
     private fun extratoOperation(op: String, i: JSONObject): JSONObject = when(op) {
         "extrato.estado", "extrato.contexto" -> { require(i.length()==0);JSONObject((if(op=="extrato.estado") extratos.estado() else extratos.contexto()).toString()) }
+        "extrato.fluxos" -> { require(i.length()==0);JSONObject(extratos.fluxos().toString()) }
         "extrato.importar" -> {
             require(i.keys().asSequence().toSet().all { it in setOf("ofx","saldo_inicial") })
             JSONObject(extratos.importar(i.getString("ofx"),if(i.isNull("saldo_inicial")) null else i.getString("saldo_inicial")).toString())
@@ -227,8 +228,9 @@ class PreviewActivity : ComponentActivity() {
         "triagem.cancelar" -> { triagemAI.cancelar(); JSONObject().put("status","cancelado") }
         "triagem.sugerir", "triagem.organizar" -> {
             val body=Json.parseToJsonElement(i.toString()).jsonObject
+            val (financeiro,fluxos) = extratos.contextos()
             JSONObject(triagemAI.sugerir(body["bundle"]!!.jsonObject,body["rascunhos"]!!.jsonArray,
-                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje"),agente=op=="triagem.organizar",financeiro=extratos.contexto()).toString())
+                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje"),agente=op=="triagem.organizar",financeiro=financeiro,fluxosFinanceiros=fluxos).toString())
         }
         else -> error("operação indisponível")
     }
