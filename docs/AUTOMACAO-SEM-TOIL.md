@@ -1,10 +1,16 @@
 # Automação que cabe na vida
 
+> **Sequência de implementação atual:** [agente de vida, P0–P9](PLANO-AGENTE-DE-VIDA.md).
+> Este discovery continua válido; guarda nativa e executor comum antecedem
+> a coleta persistente e o planejamento dinâmico. Não são capacidades do APK atual.
+
 Diretriz do usuário em 14/10/2026: automatizar tudo que for possível para
 reduzir o trabalho de manter registros. **Configurar uma vez; acompanhar sem
-preencher todos os dias.** Registro manual é alternativa/correção. PII,
-histórico bruto e credenciais ficam exclusivamente no client, inclusive em
-trabalho de fundo. O APK atual ainda usa registro/importação manual.
+preencher todos os dias.** Registro manual é alternativa/correção. Identidade
+financeira, extrato bruto e credenciais ficam exclusivamente no client, inclusive
+em trabalho de fundo. Texto de estudo/compra e valores pode compor o contexto
+do agente, conforme a revisão em [Privacidade](PRIVACIDADE.md). O APK atual
+ainda usa registro/importação manual.
 
 ## Ordem e delegação
 
