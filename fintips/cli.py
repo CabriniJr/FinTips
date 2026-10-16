@@ -530,7 +530,7 @@ def cmd_config(args) -> None:
     raiz = Path(__file__).resolve().parent.parent
 
     if args.conferir:
-        from .contracts import conferir_depositos
+        from .contracts import conferir_depositos, conferir_fronteira
 
         dep = conferir_depositos(type(ws))
         if not dep["ok"]:
@@ -546,6 +546,27 @@ def cmd_config(args) -> None:
             print(dep["como_corrigir"])
             raise SystemExit(1)
         print(f"ok: {dep['quantos']} depósitos declarados batem com o Workspace")
+
+        fr = conferir_fronteira()
+        if not fr["ok"]:
+            print("FRONTEIRA DE SAÍDA DESATUALIZADA:")
+            for chave, rotulo in (
+                ("campo_sem_politica", "campo da classe sem política declarada"),
+                ("declarado_e_fora_do_codigo", "política para campo que não existe mais"),
+                ("politica_desconhecida", "política fora do vocabulário"),
+                ("valor_financeiro_sem_unidade", "valor financeiro sem unidade"),
+                ("tipo_que_nao_resolve", "tipo declarado que não importa"),
+            ):
+                for item in fr[chave]:
+                    print(f"  {item}: {rotulo}")
+            print()
+            print(fr["como_corrigir"])
+            raise SystemExit(1)
+        q = fr["quantos"]
+        total = q["abertos"] + q["fechados"] + q["projetados_a_parte"]
+        print(f"ok: fronteira classifica {total} campos de {q['tipos']} tipos "
+              f"({q['abertos']} saem, {q['fechados']} ficam, "
+              f"{q['projetados_a_parte']} saem pelo tipo próprio)")
 
         r = lic_mod.conferir(raiz)
         if r["ok"]:

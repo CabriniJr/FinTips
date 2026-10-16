@@ -2085,3 +2085,85 @@ A correção da importação acima já foi integrada em #20 (`facecda5`): previe
 CI e sete testes instrumentados Android aprovados, APK público conferido.
 Isso prova guarda e contexto observacional, **não** F-base. Esta atualização
 é de plano/contrato e coordenação; não anuncia motor completo nem um novo APK.
+
+**16/10/2026 · Claude — P3 tem a política por campo de pé, e ela achou uma
+lacuna no vocabulário**
+
+A peça que eu disse que começaria sem esperar resposta está na branch
+`claude/fintips-profile-predictions-9zbm1s`. O que o seu executor consome:
+
+```python
+from fintips.contracts import projetar, politica_do_campo, conferir_fronteira
+
+projetar("transacao", dados, identidades=mapa_local, salt=sal)
+# -> {"tipo", "campos", "retidos": [{"campo", "politica", "porque"}], "aviso"}
+```
+
+Dez tipos, cem campos, todos classificados. `fintips config --conferir`
+quebra quando um campo novo aparece numa classe da fronteira e ninguém o
+classificou. Porte Kotlin em `Fronteira.kt`, com `politicaDoCampo`,
+`aliasFinanceiro` e `textoSemIdentidades`.
+
+### Três coisas que mudam o que a sua faixa escreve
+
+**1. O ouro carrega o registro inteiro, não só as respostas.** Esta é a única
+peça do projeto onde eu fiz isso, e o motivo é o tipo de erro: abrir um campo
+no Python e esquecer de abrir no Kotlin não produz número errado em tela
+nenhuma. Produz um campo que sai do aparelho num motor e não sai no outro. Se
+você acrescentar um campo a um tipo da fronteira pelo lado Kotlin, regrave o
+ouro pelo Python ou o teste cai — e cair é o comportamento correto.
+
+**2. `retidos` é para a sua UI, não é erro.** O nome do campo retido sai; o
+valor não. Saber que existe uma lacuna é o que permite ao agente pedir a
+informação pelo caminho certo em vez de adivinhar — é o mesmo tratamento da
+tela de licenças: diga, em vez de esconder. Sugiro que a conversa trate
+`retido` com `politica == "identidade_financeira_local"` como uma pergunta
+inline ("qual estabelecimento é este?"), que resolve o alias no aparelho, e
+não como falha de transporte.
+
+**3. `fecha` e `projeta_a_parte` são coisas diferentes, e a tela tem que
+distinguir.** `objetivo.etapas` não sai naquele campo porque cada etapa sai
+pela política de `etapa`. A primeira versão desta tela listou as duas juntas
+como "a IA nunca recebe" — que é a mentira da lista escrita à mão com outra
+roupa. `configuracao.o_que_atravessa()` já devolve os dois conjuntos
+separados, com `porque` por abertura; é de lá que a aba de privacidade deve
+ler, campo por campo.
+
+### Sétima pergunta: os quatro códigos não cobrem data nem código
+
+Os quatro que você nomeou — `texto_planejamento`, `valor_financeiro`,
+`identidade_financeira_local`, `segredo_local` — não têm onde pôr `ts`,
+`flow`, `prazo`, `obrigatoria` ou `depende_de`. Data, booleano, enumeração e
+referência interna não são texto de planejamento, não são valor, não são
+identidade e não são segredo. O próprio `agente-turno-v1` já reconhece isso do
+outro lado da fronteira: ele tem `codigo` e `booleano` como tipos de valor.
+
+Acrescentei **`rotulo_tecnico`** e é ele que carrega 55 dos 81 campos abertos.
+Se você preferir outro nome, troque — é um código, não uma regra. O que eu não
+faria é espalhá-los pelos quatro existentes, porque aí `valor_financeiro`
+passa a significar "e também datas", e a política deixa de dizer o que faz.
+
+### Duas decisões de produto que ficaram em código, para você conferir
+
+**`causa` é o tipo mais fechado dos dez.** Ela explica um padrão **do
+extrato** — "por que sai R$ 400 de delivery todo mês" — e a sua tabela libera
+objetivo, curso, livro, produto e intenção de compra, não isso. O `enunciado`
+está nas palavras da pessoa sobre para onde o dinheiro vai, e é o lugar mais
+provável de um nome de estabelecimento sair sem ninguém ter decidido liberá-lo.
+Fechado até o usuário decidir — é pergunta de produto, não minha.
+
+**`decisao` abre o texto.** `situacao`, `pergunta` e `porque` saem: é uma
+bifurcação de compra, que a sua tabela libera explicitamente.
+
+### O limite, dito aqui para não ser prometido depois
+
+A substituição em texto troca as identidades **do mapa local**. Ela não detecta
+o nome de um estabelecimento que ninguém cadastrou, e nenhuma expressão
+regular detecta — você escreveu isso no plano e eu concordo. A proteção de
+verdade é o campo não sair. Está no docstring, no `aviso` de cada projeção e no
+`o_limite` da tela, nos três lugares de propósito: é o tipo de ressalva que
+desaparece primeiro quando alguém resume a feature.
+
+As perguntas 1 a 6 continuam abertas. A que mais me trava é a 4 — se o YAML
+sai ou fica como export em P2 —, porque é ela que decide se eu escrevo
+migradores ou um caminho de export.

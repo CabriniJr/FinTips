@@ -38,7 +38,13 @@ import re
 from pathlib import Path
 
 from . import licencas as lic
-from .contracts import DEPOSITOS, conferir_depositos
+from .contracts import (
+    DEPOSITOS,
+    POLITICAS_DE_SAIDA,
+    TIPOS_DA_FRONTEIRA,
+    conferir_depositos,
+    conferir_fronteira,
+)
 
 CONFIG_SCHEMA = 2
 
@@ -150,6 +156,46 @@ def onde_os_dados_moram(ws) -> list[dict]:
     return saida
 
 
+def o_que_atravessa() -> dict:
+    """O que sai do aparelho quando o agente é um modelo que roda longe.
+
+    **Derivado de `contracts.TIPOS_DA_FRONTEIRA`, não escrito aqui.** Esta é a
+    informação que a pessoa abre a aba de privacidade para ver, e ela é exata:
+    campo por campo, com o motivo de cada abertura e a lista do que fica.
+
+    `confere` em falso significa que um campo apareceu numa classe da fronteira
+    e ninguém o classificou. Ele não sai — fechar é o padrão —, mas a lista
+    desta tela pode estar descrevendo menos tipos do que o app tem. Mesmo
+    tratamento das licenças: diga, em vez de esconder.
+    """
+    por_tipo = [
+        {
+            "tipo": t.nome,
+            "sai": [
+                {"campo": c.campo, "politica": c.politica, "porque": c.porque,
+                 "unidade": c.unidade}
+                for c in t.abre
+            ],
+            "fica": list(t.fecha),
+            "sai_pelo_tipo_proprio": list(t.projeta_a_parte),
+        }
+        for t in TIPOS_DA_FRONTEIRA
+    ]
+    confere = conferir_fronteira()
+    return {
+        "politicas": POLITICAS_DE_SAIDA,
+        "por_tipo": por_tipo,
+        "confere": confere["ok"],
+        "quantos": confere["quantos"],
+        "o_limite": (
+            "a proteção é o campo não sair. Em texto de planejamento o app "
+            "troca as identidades do mapa local por alias; ele não detecta o "
+            "nome de um estabelecimento que ninguém cadastrou, e nenhuma "
+            "varredura de texto detecta"
+        ),
+    }
+
+
 def ligacao_com_a_ia(ws, executavel: str = "") -> dict:
     """Como a sua IA se conecta a este motor, e o que ela recebe.
 
@@ -175,11 +221,21 @@ def ligacao_com_a_ia(ws, executavel: str = "") -> dict:
             "agregados: baseline, score, planos, projeção, perfil",
             "as primitivas de escrita, que sempre exigem `porque`",
         ],
-        "o_que_a_ia_nunca_recebe": [
-            "o extrato bruto",
-            "o conteúdo de `.fintips-salt`",
-            "nomes completos de pessoas físicas em claro",
+        # Derivado da fronteira. Era uma lista de três linhas escrita à mão, e
+        # três linhas não descrevem quatorze campos fechados. Só `fecha` entra
+        # aqui: o que sai pelo tipo próprio a IA **recebe**, e dizer o
+        # contrário numa tela de privacidade é a mesma mentira de antes.
+        "o_que_a_ia_nunca_recebe": sorted(
+            f"{t.nome}.{campo}" for t in TIPOS_DA_FRONTEIRA for campo in t.fecha
+        ) + [
+            # Duas frases em português ao lado dos nomes de campo: a lista
+            # derivada é exata e não é legível por quem não leu o código.
+            "o extrato bruto — o texto original do banco é `transacao.memo_raw`",
+            "a identidade de quem recebe — `transacao.counterparty` sai só como alias",
+            "o conteúdo de `.fintips-salt`, que é o que torna o alias reversível",
+            "qualquer campo de um tipo da fronteira que ninguém classificou",
         ],
+        "fronteira": o_que_atravessa(),
         "como_desligar": (
             "remova a entrada do arquivo de config do seu cliente de IA. O "
             "motor não tem serviço em execução esperando conexão: quem sobe o "
