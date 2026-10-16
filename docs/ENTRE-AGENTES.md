@@ -1735,7 +1735,7 @@ não escolher modelo pelo marketing, nem enviar texto bruto se o aparelho não
 sustentar a execução. O contrato tipado de saída precisa ser validado; schema
 JSON de turno não é detector de PII.
 
-Conferência desta proposta: cinco exemplos estruturais e sete adulterações
+Conferência desta proposta, também no portão CI: cinco exemplos estruturais e sete adulterações
 recusadas. Exemplos sintéticos, sem dados pessoais ou modelo real; sem testes
 semânticos alegados. Schemas ainda não implementam o executor. O plano exige
 evals reais separadas de mocks, ouro Python/Kotlin para regras novas e teste de

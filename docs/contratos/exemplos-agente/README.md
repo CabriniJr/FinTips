@@ -82,6 +82,7 @@ A partir da raiz do repo:
 python scripts/verificar-contrato-agente-proposto.py
 ```
 
+O job `motor Python` do portão executa esta conferência no CI.
 A conferência valida os cinco exemplos e rejeita adulterações: campos extras,
 comandos em noop, aprovação pelo agente, quantidade fracionária, unidade
 inválida, texto livre em referência e proveniência ausente. Não chama modelos,
