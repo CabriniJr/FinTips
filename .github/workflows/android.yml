@@ -265,7 +265,7 @@ jobs:
             echo "seletor de arquivos nem lifecycle no aparelho."
             echo
             echo "Motor Kotlin ligado à UI: frentes do dia, ritmo de leitura e importação persistente de extratos OFX."
-            echo "Preview 12: guarda nativa comum e Librera conectado por documento persistente; job atualiza livros e pacing sem reimportação diária."
+            echo "Preview 13: seleção do Librera preserva perfil/revisão ao recriar a tela. Guarda nativa comum e Librera conectado por documento persistente; job atualiza livros e pacing sem reimportação diária."
             echo "Migração preserva o legado WebView; limites e instruções em docs/LIBRERA-AUTOMATICO.md. Fluxos financeiros da preview 11 continuam separados."
             echo "Recebimentos/pagamentos identificados por canal, com bruto em detalhe de conferência. Fontes da preview 10 são recalculadas sem reimportação."
             echo "Saldo inicial opcional; repetição e períodos sobrepostos não duplicam movimentações com a mesma identidade."

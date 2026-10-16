@@ -61,6 +61,7 @@ class PreviewActivity : ComponentActivity() {
     private val librera by lazy { LibreraFonte(this,estadoCliente) }
     private var libreraProfile="principal"
     private var libreraPicking=false
+    private var libreraSelectionToken: Long?=null
     private val extratos by lazy { ExtratosLocais(this) }
     private var keyDialog: AlertDialog? = null
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -73,12 +74,15 @@ class PreviewActivity : ComponentActivity() {
 
     private val libreraPicker=registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         libreraPicking=false
+        val selectedProfile=libreraProfile
+        val selectedToken=libreraSelectionToken
+        libreraSelectionToken=null
         if(uri!=null) io.execute {
             var granted=false
             try {
                 val hadGrant=contentResolver.persistedUriPermissions.any { it.uri==uri && it.isReadPermission }
                 contentResolver.takePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION);granted=!hadGrant
-                librera.conectar(uri,libreraProfile)
+                librera.conectar(uri,selectedProfile,expectedToken=selectedToken ?: error("seleção sem revisão"))
             } catch(_:Exception) {
                 if(granted && runCatching { estadoCliente.fonte()?.get("uri")?.jsonPrimitive?.content }.getOrNull()!=uri.toString()) runCatching { contentResolver.releasePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION) }
                 runOnUiThread { if(!closed) view.evaluateJavascript("dispatchEvent(new CustomEvent('fintips:librera-error',{detail:'Não foi possível conectar. Escolha o app-Progress.json que o Librera atualiza, com acesso persistente; a fonte anterior foi preservada.'}))",null) }
@@ -88,6 +92,11 @@ class PreviewActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if(savedInstanceState!=null) {
+            libreraProfile=savedInstanceState.getString("librera_profile","principal")
+            libreraPicking=savedInstanceState.getBoolean("librera_picking",false)
+            libreraSelectionToken=if(savedInstanceState.containsKey("librera_selection_token")) savedInstanceState.getLong("librera_selection_token") else null
+        }
         val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this)).build()
         view = WebView(this)
@@ -236,9 +245,10 @@ class PreviewActivity : ComponentActivity() {
         "librera.conectar" -> {
             require(i.keys().asSequence().toSet() in listOf(emptySet<String>(),setOf("perfil")))
             val p=i.optString("perfil","principal").trim();require(p.isNotBlank() && p.length<=100)
-            runOnUiThread { if(!closed && !libreraPicking) { libreraPicking=true;libreraProfile=p
+            val selectionToken=estadoCliente.tokenFonte()
+            runOnUiThread { if(!closed && !libreraPicking) { libreraPicking=true;libreraProfile=p;libreraSelectionToken=selectionToken
                 try { libreraPicker.launch(arrayOf("application/json","text/plain","application/octet-stream")) }
-                catch(_:Exception) { libreraPicking=false;notice("Não foi possível abrir o seletor de documentos.");atualizarEstadoWeb() }
+                catch(_:Exception) { libreraPicking=false;libreraSelectionToken=null;notice("Não foi possível abrir o seletor de documentos.");atualizarEstadoWeb() }
             } }
             JSONObject().put("status","selecao_solicitada")
         }
@@ -448,6 +458,9 @@ class PreviewActivity : ComponentActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("librera_profile",libreraProfile)
+        outState.putBoolean("librera_picking",libreraPicking)
+        libreraSelectionToken?.let { outState.putLong("librera_selection_token",it) }
         view.saveState(outState)
         super.onSaveInstanceState(outState)
     }

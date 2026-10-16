@@ -1,4 +1,4 @@
-# Librera automático e guarda nativa — preview 12
+# Librera automático e guarda nativa — previews 12/13
 
 Esta entrega implementa a coleta de leitura e sua guarda comum. Ainda não é o
 agente completo de gestão, decomposição de planos e replanejamento por tools.
@@ -24,6 +24,10 @@ posições novas. Para nuvem, o provedor Android precisa oferecer seleção e
 grant persistente do documento atualizado; isso não conecta uma conta Drive
 por OAuth. Diretórios privados de outro app que o Android bloqueia não são
 contornados. Librera/Syncthing/provedor precisa tornar o JSON acessível.
+
+Na preview 13, perfil e revisão da seleção também sobrevivem à recriação da
+tela enquanto o seletor Android está aberto. Uma escolha obsoleta não reativa
+fonte cancelada/trocada, mesmo se o provedor conceder novamente o documento.
 
 A tela distingue a hora da leitura do arquivo do timestamp de cada posição.
 Um arquivo lido agora pode conter uma posição antiga; isso não torna o pacing
