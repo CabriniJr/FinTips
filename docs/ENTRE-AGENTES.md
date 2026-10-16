@@ -1300,6 +1300,407 @@ essa main e preservei os dois logs do conflito. O estado atual substitui as
 notas históricas de chave pendente: Secret configurado e validado, CI integrado.
 O pedido agora é integrar as entregas prontas e acompanhar a publicação real.
 
+**2026-10-14 · Codex assume gauges Android e discovery das fontes**
+
+Li e preservo objetivos/CI na main `ca32ec0`. Nova branch
+`codex/android-gauges-fontes` nasce dessa main; não reaplicar a alpha 3 nem
+voltar sobre o motor. O PR #8 antigo está incorporado na main e será encerrado;
+a trilha nova usa diff incremental dessa base.
+
+O usuário confirmou comprometimento como cumprimento de metas escolhidas,
+com pesos ajustáveis e ausência de dados separada de meta não cumprida.
+`SCORES-FONTES-CONECTORES.md` registra as fontes oficiais e os aceites
+S-01/A-06/C-01/UI-05/UI-06. Os pedidos aguardam resposta do Claude.
+
+Codex altera só Compose e docs: arco segmentado, ponteiro animado, detalhe
+ao toque, base parcial e sem base distinto de zero. Frentes vêm de
+`montarTela`; não há fórmula, faixa ou média na UI. Renderer de agregado e
+objetivos recebe números prontos; a guarda/adaptação nativa desses dados ainda
+falta. V1 não está completo; V2/V3 continuam na fila. A alpha 3 publicada não
+ganha fontes/conector por esta entrega de componentes.
+
+Validação: assembleDebug e assembleRelease passaram; 194 Python, 134 JVM e
+18 arquivos de ouro conferidos. Aparência, fonte ampliada, TalkBack, toque e lifecycle ainda precisam
+de Android em aparelho/emulador. Não ativar mock para aparentar coleta.
+
+**14/10/2026 · Codex — gauges atualizados para integração**
+
+Usuário autorizou integrar as entregas na main e seguir. PR #10 já está em
+`2315ab9`; PR #11 em `639ca9e`. Atualizei a base do PR #9, preservando o motor e
+os logs do Claude. O componente permanece no alvo Compose: a alpha entregue
+continua WebView; não alegar que o APK de avaliação já abriu esta tela.
+As frentes estão alimentadas pelo motor; agregado/objetivos continuam aguardando
+a guarda/adaptação nativa documentada em S-01/A-06/C-01. Nenhuma média na UI,
+nenhuma nova permissão, coleta automática ou saída de PII.
+
+**14/10/2026 · Codex — publicação bloqueada corretamente; keystore explícito**
+
+A primeira execução da main após integrar CI compilou e leu o Secret, mas o
+verificador recusou o certificado do APK. A conferência isolada do Secret tinha
+passado. Não houve publicação incompatível. A seleção implícita do keystore do
+Gradle não é suficiente no runner.
+
+Ajustei o job para fornecer `FINTIPS_SIGNING_KEYSTORE` com o caminho do arquivo
+privado instalado; o signingConfig debug usa esse caminho explicitamente.
+Nenhum valor privado entra no código ou em argumentos de linha de comando.
+Build local foi repetido com Android user home diferente: debug e release
+compilaram, e o APK default manteve o certificado das alphas, package .ui,
+launcher e seis assets offline corretos. O verificador passou. Notas de release
+passam a usar o banner da identidade com URL fixada ao commit.
+
+Validação da integração: 234 Python, 136 JVM, 19 ouros, licenças, PII, Actionlint,
+assembleDebug/assembleRelease e verificador do APK. Próxima faixa visual:
+concluir guarda/adaptação do agregado e levar telas existentes para Compose,
+sem substituir o launcher antes de preservar armazenamento e fluxos da alpha.
+
+**15/10/2026 · Codex — motor Kotlin na UI e piloto MCP comum**
+
+Usuário pediu motor embarcado e vínculo pelo app, confirmou **ChatGPT e Claude
+com o mesmo MCP** e reiterou “Siga”. Branch `codex/android-motor-ia`, base
+`a3717da`. Faixa: ponte debug/WebView, UI Contexto/IA e conferência OFX,
+projeção mínima pura com ouro e serviço MCP separado em `integracoes/mcp`.
+Não houve aceite novo do Claude ou outro PR aberto nesta consulta.
+
+A UI aprovada chama `montarTela`, `ritmoDeLeitura` e `lerOfx/concilia` pelo
+contrato `executarMotorLocal`, testável no módulo puro. Registros da alpha
+continuam no mesmo localStorage, package .ui e assinatura; versionCode 4.
+Não ativar o launcher Compose nem migrar armazenamento por esta entrega.
+O OFX fica em memória e o usuário informa saldo anterior: é conferência,
+sem classificação, score ou histórico financeiro. **Avaliação do motor:** o
+parser canônico tem fluxo default `expense`; não utilizá-lo como classificação
+real. Para liberar finanças completas, solicito ao Claude o classificador com
+proveniência, análise e contrato local sem heurísticas inventadas na UI.
+
+C-01 ganhou projeção Python/Kotlin/JS com vocabulários fechados, sem nomes,
+textos, datas, valores, IDs, contagens ou livros; escopos desmarcados e revisão
+integral. Ausência de registro não é falha. O APK permanece sem INTERNET; abre
+o navegador externo com a projeção validada no fragmento. O portal limpa o
+fragmento, pede confirmação e envia o snapshot. A declaração de privacidade
+foi corrigida: navegador pode transmitir e isso não é anonimato. Config schema
+2 deixa a ficha da loja pendente da hospedagem concreta, em vez de “nenhuma
+coleta” baseado só na permissão do APK.
+
+Serviço: um `/mcp` read-only para ambos, OAuth PKCE S256, DCR com callbacks
+exatos, audience, tokens rotativos, revogação e TTL de uma hora. Sem workspace,
+sem I/O de dados pessoais, sem logs de pedidos e sem estado persistente.
+**Piloto de uma instância:** reiniciar revoga inclusive DCR; não anunciar
+sincronização contínua, alta disponibilidade ou conexão real com as contas.
+A hospedagem HTTPS ainda precisa de destino/configuração; perguntei ao usuário
+qual infraestrutura já tem. Sem endpoint público no APK. Não publicar o MCP
+Python completo na internet como atalho.
+
+S-01 (agregado/pesos escolhidos), A-02 (UsageStats) e A-06 (TotalPass) continuam
+solicitados ao Claude, aguardando aceite. A projeção atual não inventa score,
+nem conclui presença em academia a partir de tarefa ou abertura de app.
+
+Validação local: 248 Python, 144 JVM, 20 ouros em paridade, 20 JS da UI, 13 do
+MCP/portal, chamada real pelo SDK MCP Python, build debug/release e verificador
+do APK (certificado das alphas, package, versão 4, 6 assets, sem INTERNET,
+backup false). QA Chromium 320/390/768 com motor Kotlin JVM real: persistência,
+leitura, OFX, ausência da ponte e corrupção preservada, revisão sem canary
+pessoal. Intent Android substituído por captura nesse teste, sem alegar teste
+em aparelho. Portal testado no navegador com OAuth e revogação efetiva; encontrei
+e corrigi reabertura da mesma aba com novo fragmento, com regressão no CI.
+Faltam aparelho/WebView real e consulta nas duas contas para concluir C-01.
+
+
+**15/10/2026 · Codex — MCP embarcado no celular (preview 5)**
+
+Direção explícita do usuário: **“Server local no celular”**. Branch
+`codex/android-servidor-local`, base `34cb358` (PR #12 integrado). A entrega
+atual substitui a configuração de hospedagem remota na UI por uma sessão MCP
+Kotlin no próprio Android; o piloto Node fica como referência histórica.
+Não houve novo aceite ou delegação aceita pelo Claude nesta faixa.
+
+`conector` é um módulo JVM independente do SDK Android, usando o motor puro
+existente. Faz bind exclusivo em 127.0.0.1, token aleatório por sessão,
+Streamable HTTP stateless e somente `ler_contexto_revisado`. Sem acesso ao
+workspace, escrita, logs de pedidos, arquivos ou cliente de upload. A projeção
+continua com vocabulários fechados e sem registros completos. TTL de 1 h;
+fontes inválidas retiram o contexto. `SessaoLocal` trava escopos exatos,
+geração de consentimento e pausa até revisão; atualizações antigas não retomam
+uma sessão pausada. Encerrar fecha o socket e impede início tardio enfileirado.
+
+O debug WebView aprovado mantém armazenamento/origem, package .ui e certificado;
+versionCode 5. A pessoa escolhe as áreas, revisa o JSON e autoriza atualização
+ao usar o app. Mudanças de tarefa/leitura, retomada e período visível atualizam
+somente as áreas aprovadas. O serviço foreground tem notificação e ação Encerrar;
+não inicia no boot, não reinicia sticky nem persiste token/contexto. INTERNET
+é necessária ao socket loopback; FGS, specialUse e notificação estão restritos
+a debug. O release Compose continua fora dessa migração. O verificador do APK
+cobra permissões exatas, serviço não exportado, backup desabilitado e assets.
+
+**C-01 segue parcial:** os conectores de ChatGPT/Claude chamam pela nuvem;
+loopback no telefone não conecta as contas. Ainda falta ponte HTTPS autenticada
+que encaminhe ao aparelho sem hospedar registros. Secure MCP Tunnel da OpenAI
+foi pesquisado, mas não validado embarcado em Android e não resolve Claude por
+si. Nenhum túnel foi ativado, endpoint público fornecido ou conta anunciada
+como conectada. Arquitetura, fontes oficiais e aceites em
+`SERVIDOR-MCP-LOCAL.md`. Solicito ao Claude revisão do transporte/consentimento
+e proposta de ponte comum; S-01, A-02 e A-06 continuam aguardando resposta.
+
+Validação local: 248 Python, 144 JVM do motor + 12 do conector, 20 ouros,
+20 JS UI, 13 Node do piloto, licenças, PII, Actionlint, debug/release e
+verificador do APK. SDK MCP real conversa com o servidor Kotlin. QA Chromium
+320/390/768 usa motor, SessaoLocal e socket Kotlin reais: seleção/revisão,
+atualização por tarefas/leitura, pausa sem retomada automática, reautorização,
+encerramento, preservação de registros e nenhum canary privado no contexto.
+O wrapper Android e clipboard foram simulados nesse QA: foreground, permissão,
+notificação, bateria e lifecycle precisam de avaliação em aparelho real.
+
+
+**15/10/2026 · Codex — regressão reportada no servidor Android**
+
+O usuário reportou que o servidor não funciona na preview 5. Não confundir os
+checks de JVM/Chromium anteriores com execução do foreground service Android.
+Branch `codex/android-mcp-diagnostico`, base `a463194`. Faixa: debug bridge,
+serviço, teste instrumentado e CI Android. Reproduzindo o APK publicado em
+Android 14 e adicionando cobertura pelo bridge WebView e socket sem wrappers
+substituídos. O motivo original ainda não foi isolado; não anunciar correção
+nem conexão das contas antes de validar o caminho real. O erro genérico atual
+perde a causa ao passar por ResultReceiver e precisa de diagnóstico seguro.
+
+
+**15/10/2026 · Codex — diagnóstico verificável da preview 6**
+
+A reprodução instrumentada da base `a463194` passou no CI Android 14/KVM
+(run 38713894344). Inicialização pelo WebMessageListener, foreground service e
+consulta real ao socket funcionaram; isso não reproduziu o relato do aparelho.
+O emulador local sem KVM falhou por timeout ao inicializar o WebView, antes de
+atingir o serviço. Não tratar essa lentidão da infraestrutura como causa do
+relato, nem anunciar “bug corrigido” sem evidência.
+
+Preview 6 passa a confirmar o início só após handshake, descoberta e consulta
+MCP pelo socket real; se falhar, encerra a sessão. Há botão Testar servidor,
+resultado na UI, build/API Android e códigos MCP-00…06 fixos. ResultReceiver
+antes descartava toda causa: agora preserva categoria segura, sem mensagens de
+exception, contexto ou token. Falta de suporte WebMessageListener passa a pedir
+atualização do WebView/Chrome, em vez de só pedir outro APK.
+
+A sonda ocorre fora do lock do consentimento: parar/revogar não espera rede, e
+resultado antigo não valida nova geração. Nenhuma permissão, envio remoto,
+regra de motor ou fonte de score nova. O transporte da sonda é exclusivamente
+127.0.0.1; não há teste a endpoint externo. Origem/armazenamento/certificado
+preservados; versionCode 6. O diagnóstico não conecta ChatGPT/Claude.
+
+Validação local: 248 Python, 144 JVM motor + 15 conector, 20 JS, 20 ouros,
+licenças, Actionlint, builds debug/release/test APK e verificador de assinatura,
+manifesto e assets. A nova rodada Android cobre também teste manual,
+notificações bloqueadas por AppOps (sem revogar permissão e matar o runner),
+background, ação Encerrar, novo token e erro de contexto sem eco do conteúdo.
+O teste da base já passou; verificar os checks do novo head antes de integrar.
+O próximo dado necessário do aparelho é resultado/código exibido, nunca token,
+JSON de contexto ou arquivos pessoais.
+
+A compilação do APK de instrumentação revelou um problema na auditoria de
+privacidade: o scanner incluía manifestos de testes e atribuía REORDER_TASKS
+ao app entregue. A seleção agora exclui árvores androidTest/unitTest, com
+regressão que também protege allowBackup. Não ampliar a allowlist do APK para
+permissões de testes. Com a regressão, a suíte Python passa a 249 testes.
+
+Conferi também os XMLs do JUnit: um teste legado de geração terminava em
+assertFails e inferia retorno Throwable, ficando fora da descoberta Jupiter.
+Os testes de expressão agora declaram Unit; a contagem de 15 do conector
+exige 15 casos executados no relatório, não só 15 anotações no fonte.
+
+A rodada 38715422850 passou no serviço/socket e no background/ação Encerrar,
+mas a preparação do teste de notificação falhou: AppOps não reproduziu a
+negativa runtime do Android 14. Não enfraquecer a asserção. O CI agora instala
+os APKs CI, revoga POST_NOTIFICATIONS antes de iniciar o runner e executa os
+três casos em ordem: negativa real, socket, notificação permitida/background.
+O script recusa pacote .ui e exige OK (3 tests), pois am instrument pode
+retornar zero com JUnit vermelho. Sem testes simulados de permissão.
+
+**15/10/2026 · Codex — conexão MCP que faltava (preview 7)**
+
+O usuário esclareceu que o problema era a conexão às IAs não implementada,
+não uma falha do socket Android. A preview 6 não resolvia essa lacuna.
+Branch `codex/android-ponte-mcp`, base `c10e457`. Implementei o caminho
+ChatGPT/Claude → HTTPS/OAuth PKCE → WSS iniciado pelo telefone → mesmo socket
+MCP Kotlin. O motor e os registros não são hospedados; sem snapshot remoto.
+
+Arquivos novos: `integracoes/ponte/` (relay, OAuth/DCR, portal, testes,
+Docker/Compose), `render.yaml`, `PonteRemota.kt`, UI `connect-remote.jsx` e
+harness SDK. O serviço anterior `integracoes/mcp` é histórico, não entrypoint
+da ponte viva. Android mantém origem, package, armazenamento e assinatura;
+versionCode 7. Nenhuma nova permissão. WebView não faz rede externa: a conexão
+é Kotlin/OkHttp HTTPS/WSS e só começa por consentimento explícito.
+
+Cada chat precisa do próprio código OAuth e áreas revisadas (padrão vazio).
+O cliente conserva as aprovações localmente; relay não pode inventar grants
+nem ampliar escopos. Mostramos ponte online, aguardando IA, OAuth concluído e
+consulta recebida separadamente. Pausa, fonte inválida, TTL, offline e revogação
+não entregam conteúdo antigo. Encerrar fecha o canal, nega novas respostas
+localmente e tenta revogação HTTPS sem bloquear foreground. Sem credenciais
+persistentes nesta alpha: reinício exige nova sessão. Relay de uma instância,
+metadados e hashes em memória; sleep/restart exige reautorização.
+
+Faixa compartilhada: README, docs de privacidade/estado, CI e configuração de
+transparência. Regras de motor e ouro não mudaram. OkHttp/Okio e PSL declarados;
+Apache + NOTICE + MPL do PSL incluídos no APK. A regressão de dependência nova
+precisou usar um ID sintético, pois OkHttp agora é uma dependência declarada.
+
+Validação local: 249 Python; 144 motor JVM + 19 conector; 20 JS UI;
+13 testes do piloto + 7 do relay novo; 20 ouros; 17 licenças declaradas;
+Actionlint; builds debug/release/instrumentação; container com contexto fechado.
+SDK MCP real executou dois clientes OAuth PKCE até o socket Kotlin por HTTPS/WSS,
+incluindo atualização e pausa sem snapshot. Chromium + cliente Kotlin real
+validou autorização de ambos por áreas diferentes, revisão/consentimento,
+revogação, zero fetch externo do WebView e larguras 320/390/768. Wrappers de
+Android/clipboard são simulados nesse QA; instrumentação Android separada
+exige quatro casos reais no CI (três existentes + transporte TLS/WSS/pausa).
+Conferir checks do head antes de mesclar.
+
+**Ainda não concluído:** não há instância HTTPS publicada nem contas reais
+vinculadas. Perguntei ao usuário a hospedagem/domínio, sem resposta até aqui.
+Render blueprint e Compose são opções concretas; não declarar conexão pronta
+por SDK verde ou por abrir o site da IA. Ativação requer host HTTPS e o OAuth
+na UI de cada conta, seguido de consulta real. Callbacks oficiais estão na
+allowlist e documentados, sem wildcard; conferir valores apresentados na conta.
+Peço revisão do Claude especialmente em consentimento/retencão, relay sem
+snapshot e comportamento de rede Android. Não mover PII para a hospedagem.
+
+O smoke do container encontrou permissões de arquivos/diretórios herdadas do
+workspace que impediam leitura por `node`. Dockerfile agora fixa 0644/0755;
+a imagem iniciou como UID 1000, read-only e sem capabilities. O CI constrói
+e inicia o container, confere health/OAuth e ausência de data/fixtures.
+
+Na revisão final da UI, trocar o código OAuth passou a limpar também as áreas
+selecionadas. Um conector não deve herdar seleções de uma autorização anterior
+interrompida. O QA móvel conferiu esse reinício e os dois estados de consulta
+recebida, além da revogação. Nenhum fetch externo no navegador da UI.
+
+**15/10/2026 · Codex — chat embarcado e contratos universais de triagem (preview 8)**
+
+Pedido: chat Android que tire do usuário o trabalho de registrar/correlacionar,
+com uma API comum para todos os assets. Usuário manteve PII exclusivamente no
+client e esclareceu depois: valores, relações e explicação de cálculos com
+labels abstratas podem passar; nomes e origem/destino reais não. Chave API da
+OpenAI será configurada no próprio app, nunca solicitada na conversa do Codex.
+
+Branch `codex/android-triagem-conversa`, base `2618308`. Faixa nova de contratos
+`fintips/triagem_{universal,openai,api}.py`, `fintips/rules/triagem-catalogo.json`,
+`kotlin/motor/.../triagem/`, `OpenAITriagem.kt`, chat/storage web e chave nativa.
+Compartilhados: adição de router em api.py antes do fallback SPA; gerador de
+ouro (novo arquivo), README, configuração de privacidade, CI e package-data.
+Nenhuma fórmula financeira/score anterior foi alterada. Python continua fonte;
+novo ouro exige a paridade do contrato Kotlin, inclusive erros e hashes.
+
+Fonte única do catálogo gera constante Kotlin e JSON Schema. 14 tipos usam
+as mesmas operações: catalogar/contexto/preparar/validar/aplicar; criação,
+atualização e vínculos explícitos. A confirmação grava todo o bundle numa
+única chave atômica. Base SHA-256, ID/conteúdo e janela de 256 recibos impedem
+replay e confirmação de proposta antiga; janela não limita atualizações novas.
+Os editores de vida/leitura leem e escrevem o estado unificado após a primeira
+confirmação, preservando as chaves anteriores. Exclusão limpa vínculos órfãos.
+Cópia local inclui vida/leitura/catálogo/conversa, sem chave; corrupção exporta
+strings originais em formato de recuperação em vez de apagar a fonte.
+
+Destinos reais desta entrega: planos de vida, tarefas, livros e tempo de uso
+nas abas existentes; outros tipos no catálogo local. **Esses outros ainda não
+alimentam o cálculo financeiro ou sensores.** Não chamar os registros de
+`caderno` de custos/regras já aplicados ao motor financeiro. O usuário pode
+revisar, atualizar e remover esses registros, ou importar proposta de outro
+agente/API local e confirmar no app. Detalhes opcionais ficam recolhidos para
+não transformar a conversa em formulário.
+
+A extração de texto é **local, determinística e limitada**, com revisão. Não
+embutimos LLM local nem enviamos a conversa à OpenAI. O assistente remoto escolhe
+próximas perguntas, valores válidos e sugestões de relação usando projeção
+reconstruída no Kotlin, com números, enums e aliases. Mapa de títulos/IDs,
+texto, datas exatas e origem/destino reais não entram no corpo HTTP. A presença
+dos campos opcionais de origem/destino também é omitida. Pacing e estados de
+evidência reutilizam os motores existentes; ausência não vira zero.
+
+Chave digitada em janela nativa com senha/FLAG_SECURE, cifrada AES-GCM com
+Android Keystore, fora do WebView e backups. HTTPS direto api.openai.com,
+modelo gpt-4.1-mini, Structured Outputs, store=false, sem redirects ou retries
+automáticos. Até 20 consultas por conversa; cancelamento e retomada local.
+Nenhuma chave real foi usada. Store=false não é promessa de retenção zero e
+números abstratos não são anunciados como anônimos. MCP/relay/grants existentes
+permanecem com sua allowlist própria; a triagem não conecta contas nem abre um
+novo endpoint público de escrita.
+
+Validações locais até aqui: 261 Python, 147 motor JVM, 22 conector, 25 JS,
+21 ouros, catálogo/schema gerados, builds Android debug/release/instrumentação.
+Fluxo móvel com motor e cliente HTTPS Kotlin reais e API simulada passou:
+lote nas abas, valores/aliases sem strings privadas, key fora da conversa,
+consentimento, ausência de progresso preservada, backup, reload e atualização
+de duplicata. O CI agora repete esse QA e exige **6 testes Android**: quatro
+anteriores mais Keystore e HTTP TLS com corpo abstrato. Conferir novo head.
+
+Peço revisão do Claude em contratos, proveniência e próximos adaptadores que
+consumam o catálogo financeiro no motor. **Não mover o workspace para serviços
+remotos para simplificar a triagem.** Caminho e limites estão em
+`docs/TRIAGEM-CONVERSACIONAL.md`. Acrescentar novos tipos por catálogo/adaptador
+com ouro; não criar um formulário e uma API diferentes para cada asset.
+
+**15/10/2026 · Codex — corrigindo o papel do agente (preview 9)**
+
+Correção explícita do usuário: a IA deve fazer o preenchimento e a correlação,
+com perguntas inline, como um assistente de desenvolvimento. Deixar a pessoa
+configurar tipos/campos e a IA só rotear perguntas aumenta o toil. A preview 8
+não atendia a esse ponto. Não interpretar essa correção como autorização para
+publicar texto pessoal: valores/labels abstratos continuam permitidos; nomes
+e origem/destino reais continuam exclusivamente no aparelho.
+
+Branch `codex/android-agente-inline`, base `7f5f415`. Protocolo novo
+`fintips_agente_v2`: retorno com vários preenchimentos por referência local,
+criação de até seis registros por resposta, vínculos e uma pergunta. O contrato
+universal v1/persistência é preservado. Python é fonte em triagem_agente.py;
+AgenteTriagem.kt porta as mesmas validações, com ouro próprio. O payload é
+construído no Kotlin; não há encaminhamento de prompt arbitrário do WebView.
+Catálogo/limites e conceitos têm geração conferida. Origem/destino não geram
+referência nem metadado. Texto, mapas e valores privados são restaurados só
+localmente. Observações não podem ser copiadas entre rascunhos, unidades não
+são intercambiáveis e o agente não pode inventar motivos ou mudar um número
+explícito. Erros recusam a resposta inteira, sem gravação parcial.
+
+O chat agora apresenta resumo/aceite inline; formulários e importação de JSON
+ficam em detalhes opcionais. Ativação pela conversa, chave nativa uma vez,
+consentimento preservado nas próximas conversas, pausa disponível. Um turno
+processado não é reenviado ao reabrir, e escrita do agente não realimenta a
+API. Correções de ritmo atualizam o livro atual; ambiguidade vira uma escolha
+inline. Duplicata exata/única reaproveita o registro e obrigatórios existentes;
+a escolha explícita de manter separado prevalece. Medidas de dias diferentes
+não são fundidas. Ausência de progresso continua ausência de observação.
+
+**Limite deliberadamente declarado:** ainda não há LLM local. Extração privada
+usa regras e vocabulário fechado para publicar conceitos/unidades, sem enviar
+texto livre. O agente pode executar preenchimento e correlação, mas isso não
+é compreensão irrestrita de qualquer mensagem pessoal. Não prometer essa
+compreensão nem relaxar a privacidade em silêncio. Fórmulas financeiras,
+sensores e escopos readonly MCP não foram ampliados. Próxima evolução precisa
+medir mensagens que ainda exigem esclarecimento e ampliar interpretação local
+sem converter a experiência novamente em configuração de contratos.
+
+Validação/publicação: registrar o head aprovado e a build depois dos checks.
+
+Complemento do mesmo trabalho: o contexto agora inclui estrutura com negação,
+condição e intenção, compilada por léxico fechado. Qualquer palavra fora dele
+vira `opaco_N`; o texto original e mapas continuam locais. A pergunta pode ser
+redigida pelo agente, com placeholders de registros restaurados no client;
+não há escrita livre de campos pelo modelo. Título de leitura e ação podem
+ser extraídos localmente sem exigir aspas ou seleção de tipo. Ouro cobre
+“Quero ler …” → livro + tarefa relacionados, pergunta natural e negação,
+além da preservação da escolha explícita de manter registros separados.
+O teto artificial de 20 chamadas por conversa foi retirado: uma chamada por
+turno, recibo local do turno processado e cancelamento quando a pessoa muda a
+conversa evitam realimentação sem exigir que ela reconfigure/reinicie o chat.
+
+Validação local concluída: 266 Python, 148 motor JVM, 22 conector JVM, 26 JS,
+22 ouros, geração dos contratos, PII e licenças. Builds debug/release/testAPK.
+QA 320/390/768 com Kotlin/HTTPS reais e API simulada passou: preenchimento e
+vínculos, pergunta inline, correção de ritmo, persistência, backup, duplicata,
+importação, remoção e nenhuma chamada externa pelo WebView. A instrumentação
+CI mantém seis casos; o caso HTTPS Android agora inclui três campos e um
+vínculo do agente. Conferir o head e os runs do PR antes de integrar/publicar.
+
+Revisão visual: o chat passa a acompanhar o resultado do agente reservando
+espaço para o compositor e a navegação inferior. QA exige que o botão inline
+esteja acima da barra fixa. Deduplicação exige título igual com acentos
+preservados, além de tipo/ocorrência única; ouro distingue “avó” de “avô”.
+
 **14/10/2026 · registro de depósitos: um contrato para o que o app escreve**
 
 Achei um erro meu de duas entregas atrás e ele valeu mais que a correção.

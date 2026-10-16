@@ -1,7 +1,11 @@
+import { CLIENT_STATE_KEY, writeSlice } from "./client-state.js";
+import { backupAll } from "./triagem-store.js";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AREAS, STORAGE_KEY, dailyProgress, emptyLife, isDone, localDay, newId,
   readLife, removeTask, shiftDay, tasksForDay, toggleTask, validateLife } from "./life-store.js";
 import { Icon } from "./icons.jsx";
+import { useDailyMotor } from "./motor-hooks.js";
+import { isAndroid } from "./native-motor.js";
 import { ReadingTracker } from "./reading.jsx";
 import { reducedMotion } from "./motion.js";
 
@@ -18,7 +22,7 @@ export function useLocalLife() {
     try {
       const next = transform(readLife(localStorage));
       if (!validateLife(next)) throw new Error("estado inválido");
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      writeSlice(localStorage, STORAGE_KEY, "vida", next);
       setState(next); setIssue(""); return true;
     } catch {
       setIssue("Não foi possível salvar no aparelho. Sua alteração não foi gravada. Verifique o espaço e tente novamente.");
@@ -27,7 +31,7 @@ export function useLocalLife() {
   }, [blocked]);
   useEffect(() => {
     const refresh = (event) => {
-      if (event.key !== STORAGE_KEY && event.key !== null) return;
+      if (event.key !== STORAGE_KEY && event.key !== CLIENT_STATE_KEY && event.key !== null) return;
       try { setState(readLife(localStorage)); setBlocked(false); setIssue(""); }
       catch { setBlocked(true); setIssue("Os dados locais não puderam ser lidos. A edição foi pausada para preservar seus registros."); }
     };
@@ -142,26 +146,27 @@ function Tasks({ life, selectedDay, area, add, toast }) {
   </section>;
 }
 
-function AreaCards({ life, selectedDay, openArea }) {
+function AreaCards({ life, selectedDay, openArea, motor }) {
   return <div className="area-grid">{AREAS.map((a) => {
-    const progress = dailyProgress(life.state, selectedDay, a.id);
+    const progress = isAndroid() ? motor?.data?.fronts.find((f) => f.area === a.id) : dailyProgress(life.state, selectedDay, a.id);
     return <button className="area-card" key={a.id} onClick={() => openArea(a.id)} style={{ "--area": a.cor }}>
       <span className="area-card-top"><span className="area-icon"><Icon name={a.icone}/></span><span className="area-code" aria-hidden="true">{a.id}</span></span>
-      <strong>{a.nome}</strong><span className="area-reading" aria-hidden="true">{progress.total ? `${progress.done}/${progress.total}` : "—"}</span><small>{progress.total ? `${progress.done} de ${progress.total} tarefas` : "Sem tarefas ainda"}</small>
-      <span className="area-progress"><i style={{ width: `${progress.pct}%` }}/></span>
+      <strong>{a.nome}</strong><span className="area-reading" aria-hidden="true">{progress?.total ? `${progress.done}/${progress.total}` : "—"}</span><small>{!progress ? (motor?.error ? "Motor indisponível" : "Calculando…") : progress.total ? `${progress.done} de ${progress.total} tarefas` : "Sem tarefas ainda"}</small>
+      <span className="area-progress"><i style={{ width: `${progress?.pct || 0}%` }}/></span>
     </button>;
   })}</div>;
 }
 
 export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
   const [form, setForm] = useState(false);
+  const motor = useDailyMotor(life.state, selectedDay, tasksForDay, isDone);
   const progress = dailyProgress(life.state, selectedDay);
   const weekday = new Date(`${selectedDay}T12:00:00`).getDay();
   const start = shiftDay(selectedDay, -((weekday + 6) % 7));
   const isToday = selectedDay === localDay();
   return <>
     <PageHeading overline={isToday ? "Rotina diária" : "Histórico da rotina"} title={isToday ? "Hoje" : "Seu dia"}
-      description="Seu dia, em seis áreas da vida."/>
+      description="Seu dia, em seis áreas da vida." action={<a className="life-button" href="#conversa"><Icon name="context" size={18}/>Conversar</a>}/>
     <div className="week-strip" aria-label="Selecionar dia da semana">{Array.from({ length: 7 }, (_, i) => {
       const d = shiftDay(start, i), date = new Date(`${d}T12:00:00`);
       return <button key={d} aria-pressed={d === selectedDay} aria-label={date.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
@@ -179,7 +184,8 @@ export function Today({ life, selectedDay, setDay, ir, openArea, toast }) {
     </section>
     <Tasks life={life} selectedDay={selectedDay} add={() => setForm(true)} toast={toast}/>
     <div className="section-head outside"><h2>Suas áreas de vida</h2><button className="text-button" onClick={() => ir("vida")}>Explorar <Icon name="arrow" size={16}/></button></div>
-    <AreaCards life={life} selectedDay={selectedDay} openArea={openArea}/>
+    {isAndroid() && <p className="motor-label" role="status">{motor?.data ? "Áreas calculadas pelo motor Kotlin · no aparelho" : motor?.error ? "Motor indisponível. Atualize o Android System WebView; seus registros continuam salvos." : "Carregando motor Kotlin…"}</p>}
+    <AreaCards life={life} selectedDay={selectedDay} openArea={openArea} motor={motor}/>
     <button className="context-prompt" onClick={() => ir("contexto")}><span className="area-icon"><Icon name="context"/></span><span><strong>O celular também pode contar uma história</strong><small>Descubra quais sinais podem ajudar a entender sua rotina.</small></span><Icon name="arrow" size={18}/></button>
     {form && <TaskForm life={life} selectedDay={selectedDay} close={() => setForm(false)} toast={toast}/>}
   </>;
@@ -290,16 +296,18 @@ export function PhoneContext({ life, toast }) {
   const largest = Math.max(...data.map((m) => m.minutos), 1);
   const backup = () => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY) || JSON.stringify(life.state);
+      const raw = JSON.stringify(backupAll(localStorage));
       const url = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
-      const link = document.createElement("a"); link.href = url; link.download = `fintips-vida-${localDay()}.json`; link.click();
+      const link = document.createElement("a"); link.href = url; link.download = `fintips-local-${localDay()}.json`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       toast("Cópia local criada. Guarde-a com cuidado.");
     } catch { toast("Não foi possível criar a cópia local."); }
   };
   return <>
     <PageHeading code="05" overline="Sinais da rotina" title="Contexto" description="O que seu celular pode contar, sob seu controle."/>
-    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros desta tela ficam neste navegador. A coleta automática e a conexão com ChatGPT ainda não estão ativas.</p></div></section>
+    <a className="life-card context-chat-entry" href="#conversa"><div><span className="manual-tag">CONVERSA / REGISTRO LOCAL</span><h2>Vamos organizar seus planos?</h2><p>Conte o que você quer fazer. Revise tarefas, livros, metas e vínculos em um lote.</p></div><Icon name="arrow" size={24}/></a>
+    <section className="privacy-card"><span className="privacy-icon"><Icon name="lock" size={24}/></span><div><h2>Seus dados ficam com você</h2><p>Tarefas, planos e registros completos ficam no aparelho. A coleta automática ainda não está ativa. Você pode preparar um contexto mínimo para autorizar por MCP.</p></div></section>
+    <button className="context-prompt" onClick={() => { location.hash = "ia"; }}><span className="area-icon"><Icon name="context"/></span><span><strong>Servidor IA local</strong><small>Motor e MCP no celular · revisão e controle</small></span><Icon name="arrow" size={18}/></button>
     <section className="life-card"><div className="section-head"><h2>Seu tempo de tela</h2><span className="manual-tag">Registro manual</span></div>
       <label className="usage-date">Dia do registro<input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)}/></label>
       {!data.length ? <Empty icon="clock" title="Antes de concluir, observe">Registre o tempo que aparece nas configurações do celular. Não temos acesso automático aos seus apps nesta versão.</Empty>

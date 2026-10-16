@@ -1,0 +1,26 @@
+services:
+  relay:
+    build:
+      context: ../..
+      dockerfile: integracoes/ponte/Dockerfile
+    environment:
+      PUBLIC_URL: https://${MCP_DOMAIN:?Informe o domínio da ponte}
+      PHONE_JOIN_SECRET: ${PHONE_JOIN_SECRET:?Gere o convite privado}
+      OAUTH_CALLBACKS: ${OAUTH_CALLBACKS:?Configure os callbacks exatos}
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+  https:
+    image: caddy:2-alpine
+    environment:
+      MCP_DOMAIN: ${MCP_DOMAIN:?Informe o domínio da ponte}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+volumes:
+  caddy_data:
+  caddy_config:

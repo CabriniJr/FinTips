@@ -12,15 +12,28 @@ android {
         applicationId = "com.fintips.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        versionCode = 9
         versionName = "0.6.0"
     }
     buildFeatures { compose = true }
+    // O runner pode definir outro Android user home. Na publicação, apontar
+    // explicitamente para o keystore validado, sem depender desse default.
+    signingConfigs {
+        getByName("debug") {
+            providers.environmentVariable("FINTIPS_SIGNING_KEYSTORE").orNull?.let { caminho ->
+                storeFile = file(caminho)
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
     buildTypes {
         getByName("debug") {
             val ci = providers.gradleProperty("fintips.ciPreview").orNull == "true"
             applicationIdSuffix = if (ci) ".ci" else ".ui"
-            versionNameSuffix = if (ci) "-ci" else "-ui-preview.3"
+            versionNameSuffix = if (ci) "-ci" else "-ui-preview.9"
             manifestPlaceholders["previewLabel"] = if (ci) "FinTips CI" else "FinTips UI"
         }
     }
@@ -40,11 +53,18 @@ kotlin {
 }
 
 dependencies {
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    androidTestImplementation("com.squareup.okhttp3:okhttp-tls:4.12.0")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:core:1.6.1")
+    debugImplementation(project(":conector"))
     debugImplementation("androidx.webkit:webkit:1.11.0")
     implementation(project(":motor"))
     // Esta tela importa Clock/LocalDate diretamente; não depender da
     // dependência implementation interna do motor para compilá-los.
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+    debugImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     val compose = "1.7.5"
     implementation("androidx.compose.ui:ui:$compose")
     implementation("androidx.compose.foundation:foundation:$compose")

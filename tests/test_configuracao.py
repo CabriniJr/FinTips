@@ -42,10 +42,10 @@ def test_dependencia_nova_sem_declaracao_quebra(tmp_path):
     continua bonita enquanto deixa de citar código que viaja no binário."""
     _copia_minima(tmp_path)
     g = tmp_path / "kotlin" / "app" / "build.gradle.kts"
-    g.write_text(g.read_text() + '\nimplementation("com.squareup.okhttp3:okhttp:4.12.0")\n')
+    g.write_text(g.read_text() + '\nimplementation("org.example:dependencia-nao-declarada:4.12.0")\n')
     r = lic.conferir(tmp_path)
     assert not r["ok"]
-    assert "gradle:com.squareup.okhttp3:okhttp" in r["nao_declarados"]
+    assert "gradle:org.example:dependencia-nao-declarada" in r["nao_declarados"]
 
 
 def test_declaracao_que_sobrou_tambem_quebra(tmp_path):
@@ -137,8 +137,10 @@ def test_as_permissoes_vem_do_manifesto_compilado(ws):
     # Ela aparece após assembleDebug/Release; não é uma permissão de usuário.
     internas = {f"{pacote}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" for pacote in (
         "com.fintips.app", "com.fintips.app.ui", "com.fintips.app.ci")}
-    assert set(d["privacidade"]["permissoes_do_app"]) <= internas
-    assert d["privacidade"]["sem_permissao_de_rede"] is True
+    locais = {"android.permission.INTERNET", "android.permission.FOREGROUND_SERVICE",
+              "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.POST_NOTIFICATIONS"}
+    assert locais <= set(d["privacidade"]["permissoes_do_app"]) <= internas | locais
+    assert d["privacidade"]["sem_permissao_de_rede"] is False
     assert d["privacidade"]["backup_automatico"] == "false"
 
 
@@ -155,10 +157,34 @@ def test_manifesto_compilado_nao_esconde_permissao_de_rede(tmp_path):
     ]
 
 
-def test_a_ficha_da_loja_diz_que_nao_coleta_e_diz_por_que(ws):
+def test_apk_de_instrumentacao_nao_muda_privacidade_do_aplicativo(tmp_path):
+    raiz = tmp_path / "kotlin/app"
+    real = raiz / "build/intermediates/merged_manifests/debug/AndroidManifest.xml"
+    test = raiz / "build/intermediates/merged_manifests/debugAndroidTest/AndroidManifest.xml"
+    source = raiz / "src/androidTest/AndroidManifest.xml"
+    for p in (test, source):
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text('<manifest><uses-permission android:name="android.permission.REORDER_TASKS"/>'
+                     '<application android:allowBackup="true"/></manifest>')
+    real.parent.mkdir(parents=True, exist_ok=True)
+    real.write_text('<manifest><uses-permission android:name="android.permission.INTERNET"/>'
+                    '<application android:allowBackup="false"/></manifest>')
+    assert cfg._permissoes_do_manifesto(tmp_path) == ["android.permission.INTERNET"]
+    assert cfg._flag_do_manifesto(tmp_path, "android:allowBackup") == "false"
+
+
+def test_a_declaracao_revela_saida_opcional_mesmo_sem_internet_no_apk(ws):
     s = cfg.montar(ws, RAIZ)["privacidade"]["seguranca_dos_dados"]
-    assert s["coleta_dados"] is False
-    assert s["compartilha_com_terceiros"] is False
+    assert s["coleta_dados"] is None  # Não publicar uma ficha "nenhuma coleta".
+    assert s["coleta_automatica"] is False
+    assert s["compartilha_com_terceiros"] is True
+    assert s["compartilhamento_opcional"] is True
+    assert s["dados_em_transito_criptografados"] is False
+    assert "loopback" in s["transporte_atual"]
+    assert "pendente" in s["declaracao_play_store"]
+    assert "navegador externo" in s["por_que_nao_coleta"]
+    assert s["ponte_externa_criptografada"] is True
+    assert "HTTPS/WSS" in s["transporte_atual"]
     assert "INTERNET" in s["por_que_nao_coleta"]
 
 

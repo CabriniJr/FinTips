@@ -1,0 +1,11 @@
+# Contexto fechado: nenhum registro, certificado, teste ou secret vai ao builder.
+**
+!integracoes/
+!integracoes/ponte/
+!integracoes/mcp/
+!integracoes/ponte/package.json
+!integracoes/ponte/package-lock.json
+!integracoes/ponte/relay.mjs
+!integracoes/ponte/portal.js
+!integracoes/mcp/context.mjs
+!integracoes/mcp/portal.css

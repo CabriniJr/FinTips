@@ -1,0 +1,1 @@
+{"name":"fintips-mcp-relay","version":"0.1.0","private":true,"type":"module","license":"MIT","engines":{"node":">=22"},"scripts":{"start":"node relay.mjs","test":"node --test *.test.mjs"},"dependencies":{"ws":"8.22.0"}}

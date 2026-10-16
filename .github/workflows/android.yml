@@ -140,7 +140,8 @@ jobs:
           if [ -n "$KEYSTORE_B64" ]; then
             umask 077
             mkdir -p "$HOME/.android"
-            echo "$KEYSTORE_B64" | base64 -d > "$HOME/.android/debug.keystore"
+            printf '%s' "$KEYSTORE_B64" | base64 -d > "$HOME/.android/debug.keystore"
+            echo "FINTIPS_SIGNING_KEYSTORE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
             echo "propria=true" >> "$GITHUB_OUTPUT"
             echo "Chave do environment instalada; a compatibilidade será conferida no APK."
           else
@@ -151,7 +152,7 @@ jobs:
 
       - name: compilar
         working-directory: kotlin
-        run: ./gradlew -Pfintips.android=true :motor:jvmTest :app:assembleDebug :app:assembleRelease --no-daemon
+        run: ./gradlew -Pfintips.android=true :motor:jvmTest :conector:test :app:assembleDebug :app:assembleRelease --no-daemon
 
       - name: verificar o APK e os assets embarcados
         env:
@@ -243,6 +244,8 @@ jobs:
         run: |
           set -euo pipefail
           {
+            echo "![FinTips Android](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/docs/identidade/banner-release.png)"
+            echo
             if [ "${{ steps.pacote.outputs.rolante }}" = "true" ]; then
               echo "Build automático do último commit da \`main\`."
               echo "Esta pré-release é **rolante**: ela é substituída a cada push."
@@ -261,8 +264,33 @@ jobs:
             echo "Não é a tela Compose nativa, e a compilação não prova fluidez,"
             echo "seletor de arquivos nem lifecycle no aparelho."
             echo
-            echo "Sem permissão \`INTERNET\`, sem analytics, sem upload."
-            echo "Seus dados ficam no aparelho."
+            echo "Motor Kotlin ligado à UI: frentes do dia, ritmo de leitura e conferência de saldo OFX."
+            echo "As finanças ainda não oferecem classificação, score ou histórico no APK."
+            echo
+            echo "Servidor MCP Kotlin embarcado no celular, somente em 127.0.0.1 e com token por sessão."
+            echo "Inicie/encerre em Contexto → Servidor IA local. Serviço com notificação de controle."
+            echo "Preview 9: agente de preenchimento em Hoje → Conversar."
+            echo "A IA preenche vários campos, prepara vínculos e pergunta inline; uma ação salva o conjunto."
+            echo "Correções de ritmo pela conversa; formulários e contratos ficam nos detalhes. A extração privada ainda é limitada. JSON/HTTPS testados com API simulada."
+            echo "Tarefas, planos, livros e tempo de uso entram nas abas existentes."
+            echo "Outros tipos ficam no catálogo local; ainda não alimentam o cálculo financeiro."
+            echo "OpenAI opcional: chave cifrada com Android Keystore e valores com aliases."
+            echo "A conversa, nomes e origem/destino reais ficam no client; não vão para a API."
+            echo "A cobrança usa a conta API da pessoa. Nenhuma chave de produção foi usada nos testes."
+            echo "As cópias locais incluem vida, leitura, catálogo e conversa, sem a chave."
+            echo "Contrato e API local: docs/TRIAGEM-CONVERSACIONAL.md."
+            echo
+            echo "Preview 7: ponte HTTPS/OAuth comum para ChatGPT e Claude, com WSS de saída pelo Android."
+            echo "Cada consulta chega ao mesmo MCP local; não há snapshot remoto reutilizado."
+            echo "Aprovação e revogação por conector; somente indicadores revisados saem do telefone."
+            echo "Registros completos, nomes, títulos, OFX e credenciais das fontes ficam locais."
+            echo "Pausa, offline, fonte inválida e contexto vencido retornam indisponibilidade."
+            echo "Hospedagem HTTPS e autorização nas contas reais ainda precisam ser ativadas."
+            echo "Veja integracoes/ponte/README.md e o blueprint render.yaml para implantação."
+            echo "Nenhum domínio externo vem configurado; abrir o site da IA não conclui o vínculo."
+            echo "Credenciais da ponte são efêmeras: reinício do processo exige nova sessão."
+            echo "Sem atualização local por uma hora, a ferramenta informa indisponibilidade."
+            echo "A UI continua WebView com assets locais; não há analytics."
             echo
             echo "Confira o download com \`sha256sum -c SHA256SUMS.txt\`."
           } > dist/NOTAS.md

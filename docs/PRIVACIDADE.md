@@ -1,5 +1,73 @@
 # Privacidade e PII
 
+## Android preview 8: triagem com valores e labels abstratas
+
+O usuário autorizou números, relações e componentes de cálculo com aliases;
+manteve nomes e origem/destino reais no client. A triagem reconstrói o contexto
+por schema, em Kotlin, sem encaminhar conversa, títulos, descrições, IDs ou
+datas exatas. A correspondência dos aliases fica no aparelho. A API só sugere
+opções e números válidos; gravar exige confirmação local do lote.
+
+A conexão OpenAI é direta pelo Android, opcional e separada do MCP. Chave cifrada
+com Android Keystore, digitada em janela nativa, fora do WebView, backups e
+relay. `store: false` não equivale a retenção zero; valores abstratos ainda
+revelam rotina. [Fronteira, persistência e API](TRIAGEM-CONVERSACIONAL.md).
+
+## Android preview 7: motor local, consulta remota autorizada
+
+O motor e o servidor MCP vivem no Android, em `127.0.0.1`, com bearer em
+memória e foreground service controlado pela pessoa. Uma ponte externa
+opcional aceita OAuth PKCE dos chats e encaminha cada consulta por WSS aberto
+pelo telefone. O app conserva suas próprias aprovações por áreas. Não há cópia
+remota reutilizada: offline, pausa, fonte inválida ou contexto vencido resultam
+em indisponibilidade. Encerrar o serviço encerra também o canal externo.
+
+Registros completos, nomes, títulos, datas, valores, contagens, identificadores
+pessoais, OFX e texto livre ficam no client. Só a projeção fechada de estados
+e fontes sai em consulta autorizada; app e relay validam a allowlist.
+**Indicadores reduzidos ainda revelam rotina e não são anônimos.** Mensagens
+já entregues à IA continuam sob as políticas do cliente escolhido.
+
+O relay guarda em memória metadados de autorização e hashes das credenciais,
+não arquivos pessoais nem snapshots de contexto. HTTPS/WSS protege o trânsito
+externo; o bearer do MCP local não sai do telefone. Credenciais do canal e
+aprovações do app também não são persistidas nesta alpha. Reiniciar app/relay
+exige nova autorização; os registros do app permanecem no armazenamento local.
+A hospedagem deve desativar logs de pedidos/corpos/tokens. Terminação TLS e
+políticas do provedor devem ser conferidas antes da publicação na Play Store.
+
+A variante debug declara INTERNET, permissões do foreground service e
+notificação; essas permissões não limitam destinos. O código mantém o socket
+local no loopback e só abre conexão externa nativa após informar uma origem
+HTTPS e consentir. Não segue redirects HTTP. O WebView continua restrito aos
+assets locais, sem fetch remoto. O Compose release não ganha esse serviço.
+Não há domínio externo embutido, coleta automática de sensores ou analytics.
+
+A hospedagem e as contas reais ainda não foram ativadas; os testes usam OAuth
+real de protocolo, SDK MCP e fontes sintéticas. [Arquitetura e implantação](../integracoes/ponte/README.md).
+As próximas seções registram o piloto anterior e o workspace Python histórico.
+
+## Android alpha 4 e MCP remoto
+
+Registros completos continuam no client. O fluxo Conectar IA permite escolher
+indicadores reduzidos de rotina, estado dos planos por área e estados do ritmo
+de leitura. O motor Kotlin aplica allowlist antes de abrir o navegador externo;
+a pessoa revisa o JSON integral. Não exporta títulos, nomes, IDs, datas, valores,
+lista de apps ou texto livre. Indicadores reduzidos ainda revelam aspectos da
+rotina e **não são anunciados como anônimos**.
+
+O navegador exige confirmação antes de enviar ao servidor escolhido. O piloto
+MCP remoto é somente leitura; snapshots expiram em uma hora e podem ser
+revogados. A revogação não apaga mensagens já recebidas pela IA. Credenciais
+de bancos e fontes ficam locais; tokens OAuth do conector ficam com o serviço
+e o cliente de IA, como parte da autorização. O APK não tem INTERNET, mas
+o navegador tem sua própria rede: isso é saída opcional de contexto.
+
+Hospedagem e contas ainda não estão configuradas/testadas. Contrato, retenção
+e limites: [motor embarcado](MOTOR-EMBARCADO-MCP.md) e
+[serviço MCP](../integracoes/mcp/README.md). As seções seguintes descrevem o
+workspace Python local, que não é publicado por este novo serviço.
+
 Extrato bancário é um dos conjuntos de dados pessoais mais reveladores que
 existem: identifica onde você esteve, com quem se relaciona, o que consome e
 quanto ganha. O projeto trata isso como requisito, não como recurso.

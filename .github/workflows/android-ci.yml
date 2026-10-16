@@ -54,3 +54,39 @@ jobs:
           echo '## APK de teste disponível em Artifacts' >> "$GITHUB_STEP_SUMMARY"
           echo 'FinTips CI usa pacote próprio; não substitui o FinTips UI instalado.' >> "$GITHUB_STEP_SUMMARY"
           echo 'A UI do APK ainda é WebView; o alvo Compose também foi compilado.' >> "$GITHUB_STEP_SUMMARY"
+
+
+  servidor-android:
+    name: MCP no Android 14
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Habilitar KVM para o emulador
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Testar ponte WebView, serviço e socket reais
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          working-directory: kotlin
+          disable-animations: true
+          script: |
+            ./gradlew -Pfintips.android=true -Pfintips.ciPreview=true :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon
+            python3 ../scripts/testar-mcp-android.py
+      - name: Guardar relatório Android
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testes-mcp-android-${{ github.run_id }}-${{ github.run_attempt }}
+          path: kotlin/app/build/reports/androidTests/
+          if-no-files-found: warn

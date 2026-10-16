@@ -1,9 +1,18 @@
 package com.fintips.app
 
 import android.content.ContentValues
+import android.content.ClipData
+import android.content.ClipDescription
+import android.content.ClipboardManager
+import android.content.pm.PackageManager
+import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.ResultReceiver
 import android.provider.MediaStore
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -17,15 +26,39 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
+import androidx.webkit.WebMessageCompat
 import org.json.JSONObject
+import com.fintips.mcp.OpenAITriagem
+import com.fintips.mcp.FalhaTriagem
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonArray
+import android.app.AlertDialog
+import android.widget.EditText
+import android.text.InputType
+import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import com.fintips.mcp.FalhaPonte
 import java.io.ByteArrayInputStream
 import java.util.concurrent.Executors
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
-/** Apenas debug: APK offline para avaliar os cinco destinos do protótipo. */
+/** Apenas debug: assets locais e conexão MCP externa opcional e autorizada. */
 class PreviewActivity : ComponentActivity() {
     private lateinit var view: WebView
     private var files: ValueCallback<Array<Uri>>? = null
-    private val io = Executors.newSingleThreadExecutor()
+    private val io = Executors.newFixedThreadPool(3)
+    private val motor = MotorBridge()
+    private var closed = false
+    private val triagemAI = OpenAITriagem()
+    private val chaveTriagem by lazy { ChaveTriagem(this) }
+    private var keyDialog: AlertDialog? = null
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        McpLocalService.refreshNotification()
+    }
     private val picker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         files?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
         files = null
@@ -62,6 +95,43 @@ class PreviewActivity : ComponentActivity() {
             }
         }
         view.addJavascriptInterface(LocalBackup(), "FinTipsLocal")
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addWebMessageListener(view, "FinTipsMotor", setOf("https://$HOST")) { _, message, origin, mainFrame, reply ->
+                if (!mainFrame || origin.scheme != "https" || origin.host != HOST || origin.port !in listOf(-1, 443) || message.type != WebMessageCompat.TYPE_STRING) return@addWebMessageListener
+                val raw = message.data ?: return@addWebMessageListener
+                if (raw.toByteArray(Charsets.UTF_8).size > 1536 * 1024) return@addWebMessageListener
+                io.execute {
+                    var id: String? = null
+                    var operation: String? = null
+                    val response = try {
+                        val request = JSONObject(raw)
+                        id = request.getString("id").also { require(it.length <= 100) }
+                        val op = request.getString("operation").also { operation = it }
+                        val input = request.getJSONObject("input")
+                        val result = when {
+                            op in setOf("triagem.chave_status", "triagem.configurar_chave", "triagem.apagar_chave", "triagem.sugerir", "triagem.organizar", "triagem.cancelar") -> triagemOperation(op, input)
+                            op == "ponte.copiar_endpoint" -> copyLocal(McpLocalService.ponteOperation("ponte.status", JSONObject()).getString("origem") + "/mcp", false)
+                            op == "ponte.abrir_cliente" -> openAIClient(input.getString("provedor"))
+                            op.startsWith("ponte.") -> McpLocalService.ponteOperation(op, input)
+                            op.startsWith("servidor.") -> localServer(op, input)
+                                .put("versao_app", packageManager.getPackageInfo(packageName, 0).versionName)
+                                .put("android_sdk", Build.VERSION.SDK_INT)
+                            op == "ia.abrir" -> openConnector(input)
+                            else -> motor.execute(op, input)
+                        }
+                        JSONObject().put("id", id).put("result", result)
+                    } catch (e: Exception) {
+                        val failure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaMcp>().firstOrNull()
+                        val bridgeFailure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaPonte>().firstOrNull()
+                        val triageFailure = generateSequence<Throwable>(e) { it.cause }.filterIsInstance<FalhaTriagem>().firstOrNull()
+                        val message = if (operation?.startsWith("triagem.") == true) mensagemTriagem(triageFailure?.codigo) else if (operation?.startsWith("ponte.") == true) mensagemPonte(bridgeFailure?.codigo) else failure?.codigo?.mensagem ?: if (operation?.startsWith("servidor.") == true)
+                            CodigoMcp.DESCONHECIDO.mensagem else "O motor não aceitou este pedido. Confira os dados e tente novamente."
+                        JSONObject().put("id", id ?: JSONObject.NULL).put("error", message)
+                    }
+                    runOnUiThread { if (!closed) reply.postMessage(response.toString()) }
+                }
+            }
+        }
         view.setDownloadListener { url, _, _, _, _ ->
             if (url.startsWith("blob:https://$HOST/")) {
                 val quoted = JSONObject.quote(url)
@@ -79,7 +149,7 @@ class PreviewActivity : ComponentActivity() {
         })
         setContentView(view)
         if (savedInstanceState == null || view.restoreState(savedInstanceState) == null) {
-            view.loadUrl("https://$HOST/index.html")
+            view.loadUrl("https://$HOST/index.html" + if (intent.getBooleanExtra("abrir_ia", false)) "#ia" else "")
         }
     }
 
@@ -124,14 +194,199 @@ class PreviewActivity : ComponentActivity() {
 
     private fun notice(message: String) = runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
 
+    private fun openAIClient(provider: String): JSONObject {
+        val url = when (provider) { "chatgpt" -> "https://chatgpt.com/"; "claude" -> "https://claude.ai/"; else -> error("provedor inválido") }
+        runOnUiThread {
+            if (!closed) try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)) }
+            catch (_: Exception) { notice("Abra o site da IA para configurar o conector MCP.") }
+        }
+        return JSONObject().put("status", "abertura_solicitada")
+    }
+
+    private fun triagemOperation(op: String, i: JSONObject): JSONObject = when(op) {
+        "triagem.chave_status" -> JSONObject().put("configurada",chaveTriagem.configurada()).put("modelo","gpt-4.1-mini")
+        "triagem.configurar_chave" -> { triagemAI.cancelar(); runOnUiThread { configurarChaveTriagem() }; JSONObject().put("status","dialogo_solicitado") }
+        "triagem.apagar_chave" -> { triagemAI.cancelar(); chaveTriagem.apagar(); JSONObject().put("configurada",false) }
+        "triagem.cancelar" -> { triagemAI.cancelar(); JSONObject().put("status","cancelado") }
+        "triagem.sugerir", "triagem.organizar" -> {
+            val body=Json.parseToJsonElement(i.toString()).jsonObject
+            JSONObject(triagemAI.sugerir(body["bundle"]!!.jsonObject,body["rascunhos"]!!.jsonArray,
+                chaveTriagem.ler() ?: throw FalhaTriagem("CHAVE"),i.optBoolean("autorizado",false),i.getString("hoje"),agente=op=="triagem.organizar").toString())
+        }
+        else -> error("operação indisponível")
+    }
+    private fun configurarChaveTriagem() {
+        if(closed || keyDialog?.isShowing==true) return
+        val alreadySecure=window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        val input=EditText(this).apply {
+            inputType=InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            importantForAutofill=android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+            imeOptions=EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+            hint="sk-…";setSingleLine();setPadding(32,24,32,24)
+        }
+        val dialog=AlertDialog.Builder(this,android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle("Chave OpenAI neste aparelho")
+            .setMessage("A chave fica cifrada com Android Keystore e não entra no chat, cópias locais ou MCP. A API recebe só valores e rótulos abstratos após sua autorização. Modelo: gpt-4.1-mini.")
+            .setView(input).setPositiveButton("Guardar",null).setNegativeButton("Cancelar",null).create()
+        keyDialog=dialog
+        dialog.setOnDismissListener {
+            input.text?.clear();keyDialog=null
+            if(!alreadySecure) window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            if(!closed) view.evaluateJavascript("dispatchEvent(new Event('fintips:chave-triagem'))",null)
+        }
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val raw=input.text.toString().trim()
+                try { chaveTriagem.salvar(raw);dialog.dismiss() }
+                catch(_:Exception) { input.error="Chave inválida ou armazenamento indisponível. Nada foi exibido ou enviado." }
+            }
+        }
+        dialog.show();dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+    }
+    private fun mensagemTriagem(code: String?): String = when(code) {
+        "CHAVE" -> "TRIAGEM-02: Configure ou substitua a chave OpenAI neste aparelho."
+        "LIMITE" -> "TRIAGEM-03: A API atingiu um limite. Você pode continuar a triagem local."
+        "CONSENTIMENTO" -> "TRIAGEM-04: Revise e autorize o contexto abstrato antes de usar a API."
+        "CANCELADO" -> "TRIAGEM-05: Consulta cancelada. Seus registros foram preservados."
+        "OCUPADO" -> "TRIAGEM-06: Aguarde a consulta atual ou cancele."
+        "REDE", "RESPOSTA" -> "TRIAGEM-07: A API não retornou uma sugestão válida. Você pode continuar localmente."
+        else -> "TRIAGEM-01: Contrato ou revisão recusados. Nenhum registro foi alterado; confira os campos e a versão da proposta."
+    }
+
+    private fun mensagemPonte(code: String?): String = when (code) {
+        "CODIGO_EXPIRADO" -> "PONTE-02: Código expirado ou já usado. Inicie uma nova autorização na IA."
+        "AUTORIZACAO_RECUSADA" -> "PONTE-03: A ponte recusou a autorização. Confira o convite ou o código informado."
+        "SESSAO_ENCERRADA" -> "PONTE-04: Inicie o servidor local antes de conectar a ponte."
+        else -> "PONTE-01: Não foi possível concluir a conexão. Confira o endereço HTTPS, a rede e o estado da ponte."
+    }
+
+    private fun localServer(operation: String, i: JSONObject): JSONObject = when (operation) {
+        "servidor.status" -> McpLocalService.status()
+        "servidor.verificar" -> McpLocalService.verificar(i.getString("sessao"))
+        "servidor.atualizar" -> McpLocalService.atualizar(i.getString("sessao"), i.getJSONObject("context").toString())
+        "servidor.invalidar" -> McpLocalService.atualizar(i.getString("sessao"), null)
+        "servidor.pausar" -> McpLocalService.pausar(i.getString("sessao"))
+        "servidor.copiar_token" -> copyLocal(McpLocalService.credencial(), true)
+        "servidor.copiar_endereco" -> copyLocal(McpLocalService.status().getString("endpoint"), false)
+        "servidor.notificacoes" -> {
+            runOnUiThread { requestNotifications(true) }
+            JSONObject().put("status", "solicitado")
+        }
+        "servidor.iniciar", "servidor.encerrar" -> {
+            if (operation == "servidor.encerrar" && !McpLocalService.status().optBoolean("ativo")) McpLocalService.status()
+            else {
+                val context = if (operation == "servidor.iniciar") {
+                    try { MotorBridge.validateContext(i.getJSONObject("context").toString()) }
+                    catch (_: Exception) { throw FalhaMcp(CodigoMcp.CONTEXTO) }
+                } else null
+                val future = CompletableFuture<JSONObject>()
+                val receiver = object : ResultReceiver(Handler(Looper.getMainLooper())) {
+                    override fun onReceiveResult(code: Int, data: Bundle?) {
+                        if (code == 0) runCatching { JSONObject(data?.getString("json") ?: error("resposta ausente")) }
+                            .onSuccess { future.complete(it) }.onFailure { future.completeExceptionally(it) }
+                        else future.completeExceptionally(FalhaMcp(CodigoMcp.de(data?.getString("erro"))))
+                    }
+                }
+                runOnUiThread {
+                    try {
+                        check(!closed)
+                        val command = Intent(this, McpLocalService::class.java).putExtra("reply", receiver)
+                        if (context != null) {
+                            requestNotifications(false)
+                            command.action = McpLocalService.START; command.putExtra("context", context)
+                            startForegroundService(command)
+                        } else { command.action = McpLocalService.STOP; startService(command) }
+                    } catch (_: Exception) { future.completeExceptionally(FalhaMcp(CodigoMcp.ANDROID)) }
+                }
+                try { future.get(10, TimeUnit.SECONDS) }
+                catch (_: java.util.concurrent.TimeoutException) { throw FalhaMcp(CodigoMcp.TEMPO) }
+            }
+        }
+        else -> error("operação indisponível")
+    }
+
+    private fun copyLocal(value: String, secret: Boolean): JSONObject {
+        val future = CompletableFuture<JSONObject>()
+        runOnUiThread {
+            try {
+                check(!closed)
+                val clip = ClipData.newPlainText(if (secret) "Token MCP local" else "Endereço MCP local", value)
+                if (secret && Build.VERSION.SDK_INT >= 33) clip.description.extras = android.os.PersistableBundle().apply {
+                    putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+                getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
+                future.complete(JSONObject().put("status", "copiado"))
+            } catch (e: Exception) { future.completeExceptionally(e) }
+        }
+        return future.get(2, TimeUnit.SECONDS)
+    }
+
+    private fun requestNotifications(explicit: Boolean) {
+        if (closed) return
+        val prefs = getSharedPreferences("mcp-local", MODE_PRIVATE)
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            val asked = prefs.getBoolean("notificacoes_solicitadas", false)
+            if (!explicit && asked) return
+            if (explicit && asked && !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                startActivity(Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName))
+            } else {
+                prefs.edit().putBoolean("notificacoes_solicitadas", true).apply()
+                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else if (explicit) startActivity(Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::view.isInitialized) { view.onResume(); view.evaluateJavascript("dispatchEvent(new Event('fintips:resume'))", null) }
+    }
+
+    override fun onPause() {
+        if (::view.isInitialized) view.onPause()
+        super.onPause()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent); setIntent(intent)
+        if (intent.getBooleanExtra("abrir_ia", false)) view.evaluateJavascript("location.hash='ia'", null)
+    }
+
+    /** Somente a projeção validada sai, por gesto explícito, no navegador externo.
+     * O fragmento não é enviado no pedido HTTP; a página de pareamento o consome.
+     * O WebView segue offline e nunca recebe conteúdo remoto.
+     */
+    private fun openConnector(i: JSONObject): JSONObject {
+        val base = Uri.parse(i.getString("endpoint"))
+        require(base.scheme == "https" && !base.host.isNullOrBlank() && base.userInfo == null)
+        require(base.encodedPath in listOf("", "/") && base.query == null && base.fragment == null)
+        val revocation = i.getString("revocation")
+        require(Regex("[a-f0-9]{64}").matches(revocation))
+        val payload = JSONObject().put("revocation", revocation)
+        if (i.optBoolean("revoke", false)) payload.put("revoke", true) else {
+            val code = i.getString("code").replace("-", "").uppercase()
+            require(Regex("[A-Z2-7]{12}").matches(code))
+            payload.put("code", code).put("context", JSONObject(MotorBridge.validateContext(i.getJSONObject("context").toString())))
+        }
+        val url = base.buildUpon().path("/link").fragment(payload.toString()).build()
+        runOnUiThread {
+            if (!closed) try { startActivity(Intent(Intent.ACTION_VIEW, url).addCategory(Intent.CATEGORY_BROWSABLE)) }
+            catch (_: Exception) { notice("Nenhum navegador disponível para abrir o conector.") }
+        }
+        return JSONObject().put("status", "navegador_solicitado")
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         view.saveState(outState)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
+        closed = true
+        triagemAI.cancelar(); keyDialog?.dismiss(); keyDialog=null
         files?.onReceiveValue(null); files = null
         view.removeJavascriptInterface("FinTipsLocal")
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) WebViewCompat.removeWebMessageListener(view, "FinTipsMotor")
         view.destroy()
         io.shutdown()
         super.onDestroy()

@@ -27,3 +27,4 @@ kotlin/.kotlin/
 kotlin/build/
 kotlin/*/build/
 .gradle/
+.ouro-tmp-*

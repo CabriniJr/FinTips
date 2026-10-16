@@ -1,9 +1,12 @@
+import { CLIENT_STATE_KEY, writeSlice } from "./client-state.js";
 import React, { useCallback, useEffect, useState } from "react";
 import { Icon } from "./icons.jsx";
 import { Sheet, closeSheet } from "./life.jsx";
 import { localDay, newId, shiftDay } from "./life-store.js";
-import { READING_KEY, emptyReading, libreraPositions, mergeLibrera, pacing, readReading, validateReading } from "./reading-model.js";
+import { READING_KEY, emptyReading, libreraPositions, mergeLibrera, readReading, validateReading } from "./reading-model.js";
 import "./reading.css";
+import { usePacing } from "./motor-hooks.js";
+import { isAndroid } from "./native-motor.js";
 
 const percent = (bp) => `${(bp / 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`;
 const pp = (bp) => `${(bp / 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} p.p.`;
@@ -22,12 +25,12 @@ function useReading() {
     try {
       const next = transform(readReading(localStorage));
       if (!validateReading(next)) throw new Error("estado inválido");
-      localStorage.setItem(READING_KEY, JSON.stringify(next)); setState(next); setIssue(""); return true;
+      writeSlice(localStorage, READING_KEY, "leitura", next); setState(next); setIssue(""); dispatchEvent(new Event("fintips:reading-changed")); return true;
     } catch { setIssue("Não foi possível salvar os registros de leitura no aparelho. A alteração não foi gravada."); return false; }
   }, [blocked]);
   useEffect(() => {
     const refresh = (e) => {
-      if (e.key !== READING_KEY && e.key !== null) return;
+      if (e.key !== READING_KEY && e.key !== CLIENT_STATE_KEY && e.key !== null) return;
       try { setState(readReading(localStorage)); setBlocked(false); setIssue(""); }
       catch { setBlocked(true); setIssue("Não foi possível ler os registros de leitura. A edição foi pausada para preservá-los."); }
     };
@@ -144,9 +147,10 @@ function PositionChart({ observations }) {
 function BookCard({ book, store, onProgress, onPace, onRemove }) {
   const today = localDay();
   const observations = [...book.observacoes].sort((a, b) => a.dia.localeCompare(b.dia));
-  let r;
-  try { r = pacing(observations, { today, deadline: book.prazo || null, reading_days: book.dias_semana }); }
-  catch { return <article className="reading-book"><h3>{book.titulo}</h3><p className="form-error">Há uma data inconsistente neste histórico. Confira o relógio do aparelho e preserve uma cópia dos dados.</p></article>; }
+  const calculation = usePacing(observations, { today, deadline: book.prazo || null, reading_days: book.dias_semana });
+  if (calculation.error) return <article className="reading-book"><h3>{book.titulo}</h3><p role="alert" className="form-error">{calculation.error}</p></article>;
+  if (calculation.loading) return <article className="reading-book"><h3>{book.titulo}</h3><p role="status">Calculando no aparelho…</p></article>;
+  const r = calculation.data;
   const last = observations.at(-1);
   const demanding = r.estado === "estimado" && r.prazo_dias !== null && r.prazo_dias >= 0 &&
     (10000 - r.progresso_bp) * r.intervalo_dias > r.avanco_bp * Math.max(1, r.prazo_dias);
@@ -157,6 +161,7 @@ function BookCard({ book, store, onProgress, onPace, onRemove }) {
     {last && <p className="reading-caption">Última posição de {dateLabel(last.dia)} · {book.fonte === "librera" ? `perfil ${book.perfil}` : "registro local"}</p>}
     <PositionChart observations={observations}/>
     <div className="reading-pacing">
+      {isAndroid() && <small className="motor-label">Motor Kotlin · cálculo no aparelho</small>}
       {r.estado === "estimado" ? <><span className="eyebrow">{r.preliminar ? "Primeira estimativa" : "Seu ritmo observado"}</span>
         <strong>{pp(r.avanco_bp / r.intervalo_dias)} por dia de calendário</strong>
         <p>Nesse ritmo, o fim fica em aproximadamente <b>{r.previsao_dias} dias</b>, por volta de {dateLabel(shiftDay(today, r.previsao_dias))}.</p>
@@ -185,7 +190,7 @@ export function ReadingTracker({ toast }) {
   const close = () => setMode(null);
   const backup = () => {
     try {
-      const raw = localStorage.getItem(READING_KEY) || JSON.stringify(store.state);
+      const raw = JSON.stringify(store.state);
       const url = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
       const link = document.createElement("a"); link.href = url; link.download = `fintips-leitura-${localDay()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
       toast("Cópia local dos livros criada. Guarde-a com cuidado.");

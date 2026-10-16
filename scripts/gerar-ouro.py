@@ -2457,7 +2457,15 @@ def ouro_perfil_tempo() -> dict:
     }
 
 
+from ouro_contexto_ia import ouro_contexto_ia
+
+from ouro_triagem import gerar as ouro_triagem_universal
+from ouro_agente import gerar as ouro_agente
+
 GERADORES = {
+    "triagem-universal.json": ouro_triagem_universal,
+    "triagem-agente.json": ouro_agente,
+    "contexto-ia.json": ouro_contexto_ia,
     "dinheiro.json": ouro_dinheiro,
     "datas.json": ouro_datas,
     "privacidade.json": ouro_privacidade,

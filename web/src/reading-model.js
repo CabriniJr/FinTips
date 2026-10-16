@@ -1,3 +1,4 @@
+import { readSlice } from "./client-state.js";
 import { localDay, newId } from "./life-store.js";
 
 export const READING_KEY = "fintips.leitura.v1";
@@ -69,7 +70,7 @@ export function validateReading(s) {
 }
 
 export function readReading(storage) {
-  const raw = storage.getItem(READING_KEY);
+  const raw = readSlice(storage, READING_KEY, "leitura");
   if (!raw) return emptyReading();
   const parsed = JSON.parse(raw);
   if (!validateReading(parsed)) throw new Error("Estado local de leitura inválido.");

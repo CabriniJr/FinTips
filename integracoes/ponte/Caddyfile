@@ -1,0 +1,7 @@
+{$MCP_DOMAIN} {
+    request_body {
+        max_size 16KB
+    }
+    reverse_proxy relay:8787
+    # Sem access log. Não registrar Authorization, corpos ou queries OAuth.
+}

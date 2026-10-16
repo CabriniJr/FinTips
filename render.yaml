@@ -1,0 +1,19 @@
+# Implantação opcional do relay. Motor e registros não são hospedados.
+# Configure após criar a infraestrutura; o APK não recebe destino por este arquivo.
+services:
+  - type: web
+    name: fintips-mcp-bridge
+    runtime: docker
+    dockerfilePath: ./integracoes/ponte/Dockerfile
+    dockerContext: .
+    plan: free
+    numInstances: 1
+    autoDeploy: false
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8787"
+      - key: PHONE_JOIN_SECRET
+        generateValue: true
+      - key: OAUTH_CALLBACKS
+        value: '[{"uri":"https://chatgpt.com/connector_platform_oauth_redirect","provider":"chatgpt"},{"uri":"https://claude.ai/api/mcp/auth_callback","provider":"claude"}]'

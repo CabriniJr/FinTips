@@ -54,6 +54,11 @@ O job de publicação usa o GitHub environment **Fintips**. O workflow exige
 chave, bloqueia publicação em vez de oferecer atualização incompatível que
 levaria a desinstalar e perder dados. CI de PRs continua compilando normalmente.
 
+O runner instala a chave fora do repo e fornece somente seu caminho via
+`FINTIPS_SIGNING_KEYSTORE`. O Gradle usa esse arquivo explicitamente na
+configuração debug: o Android user home do runner não decide qual chave assina
+o APK publicado. Sem essa variável, builds locais/CI continuam com seu default.
+
 A chave correta foi conferida localmente contra a alpha 3. O conector pode
 escrever código/rodar Actions, mas a API de administração de Secrets retornou
 403. Configuração pelo proprietário do repo, apenas uma vez:
