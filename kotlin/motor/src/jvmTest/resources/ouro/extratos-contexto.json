@@ -1,0 +1,456 @@
+{
+  "validacoes": [
+    {
+      "entrada": {
+        "schema_version": 1,
+        "estado": "sem_extrato",
+        "arquivos": 0,
+        "contas": 0,
+        "transacoes": 0,
+        "inicio": null,
+        "fim": null,
+        "entradas_centavos": 0,
+        "saidas_centavos": 0,
+        "liquido_centavos": 0,
+        "meses": [],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      },
+      "aceito": true
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "estado": "sem_extrato",
+        "arquivos": 0,
+        "contas": 0,
+        "transacoes": 0,
+        "inicio": null,
+        "fim": null,
+        "entradas_centavos": 0,
+        "saidas_centavos": 0,
+        "liquido_centavos": 0,
+        "meses": [],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null,
+        "memo": "CANARY"
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "estado": "sem_extrato",
+        "arquivos": 0,
+        "contas": 0,
+        "transacoes": 0,
+        "inicio": null,
+        "fim": null,
+        "entradas_centavos": "1",
+        "saidas_centavos": 0,
+        "liquido_centavos": 0,
+        "meses": [],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "estado": "sem_extrato",
+        "arquivos": 0,
+        "contas": 0,
+        "transacoes": 0,
+        "inicio": "invalid",
+        "fim": null,
+        "entradas_centavos": 0,
+        "saidas_centavos": 0,
+        "liquido_centavos": 0,
+        "meses": [],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      },
+      "aceito": false
+    },
+    {
+      "entrada": {
+        "schema_version": 1,
+        "estado": "sem_extrato",
+        "arquivos": 0,
+        "contas": 0,
+        "transacoes": 0,
+        "inicio": null,
+        "fim": null,
+        "entradas_centavos": 0,
+        "saidas_centavos": 0,
+        "liquido_centavos": 0,
+        "meses": [],
+        "conciliacao": {
+          "conferidos": -1,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      },
+      "aceito": false
+    }
+  ],
+  "casos": [
+    {
+      "nome": "vazio",
+      "arquivos": [],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "sem_extrato",
+        "arquivos": 0,
+        "contas": 0,
+        "transacoes": 0,
+        "inicio": null,
+        "fim": null,
+        "entradas_centavos": 0,
+        "saidas_centavos": 0,
+        "liquido_centavos": 0,
+        "meses": [],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "sem_saldo_inicial",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 1,
+        "contas": 1,
+        "transacoes": 2,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-02",
+        "entradas_centavos": 100000,
+        "saidas_centavos": 25000,
+        "liquido_centavos": 75000,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 2,
+            "entradas_centavos": 100000,
+            "saidas_centavos": 25000,
+            "liquido_centavos": 75000
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 1
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "conferido",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>",
+          "saldo_inicial": "0"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 1,
+        "contas": 1,
+        "transacoes": 2,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-02",
+        "entradas_centavos": 100000,
+        "saidas_centavos": 25000,
+        "liquido_centavos": 75000,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 2,
+            "entradas_centavos": 100000,
+            "saidas_centavos": 25000,
+            "liquido_centavos": 75000
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 1,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "divergente",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>",
+          "saldo_inicial": "1"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 1,
+        "contas": 1,
+        "transacoes": 2,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-02",
+        "entradas_centavos": 100000,
+        "saidas_centavos": 25000,
+        "liquido_centavos": 75000,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 2,
+            "entradas_centavos": 100000,
+            "saidas_centavos": 25000,
+            "liquido_centavos": 75000
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 1,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "sem_saldo_declarado",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><DTASOF>20261031</LEDGERBAL></OFX>",
+          "saldo_inicial": "0"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 1,
+        "contas": 1,
+        "transacoes": 2,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-02",
+        "entradas_centavos": 100000,
+        "saidas_centavos": 25000,
+        "liquido_centavos": 75000,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 2,
+            "entradas_centavos": 100000,
+            "saidas_centavos": 25000,
+            "liquido_centavos": 75000
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 1
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "conciliacao_canonica_centavos",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1.005<FITID>s<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>1.00<DTASOF>20261031</LEDGERBAL></OFX>",
+          "saldo_inicial": "0"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 1,
+        "contas": 1,
+        "transacoes": 1,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-01",
+        "entradas_centavos": 100,
+        "saidas_centavos": 0,
+        "liquido_centavos": 100,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 1,
+            "entradas_centavos": 100,
+            "saidas_centavos": 0,
+            "liquido_centavos": 100
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 1,
+          "divergentes": 0,
+          "nao_conferidos": 0
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "mesmo_arquivo",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>"
+        },
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 2,
+        "contas": 1,
+        "transacoes": 2,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-02",
+        "entradas_centavos": 100000,
+        "saidas_centavos": 25000,
+        "liquido_centavos": 75000,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 2,
+            "entradas_centavos": 100000,
+            "saidas_centavos": 25000,
+            "liquido_centavos": 75000
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 2
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "sobreposicao_estorno_id_literal",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>-200.00<FITID>x<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>200.00<FITID>x<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>3.00<FITID>x#2<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>"
+        },
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>200.00<FITID>x<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261003120000[-3:BRT]<TRNAMT>3.00<FITID>x#2<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 2,
+        "contas": 1,
+        "transacoes": 3,
+        "inicio": "2026-10-03",
+        "fim": "2026-10-03",
+        "entradas_centavos": 20300,
+        "saidas_centavos": 20000,
+        "liquido_centavos": 300,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 3,
+            "entradas_centavos": 20300,
+            "saidas_centavos": 20000,
+            "liquido_centavos": 300
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 2
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    },
+    {
+      "nome": "contas_bancos_distintos",
+      "arquivos": [
+        {
+          "ofx": "<OFX><BANKID>001<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>"
+        },
+        {
+          "ofx": "<OFX><BANKID>002<ACCTID>ACCT_CANARY<CURDEF>BRL<BANKTRANLIST><STMTTRN><DTPOSTED>20261001120000[-3:BRT]<TRNAMT>1000.00<FITID>a<MEMO>DESTINO_CANARY</STMTTRN><STMTTRN><DTPOSTED>20261002120000[-3:BRT]<TRNAMT>-250.00<FITID>b<MEMO>DESTINO_CANARY</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>750.00<DTASOF>20261031</LEDGERBAL></OFX>"
+        }
+      ],
+      "sal": "sal-sintetico-local",
+      "esperado": {
+        "schema_version": 1,
+        "estado": "importado",
+        "arquivos": 2,
+        "contas": 2,
+        "transacoes": 4,
+        "inicio": "2026-10-01",
+        "fim": "2026-10-02",
+        "entradas_centavos": 200000,
+        "saidas_centavos": 50000,
+        "liquido_centavos": 150000,
+        "meses": [
+          {
+            "mes": "2026-10",
+            "transacoes": 4,
+            "entradas_centavos": 200000,
+            "saidas_centavos": 50000,
+            "liquido_centavos": 150000
+          }
+        ],
+        "conciliacao": {
+          "conferidos": 0,
+          "divergentes": 0,
+          "nao_conferidos": 2
+        },
+        "classificacao": "pendente",
+        "saldo_disponivel_centavos": null
+      }
+    }
+  ]
+}

@@ -36,6 +36,7 @@ fun main() {
                         "triagem.cancelar" -> { ai?.cancelar(); buildJsonObject { put("status","cancelado") } }
                         "triagem.sugerir", "triagem.organizar" -> { check(configured); ai!!.sugerir(i["bundle"]!!.jsonObject,i["rascunhos"]!!.jsonArray,"sk-"+"T".repeat(40),i["autorizado"]==JsonPrimitive(true),string("hoje"),agente=op=="triagem.organizar") }
 
+                        "extrato.contexto" -> com.fintips.motor.importacao.contextoExtratos(JsonArray(emptyList()),"fixture-local")
                         "servidor.status" -> local.estado()
                         "servidor.iniciar" -> { val s = local.iniciar(i["context"]!!.jsonObject); local.verificar(s["sessao"]!!.jsonPrimitive.content) }
                         "servidor.encerrar" -> { ponte?.close(); ponte = null; local.encerrar() }

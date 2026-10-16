@@ -1,3 +1,4 @@
+import { FinancialContextCard } from "./financial-context.jsx";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { PageHeading } from "./life.jsx";
 import { AREAS, localDay, newId } from "./life-store.js";
@@ -183,6 +184,7 @@ export function TriageChat({ toast }) {
         }}>{key.configurada ? "Usar assistente" : "Conectar minha OpenAI"}</button>
         {!native && <p className="form-hint">A conexão segura está disponível no APK Android. Aqui você pode continuar com a preparação local.</p>}
       </section>}
+      <FinancialContextCard/>
       <section className="triage-thread" aria-label="Conversa de triagem" aria-live="polite">
         {!chat.messages.length && <div className="triage-bubble assistant"><span>FINTIPS / TRIAGEM LOCAL</span><p>O que você quer tirar da cabeça hoje? Me conte o que pretende fazer e o que está pegando.</p><small>Eu organizo por trás da conversa. Quando faltar uma decisão, pergunto aqui.</small></div>}
         {chat.messages.map((m, i) => <div key={i} className={`triage-bubble ${m.role === "usuario" ? "user" : "assistant"}`}><span>{m.role === "usuario" ? "VOCÊ" : "FINTIPS"}</span><p>{m.text}</p></div>)}

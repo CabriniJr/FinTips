@@ -103,7 +103,7 @@ function App() {
       {current.page === "contexto" && <PhoneContext life={life} toast={toast}/>}
       {current.page === "conversa" && <TriageChat toast={toast}/>}
       {current.page === "ia" && <ConnectAI life={life} toast={toast} syncIssue={syncIssue}/>}
-      {financeiro && isAndroid() && <NativeFinance/>}
+      {financeiro && isAndroid() && <NativeFinance toast={toast}/>}
       {financeiro && !isAndroid() && <div className="finance-content"><PageHeading code="03" overline="Reserva, escolhas e metas" title="Finanças" description="Entenda o presente. Abra espaço para seus planos."/>
         <div className="finance-tabs" aria-label="Seções financeiras">{FINANCE.map(([id, label]) => <button key={id} aria-pressed={current.page === id} onClick={() => ir(id)}>{label}{id === "triagem" && ctx?.triagem?.resumo?.abertos > 0 && <span className="finance-count">{ctx.triagem.resumo.abertos}</span>}</button>)}</div>
         {loading && <div className="loading-card" role="status">Organizando suas finanças…</div>}
