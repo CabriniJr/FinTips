@@ -1,3 +1,4 @@
+import { clientStorage } from "./native-storage.js";
 import { FinancialContextCard } from "./financial-context.jsx";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { PageHeading } from "./life.jsx";
@@ -27,7 +28,7 @@ function agentLinks(previous, result, links) {
   return resolved;
 }
 export function TriageChat({ toast }) {
-  const [initial] = useState(() => { try { return { chat: readChat(localStorage) || initialChat() }; } catch (e) { return { chat: initialChat(), error: e.message }; } });
+  const [initial] = useState(() => { try { return { chat: readChat(clientStorage) || initialChat() }; } catch (e) { return { chat: initialChat(), error: e.message }; } });
   const [chat, setChat] = useState(initial.chat), [catalog, setCatalog] = useState(null), [projection, setProjection] = useState(null);
   const [text, setText] = useState(""), [error, setError] = useState(initial.error || ""), [busy, setBusy] = useState(false), [aiBusy, setAiBusy] = useState(false);
   const [clarify, setClarify] = useState(null);
@@ -42,7 +43,7 @@ export function TriageChat({ toast }) {
   useEffect(() => { contract("triagem.catalogo").then(setCatalog).catch((e) => setError(e.message)); }, []);
   useEffect(() => {
     if (blocked) return;
-    try { localStorage.setItem(CHAT_KEY, JSON.stringify(chat)); } catch { setError("A conversa não pôde ser guardada. Confira o espaço; os registros existentes foram preservados."); }
+    try { clientStorage.setItem(CHAT_KEY, JSON.stringify(chat)); } catch { setError("A conversa não pôde ser guardada. Confira o espaço; os registros existentes foram preservados."); }
   }, [chat, blocked]);
   useEffect(() => {
     const update = () => { generation.current++; setRefresh((v) => v + 1); };
@@ -52,7 +53,7 @@ export function TriageChat({ toast }) {
   useEffect(() => {
     let active = true; setProjection(null);
     try {
-      const bundle = readBundle(localStorage); setNotebook(bundle);
+      const bundle = readBundle(clientStorage); setNotebook(bundle);
       if (chat.drafts.length) contract("triagem.contexto", { bundle, rascunhos: chat.drafts, hoje: localDay() })
         .then((data) => { if (active) setProjection(data); }).catch((e) => { if (active) setError(e.message); });
     } catch (e) { setError(e.message); }
@@ -74,7 +75,7 @@ export function TriageChat({ toast }) {
     const ticket = generation.current; setAiBusy(true); setError("");
     setChat((c) => ({ ...c, requests: c.requests + 1 }));
     try {
-      const result = await nativeMotor("triagem.organizar", { bundle: readBundle(localStorage), rascunhos: current.drafts, autorizado: true, hoje: localDay() });
+      const result = await nativeMotor("triagem.organizar", { bundle: readBundle(clientStorage), rascunhos: current.drafts, autorizado: true, hoje: localDay() });
       if (mounted.current && ticket === generation.current && chatRef.current.cloudConsent) {
         // O contrato nativo valida o lote inteiro antes de devolver referências restauradas.
         const links = agentLinks(current.drafts, result.rascunhos, [...current.links, ...result.relacoes]);
@@ -135,11 +136,11 @@ export function TriageChat({ toast }) {
     setBusy(true); setError(""); const ticket = ++generation.current;
     if (native) nativeMotor("triagem.cancelar").catch(() => {});
     try {
-      const before = readBundle(localStorage), id = newId(), selected = structuredClone(chat.drafts), rels = structuredClone(chat.links);
+      const before = readBundle(clientStorage), id = newId(), selected = structuredClone(chat.drafts), rels = structuredClone(chat.links);
       const proposal = await contract("triagem.preparar", { bundle: before, rascunhos: selected, relacoes: rels, id });
       const result = await contract("triagem.aplicar", { bundle: before, proposta: proposal, confirmado: true, hoje: localDay(), tempo_ms: Date.now() });
       if (!mounted.current || ticket !== generation.current) throw new Error("A conversa mudou. Revise o lote antes de confirmar.");
-      commitBundle(localStorage, before, result.bundle);
+      commitBundle(clientStorage, before, result.bundle);
       change((c) => ({ ...c, drafts: [], links: [], separate: [], requests: 0, messages: [...c.messages, { role: "assistente", text: `Salvei ${selected.length} registro(s) e ${rels.length} vínculo(s). Pode continuar de onde parou ou me contar outro plano.` }].slice(-80) }));
       lastAPI.current = turnSignature(chatRef.current); toast(`${selected.length} registro(s) salvo(s) no aparelho`); setRefresh((v) => v + 1);
     } catch (e) { setError(e.message); }
@@ -159,7 +160,7 @@ export function TriageChat({ toast }) {
   };
   const updateExisting = (from, to) => { try {
     const c = chatRef.current;
-    const b = readBundle(localStorage), type = from.tipo;
+    const b = readBundle(clientStorage), type = from.tipo;
     const col = { tarefa: "tarefas", plano: "planos", medida: "medidas" }[type];
     const a = col ? b.vida[col].find((a) => a.id === to.id) : type === "livro" ? b.leitura.livros.find((a) => a.id === to.id) : b.caderno.assets.find((a) => a.id === to.id && a.tipo === type)?.campos;
     if (!a) throw new Error("Esse registro mudou. Tente novamente com a conversa atualizada.");
@@ -241,7 +242,7 @@ export function TriageChat({ toast }) {
         setBusy(true); setError(""); const ticket = ++generation.current;
         try {
           if (file.size > 1024 * 1024) throw new Error("A proposta deve ter até 1 MB.");
-          const proposal = JSON.parse(await file.text()), before = readBundle(localStorage);
+          const proposal = JSON.parse(await file.text()), before = readBundle(clientStorage);
           const checked = await contract("triagem.preparar", { bundle: before, rascunhos: proposal.operacoes, relacoes: proposal.relacoes, id: proposal.id });
           if (stableJSON(checked) !== stableJSON(proposal)) throw new Error("A proposta não corresponde ao contrato ou ao estado atual. Gere uma revisão atualizada na API local.");
           if (!mounted.current || ticket !== generation.current) return;
@@ -259,10 +260,10 @@ export function TriageChat({ toast }) {
     {removing && <section className="life-card" role="alertdialog" aria-label="Remover registro local"><p>Remover este registro do catálogo e seus vínculos? Conversas e cópias locais são independentes.</p><button className="life-button" disabled={busy} onClick={async () => {
       setBusy(true); setError(""); ++generation.current;
       try {
-        const before = readBundle(localStorage), next = structuredClone(before);
+        const before = readBundle(clientStorage), next = structuredClone(before);
         next.caderno.assets = next.caderno.assets.filter((a) => a.id !== removing.id || a.tipo !== removing.tipo);
         next.caderno.relacoes = next.caderno.relacoes.filter((r) => ![r.de, r.para].some((a) => a.id === removing.id && a.tipo === removing.tipo));
-        await contract("triagem.validar", { bundle: next }); commitBundle(localStorage, before, next);
+        await contract("triagem.validar", { bundle: next }); commitBundle(clientStorage, before, next);
         change((c) => ({ ...c, links: c.links.filter((r) => ![r.de, r.para].some((a) => a.id === removing.id && a.tipo === removing.tipo)) }));
         setRemoving(null); setRefresh((v) => v + 1); toast("Registro removido do aparelho");
       } catch (e) { setError(e.message); } finally { setBusy(false); }

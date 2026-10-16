@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <provider android:name="com.fintips.app.LibreraTestProvider" android:authorities="com.fintips.app.ci.test.librera" android:exported="true" android:grantUriPermissions="true" />
+  </application>
+</manifest>

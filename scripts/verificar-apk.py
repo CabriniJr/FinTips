@@ -34,7 +34,8 @@ if package.group(1) != expected_package:
     raise SystemExit("Pacote inesperado")
 permissoes = set(re.findall(r"uses-permission[^:\n]*:\s*name='([^']+)'", badging))
 esperadas = {"android.permission.INTERNET", "android.permission.FOREGROUND_SERVICE",
-             "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.POST_NOTIFICATIONS"}
+             "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.POST_NOTIFICATIONS",
+             "android.permission.RECEIVE_BOOT_COMPLETED"}
 internas = {f"{expected_package}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"}
 if not esperadas <= permissoes or permissoes - esperadas - internas or badging.count("launchable-activity:") != 1:
     raise SystemExit("Permissões/launcher não respeitam o contrato do servidor local")
@@ -44,12 +45,16 @@ if f"application-label:'{label}'" not in badging or f"label='{label}'" not in ba
 manifest = subprocess.check_output([str(tools / "aapt"), "dump", "xmltree", str(apk), "AndroidManifest.xml"], text=True)
 if not re.search(r"android:allowBackup[^\n]*=\s*\(type 0x12\)0x0\s*$", manifest, re.M):
     raise SystemExit("Backup automático não está desabilitado")
-service = re.search(r"(?ms)^(\s*)E: service\b.*?(?=^\1E:|\Z)", manifest)
-if not service or "com.fintips.app.McpLocalService" not in service.group(0) or not re.search(
-        r"android:exported[^\n]*=\s*\(type 0x12\)0x0\s*$", service.group(0), re.M):
+services = [m.group(0) for m in re.finditer(r"(?ms)^(\s*)E: service\b.*?(?=^\1E:|\Z)", manifest)]
+service = next((s for s in services if "com.fintips.app.McpLocalService" in s), None)
+if not service or "com.fintips.app.McpLocalService" not in service or not re.search(
+        r"android:exported[^\n]*=\s*\(type 0x12\)0x0\s*$", service, re.M):
     raise SystemExit("Serviço MCP ausente ou exportado")
-if "android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" not in service.group(0):
+if "android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" not in service:
     raise SystemExit("Finalidade do foreground service não declarada")
+job = next((s for s in services if "com.fintips.app.LibreraJobService" in s), None)
+if not job or 'android.permission.BIND_JOB_SERVICE' not in job or not re.search(r'android:exported[^\n]*=\s*\(type 0x12\)0xffffffff\s*$', job, re.M):
+    raise SystemExit("Job Librera não está protegido pela permissão do sistema")
 with zipfile.ZipFile(apk) as archive:
     files = [p for p in (root / "fintips/web").rglob("*") if p.is_file()]
     expected_assets = {"assets/" + str(p.relative_to(root / "fintips/web")) for p in files}

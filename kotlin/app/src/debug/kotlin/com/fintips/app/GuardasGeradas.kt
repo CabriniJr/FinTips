@@ -1,0 +1,4 @@
+// Gerado por scripts/gerar-guardas-android.py; não editar.
+package com.fintips.app
+
+internal const val GUARDAS_ANDROID = """{"schema_version":1,"guardas":{"estado":{"arquivo":"estado-cliente-v1.json","schema_version":1,"sensivel":true,"guarda":"privada_nativa_sem_backup_nuvem","autoridade":"vida_leitura_caderno_conversa_e_fonte_librera","migracao":"webview_v1_preservado_como_legado_somente_leitura"},"extratos":{"arquivo":"extratos-v1.json","schema_version":1,"sensivel":true,"guarda":"privada_nativa_sem_backup_nuvem","autoridade":"fontes_ofx","migracao":"schema_1_preservado"}}}"""

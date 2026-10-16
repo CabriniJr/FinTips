@@ -1,3 +1,4 @@
+import { hasNativeStorage } from "./native-storage.js";
 import { useEffect, useState } from "react";
 import { isAndroid, nativeMotor } from "./native-motor.js";
 import { projectContext } from "./ai-projection.js";
@@ -21,9 +22,12 @@ export function useLocalMcpSync(life) {
         if (!status.ativo || status.pausado) { setIssue(""); return; }
         session = status.sessao;
         if (life.blocked) throw new Error("dados indisponíveis");
-        const context = await projectContext(life.state, status.escopos);
-        if (ended) return;
-        await nativeMotor("servidor.atualizar", { sessao: session, context });
+        if (hasNativeStorage()) await nativeMotor("servidor.atualizar_nativo", { sessao: session });
+        else {
+          const context = await projectContext(life.state, status.escopos);
+          if (ended) return;
+          await nativeMotor("servidor.atualizar", { sessao: session, context });
+        }
         if (!ended) setIssue("");
       } catch {
         if (!ended && session) {

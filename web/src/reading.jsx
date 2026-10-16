@@ -1,3 +1,5 @@
+import { LibreraSource } from "./librera-source.jsx";
+import { clientStorage } from "./native-storage.js";
 import { CLIENT_STATE_KEY, writeSlice } from "./client-state.js";
 import React, { useCallback, useEffect, useState } from "react";
 import { Icon } from "./icons.jsx";
@@ -14,7 +16,7 @@ const dateLabel = (iso) => new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR
 
 function useReading() {
   const [initial] = useState(() => {
-    try { return { data: readReading(localStorage), blocked: false }; }
+    try { return { data: readReading(clientStorage), blocked: false }; }
     catch { return { data: emptyReading(), blocked: true }; }
   });
   const [state, setState] = useState(initial.data);
@@ -23,15 +25,15 @@ function useReading() {
   const update = useCallback((transform) => {
     if (blocked) return false;
     try {
-      const next = transform(readReading(localStorage));
+      const next = transform(readReading(clientStorage));
       if (!validateReading(next)) throw new Error("estado inválido");
-      writeSlice(localStorage, READING_KEY, "leitura", next); setState(next); setIssue(""); dispatchEvent(new Event("fintips:reading-changed")); return true;
+      writeSlice(clientStorage, READING_KEY, "leitura", next); setState(next); setIssue(""); dispatchEvent(new Event("fintips:reading-changed")); return true;
     } catch { setIssue("Não foi possível salvar os registros de leitura no aparelho. A alteração não foi gravada."); return false; }
   }, [blocked]);
   useEffect(() => {
     const refresh = (e) => {
       if (e.key !== READING_KEY && e.key !== CLIENT_STATE_KEY && e.key !== null) return;
-      try { setState(readReading(localStorage)); setBlocked(false); setIssue(""); }
+      try { setState(readReading(clientStorage)); setBlocked(false); setIssue(""); }
       catch { setBlocked(true); setIssue("Não foi possível ler os registros de leitura. A edição foi pausada para preservá-los."); }
     };
     addEventListener("storage", refresh); return () => removeEventListener("storage", refresh);
@@ -86,7 +88,7 @@ function ImportForm({ store, close, toast }) {
       {(issue || store.issue) && <p className="form-error" role="alert">{issue || store.issue}</p>}
       <button className="life-button primary full" disabled={busy || store.blocked || !file}>{busy ? "Lendo no aparelho…" : "Importar progresso local"}</button>
     </form>
-    <p className="reading-caption">A sincronização direta com a nuvem ainda não está conectada. O arquivo guarda a última posição; o histórico começa a se formar com as próximas atualizações.</p>
+    <p className="reading-caption">Esta é uma importação pontual. No Android, use Conectar arquivo do Librera para acompanhar uma fonte que se atualiza. O histórico começa com as posições que o FinTips observa.</p>
   </Sheet>;
 }
 
@@ -199,6 +201,7 @@ export function ReadingTracker({ toast }) {
   return <section className="life-card reading-card" aria-label="Leitura e ritmo">
     <div className="section-head"><h2>Seu próximo capítulo</h2><Icon name="book" size={22}/></div>
     <p className="reading-intro">Acompanhe o avanço nos livros e encontre um ritmo que cabe na semana.</p>
+    <LibreraSource toast={toast}/>
     <div className="reading-toolbar"><button className="life-button primary" disabled={store.blocked} onClick={() => open("new")}><Icon name="plus" size={17}/> Adicionar livro</button>
       <button className="life-button" disabled={store.blocked} onClick={() => open("import")}>Importar Librera</button></div>
     {store.issue && <p className="form-error" role="alert">{store.issue}</p>}

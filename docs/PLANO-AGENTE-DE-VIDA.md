@@ -3,8 +3,9 @@
 Status: plano de execução proposto em 16/10/2026, a partir da main `2d6981b`.
 Fronteira de privacidade revisada no mesmo dia após esclarecimento do usuário.
 Este documento especifica o destino; **não declara o agente completo disponível
-na preview 10**. A preview 10 já persiste extratos e oferece um resumo observado,
-mas ainda não integra o motor financeiro completo nesta experiência. Os
+na preview 12**. As previews 10/11 já persistem extratos e separam fluxos;
+a preview 12 adiciona guarda comum e fonte Librera persistente. Ainda não
+integram o motor financeiro completo nem o gestor semântico desta experiência. Os
 schemas/exemplos anexos são contratos de projeto, ainda sem endpoint anunciado.
 Substitui a direção da triagem por rascunhos de mensagens.
 
@@ -34,8 +35,8 @@ acoplável a agentes diferentes. Eles não produzem compreensão sozinhos.
 | Interpretação | `triagem-model.js`, `triagem_agente.py`, `AgenteTriagem.kt` | regras e léxico fechado; API recebe rascunhos/projeção, sem uma sessão semântica completa |
 | Operações do agente | protocolo `fintips_agente_v2` | preenche referências e vínculos, mas não oferece o ciclo consultar → decompor → simular → agendar → revisar |
 | Vida e agenda | `life-store.js`: `inicio` e `repetir` booleano | tarefa diária/pontual; não há sessões com duração, dias alternados e orçamento semanal |
-| Leitura | `reading.py`, `vida/Leitura.kt` e importador web | pacing existe; importação pontual, sem fonte persistente/worker |
-| Guarda | `client-state.js`, `triagem-store.js`; preview 10: `ExtratosLocais` | vida/leitura/catálogo continuam no WebView; extratos têm guarda nativa própria; P2 unifica interfaces/migração sem criar cópias concorrentes |
+| Leitura | pacing e, na preview 12, `LibreraFonte`/`LibreraJobService` | fonte persistente e job atualizam os mesmos livros; agenda e replanejamento do agente continuam pendentes |
+| Guarda | preview 12: `EstadoCliente`, `native-storage.js`; `ExtratosLocais` preservado | bundle/chat migrados para autoridade atômica nativa com CAS; tipos/consultas futuros exigem evolução com migrador; Workspace desktop mantém sua guarda |
 | Finanças | `plans.py`, `projection.py`, `profile.py`, `score.py` e portes | regras existem, mas o dispatcher Android expõe apenas parte; cadastro genérico no caderno não alimenta projeção financeira |
 | MCP Android/ponte | `ServidorLocal.kt`, `integracoes/ponte/` | consulta readonly reduzida; não expõe propostas/agenda/cenários deste plano |
 | Visualização | UI móvel e renderer Compose de gauges | bons componentes, mas faltam os dados/contratos integrados para alimentar o painel pretendido |
@@ -492,6 +493,10 @@ Continuar sem banco pessoal/snapshot no relay. Testar API e MCP com o SDK,
 inclusive cliente sem capacidade, replay, offline, cancelamento e revogação.
 
 ## Librera: um agendamento Android sobre a fonte escolhida
+
+A base desta seção foi implementada na preview 12 com SAF/JobScheduler e
+`EstadoCliente`; [uso, cobertura e limites](LIBRERA-AUTOMATICO.md). Os aceites
+do agente/agenda abaixo continuam exigindo as demais fases.
 
 O equivalente ao “cron lendo o path” é **WorkManager + URI persistente**, com
 seleção única pelo Storage Access Framework. Não exige digitar um path nem

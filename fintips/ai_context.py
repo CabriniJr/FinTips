@@ -49,3 +49,18 @@ def project_context(*, fronts: list[dict], plans: list[dict], reading: list[dict
             "fontes": [s for s in ("usuario", "librera") if any(r["source"] == s for r in reading)],
         }
     return result
+
+
+def project_bundle(bundle: dict, scopes: list[str], today: str) -> dict:
+    """Mesmo contrato v1, agora derivado da autoridade canônica sem WebView."""
+    from .reading import pacing
+    tasks=[t for t in bundle['vida']['tarefas'] if t['inicio'] <= today and (t['repetir'] or t['inicio']==today)]
+    done={r['tarefaId'] for r in bundle['vida']['registros'] if r['dia']==today}
+    fronts=[dict(area=a,total=sum(t['atributo']==a for t in tasks),done=sum(t['atributo']==a and t['id'] in done for t in tasks)) for a in AREAS]
+    plans=[dict(area=p['atributo'],done=p['concluido']) for p in bundle['vida']['planos']]
+    reading=[]
+    for b in bundle['leitura']['livros'] if 'leitura' in scopes else []:
+        result=pacing([dict(dia=p['dia'],progresso_bp=p['progresso_bp']) for p in b['observacoes']],today=today,deadline=b['prazo'] or None,reading_days=b['dias_semana'])
+        last=max(b['observacoes'],key=lambda o:o['dia'],default=None)
+        reading.append(dict(state=result['estado'],source=last['origem'] if last else b['fonte']))
+    return project_context(fronts=fronts,plans=plans,reading=reading,scopes=scopes)

@@ -154,6 +154,17 @@ class McpLocalService : Service() {
             if (service == null && op == "ponte.status") return JSONObject("{\"ativo\":false,\"estado\":\"encerrado\",\"autorizacoes\":[]}")
             return (service ?: throw FalhaPonte("SESSAO_ENCERRADA")).bridgeOperation(op, input)
         }
+        fun atualizarDaGuarda(context: android.content.Context, expectedSession: String? = null): JSONObject {
+            val service=current ?: return stopped()
+            val state=service.host.estado();val session=state["sessao"]?.jsonPrimitive?.content ?: return stopped()
+            if(expectedSession!=null) require(expectedSession==session)
+            if(state["pausado"]==JsonPrimitive(true)) return JSONObject(state.toString())
+            try {
+                val scopes=state["escopos"]!!.jsonArray.map { it.jsonPrimitive.content }
+                val projection=com.fintips.motor.projetarBundleIA(EstadoCliente(context).bundle(),scopes,java.time.LocalDate.now().toString())
+                return JSONObject(service.host.atualizar(session,projection).toString())
+            } catch(e:Exception) { runCatching { service.host.atualizar(session,null) };throw e }
+        }
         fun refreshNotification() { current?.notifyRunning() }
         fun pausar(session: String): JSONObject = JSONObject((current?.host?.pausar(session) ?: error("servidor encerrado")).toString())
         fun atualizar(session: String, raw: String?): JSONObject = JSONObject((current?.host?.atualizar(session,

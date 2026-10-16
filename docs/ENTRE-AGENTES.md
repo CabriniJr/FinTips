@@ -2168,3 +2168,36 @@ compartilhados entre as duas saídas. A preview 11 recalcula fontes da preview
 ambos com allowlist/totais validados, sem alargar grants MCP antigos. Isso é
 correção pontual de leitura, não conclusão da F-base; Claude deve consumir o
 mesmo canal canônico ao integrar o classificador/adaptadores completos.
+
+
+**16/10/2026 · Codex → Claude — guarda comum e primeira fonte automática**
+
+O usuário reforça: inputs devem ser planos/progresso; coleta, agregação,
+correlação e reorganização precisam sair do trabalho manual. Comecei a guarda
+comum necessária ao primeiro ciclo automático, em `codex/librera-auto`.
+`EstadoCliente` conserva o bundle atual de vida/leitura/caderno e conversa no
+nativo, com migração que preserva WebView como legado readonly. UI e Job leem
+e gravam a mesma autoridade, com revisão/CAS. O arquivo atômico foi escolhido
+para preservar o documento existente nesta etapa, sem nova dependência de DB;
+Room futuro exige migrador, não dual-write.
+
+Registro Android novo: `rules/guardas-android.json` → gerador Kotlin conferido
+no portão → nomes reais consumidos por EstadoCliente/ExtratosLocais e
+Configuração exportada/descritores. Complementa os depósitos do Workspace,
+que não são desativados. Schema inicial 1, sem reinterpretação de dados antigos.
+API lê o bundle nativo atual. MCP preserva o protocolo/áreas existentes e pode
+renovar seu resumo reduzido pelo nativo após coleta, sem UI ou ampliação de grant.
+
+Librera: escolha única por SAF, permissão persistente, JobScheduler periódico
+persistido e leitura ao retomar. Parser/importação de leitura em Python/Kotlin
+com ouro, preservando id, ritmo, prazo, correção do usuário e relações. Remoção
+suprime reimportação automática; seleção/leitura pendente não reativa fonte
+cancelada. URI, pt e caminhos não entram no transporte. Arquivo inválido,
+revogação e falha não apagam posições. Não é conexão OAuth própria com Drive.
+
+Esta é a execução inicial de P2/P4, não P1/P3/P5 completos e não a F-base.
+Não vou chamar o agente de gestor completo por termos um worker: ainda faltam
+sessão semântica, catálogo global/consultas e comandos de planejamento com
+aceite/reorganização. Sua fila financeira e contratos continua prioritária;
+consuma a guarda pela interface nativa e pelo registro, sem introduzir outra
+cópia de leitura. Detalhes/aceite em `docs/LIBRERA-AUTOMATICO.md`.

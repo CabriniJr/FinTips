@@ -1,0 +1,1925 @@
+{
+  "casos": [
+    {
+      "nome": "primeira_importacao",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.25,
+            "t": 1791986400000,
+            "pt": "PAGE_CONTENT_CANARY",
+            "path": "PRIVATE_PATH_CANARY"
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 1,
+        "atualizados": 1,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "repeticao",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.25,
+            "t": 1791986400000,
+            "pt": "PAGE_CONTENT_CANARY",
+            "path": "PRIVATE_PATH_CANARY"
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 0,
+        "atualizados": 0,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "atualizacao_mesmo_dia",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.32,
+            "t": 1791986401000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 3200,
+                  "tempo_ms": 1791986401000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 0,
+        "atualizados": 1,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 3200,
+                  "tempo_ms": 1791986401000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "arquivo_atrasado",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.15,
+            "t": 1791986399000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 0,
+        "atualizados": 0,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "correcao_usuario_vence",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 3600,
+                  "tempo_ms": 1791986400000,
+                  "origem": "usuario"
+                }
+              ]
+            }
+          ]
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.5,
+            "t": 1791986402000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 3600,
+                  "tempo_ms": 1791986400000,
+                  "origem": "usuario"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 0,
+        "atualizados": 0,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 3600,
+                  "tempo_ms": 1791986400000,
+                  "origem": "usuario"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "usuario"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "novo_dia",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.4,
+            "t": 1792072800000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                },
+                {
+                  "dia": "2026-10-15",
+                  "progresso_bp": 4000,
+                  "tempo_ms": 1792072800000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 0,
+        "atualizados": 1,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                },
+                {
+                  "dia": "2026-10-15",
+                  "progresso_bp": 4000,
+                  "tempo_ms": 1792072800000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "estimado"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "recuo_nao_e_conclusao",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.1,
+            "t": 1792072800000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                },
+                {
+                  "dia": "2026-10-15",
+                  "progresso_bp": 1000,
+                  "tempo_ms": 1792072800000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 0,
+        "atualizados": 1,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                },
+                {
+                  "dia": "2026-10-15",
+                  "progresso_bp": 1000,
+                  "tempo_ms": 1792072800000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "outro_perfil",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.25,
+            "t": 1791986400000,
+            "pt": "PAGE_CONTENT_CANARY",
+            "path": "PRIVATE_PATH_CANARY"
+          }
+        },
+        "profile": "trabalho",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            },
+            {
+              "id": "lib_2903bd245b8564b90f3f7f301766ae9f5a9861b8fb662b6851d7952d8eaeba49",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "trabalho",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 1,
+        "atualizados": 1,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_ad4bc10eb3b5c1d9784920d140a17f326454dced694337bf42d595d7d704f54c",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            },
+            {
+              "id": "lib_2903bd245b8564b90f3f7f301766ae9f5a9861b8fb662b6851d7952d8eaeba49",
+              "titulo": "Livro Sintético",
+              "fonte": "librera",
+              "chave": "Livro Sintético.epub",
+              "perfil": "trabalho",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-14",
+                  "progresso_bp": 2500,
+                  "tempo_ms": 1791986400000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "futuro",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "raw": {
+          "Livro.epub": {
+            "p": 0.8,
+            "t": 1792238400000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "adicionados": 0,
+        "atualizados": 0,
+        "ignorados": 1
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [],
+          "fontes": []
+        }
+      }
+    },
+    {
+      "nome": "removido_nao_reaparece",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "raw": {
+          "Livro Sintético.epub": {
+            "p": 0.25,
+            "t": 1791986400000,
+            "pt": "PAGE_CONTENT_CANARY",
+            "path": "PRIVATE_PATH_CANARY"
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": [
+          [
+            "principal",
+            "Livro Sintético.epub"
+          ]
+        ]
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "adicionados": 0,
+        "atualizados": 0,
+        "ignorados": 1
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [],
+          "fontes": []
+        }
+      }
+    },
+    {
+      "nome": "extensao_apenas",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "raw": {
+          ".epub": {
+            "p": 0.1,
+            "t": 1792152000000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_f3758f4bc6ed01beb022b8e32b50277520e657fea13f559f71d9b675bd829b67",
+              "titulo": ".epub",
+              "fonte": "librera",
+              "chave": ".epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-16",
+                  "progresso_bp": 1000,
+                  "tempo_ms": 1792152000000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "adicionados": 1,
+        "atualizados": 1,
+        "ignorados": 0
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": [
+            {
+              "id": "lib_f3758f4bc6ed01beb022b8e32b50277520e657fea13f559f71d9b675bd829b67",
+              "titulo": ".epub",
+              "fonte": "librera",
+              "chave": ".epub",
+              "perfil": "principal",
+              "prazo": "",
+              "dias_semana": null,
+              "observacoes": [
+                {
+                  "dia": "2026-10-16",
+                  "progresso_bp": 1000,
+                  "tempo_ms": 1792152000000,
+                  "origem": "librera"
+                }
+              ]
+            }
+          ]
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [
+            "calibrando"
+          ],
+          "fontes": [
+            "librera"
+          ]
+        }
+      }
+    },
+    {
+      "nome": "formas_invalidas",
+      "entrada": {
+        "reading": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "raw": {
+          "path/livro": {
+            "p": 0.2,
+            "t": 1792152000000
+          },
+          "float.epub": {
+            "p": 0.4,
+            "t": 1.0
+          },
+          "bad": {
+            "p": true,
+            "t": 1792152000000
+          }
+        },
+        "profile": "principal",
+        "now_ms": 1792152000000,
+        "zone": "America/Sao_Paulo",
+        "excluded": []
+      },
+      "resultado": {
+        "leitura": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "adicionados": 0,
+        "atualizados": 0,
+        "ignorados": 3
+      },
+      "bundle": {
+        "schema_version": 1,
+        "vida": {
+          "schema_version": 1,
+          "tarefas": [],
+          "registros": [],
+          "planos": [],
+          "medidas": []
+        },
+        "leitura": {
+          "schema_version": 1,
+          "livros": []
+        },
+        "caderno": {
+          "schema_version": 1,
+          "assets": [],
+          "relacoes": [],
+          "aplicacoes": []
+        }
+      },
+      "contexto_ia": {
+        "schema_version": 1,
+        "rotina": [
+          {
+            "area": "FOR",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "AGI",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "VIT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "INT",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "FOC",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          },
+          {
+            "area": "OURO",
+            "evidencia": "sem_metas",
+            "origem": "usuario"
+          }
+        ],
+        "planos": [
+          {
+            "area": "FOR",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "AGI",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "VIT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "INT",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "FOC",
+            "estado": "sem_planos"
+          },
+          {
+            "area": "OURO",
+            "estado": "sem_planos"
+          }
+        ],
+        "leitura": {
+          "estados": [],
+          "fontes": []
+        }
+      }
+    }
+  ]
+}

@@ -59,6 +59,8 @@ jobs:
         run: python -m pytest tests/ -q
       - name: contratos de triagem gerados conferem
         run: python scripts/gerar-contratos-triagem.py --conferir
+      - name: guardas Android derivadas conferem
+        run: python scripts/gerar-guardas-android.py --conferir
       - name: canais de importação derivados do Python conferem
         run: python scripts/gerar-canais-importacao.py --conferir
       - name: contrato proposto do agente permanece estruturalmente válido
@@ -144,6 +146,8 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -e . playwright==1.62.0
+      - name: Librera e guarda nativa na UI (bridge simulado)
+        run: python scripts/verificar-librera-ui.py
       - name: Extrato registrado e contexto nas abas (bridge simulado)
         run: python scripts/verificar-extrato-ui.py
       - name: Conversa até os registros, com Kotlin e HTTPS reais
@@ -155,4 +159,5 @@ jobs:
           path: |
             kotlin/conector/build/reports/triagem-ui/
             kotlin/conector/build/reports/extrato-ui/
+            kotlin/conector/build/reports/librera-ui/
           if-no-files-found: warn

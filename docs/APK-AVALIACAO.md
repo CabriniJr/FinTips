@@ -1,5 +1,9 @@
 # APK para avaliar a UI
 
+**Atualização preview 12:** guarda nativa comum com migração do WebView e
+Librera persistente por documento escolhido. Job atualiza os livros sem UI;
+retomar também atualiza. [Como usar e limites](LIBRERA-AUTOMATICO.md).
+
 **Atualização preview 11:** aplicações e resgates separados dos recebimentos e
 pagamentos identificados; estornos separados e Pix/fluxos desconhecidos a
 revisar. Movimento bruto fica em detalhe de conferência. A separação também
